@@ -388,7 +388,7 @@
 
   // PWA: offline-capable service worker, plus an "Install app" menu item when the browser allows it.
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-    addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {}));
+    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {});
   }
   const installBtn = document.querySelector('.nav-install');
   const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;

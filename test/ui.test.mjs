@@ -152,3 +152,10 @@ test('installable PWA: manifest, icons, head links, versioned service worker, of
   assert.match(read('offline.html'), /You’re offline/);
   assert.match(read('_headers'), /worker-src 'self'; manifest-src 'self'/);
 });
+
+test('UI copy has no hardcoded persona counts', () => {
+  const home = read('index.html');
+  assert.match(home, /Dead Thinkers Society\. AI personas of real, dead thinkers/);
+  assert.match(home, /Show all →/);
+  assert.doesNotMatch(home + read('thinkers/index.html') + read('about/index.html'), /\b\d+ (AI personas|thinkers|AI thinker personas)\b|Show all \d+/);
+});
