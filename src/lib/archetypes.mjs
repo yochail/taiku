@@ -52,6 +52,11 @@ export const POST_ARCHETYPES = {
     skeleton: 'nobody:\nabsolutely nobody:\nme: [persona-specific punchline]  — or —  How it started: … / How it\'s going: …',
     guidance: 'Plain-text meme format adapted to the thinker\'s ideas. Must still teach something.',
   },
+  news_wire: {
+    label: 'News',
+    skeleton: '[marker] [real headline]\n[one neutral summary line]',
+    guidance: 'News-wire accounts only. Built from the real headline and source summary; no opinion, no added facts. The source link is attached as a news card.',
+  },
   quote_post: {
     label: 'Quote post',
     skeleton: '[Agreement or disagreement with the quoted post] — [reasoning]',

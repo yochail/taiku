@@ -8,7 +8,7 @@ export const PERSONAS_DIR = path.join(ROOT, 'personas');
 export const POSTS_DIR = path.join(ROOT, 'content', 'posts');
 
 const REQUIRED_PERSONA_FIELDS = [
-  'id', 'name', 'handle', 'avatar', 'lifespan', 'region', 'tradition', 'school', 'headline', 'bio', 'location', 'background',
+  'id', 'kind', 'name', 'handle', 'avatar', 'lifespan', 'region', 'tradition', 'school', 'headline', 'bio', 'location', 'background',
   'core_ideas', 'key_works', 'voice', 'favorite_topics', 'pet_peeves', 'post_archetypes',
   'reply_archetypes', 'argument_style', 'news_lens', 'allies', 'rivals', 'never', 'sample_posts',
   'modernity', 'reactivity', 'topic_affinity', 'native_language', 'sensitive_notes', 'quotables', 'sources',
@@ -17,9 +17,26 @@ const REQUIRED_PERSONA_FIELDS = [
 
 export const TOPIC_KEYS = ['politics', 'world', 'tech', 'science', 'economy', 'culture', 'sports', 'religion', 'memes'];
 export const PERSONA_TOOLS = ['search_sources', 'get_quote', 'search_news'];
+// thinker = real deceased person; parody = fictional/abstract/historical-joke account; news = neutral fictional newswire.
+export const PERSONA_KINDS = ['thinker', 'parody', 'news'];
+export const HANDLE_RE = /^[A-Za-z0-9_]{4,15}$/;
+const ALWAYS_OPTIONAL = ['never', 'sensitive_notes'];
+const NON_THINKER_OPTIONAL = ['allies', 'rivals', 'quotables', 'key_works', 'native_language'];
+
+function optionalFor(p, k) {
+  return ALWAYS_OPTIONAL.includes(k) || (p.kind !== 'thinker' && NON_THINKER_OPTIONAL.includes(k));
+}
 
 function validateSkill(p, errors) {
   const e = (m) => errors.push(`persona ${p.id}: ${m}`);
+  if (!PERSONA_KINDS.includes(p.kind)) e(`kind must be one of ${PERSONA_KINDS.join('|')}`);
+  if (typeof p.handle === 'string' && !HANDLE_RE.test(p.handle)) e(`handle "${p.handle}" must be 4-15 chars of [A-Za-z0-9_] (X rules)`);
+  if (p.active_hours_utc !== undefined) {
+    const h = p.active_hours_utc;
+    if (!(Array.isArray(h) && h.length === 2 && h.every((x) => Number.isInteger(x) && x >= 0 && x <= 24))) e('active_hours_utc must be [startHour, endHour] in 0-24');
+  }
+  if (p.kind === 'news' && !(p.post_archetypes?.length === 1 && p.post_archetypes[0] === 'news_wire')) e('news accounts must use only the news_wire post archetype');
+  if (p.kind !== 'news' && p.post_archetypes?.includes('news_wire')) e('only news accounts may use news_wire');
   if (typeof p.bio === 'string' && [...p.bio].length > 160) e(`bio must be ≤160 chars (X limit), got ${[...p.bio].length}`);
   if (typeof p.location === 'string' && [...p.location].length > 30) e(`location must be ≤30 chars (X limit), got ${[...p.location].length}`);
   for (const k of ['modernity', 'reactivity']) {
@@ -48,6 +65,8 @@ function validateSkill(p, errors) {
   }
 }
 
+const kindRank = (p) => Math.max(0, PERSONA_KINDS.indexOf(p.kind));
+
 export function loadPersonas(dir = PERSONAS_DIR) {
   return fs
     .readdirSync(dir)
@@ -57,7 +76,7 @@ export function loadPersonas(dir = PERSONAS_DIR) {
       p._file = f;
       return p;
     })
-    .sort((a, b) => (a.born ?? 0) - (b.born ?? 0) || a.name.localeCompare(b.name));
+    .sort((a, b) => kindRank(a) - kindRank(b) || (a.born ?? 0) - (b.born ?? 0) || a.name.localeCompare(b.name));
 }
 
 export function listPostFiles(dir = POSTS_DIR) {
@@ -82,16 +101,16 @@ export function validate(personas, posts) {
   const handles = new Set();
   for (const p of personas) {
     for (const k of REQUIRED_PERSONA_FIELDS) {
-      if (p[k] === undefined || p[k] === null || (Array.isArray(p[k]) && p[k].length === 0 && !['never', 'sensitive_notes'].includes(k))) {
+      if (optionalFor(p, k) ? p[k] === undefined : p[k] === undefined || p[k] === null || (Array.isArray(p[k]) && p[k].length === 0)) {
         errors.push(`persona ${p._file}: missing "${k}"`);
       }
     }
     validateSkill(p, errors);
     if (p._file !== `${p.id}.json`) errors.push(`persona ${p._file}: filename must be ${p.id}.json`);
     if (ids.has(p.id)) errors.push(`duplicate persona id ${p.id}`);
-    if (handles.has(p.handle)) errors.push(`duplicate handle ${p.handle}`);
+    if (handles.has(String(p.handle).toLowerCase())) errors.push(`duplicate handle ${p.handle}`);
     ids.add(p.id);
-    handles.add(p.handle);
+    handles.add(String(p.handle).toLowerCase());
     for (const a of p.post_archetypes ?? []) if (!POST_ARCHETYPES[a]) errors.push(`persona ${p.id}: unknown post archetype ${a}`);
     for (const a of p.reply_archetypes ?? []) if (!REPLY_ARCHETYPES[a]) errors.push(`persona ${p.id}: unknown reply archetype ${a}`);
   }
@@ -113,6 +132,9 @@ export function validate(personas, posts) {
     if (!post.text || typeof post.text !== 'string') errors.push(`${where}: empty text`);
     else if ([...post.text].length > 320) errors.push(`${where}: text too long (${[...post.text].length})`);
     if (!ALL_TYPES[post.type]) errors.push(`${where}: unknown type ${post.type}`);
+    const author = personas.find((p) => p.id === post.authorId);
+    if (post.type === 'news_wire' && !(author?.kind === 'news' && post.news?.url)) errors.push(`${where}: news_wire posts need a news author and news.url`);
+    if (author?.kind === 'news' && post.type !== 'news_wire') errors.push(`${where}: news accounts only post news_wire`);
     if (Number.isNaN(Date.parse(post.createdAt))) errors.push(`${where}: bad createdAt`);
     if (post.inReplyTo && !postIds.has(post.inReplyTo)) errors.push(`${where}: inReplyTo missing ${post.inReplyTo}`);
     if (post.quoteOf && !postIds.has(post.quoteOf)) errors.push(`${where}: quoteOf missing ${post.quoteOf}`);

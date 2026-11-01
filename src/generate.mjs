@@ -4,7 +4,7 @@
 //   node src/generate.mjs                 # live (needs LLM_API_KEY or GITHUB_TOKEN)
 //   node src/generate.mjs --mock          # offline placeholder content, written to disk
 //   node src/generate.mjs --dry-run       # offline, prints what would be written, writes nothing
-//   options: --posts N  --replies N  --seed S  --live (use real LLM even with --dry-run)
+//   options: --posts N  --replies N  --wire N (newswire headline posts)  --seed S  --live (use real LLM even with --dry-run)
 import fs from 'node:fs';
 import path from 'node:path';
 import { POSTS_DIR, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
@@ -27,6 +27,7 @@ const cfg = llmConfig();
 const MOCK = flag('mock') || (DRY && !flag('live'));
 const N_POSTS = Number(opt('posts', process.env.GEN_POSTS ?? 3));
 const N_REPLIES = Number(opt('replies', process.env.GEN_REPLIES ?? 7));
+const N_WIRE = Number(opt('wire', process.env.GEN_WIRE ?? 3));
 const SEED = opt('seed', process.env.GEN_SEED ?? String(Date.now()));
 const rand = rng(SEED);
 
@@ -65,11 +66,22 @@ function lastPostedAt(personaId) {
   return t;
 }
 
+function isActive(p) {
+  if (!p.active_hours_utc) return true;
+  const [start, end] = p.active_hours_utc;
+  const h = new Date(now).getUTCHours();
+  return start <= end ? h >= start && h < end : h >= start || h < end;
+}
+
+// Opinion accounts: thinkers + parody (news wires never post opinions or reply).
+const voices = personas.filter((p) => p.kind !== 'news');
+const wires = personas.filter((p) => p.kind === 'news');
+
 function chooseAuthor(exclude) {
   return weightedPick(
     rand,
-    personas.filter((p) => !exclude.has(p.id)),
-    (p) => (p.popularity ?? 5) * Math.min(6, 1 + (now - lastPostedAt(p.id)) / (12 * HOUR)),
+    voices.filter((p) => !exclude.has(p.id) && isActive(p)),
+    (p) => (p.popularity ?? 5) * (p.kind === 'parody' ? 0.5 : 1) * Math.min(6, 1 + (now - lastPostedAt(p.id)) / (12 * HOUR)),
   );
 }
 
@@ -157,7 +169,13 @@ async function makePost(headlines, usedNews, usedAuthors) {
   if (freshNews.length && rand() < 0.35) archetype = 'news_take';
   let news = null;
   let quoted = null;
-  if (archetype === 'news_take') {
+  // Prefer quote-taiking today's wire posts so news threads cluster around the newswire.
+  const freshWires = created.filter((p) => p.type === 'news_wire' && !all.some((q) => q.quoteOf === p.id && q.authorId === persona.id));
+  if (freshWires.length && rand() < 0.6) {
+    quoted = pick(rand, freshWires);
+    news = quoted.news;
+    archetype = 'news_take';
+  } else if (archetype === 'news_take') {
     if (!freshNews.length) archetype = pick(rand, persona.post_archetypes.filter((a) => a !== 'news_take' && a !== 'quote_post'));
     else {
       news = pick(rand, freshNews.slice(0, 12));
@@ -230,7 +248,7 @@ async function makeReply() {
   const inConvo = new Set(chain.map((c) => c.authorId));
   const replier = weightedPick(
     rand,
-    personas.filter((p) => p.id !== target.authorId),
+    voices.filter((p) => p.id !== target.authorId),
     (p) => {
       const rel = relation(p.id, target.authorId);
       const w = rel === 'rival' ? 5 : rel === 'ally' ? 3.5 : 0.5;
@@ -262,6 +280,34 @@ async function makeReply() {
   return `${replier.name} → ${byId.get(target.authorId).name} [${archetype}] ${text.slice(0, 60)}…`;
 }
 
+// Neutral newswire post built straight from the headline: no LLM, so no added facts or opinions.
+function makeWire(headlines, usedNews, i) {
+  const fresh = headlines.filter((h) => !usedNews.has(h.url));
+  if (!fresh.length || !wires.length) throw new Error('no fresh headlines for the wire');
+  const h = fresh[0];
+  usedNews.add(h.url);
+  const wire = wires[i % wires.length];
+  const marker = wire.voice.tics[0] ?? '📰';
+  const clip = (s, n) => (s.length <= n ? s : s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…');
+  const title = clip(h.title.replace(/\s+/g, ' ').trim(), 150);
+  const summary = (h.description ?? '').replace(/\s+/g, ' ').trim();
+  const text = `${marker} ${title}${summary && summary !== h.title ? `\n${clip(summary, 270 - marker.length - title.length - 2)}` : ''}`;
+  add({
+    id: newId(new Date(), rand),
+    authorId: wire.id,
+    type: 'news_wire',
+    text,
+    createdAt: nextTime(),
+    inReplyTo: null,
+    quoteOf: null,
+    tags: [],
+    news: { title: h.title, url: h.url, source: h.source },
+    citation: null,
+    origin: 'wire',
+  });
+  return `${wire.name} [news_wire] ${title.slice(0, 70)}`;
+}
+
 // ---------- run ----------
 
 const headlines = MOCK ? MOCK_HEADLINES : await fetchHeadlines();
@@ -270,11 +316,12 @@ const usedAuthors = new Set();
 console.log(`Generator: provider=${provider.name} posts=${N_POSTS} replies=${N_REPLIES} headlines=${headlines.length} seed=${SEED}${DRY ? ' (dry-run)' : ''}`);
 
 let failures = 0;
-const steps = [...Array(N_POSTS).fill('post'), ...Array(N_REPLIES).fill('reply')];
-// interleave: posts first so replies can target fresh posts, but sprinkle replies in between
+const steps = [...Array(N_WIRE).fill('wire'), ...Array(N_POSTS).fill('post'), ...Array(N_REPLIES).fill('reply')];
+// wires first (the day's topics), then posts so replies can target fresh posts
+let wireN = 0;
 for (const step of steps) {
   try {
-    const msg = step === 'post' ? await makePost(headlines, usedNews, usedAuthors) : await makeReply();
+    const msg = step === 'wire' ? makeWire(headlines, usedNews, wireN++) : step === 'post' ? await makePost(headlines, usedNews, usedAuthors) : await makeReply();
     console.log('  + ' + msg);
   } catch (e) {
     failures++;

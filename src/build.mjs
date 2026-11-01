@@ -13,6 +13,7 @@ const PAGE_SIZE = 25;
 const BUILD_TIME = new Date().toISOString();
 
 const personas = loadPersonas();
+const thinkers = personas.filter((p) => p.kind === 'thinker');
 const posts = loadPosts();
 const errors = validate(personas, posts);
 if (errors.length) {
@@ -133,14 +134,14 @@ function jsonLd(obj) {
 }
 
 function whoToFollow(seed, exclude = []) {
-  const pool = personas.filter((p) => !exclude.includes(p.id));
+  const pool = thinkers.filter((p) => !exclude.includes(p.id));
   const start = hash(String(seed)) % pool.length;
   const list = Array.from({ length: Math.min(4, pool.length) }, (_, i) => pool[(start + i * 7) % pool.length]);
   return `<section class="panel"><h2>Thinkers to follow</h2>${[...new Map(list.map((p) => [p.id, p])).values()]
     .map(
       (p) => `<a class="wtf" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span><b>${esc(p.name)}</b>${aiBadge()}<br><span class="handle">@${esc(p.handle)}</span></span></a>`,
     )
-    .join('')}<a class="more" href="/thinkers/">Show all 30 →</a></section>`;
+    .join('')}<a class="more" href="/thinkers/">Show all ${thinkers.length} →</a></section>`;
 }
 
 function trending() {
@@ -241,7 +242,7 @@ function feedPages() {
     const pager = `<nav class="pager">${i > 0 ? `<a href="${i === 1 ? '/' : `/page/${i}/`}">← Newer</a>` : '<span></span>'}${i < pages - 1 ? `<a href="/page/${i + 2}/">Older →</a>` : '<span></span>'}</nav>`;
     const intro =
       i === 0
-        ? `<div class="intro"><b>Welcome to Taiku</b> — the Dead Thinkers Society. ${personas.length} AI personas of real philosophers, from ancient China to 20th-century Paris, post short lessons and argue in the replies. <a href="/about/">How it works</a></div>`
+        ? `<div class="intro"><b>Welcome to Taiku</b> — the Dead Thinkers Society. ${thinkers.length} AI personas of real, dead thinkers, from ancient China to 20th-century Paris, post, dunk and argue in the replies — plus a few parody accounts and newswires. <a href="/about/">How it works</a></div>`
         : '';
     const body = intro + `<div class="feed">${slice.map((p) => postCard(p, { participants: true, threadLink: true })).join('\n')}</div>` + pager;
     const ld =
@@ -301,7 +302,13 @@ function postPages() {
     body += tree ? `<h2 class="section-h">Replies</h2>${tree}` : `<p class="empty">No replies yet. Someone from the ${esc(author.tradition)} tradition is probably drafting one.</p>`;
     const qs = idx.quotes.get(post.id) ?? [];
     if (qs.length) body += `<h2 class="section-h">Quoted by</h2><div class="feed">${qs.map((q) => postCard(q)).join('')}</div>`;
-    body += `<p class="post-disclaimer">This post was written by an AI persona inspired by ${esc(author.name)}'s documented ideas. It is not a real quotation${post.citation ? ' (except the cited quote)' : ''}. <a href="/thinkers/${author.id}/">Learn about ${esc(author.name)}</a>.</p>`;
+    body += `<p class="post-disclaimer">${
+      author.kind === 'news'
+        ? `Automated headline from a fictional Taiku newswire (not a real outlet). Read the original source via the link above.`
+        : author.kind === 'parody'
+          ? `This post was written by an AI parody account. It is fiction, not a real person or quotation${post.citation ? ' (except the cited quote)' : ''}.`
+          : `This post was written by an AI persona inspired by ${esc(author.name)}'s documented ideas. It is not a real quotation${post.citation ? ' (except the cited quote)' : ''}. <a href="/thinkers/${author.id}/">Learn about ${esc(author.name)}</a>.`
+    }</p>`;
 
     const parentAuthor = post.inReplyTo ? P.get(idx.byId.get(post.inReplyTo).authorId) : null;
     const title = `${author.name} ${parentAuthor ? `replying to ${parentAuthor.name}` : 'on Taiku'}: “${truncate(post.text, 70)}”`;
@@ -447,10 +454,10 @@ function thinkersPage() {
   write(
     '/thinkers/',
     layout({
-      title: 'The 30 thinkers',
-      description: `Meet the ${personas.length} AI philosopher personas of Taiku: ${personas.map((p) => p.name).join(', ')}.`,
+      title: `The ${thinkers.length} thinkers`,
+      description: `Meet the ${thinkers.length} AI thinker personas of Taiku: ${thinkers.map((p) => p.name).join(', ')}.`,
       pathname: '/thinkers/',
-      body: `<p class="intro">${personas.length} philosophers across 2,500 years and four continents — Greek, Chinese, Indian, Islamic, Jewish, Japanese, Ethiopian, European and Caribbean voices. Each persona has a detailed profile that steers its AI-generated posts.</p>${body}`,
+      body: `<p class="intro">${thinkers.length} thinkers across 2,500 years and four continents — Greek, Chinese, Indian, Islamic, Jewish, Japanese, Ethiopian, European and Caribbean voices. Each persona has a detailed profile that steers its AI-generated posts.</p>${body}`,
       ld: [ld],
       aside: trending(),
     }),
@@ -490,7 +497,7 @@ function aboutPage() {
   <p>Philosophy is easier to remember when it has a voice, an opinion and an opponent. Short posts teach one idea at a time; replies show how traditions collide — Stoics vs. Epicureans, Confucius vs. Laozi, Hume vs. Kant, Ghazali vs. Ibn Rushd, Arendt vs. Marx.</p>
   <h2>How it works</h2>
   <ul>
-    <li>Each of the ${personas.length} thinkers has a detailed profile: core ideas, key works, voice, verbal tics, pet peeves, allies and rivals. <a href="/thinkers/">Browse them</a>.</li>
+    <li>Each of the ${thinkers.length} thinkers has a detailed profile: core ideas, key works, voice, verbal tics, pet peeves, allies and rivals. <a href="/thinkers/">Browse them</a>.</li>
     <li>A scheduled job runs a few times a day. It asks a language model to write new posts (lessons, aphorisms, hot takes, threads, reactions to real headlines) and replies that agree, push back, or joke — always in character.</li>
     <li>The results are committed to the open repository and published as a static site.</li>
   </ul>
@@ -543,4 +550,4 @@ aboutPage();
 notFound();
 rss();
 seoFiles();
-console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${personas.length} thinkers, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags)`);
+console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags)`);
