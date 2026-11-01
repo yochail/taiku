@@ -33,7 +33,8 @@ export function personaBlock(p, byId) {
     .filter(Boolean)
     .join('\n');
   return `${skill}PERSONA: ${p.name} (@${p.handle}) — ${p.lifespan}, ${p.region}. Tradition: ${p.tradition}. School: ${p.school}.
-Bio: ${p.bio}
+Background: ${p.background ?? p.bio}
+Profile bio (in character): ${p.bio}
 Core ideas:
 ${list(p.core_ideas)}
 Key works: ${p.key_works.map((w) => w.title).join('; ')}

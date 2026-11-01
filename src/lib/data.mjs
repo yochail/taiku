@@ -8,7 +8,7 @@ export const PERSONAS_DIR = path.join(ROOT, 'personas');
 export const POSTS_DIR = path.join(ROOT, 'content', 'posts');
 
 const REQUIRED_PERSONA_FIELDS = [
-  'id', 'name', 'handle', 'avatar', 'lifespan', 'region', 'tradition', 'school', 'headline', 'bio',
+  'id', 'name', 'handle', 'avatar', 'lifespan', 'region', 'tradition', 'school', 'headline', 'bio', 'location', 'background',
   'core_ideas', 'key_works', 'voice', 'favorite_topics', 'pet_peeves', 'post_archetypes',
   'reply_archetypes', 'argument_style', 'news_lens', 'allies', 'rivals', 'never', 'sample_posts',
   'modernity', 'reactivity', 'topic_affinity', 'native_language', 'sensitive_notes', 'quotables', 'sources',
@@ -20,6 +20,8 @@ export const PERSONA_TOOLS = ['search_sources', 'get_quote', 'search_news'];
 
 function validateSkill(p, errors) {
   const e = (m) => errors.push(`persona ${p.id}: ${m}`);
+  if (typeof p.bio === 'string' && [...p.bio].length > 160) e(`bio must be ≤160 chars (X limit), got ${[...p.bio].length}`);
+  if (typeof p.location === 'string' && [...p.location].length > 30) e(`location must be ≤30 chars (X limit), got ${[...p.location].length}`);
   for (const k of ['modernity', 'reactivity']) {
     if (p[k] !== undefined && !(Number.isInteger(p[k]) && p[k] >= 1 && p[k] <= 5)) e(`${k} must be an integer 1-5`);
   }
