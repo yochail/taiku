@@ -1,218 +1,687 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://taiku.app/schemas/persona.schema.json",
-  "title": "Taiku persona (full profile, schemaVersion 2)",
-  "description": "One file per persona: personas/<id>.json. Everything the generator needs to run an agentic LLM turn as this persona (skill = system prompt, tools search its quote bank + local public-domain sources) and everything the site needs for the X-style profile.",
+  "title": "Taiku persona (schemaVersion 3)",
+  "description": "One file per persona: personas/<id>.json. Canonical content comes from the content lead (docs/persona-bible.md is generated from these files). Everything is keyed on `id`; `handle` is display-only and may change. kind=thinker needs the full thinker profile (enforced in src/lib/data.mjs); kind=news|parody accounts need only the account + skill fields. INTERNAL fields (voice, dials, relations, system_prompt, tools, x_behavior…) drive the LLM and the reaction model and must never be rendered on public pages (scripts/check.mjs enforces this).",
   "type": "object",
-  "additionalProperties": false,
+  "additionalProperties": true,
   "required": [
-    "schemaVersion", "id", "name", "handle", "born", "died", "lifespan", "era_group", "region", "tradition", "school",
-    "wikipedia", "popularity", "modernity", "reactivity", "headline", "bio", "core_ideas", "voice", "signature_moves",
-    "topic_affinity", "favorite_topics", "pet_peeves", "argument_style", "news_lens", "allies", "rivals",
-    "native_lang", "native_phrases", "anchors", "reading_list", "sources", "quote_policy", "quote_bank",
-    "sensitive_notes", "never", "post_archetypes", "reply_archetypes", "sample_posts", "x_behavior", "x_profile",
-    "avatar", "avatar_prompt", "skill"
+    "id",
+    "name",
+    "handle",
+    "avatar",
+    "bio",
+    "location",
+    "popularity",
+    "reactivity",
+    "topic_affinity",
+    "system_prompt"
   ],
   "properties": {
-    "schemaVersion": { "const": 2 },
-    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,30}$", "description": "Stable id = file name = URL slug (/thinkers/<id>/)." },
-    "name": { "type": "string", "minLength": 2 },
-    "handle": { "type": "string", "pattern": "^[A-Za-z0-9_]{1,15}$", "description": "X-style @handle without the @ (≤15 chars)." },
-    "born": { "type": "integer", "description": "Birth year; negative = BCE. Used for sorting." },
-    "died": { "type": "integer", "description": "Death year; negative = BCE. Only deceased persons." },
-    "lifespan": { "type": "string", "description": "Display string, e.g. 'c. 470–399 BCE'." },
-    "birth_display": { "type": "string" },
-    "death_display": { "type": "string" },
-    "era_group": { "enum": ["Ancient world (before 500 CE)", "Medieval & early modern (500–1700)", "Enlightenment & 19th century (1700–1900)", "20th century"] },
-    "region": { "type": "string" },
-    "tradition": { "type": "string" },
-    "school": { "type": "string" },
-    "wikipedia": { "type": "string", "format": "https-uri" },
-    "popularity": { "type": "integer", "minimum": 1, "maximum": 10 },
-    "modernity": { "type": "integer", "minimum": 1, "maximum": 5, "description": "Voice guide §3: 1 = fully era voice … 5 = terminally online." },
-    "reactivity": { "type": "integer", "minimum": 1, "maximum": 5, "description": "How often they jump into replies (1 rare … 5 constant)." },
-    "headline": { "type": "string", "maxLength": 200, "description": "X bio line (in voice)." },
-    "bio": { "type": "string", "minLength": 80, "description": "Factual biography summary (third person)." },
-    "core_ideas": { "type": "array", "minItems": 3, "items": { "type": "string" } },
+    "schemaVersion": {
+      "const": 3
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]{2,40}$"
+    },
+    "kind": {
+      "enum": [
+        "thinker",
+        "parody",
+        "news"
+      ],
+      "description": "Default thinker."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Field for non-philosopher thinkers (e.g. physics, psychology); default philosophy."
+    },
+    "name": {
+      "type": "string"
+    },
+    "handle": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_]{1,30}$",
+      "description": "Display only; never used as a key."
+    },
+    "avatar": {
+      "type": "object",
+      "required": [
+        "emoji",
+        "color"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "emoji": {
+          "type": "string"
+        },
+        "initials": {
+          "type": "string",
+          "maxLength": 3
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "image": {
+          "type": "string",
+          "pattern": "^/avatars/[a-z0-9_-]+\\.(webp|png|jpg|svg)$"
+        },
+        "banner": {
+          "type": "string",
+          "pattern": "^/avatars/[a-z0-9_-]+\\.(webp|png|jpg|svg)$"
+        }
+      }
+    },
+    "attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "licenseUrl": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "modified": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "born": {
+      "type": "integer"
+    },
+    "died": {
+      "type": "integer"
+    },
+    "lifespan": {
+      "type": "string"
+    },
+    "birth_display": {
+      "type": "string"
+    },
+    "death_display": {
+      "type": "string"
+    },
+    "era_group": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "tradition": {
+      "type": "string"
+    },
+    "school": {
+      "type": "string"
+    },
+    "wikipedia": {
+      "type": "string",
+      "format": "https-uri"
+    },
+    "popularity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "headline": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 160
+    },
+    "location": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "background": {
+      "type": "string"
+    },
+    "core_ideas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "key_works": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "voice": {
       "type": "object",
-      "required": ["style", "tone", "humor", "formatting", "tics"],
+      "required": [
+        "style",
+        "tone",
+        "tics"
+      ],
       "properties": {
-        "style": { "type": "string" },
-        "tone": { "type": "string" },
-        "humor": { "type": "string" },
-        "formatting": { "type": "string" },
-        "tics": { "type": "array", "minItems": 2, "items": { "type": "string" } },
-        "slang_examples": { "type": "array", "items": { "type": "string" } },
-        "do": { "type": "array", "items": { "type": "string" } },
-        "dont": { "type": "array", "items": { "type": "string" } }
+        "style": {
+          "type": "string"
+        },
+        "tone": {
+          "type": "string"
+        },
+        "humor": {
+          "type": "string"
+        },
+        "formatting": {
+          "type": "string"
+        },
+        "tics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "slang_examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "do": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dont": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
-    "signature_moves": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+    "favorite_topics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pet_peeves": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "post_archetypes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reply_archetypes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "argument_style": {
+      "type": "string"
+    },
+    "news_lens": {
+      "type": "string"
+    },
+    "allies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "why"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rivals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "why"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "frenemies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "why"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "never": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sample_posts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "signature_moves": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "modernity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "reactivity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
     "topic_affinity": {
       "type": "object",
-      "description": "topic → 0..1. Keys from: politics, tech, ai, science, business, economy, sports, culture, celebrity, religion, health, education, war, climate, law, media, memes, relationships, work.",
-      "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 }
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
     },
-    "favorite_topics": { "type": "array", "minItems": 2, "items": { "type": "string" } },
-    "pet_peeves": { "type": "array", "minItems": 1, "items": { "type": "string" } },
-    "argument_style": { "type": "string" },
-    "news_lens": { "type": "string" },
-    "allies": { "type": "array", "items": { "$ref": "#/$defs/relation" } },
-    "rivals": { "type": "array", "items": { "$ref": "#/$defs/relation" } },
-    "frenemies": { "type": "array", "items": { "$ref": "#/$defs/relation" } },
-    "native_lang": {
+    "native_language": {
       "type": "object",
-      "required": ["code", "name"],
+      "required": [
+        "name",
+        "phrases"
+      ],
       "properties": {
-        "code": { "type": "string", "description": "BCP-47-ish code: grc, la, lzh (Classical Chinese), sa, ar, he, ja, gez, de, fr, it, da, nl, en, sco…" },
-        "name": { "type": "string" }
-      }
-    },
-    "native_phrases": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["original", "english"],
-        "additionalProperties": false,
-        "properties": {
-          "original": { "type": "string" },
-          "translit": { "type": "string" },
-          "english": { "type": "string" }
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "phrases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "text",
+              "translation"
+            ],
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "translation": {
+                "type": "string"
+              },
+              "translit": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
-    "anchors": {
+    "sensitive_notes": {
       "type": "array",
-      "minItems": 2,
-      "description": "Real-idea anchors: grounding for takes; source of Community Notes.",
       "items": {
-        "type": "object",
-        "required": ["idea", "work"],
-        "additionalProperties": false,
-        "properties": {
-          "idea": { "type": "string" },
-          "work": { "type": "string" },
-          "section": { "type": "string" },
-          "url": { "type": "string", "format": "https-uri" }
-        }
+        "type": "string"
       }
     },
-    "reading_list": {
+    "quotables": {
       "type": "array",
-      "minItems": 1,
-      "description": "Profile 'Reading list' tab: key works, with a free/legit link where available.",
+      "description": "Verified real lines (content lead). The only lines besides quote_bank passages that may be quoted.",
       "items": {
         "type": "object",
-        "required": ["title"],
-        "additionalProperties": false,
+        "required": [
+          "id",
+          "text",
+          "citation",
+          "source_url"
+        ],
         "properties": {
-          "title": { "type": "string" },
-          "year": { "type": ["integer", "string"] },
-          "url": { "type": "string", "format": "https-uri" },
-          "note": { "type": "string" }
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 3
+          },
+          "context": {
+            "type": "string"
+          },
+          "citation": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string",
+            "format": "https-uri"
+          },
+          "wording": {
+            "type": "string"
+          },
+          "lang": {
+            "type": "string"
+          }
         }
       }
     },
     "sources": {
       "type": "array",
-      "description": "Public-domain texts. If `local` is set, an excerpt file is committed at that repo path (fetched by scripts/fetch-sources.mjs) and search_quotes searches it offline.",
       "items": {
         "type": "object",
-        "required": ["id", "title", "license", "url", "quotable"],
+        "required": [
+          "title",
+          "kind",
+          "url"
+        ],
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
-          "title": { "type": "string" },
-          "author": { "type": "string" },
-          "translator": { "type": "string" },
-          "year": { "type": ["integer", "string"] },
-          "license": { "enum": ["public-domain", "cc-by", "cc-by-sa"] },
-          "url": { "type": "string", "format": "https-uri", "description": "Human-readable page (Wikisource, Gutenberg, ctext.org…)." },
-          "download": { "type": "string", "format": "https-uri", "description": "Plain-text download URL used by the fetch script." },
-          "local": { "type": "string", "pattern": "^sources/[a-z0-9_]+/[a-z0-9_.-]+\\.txt$" },
-          "quotable": { "type": "boolean", "description": "May verbatim spans from this text appear in quotation marks (with citation)?" },
-          "excerpt": { "type": "object", "description": "Optional slicing rules for the fetch script (start/end markers, maxChars)." }
-        }
-      }
-    },
-    "quote_policy": { "enum": ["quote_bank", "paraphrase_only"], "description": "paraphrase_only = this persona may never use quotation marks to present words as theirs (copyrighted or no reliable PD translation)." },
-    "quote_bank": {
-      "type": "array",
-      "description": "Curated verbatim passages. `text` must be an exact substring (whitespace-normalised) of the local file of `sourceId`.",
-      "items": {
-        "type": "object",
-        "required": ["id", "text", "sourceId", "work", "section"],
-        "additionalProperties": false,
-        "properties": {
-          "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
-          "text": { "type": "string", "minLength": 10, "maxLength": 240 },
-          "sourceId": { "type": "string" },
-          "work": { "type": "string" },
-          "section": { "type": "string" },
-          "tags": { "type": "array", "items": { "type": "string" } }
-        }
-      }
-    },
-    "sensitive_notes": { "type": "array", "items": { "type": "string" }, "description": "e.g. repugnant historical views: never voiced approvingly; may be dunked on by others." },
-    "never": { "type": "array", "items": { "type": "string" } },
-    "post_archetypes": { "type": "array", "minItems": 2, "items": { "type": "string" } },
-    "reply_archetypes": { "type": "array", "minItems": 2, "items": { "type": "string" } },
-    "sample_posts": { "type": "array", "minItems": 3, "items": { "type": "string" } },
-    "x_behavior": {
-      "type": "object",
-      "required": ["activity", "reply_rate", "like_rate", "quote_rate", "repost_rate"],
-      "description": "Engagement-simulation traits (0..1 rates etc.)."
-    },
-    "x_profile": {
-      "type": "object",
-      "required": ["location", "joined", "following", "followers", "banner"],
-      "additionalProperties": false,
-      "properties": {
-        "location": { "type": "string" },
-        "joined": { "type": "string", "description": "In-joke 'Joined' line, e.g. 'Joined 399 BCE (posthumously)'." },
-        "website": { "type": "string", "format": "https-uri" },
-        "following": { "type": "integer", "minimum": 0 },
-        "followers": { "type": "integer", "minimum": 0, "description": "Simulated." },
-        "pinned": { "type": ["string", "null"], "description": "Post id of the pinned taik." },
-        "banner": {
-          "type": "object",
-          "required": ["from", "to", "motif"],
-          "additionalProperties": false,
-          "properties": {
-            "from": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
-            "to": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
-            "motif": { "enum": ["columns", "waves", "mountains", "stars", "grid", "sun", "ink", "garden", "city", "desert", "lens", "barrel"] }
+          "title": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "primary",
+              "reference"
+            ]
+          },
+          "public_domain": {
+            "type": "boolean"
+          },
+          "reading_list": {
+            "type": "boolean",
+            "description": "Shown on the profile Reading list tab."
+          },
+          "url": {
+            "type": "string",
+            "format": "https-uri"
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "local": {
+            "type": "string",
+            "pattern": "^sources/[a-z0-9_]+/[A-Za-z0-9_.-]+\\.txt$"
+          },
+          "download": {
+            "type": "string",
+            "format": "https-uri"
+          },
+          "quotable": {
+            "type": "boolean"
+          },
+          "license": {
+            "enum": [
+              "public-domain",
+              "cc-by",
+              "cc-by-sa"
+            ]
+          },
+          "translator": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "author": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": "object"
           }
         }
       }
     },
-    "avatar": {
-      "type": "object",
-      "required": ["emoji", "initials", "color"],
-      "additionalProperties": false,
-      "properties": {
-        "emoji": { "type": "string" },
-        "initials": { "type": "string", "maxLength": 3 },
-        "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
-        "image": { "type": "string", "description": "Optional committed image path under public/ (e.g. /img/avatars/kant.svg)." }
+    "search_hints": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     },
-    "avatar_prompt": { "type": "string" },
-    "skill": {
-      "type": "string",
-      "minLength": 400,
-      "description": "The persona 'skill': system-prompt text loaded for every LLM turn as this persona (second person, voice + rules + how to use tools)."
-    }
-  },
-  "$defs": {
-    "relation": {
+    "tools": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "search_sources",
+          "get_quote",
+          "search_news",
+          "get_thread"
+        ]
+      }
+    },
+    "system_prompt": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "The persona skill: paragraphs loaded as the system prompt of every agentic turn."
+    },
+    "quote_policy": {
+      "enum": [
+        "quote_bank",
+        "paraphrase_only"
+      ]
+    },
+    "quote_bank": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "text",
+          "sourceId",
+          "work",
+          "section"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 240
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "work": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "anchors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "idea",
+          "work"
+        ],
+        "properties": {
+          "idea": {
+            "type": "string"
+          },
+          "work": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "https-uri"
+          }
+        }
+      }
+    },
+    "avatar_prompt": {
+      "type": "string"
+    },
+    "x_behavior": {
       "type": "object",
-      "required": ["id", "why"],
-      "additionalProperties": false,
+      "required": [
+        "activity",
+        "reply_rate",
+        "like_rate",
+        "quote_rate",
+        "repost_rate"
+      ],
       "properties": {
-        "id": { "type": "string" },
-        "why": { "type": "string" }
+        "activity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "reply_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "like_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "quote_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "repost_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "x_profile": {
+      "type": "object",
+      "properties": {
+        "joined": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string",
+          "format": "https-uri"
+        },
+        "following": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "followers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pinned": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "banner": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string"
+            },
+            "to": {
+              "type": "string"
+            },
+            "motif": {
+              "type": "string"
+            }
+          }
+        }
       }
     }
   }

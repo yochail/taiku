@@ -157,12 +157,35 @@ export function safeUrl(u, { hosts = null } = {}) {
 }
 
 // ---------------------------------------------------------------------------
+export const TOPIC_KEYS = ['politics', 'world', 'tech', 'science', 'economy', 'culture', 'sports', 'religion', 'memes'];
+/** Final agentic tool names (persona `tools`). */
+export const PERSONA_TOOLS = ['search_sources', 'get_quote', 'search_news', 'get_thread'];
+export const personaKind = (p) => p?.kind ?? 'thinker';
+const THINKER_FIELDS = ['lifespan', 'region', 'school', 'core_ideas', 'key_works', 'voice', 'allies', 'rivals', 'never', 'sample_posts', 'modernity', 'native_language', 'quotables', 'sources', 'post_archetypes', 'reply_archetypes'];
+
+/** Public-domain/verified quotable passage lookup: quote_bank (local source spans) + quotables (content-lead verified lines). */
+export function findQuotable(p, id) {
+  return (p?.quotables ?? []).find((q) => q.id === id) ?? null;
+}
+
 function validatePersonas(personas, errors) {
   const schema = loadSchema(ROOT, 'persona');
   const ids = new Set();
   const handles = new Set();
   for (const p of personas) {
     for (const e of validateSchema(p, schema)) errors.push(`persona ${p._file}: ${e}`);
+    if (personaKind(p) === 'thinker') for (const k of THINKER_FIELDS) if (p[k] === undefined) errors.push(`persona ${p.id}: thinker missing "${k}"`);
+    for (const t of p.tools ?? []) if (!PERSONA_TOOLS.includes(t)) errors.push(`persona ${p.id}: unknown tool ${t}`);
+    for (const img of [p.avatar?.image, p.avatar?.banner].filter(Boolean)) {
+      if (!fs.existsSync(path.join(ROOT, 'public', img))) errors.push(`persona ${p.id}: missing image public${img}`);
+    }
+    if (p.avatar?.image && !(p.attribution?.author || p.attribution?.source)) errors.push(`persona ${p.id}: image without attribution`);
+    if (p.attribution?.source && !(p.attribution.license && p.attribution.author)) errors.push(`persona ${p.id}: attribution needs license and author`);
+    const qids = new Set();
+    for (const q of p.quotables ?? []) {
+      if (qids.has(q.id)) errors.push(`persona ${p.id}: duplicate quotable id ${q.id}`);
+      qids.add(q.id);
+    }
     if (p._file && p._file !== `${p.id}.json`) errors.push(`persona ${p._file}: filename must be ${p.id}.json`);
     if (ids.has(p.id)) errors.push(`duplicate persona id ${p.id}`);
     if (handles.has(String(p.handle).toLowerCase())) errors.push(`duplicate handle ${p.handle}`);
@@ -269,9 +292,16 @@ export function validate(personas, posts) {
     const author = byPersona.get(post.authorId);
     for (const ref of post.quoteRefs ?? []) {
       const owner = byPersona.get(ref.personaId ?? post.authorId);
-      const src = owner?.sources?.find((s) => s.id === ref.sourceId);
+      const qt = ref.bankId ? findQuotable(owner, ref.bankId) : null;
+      const src = qt ? null : owner?.sources?.find((s) => s.id === ref.sourceId);
       if (!owner) errors.push(`${where}: quoteRef owner unknown`);
-      else if (!src) errors.push(`${where}: quoteRef source ${ref.sourceId} unknown for ${owner.id}`);
+      else if (qt) {
+        if (normWs(qt.text) !== normWs(ref.canonical)) errors.push(`${where}: quoteRef canonical differs from quotable ${qt.id}`);
+        else {
+          const m = quoteMatches(ref.text, ref.canonical, { translated: !qt.lang || qt.lang === 'en' });
+          if (!m.ok) errors.push(`${where}: quoteRef text does not match quotable ${qt.id} (${m.reason})`);
+        }
+      } else if (!src) errors.push(`${where}: quoteRef source ${ref.sourceId} unknown for ${owner.id}`);
       else if (!verifyQuote(owner, ref.canonical, ref.sourceId)) errors.push(`${where}: quoteRef canonical is not a verbatim span of ${src.local ?? src.id}: "${String(ref.canonical).slice(0, 60)}"`);
       else {
         const m = quoteMatches(ref.text, ref.canonical, { translated: isTranslatedSource(src) });

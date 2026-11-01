@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import { loadPersonas, loadPosts } from '../src/lib/data.mjs';
 import { checkCorpus, loadSpec } from '../src/lib/realism.mjs';
+import { displayStats } from '../src/lib/crowd.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
@@ -12,6 +13,11 @@ const strict = args.includes('--strict');
 const spec = loadSpec(opt('--spec'));
 const posts = loadPosts(opt('--posts') ?? undefined);
 const personas = loadPersonas();
+const byP = new Map(personas.map((p) => [p.id, p]));
+const quoteN = new Map();
+for (const p of posts) if (p.quoteOf) quoteN.set(p.quoteOf, (quoteN.get(p.quoteOf) ?? 0) + 1);
+// Measure what visitors see: persona engagement + seeded crowd (same function as the build).
+for (const p of posts) p.stats ??= displayStats(p, byP.get(p.authorId), { quotes: quoteN.get(p.id) ?? 0 });
 const { results, summary } = checkCorpus(posts, personas, spec);
 
 const fmt = (v) => (v === null || v === undefined ? '—' : Number.isInteger(v) ? String(v) : v.toFixed(3));

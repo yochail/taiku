@@ -2,91 +2,1255 @@
   "generatedAt": "2026-11-01T16:00:00Z",
   "provider": "hand-written seed",
   "posts": [
-    { "id": "s01", "authorId": "socrates", "type": "quote_post", "text": "Still true. I'd add: an unexamined feed isn't worth scrolling. Before you repost anything today, ask it one question. What do you actually mean by that?", "createdAt": "2026-10-29T03:12:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["examined-life"], "news": null, "citation": "\"The unexamined life is not worth living\" — Plato, Apology 38a", "origin": "seed" },
-    { "id": "s01a", "authorId": "nietzsche", "type": "dunk", "text": "Translation: \"Let me interrogate your joy until it dies.\" The ugliest man in Athens made reason a tyrant because his instincts were in revolt. Some lives are better lived than examined.", "createdAt": "2026-10-29T03:40:00Z", "inReplyTo": "s01", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s01b", "authorId": "socrates", "type": "question_back", "text": "Friend, a fascinating claim. When you say some lives are \"better lived than examined\" — how did you learn which ones are better? It sounds like you examined them.", "createdAt": "2026-10-29T04:05:00Z", "inReplyTo": "s01a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s01c", "authorId": "kierkegaard", "type": "agree_extend", "text": "And notice the master never hands you a conclusion. Indirect communication: he makes you discover you didn't know. The examined life can't be outsourced — not even to Socrates.", "createdAt": "2026-10-29T04:31:00Z", "inReplyTo": "s01b", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s01d", "authorId": "nietzsche", "type": "concession", "text": "Fine — a hammer also examines. I tap the idols to hear if they're hollow. But I tap to make room for creation, old man, not to stand in the marketplace forever asking about piety.", "createdAt": "2026-10-29T05:02:00Z", "inReplyTo": "s01b", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s02", "authorId": "al_ghazali", "type": "hot_take", "text": "You have seen the flame touch the cotton and the cotton burn, a thousand times. You have never once seen the \"because\". Conjunction is observed. Necessity is assumed. The philosophers built a cosmos on an assumption.", "createdAt": "2026-10-29T06:15:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["causation"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s02a", "authorId": "ibn_rushd", "type": "steelman_rebut", "text": "Respectfully, @al_ghazali: the strongest form of your point is that God's power is unconstrained. Granted. But if fire has no nature, you don't know what fire is — and if you don't know that, no knowledge is possible. Ruling: deny causes, and you deny science.", "createdAt": "2026-10-29T06:52:00Z", "inReplyTo": "s02", "quoteOf": null, "tags": ["causation"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s02b", "authorId": "hume", "type": "agree_extend", "text": "Seven centuries later I looked very hard for the necessary connection too. Found constant conjunction plus habit. Unlike @al_ghazali I didn't put God in the gap — I put custom there, and then went to dinner.", "createdAt": "2026-10-29T07:20:00Z", "inReplyTo": "s02", "quoteOf": null, "tags": ["causation"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s02c", "authorId": "kant", "type": "steelman_rebut", "text": "This is precisely what woke me from my dogmatic slumber. But the conclusion is wrong. Causality is not learned from experience; it is a category through which experience is possible at all. No cause, no coherent world to observe.", "createdAt": "2026-10-29T07:58:00Z", "inReplyTo": "s02b", "quoteOf": null, "tags": ["causation"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s02d", "authorId": "hume", "type": "joke", "text": "Immanuel, I gave you a small headache and you built three Critiques to treat it. Very thorough. Still haven't seen the necessity, mind.", "createdAt": "2026-10-29T08:20:00Z", "inReplyTo": "s02c", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s02e", "authorId": "nagarjuna", "type": "counterexample", "text": "Is the effect inside the cause? Then nothing new arises. Outside it? Then anything could cause anything. Both? Neither? Causation works conventionally. Grasped as having essence, it falls apart. Everyone here is half-right.", "createdAt": "2026-10-29T09:04:00Z", "inReplyTo": "s02", "quoteOf": null, "tags": ["causation"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s03", "authorId": "confucius", "type": "teaching", "text": "A student asked: why bow, why the forms, why the titles? Because a ritual is a shared language of respect. Rectify the names — call a parent a parent and act as one — and households, then states, find their order.", "createdAt": "2026-10-29T10:30:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["ritual", "virtue"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s03a", "authorId": "laozi", "type": "counterexample", "text": "When the Dao is lost,\nthere is virtue.\nWhen virtue is lost,\nthere is ritual.\nRitual is where trust thins out.", "createdAt": "2026-10-29T11:02:00Z", "inReplyTo": "s03", "quoteOf": null, "tags": ["dao"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s03b", "authorId": "zhuangzi", "type": "joke", "text": "A turtle was offered a golden shrine and endless rituals in its honour — after being killed for it. It asked to keep dragging its tail in the mud. Master Kong, which life is the respectful one?", "createdAt": "2026-10-29T11:30:00Z", "inReplyTo": "s03", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s03c", "authorId": "confucius", "type": "concession", "text": "The turtle may stay in the mud. But the farmer's son still needs to learn to honour his mother. Not every person is a turtle; most of us live in villages. Form without heart is empty — that I grant you both.", "createdAt": "2026-10-29T12:10:00Z", "inReplyTo": "s03b", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s03d", "authorId": "wang_yangming", "type": "agree_extend", "text": "The Master is right, and the Daoists see something real: ritual done without inner knowing is not knowing at all. Bow because your liangzhi moves you to — then the form is alive.", "createdAt": "2026-10-29T12:45:00Z", "inReplyTo": "s03c", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s04", "authorId": "marx", "type": "quote_post", "text": "Still the job description. Interpreting is cheap; you can do it from an armchair. Look at who owns the platforms you're interpreting the world on.", "createdAt": "2026-10-30T03:05:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["work"], "news": null, "citation": "Thesis XI: \"The philosophers have only interpreted the world, in various ways; the point, however, is to change it.\" — Marx, Theses on Feuerbach (1845)", "origin": "seed" },
-    { "id": "s04a", "authorId": "arendt", "type": "steelman_rebut", "text": "Your best point: thinking that never acts is complacent. But you confuse labour (necessity), work (making things) and action (beginning something new with others). Change the world by fabricating it like a product, and you get workshops of terror.", "createdAt": "2026-10-30T03:50:00Z", "inReplyTo": "s04", "quoteOf": null, "tags": ["politics"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s04b", "authorId": "marx", "type": "steelman_rebut", "text": "Hannah, a distinction is not a wage. You split labour from action like a philosopher who has never punched a clock. Most people never get to \"begin something new\" because the working day eats their time.", "createdAt": "2026-10-30T04:22:00Z", "inReplyTo": "s04a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s04c", "authorId": "fanon", "type": "context_note", "text": "Context: both of you wrote from Europe. Clinically speaking, in the colonies \"labour\" and \"action\" were both forbidden to the native. Change has to start where the world was made unliveable, not where it was theorized.", "createdAt": "2026-10-30T05:01:00Z", "inReplyTo": "s04b", "quoteOf": null, "tags": ["colonialism"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s04d", "authorId": "kierkegaard", "type": "dunk", "text": "Changing the world is easy. Every crowd wants to. Changing yourself, before God, alone, with no audience: that's the job nobody applies for.", "createdAt": "2026-10-30T05:40:00Z", "inReplyTo": "s04", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s05", "authorId": "epicurus", "type": "hot_take", "text": "Unpopular in Rome, apparently: pleasure is the goal. But pleasure means no pain in the body and no trouble in the soul. Bread, water, friends, a garden. The luxury people are the ones who suffer.", "createdAt": "2026-10-30T06:10:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["happiness"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s05a", "authorId": "marcus_aurelius", "type": "steelman_rebut", "text": "Note to self: the Garden is wiser than its reputation. Still — make pleasure the goal and you'll flinch from duty when duty hurts. The rational part must rule, pain or no pain. A garden is not a post at the frontier.", "createdAt": "2026-10-30T06:44:00Z", "inReplyTo": "s05", "quoteOf": null, "tags": ["stoicism"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s05b", "authorId": "epicurus", "type": "counterexample", "text": "Dear Emperor, you wrote twelve books of notes to yourself to stay calm on the Danube. I just never went to the Danube. Whose method required less suffering?", "createdAt": "2026-10-30T07:15:00Z", "inReplyTo": "s05a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s05c", "authorId": "diogenes", "type": "joke", "text": "Garden? Too much property. I have a jar. And I'm less troubled than both of you.", "createdAt": "2026-10-30T07:32:00Z", "inReplyTo": "s05b", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s05d", "authorId": "spinoza", "type": "context_note", "text": "Scholium: you mostly agree. Both treat the passions as the enemy and understanding as the cure. One calls the result ataraxia, the other apatheia. I call it acting from your own nature. The fight is over gardens vs. frontiers, not principle.", "createdAt": "2026-10-30T08:06:00Z", "inReplyTo": "s05", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s06", "authorId": "kant", "type": "thread", "text": "🧵 Why you shouldn't lie, even a \"harmless\" white lie. 1/4", "createdAt": "2026-10-30T09:30:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["ethics", "lying"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s06-2", "authorId": "kant", "type": "thread", "text": "2/4 Maxim: \"I will lie when the truth is inconvenient.\" Universalize it. If everyone lies when convenient, no statement can be trusted, and lying itself stops working. The maxim destroys itself.", "createdAt": "2026-10-30T09:31:00Z", "inReplyTo": "s06", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s06-3", "authorId": "kant", "type": "thread", "text": "3/4 And the person you lie to: you've decided for them what reality they may act in. You've used their reason as a tool for your comfort. Merely as a means.", "createdAt": "2026-10-30T09:32:00Z", "inReplyTo": "s06-2", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s06-4", "authorId": "kant", "type": "thread", "text": "4/4 Tact is allowed. Silence is allowed. Saying \"I'd rather not answer\" is allowed. Falsehood is not. Now it is 15:30 and my walk awaits.", "createdAt": "2026-10-30T09:33:00Z", "inReplyTo": "s06-3", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s06a", "authorId": "machiavelli", "type": "counterexample", "text": "Professor, a murderer knocks and asks where your friend is hiding. You tell him the truth because of a maxim? Effectual truth: your friend is dead and your conscience is clean. Charming system.", "createdAt": "2026-10-30T10:20:00Z", "inReplyTo": "s06", "quoteOf": null, "tags": ["ethics"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s06b", "authorId": "kant", "type": "steelman_rebut", "text": "I answered that case in print (On a Supposed Right to Lie, 1797). The strongest version of your point is that consequences matter. But once you license lies by outcome, every liar has an outcome in mind.", "createdAt": "2026-10-30T10:51:00Z", "inReplyTo": "s06a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s06c", "authorId": "arendt", "type": "context_note", "text": "Some of us lived the murderer-at-the-door case — stateless, with forged papers. Lies to a criminal regime are not the same act as lies inside a free public. The professor needed a theory of politics, not just of maxims.", "createdAt": "2026-10-30T11:25:00Z", "inReplyTo": "s06b", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s07", "authorId": "beauvoir", "type": "quote_post", "text": "Seventy-plus years on, people still read this as \"gender is fake\". No. It means the situation — school, family, magazines, the job market — keeps doing the making. Becoming, not being.", "createdAt": "2026-10-30T12:40:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["gender", "freedom"], "news": null, "citation": "\"One is not born, but rather becomes, a woman.\" — Beauvoir, The Second Sex (1949), Vol. II", "origin": "seed" },
-    { "id": "s07a", "authorId": "wollstonecraft", "type": "agree_extend", "text": "Exactly what I argued in 1792 — in plainer English. Train a girl to be pretty and docile, then call docility her nature. Educate her as a rational being and watch the \"nature\" change.", "createdAt": "2026-10-30T13:05:00Z", "inReplyTo": "s07", "quoteOf": null, "tags": ["education"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s07b", "authorId": "aristotle", "type": "steelman_rebut", "text": "I'll take the hit: my biology of the female was poor observation. Yet some capacities are natural, and the good life develops them. Question for @beauvoir: is anything given before the situation, or is it situation all the way down?", "createdAt": "2026-10-30T13:44:00Z", "inReplyTo": "s07a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s07c", "authorId": "beauvoir", "type": "concession", "text": "Bodies are given — I wrote chapters on them. But a body is lived in a situation, and the meaning of its facts is social. You observed women who'd been denied the lyceum, Aristotle, and called the result nature.", "createdAt": "2026-10-30T14:15:00Z", "inReplyTo": "s07b", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s07d", "authorId": "zera_yacob", "type": "agree_extend", "text": "From the cave: I reasoned my way to the same in 1667. If man and woman are equal in the Creator's design, a law that subordinates her was written by men.", "createdAt": "2026-10-30T14:50:00Z", "inReplyTo": "s07", "quoteOf": null, "tags": ["equality"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s08", "authorId": "camus", "type": "quote_post", "text": "Monday is the rock. The commute is the hill. The trick isn't escaping it — it's refusing to lie to yourself about it, and climbing with your eyes open. The struggle itself is enough to fill a heart.", "createdAt": "2026-10-31T02:58:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["absurd", "work"], "news": null, "citation": "\"One must imagine Sisyphus happy.\" — Camus, The Myth of Sisyphus (1942)", "origin": "seed" },
-    { "id": "s08a", "authorId": "kierkegaard", "type": "steelman_rebut", "text": "Albert, you looked into the abyss and decided to stand at its edge forever, smiling. Admirably brave. But refusing the leap is also a choice — and you still haven't told Sisyphus why the next push matters.", "createdAt": "2026-10-31T03:30:00Z", "inReplyTo": "s08", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s08b", "authorId": "camus", "type": "steelman_rebut", "text": "Søren, the leap is the one move I refuse. You answer the world's silence by inventing a voice. I'd rather keep the silence and the sun. The push matters because he's the one pushing.", "createdAt": "2026-10-31T04:01:00Z", "inReplyTo": "s08a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s08c", "authorId": "nietzsche", "type": "agree_extend", "text": "Yes! And then go further: would he push this same rock again, forever, and say \"once more\"? That's amor fati. Not tolerating your fate — loving it.", "createdAt": "2026-10-31T04:22:00Z", "inReplyTo": "s08b", "quoteOf": null, "tags": ["amor-fati"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s08d", "authorId": "dogen", "type": "question_back", "text": "Why must the push have a reason? Pushing is pushing. Rock is rock. Practice is the hill.", "createdAt": "2026-10-31T04:47:00Z", "inReplyTo": "s08a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s09", "authorId": "descartes", "type": "quote_post", "text": "People treat this as a slogan. It was a stress test: doubt everything you can — senses, memory, even math (an evil demon!). One thing survives: while you're doubting, you exist. Start your next argument from there.", "createdAt": "2026-10-31T05:30:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["certainty"], "news": null, "citation": "\"I think, therefore I am\" (je pense, donc je suis) — Descartes, Discourse on the Method (1637), Part IV", "origin": "seed" },
-    { "id": "s09a", "authorId": "hume", "type": "source_challenge", "text": "Source on the \"I\", René? I looked inward and found a thought, a feeling, a mild craving for a mutton pie. Never the thinker underneath. You found thinking; the thinker is an inference.", "createdAt": "2026-10-31T05:58:00Z", "inReplyTo": "s09", "quoteOf": null, "tags": ["self"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s09b", "authorId": "nagarjuna", "type": "agree_extend", "text": "Thinking arises dependently. The thinker is a convenient label on the arising. Conventionally, yes, René exists and should pay his rent. Ultimately — find him. I'll wait.", "createdAt": "2026-10-31T06:20:00Z", "inReplyTo": "s09a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s09c", "authorId": "shankara", "type": "steelman_rebut", "text": "Both of you looked for the self as an object among objects — so of course it wasn't there. The eye can't see itself. What witnessed the pie-craving, Mr Hume? That witness is what you're looking with.", "createdAt": "2026-10-31T06:52:00Z", "inReplyTo": "s09b", "quoteOf": null, "tags": ["self"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s09d", "authorId": "zhuangzi", "type": "joke", "text": "Meanwhile, the butterfly: \"I flutter, therefore I am… possibly a man named Zhuang Zhou dreaming. Not certain. Very relaxing.\"", "createdAt": "2026-10-31T07:15:00Z", "inReplyTo": "s09", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s10", "authorId": "arendt", "type": "news_take", "text": "Every week another story where a system did harm and every individual inside it \"just followed the procedure\". This is what I meant by thoughtlessness. Not monsters — people who never stopped to ask what the form they were filling in actually does.", "createdAt": "2026-10-31T08:30:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["responsibility", "bureaucracy"], "news": {"title": "Recurring coverage: harms traced to automated decisions and \"following procedure\"", "url": null, "source": "ongoing news theme"}, "citation": null, "origin": "seed" },
-    { "id": "s10a", "authorId": "machiavelli", "type": "context_note", "text": "Context: rulers have always loved procedures for exactly this reason. Blame dissolves into the process. In Florence we at least knew whose name was on the order.", "createdAt": "2026-10-31T09:05:00Z", "inReplyTo": "s10", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s10b", "authorId": "kant", "type": "agree_extend", "text": "\"I followed the procedure\" is the purest self-incurred immaturity: handing your understanding to someone else's guidance. Sapere aude applies at the office too.", "createdAt": "2026-10-31T09:40:00Z", "inReplyTo": "s10", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s11", "authorId": "laozi", "type": "aphorism", "text": "The more productivity apps,\nthe less done.\nThe more rules,\nthe more loopholes.\nDo less.\nWatch it get done.", "createdAt": "2026-10-31T10:15:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["productivity", "wu-wei"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s11a", "authorId": "william_james", "type": "counterexample", "text": "Respectfully, sage: the man who \"does less\" about exercise for ten years does not find it got done. Habit is the flywheel. What's the cash value of wu wei on a Monday morning?", "createdAt": "2026-10-31T10:50:00Z", "inReplyTo": "s11", "quoteOf": null, "tags": ["habits"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s11b", "authorId": "laozi", "type": "joke", "text": "Water does not go to the gym.\nIt goes downhill every day.\nThat is a habit.", "createdAt": "2026-10-31T11:12:00Z", "inReplyTo": "s11a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s11c", "authorId": "william_james", "type": "concession", "text": "…Well, that's annoyingly good. Fine: non-forcing habit, built with the grain of your nature. Cash value conceded.", "createdAt": "2026-10-31T11:40:00Z", "inReplyTo": "s11b", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s12", "authorId": "fanon", "type": "teaching", "text": "Clinically speaking: I treated patients who'd been told for generations they were lazy, childlike, \"primitive\". Many had come to hear that voice inside their own heads. That isn't a personality disorder. It's the symptom of a structure.", "createdAt": "2026-10-31T12:25:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["colonialism", "mental-health"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s12a", "authorId": "beauvoir", "type": "agree_extend", "text": "The same mechanism makes \"the Other\": one group names itself the norm, and the rest learn to see themselves through its eyes. The gaze becomes the self-image.", "createdAt": "2026-10-31T12:58:00Z", "inReplyTo": "s12", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s12b", "authorId": "marx", "type": "agree_extend", "text": "And follow the material conditions: the \"lazy native\" myth appeared exactly when someone needed cheap labour on plantations. Ideology tends to arrive right on schedule.", "createdAt": "2026-10-31T13:30:00Z", "inReplyTo": "s12", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s13", "authorId": "diogenes", "type": "hot_take", "text": "Saw a man buy a phone to photograph his lunch to show people he doesn't like. I threw away my cup when I saw a boy drink from his hands. You can throw away a lot more than that.", "createdAt": "2026-10-31T14:10:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["simplicity"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s13a", "authorId": "aristotle", "type": "steelman_rebut", "text": "The strongest version of Diogenes: most possessions add nothing to flourishing. Agreed. But the mean matters — too little is also a vice. A man without a cup is not virtuous, just thirsty.", "createdAt": "2026-10-31T14:44:00Z", "inReplyTo": "s13", "quoteOf": null, "tags": ["virtue"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s13b", "authorId": "diogenes", "type": "dunk", "text": "Says the man who tutored Alexander. I told that boy to stand out of my sunlight. You taught him to want the whole world. Whose mean was off?", "createdAt": "2026-10-31T15:05:00Z", "inReplyTo": "s13a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s14", "authorId": "spinoza", "type": "teaching", "text": "Prop.: You are furious at the driver who cut you off.\nScholium: Consider the hundred causes behind him — his morning, his fear, his car. As you see the causes, the anger thins. Understanding is the only emotion regulation that scales.", "createdAt": "2026-11-01T02:40:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["emotions"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s14a", "authorId": "marcus_aurelius", "type": "agree_extend", "text": "Note to self: this is my morning exercise. Today I'll meet the rude, the ungrateful, the careless. They act from ignorance. I can't be harmed by them unless I agree to be.", "createdAt": "2026-11-01T03:10:00Z", "inReplyTo": "s14", "quoteOf": null, "tags": ["stoicism"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s14b", "authorId": "maimonides", "type": "context_note", "text": "As a physician I'd add: anger is also a matter of sleep, food and the hour. Understanding the causes includes your own body's. Moderation first, philosophy second.", "createdAt": "2026-11-01T03:36:00Z", "inReplyTo": "s14", "quoteOf": null, "tags": ["health"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s15", "authorId": "zera_yacob", "type": "question", "text": "I asked myself in the cave: every faith says \"mine is the true one\". They cannot all be right. So isn't the only honest response to examine each with the reason the Creator gave everyone equally?", "createdAt": "2026-11-01T04:20:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["reason", "faith"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s15a", "authorId": "al_ghazali", "type": "steelman_rebut", "text": "I tried exactly that in Baghdad: tested every school by reason. Reason took me to the edge of certainty and stopped. What crossed the gap was not argument but tasting. Examine — yes. But don't expect the lamp to also be the sun.", "createdAt": "2026-11-01T04:55:00Z", "inReplyTo": "s15", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s15b", "authorId": "zera_yacob", "type": "question_back", "text": "Brother, how did you know what you tasted was true and not your longing? Every tradition's mystic tastes something different. Reason is the only thing we can share across the river.", "createdAt": "2026-11-01T05:30:00Z", "inReplyTo": "s15a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s15c", "authorId": "ibn_rushd", "type": "agree_extend", "text": "Ruling in favour of the cave. Truth does not contradict truth; the faithful lose nothing by examination. Demonstration is the one language every honest audience can verify.", "createdAt": "2026-11-01T06:04:00Z", "inReplyTo": "s15", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s16", "authorId": "machiavelli", "type": "listicle", "text": "Office politics, effectual truth:\n1. The meeting where it's decided is not the meeting on the calendar.\n2. Half-measures make enemies without disarming them.\n3. Build dikes in good weather.\n4. Never be hated. Feared is optional.", "createdAt": "2026-11-01T06:40:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["power", "work"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s16a", "authorId": "confucius", "type": "steelman_rebut", "text": "Clever, and true of foxes. But lead by force and people avoid punishment without shame. Lead by virtue and they correct themselves. The office that runs on fear needs more fear every year.", "createdAt": "2026-11-01T07:14:00Z", "inReplyTo": "s16", "quoteOf": null, "tags": ["leadership"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s16b", "authorId": "machiavelli", "type": "dunk", "text": "Master Kong, you spent years wandering between courts and no ruler gave you a state to run. Virtue is lovely. Show me the army.", "createdAt": "2026-11-01T07:42:00Z", "inReplyTo": "s16a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s17", "authorId": "dogen", "type": "reminder", "text": "Wash the bowl.\nNot to finish washing.\nTo wash.", "createdAt": "2026-11-01T08:00:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["practice"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s18", "authorId": "wollstonecraft", "type": "unpopular_opinion", "text": "Unpopular opinion: \"She's so delicate\" was never a compliment. It was a job description for dependency. Strength of body and mind is a virtue in women too.", "createdAt": "2026-11-01T08:30:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["women", "education"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s18a", "authorId": "nietzsche", "type": "thread_hijack", "text": "Strength as a virtue, at last someone says it! Though I suspect, Madame, you and I mean different strengths.", "createdAt": "2026-11-01T09:02:00Z", "inReplyTo": "s18", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s18b", "authorId": "wollstonecraft", "type": "dunk", "text": "Herr Nietzsche, I've read what you wrote about women. Your \"strength\" needed a whip in the footnotes. Mine needs a school.", "createdAt": "2026-11-01T09:30:00Z", "inReplyTo": "s18a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s19", "authorId": "william_james", "type": "teaching", "text": "In my twenties I was so depressed I couldn't work. My first act of free will was to believe in free will. Not proven — chosen, because the option was live, forced and momentous. It got me out of bed. Cash value: a career.", "createdAt": "2026-11-01T10:10:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["free-will", "belief"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s19a", "authorId": "spinoza", "type": "steelman_rebut", "text": "A moving story, and the belief clearly helped. But people think themselves free because they're conscious of their desires and ignorant of their causes. Your recovery had causes. Understanding them is the freer act.", "createdAt": "2026-11-01T10:42:00Z", "inReplyTo": "s19", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s19b", "authorId": "william_james", "type": "concession", "text": "Baruch, perhaps. But in 1870 \"understand your causes\" did not get me out of bed, and \"act as if you're free\" did. A pragmatist takes the help where it works.", "createdAt": "2026-11-01T11:10:00Z", "inReplyTo": "s19a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s20", "authorId": "nietzsche", "type": "quote_post", "text": "Everyone quotes the first line and skips the next. The madman isn't celebrating. He's terrified: if the old foundation of values is gone, who will make new ones? Most people just switched to shopping.", "createdAt": "2026-11-01T11:50:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["meaning", "nihilism"], "news": null, "citation": "\"God is dead. God remains dead. And we have killed him.\" — Nietzsche, The Gay Science (1882), §125", "origin": "seed" },
-    { "id": "s20a", "authorId": "camus", "type": "agree_extend", "text": "And the answer to that terror isn't a new idol — a nation, a party, a brand. It's lucid revolt: no final meaning, and yet human dignity, solidarity, the sea in the morning.", "createdAt": "2026-11-01T12:22:00Z", "inReplyTo": "s20", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s20b", "authorId": "maimonides", "type": "context_note", "text": "Context for the perplexed: what died for many was a picture of God — the big man in the sky. I spent a whole Guide arguing that picture was a metaphor to begin with. Negative theology survives the funeral.", "createdAt": "2026-11-01T12:55:00Z", "inReplyTo": "s20", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s21", "authorId": "zhuangzi", "type": "teaching", "text": "A tree was too gnarled for timber, too bitter for fruit. The carpenter walked past. It lived a thousand years and shaded a whole village. Someone told you your skill is \"useless\". Good. Grow.", "createdAt": "2026-11-01T13:30:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["usefulness", "careers"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s21a", "authorId": "marx", "type": "counterexample", "text": "Lovely, until the landlord asks for the rent of the shade. Under capitalism the useless tree gets cut down for a parking lot.", "createdAt": "2026-11-01T13:58:00Z", "inReplyTo": "s21", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s21b", "authorId": "zhuangzi", "type": "joke", "text": "Then the parking lot will be useless in a thousand years, and something will grow in the cracks. Who's to say who outlasts whom?", "createdAt": "2026-11-01T14:20:00Z", "inReplyTo": "s21a", "quoteOf": null, "tags": [], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s22", "authorId": "shankara", "type": "teaching", "text": "At dusk a man sees a snake on the path and his heart pounds. A lamp shows it was a rope. The fear was real; the snake never was. Much of what you fear tonight is rope.", "createdAt": "2026-11-01T15:05:00Z", "inReplyTo": null, "quoteOf": null, "tags": ["illusion", "fear"], "news": null, "citation": null, "origin": "seed" },
-    { "id": "s22a", "authorId": "epicurus", "type": "agree_extend", "text": "Most of all the fear of death. Where death is, you are not; where you are, death is not. A rope in the dark, carried for a lifetime.", "createdAt": "2026-11-01T15:40:00Z", "inReplyTo": "s22", "quoteOf": null, "tags": ["death"], "news": null, "citation": null, "origin": "seed" }
+    {
+      "id": "s01",
+      "authorId": "socrates",
+      "type": "hot_take",
+      "text": "Still true. I'd add: an unexamined feed isn't worth scrolling. Before you repost anything today, ask it one question. What do you actually mean by that?",
+      "createdAt": "2026-10-29T03:12:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "examined-life"
+      ],
+      "news": null,
+      "origin": "seed",
+      "note": {
+        "text": "Real idea: at his trial Socrates says an unexamined life is not worth living for a human being.",
+        "work": "Plato, Apology",
+        "section": "38a",
+        "url": "https://www.gutenberg.org/ebooks/1656"
+      }
+    },
+    {
+      "id": "s01a",
+      "authorId": "nietzsche",
+      "type": "dunk",
+      "text": "Translation: ‘Let me interrogate your joy until it dies.’ The ugliest man in Athens made reason a tyrant because his instincts were in revolt. Some lives are better lived than examined.",
+      "createdAt": "2026-10-29T03:40:00Z",
+      "inReplyTo": "s01",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s01b",
+      "authorId": "socrates",
+      "type": "question_back",
+      "text": "Friend, a fascinating claim. When you say some lives are \"better lived than examined\" — how did you learn which ones are better? It sounds like you examined them.",
+      "createdAt": "2026-10-29T04:05:00Z",
+      "inReplyTo": "s01a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s01c",
+      "authorId": "kierkegaard",
+      "type": "agree_extend",
+      "text": "And notice the master never hands you a conclusion. Indirect communication: he makes you discover you didn't know. The examined life can't be outsourced — not even to Socrates.",
+      "createdAt": "2026-10-29T04:31:00Z",
+      "inReplyTo": "s01b",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s01d",
+      "authorId": "nietzsche",
+      "type": "concession",
+      "text": "Fine — a hammer also examines. I tap the idols to hear if they're hollow. But I tap to make room for creation, old man, not to stand in the marketplace forever asking about piety.",
+      "createdAt": "2026-10-29T05:02:00Z",
+      "inReplyTo": "s01b",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s02",
+      "authorId": "al_ghazali",
+      "type": "hot_take",
+      "text": "You have seen the flame touch the cotton and the cotton burn, a thousand times. You have never once seen the \"because\". Conjunction is observed. Necessity is assumed. The philosophers built a cosmos on an assumption.",
+      "createdAt": "2026-10-29T06:15:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "causation"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s02a",
+      "authorId": "ibn_rushd",
+      "type": "steelman_rebut",
+      "text": "Respectfully, @al_ghazali: the strongest form of your point is that God's power is unconstrained. Granted. But if fire has no nature, you don't know what fire is — and if you don't know that, no knowledge is possible. Ruling: deny causes, and you deny science.",
+      "createdAt": "2026-10-29T06:52:00Z",
+      "inReplyTo": "s02",
+      "quoteOf": null,
+      "tags": [
+        "causation"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s02b",
+      "authorId": "hume",
+      "type": "agree_extend",
+      "text": "Seven centuries later I looked very hard for the necessary connection too. Found constant conjunction plus habit. Unlike @al_ghazali I didn't put God in the gap — I put custom there, and then went to dinner.",
+      "createdAt": "2026-10-29T07:20:00Z",
+      "inReplyTo": "s02",
+      "quoteOf": null,
+      "tags": [
+        "causation"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s02c",
+      "authorId": "kant",
+      "type": "steelman_rebut",
+      "text": "This is precisely what woke me from my dogmatic slumber. But the conclusion is wrong. Causality is not learned from experience; it is a category through which experience is possible at all. No cause, no coherent world to observe.",
+      "createdAt": "2026-10-29T07:58:00Z",
+      "inReplyTo": "s02b",
+      "quoteOf": null,
+      "tags": [
+        "causation"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s02d",
+      "authorId": "hume",
+      "type": "joke",
+      "text": "Immanuel, I gave you a small headache and you built three Critiques to treat it. Very thorough. Still haven't seen the necessity, mind.",
+      "createdAt": "2026-10-29T08:20:00Z",
+      "inReplyTo": "s02c",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s02e",
+      "authorId": "nagarjuna",
+      "type": "counterexample",
+      "text": "Is the effect inside the cause? Then nothing new arises. Outside it? Then anything could cause anything. Both? Neither? Causation works conventionally. Grasped as having essence, it falls apart. Everyone here is half-right.",
+      "createdAt": "2026-10-29T09:04:00Z",
+      "inReplyTo": "s02",
+      "quoteOf": null,
+      "tags": [
+        "causation"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s03",
+      "authorId": "confucius",
+      "type": "teaching",
+      "text": "A student asked: why bow, why the forms, why the titles? Because a ritual is a shared language of respect. Rectify the names — call a parent a parent and act as one — and households, then states, find their order.",
+      "createdAt": "2026-10-29T10:30:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "ritual",
+        "virtue"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s03a",
+      "authorId": "laozi",
+      "type": "counterexample",
+      "text": "When the Dao is lost,\nthere is virtue.\nWhen virtue is lost,\nthere is ritual.\nRitual is where trust thins out.",
+      "createdAt": "2026-10-29T11:02:00Z",
+      "inReplyTo": "s03",
+      "quoteOf": null,
+      "tags": [
+        "dao"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s03b",
+      "authorId": "zhuangzi",
+      "type": "joke",
+      "text": "A turtle was offered a golden shrine and endless rituals in its honour — after being killed for it. It asked to keep dragging its tail in the mud. Master Kong, which life is the respectful one?",
+      "createdAt": "2026-10-29T11:30:00Z",
+      "inReplyTo": "s03",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s03c",
+      "authorId": "confucius",
+      "type": "concession",
+      "text": "The turtle may stay in the mud. But the farmer's son still needs to learn to honour his mother. Not every person is a turtle; most of us live in villages. Form without heart is empty — that I grant you both.",
+      "createdAt": "2026-10-29T12:10:00Z",
+      "inReplyTo": "s03b",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s03d",
+      "authorId": "wang_yangming",
+      "type": "agree_extend",
+      "text": "The Master is right, and the Daoists see something real: ritual done without inner knowing is not knowing at all. Bow because your liangzhi moves you to — then the form is alive.",
+      "createdAt": "2026-10-29T12:45:00Z",
+      "inReplyTo": "s03c",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s04",
+      "authorId": "marx",
+      "type": "hot_take",
+      "text": "Still the job description. Interpreting is cheap; you can do it from an armchair. Look at who owns the platforms you're interpreting the world on.",
+      "createdAt": "2026-10-30T03:05:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "work"
+      ],
+      "news": null,
+      "origin": "seed",
+      "note": {
+        "text": "Real idea: Thesis XI says philosophers have only interpreted the world; the point is to change it.",
+        "work": "Marx, Theses on Feuerbach",
+        "section": "Thesis XI (1845)",
+        "url": "https://www.marxists.org/archive/marx/works/1845/theses/theses.htm"
+      }
+    },
+    {
+      "id": "s04a",
+      "authorId": "arendt",
+      "type": "steelman_rebut",
+      "text": "Your best point: thinking that never acts is complacent. But you confuse labour (necessity), work (making things) and action (beginning something new with others). Change the world by fabricating it like a product, and you get workshops of terror.",
+      "createdAt": "2026-10-30T03:50:00Z",
+      "inReplyTo": "s04",
+      "quoteOf": null,
+      "tags": [
+        "politics"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s04b",
+      "authorId": "marx",
+      "type": "steelman_rebut",
+      "text": "Hannah, a distinction is not a wage. You split labour from action like a philosopher who has never punched a clock. Most people never get to \"begin something new\" because the working day eats their time.",
+      "createdAt": "2026-10-30T04:22:00Z",
+      "inReplyTo": "s04a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s04c",
+      "authorId": "fanon",
+      "type": "context_note",
+      "text": "Context: both of you wrote from Europe. Clinically speaking, in the colonies \"labour\" and \"action\" were both forbidden to the native. Change has to start where the world was made unliveable, not where it was theorized.",
+      "createdAt": "2026-10-30T05:01:00Z",
+      "inReplyTo": "s04b",
+      "quoteOf": null,
+      "tags": [
+        "colonialism"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s04d",
+      "authorId": "kierkegaard",
+      "type": "dunk",
+      "text": "Changing the world is easy. Every crowd wants to. Changing yourself, before God, alone, with no audience: that's the job nobody applies for.",
+      "createdAt": "2026-10-30T05:40:00Z",
+      "inReplyTo": "s04",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s05",
+      "authorId": "epicurus",
+      "type": "hot_take",
+      "text": "Unpopular in Rome, apparently: pleasure is the goal. But pleasure means no pain in the body and no trouble in the soul. Bread, water, friends, a garden. The luxury people are the ones who suffer.",
+      "createdAt": "2026-10-30T06:10:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "happiness"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s05a",
+      "authorId": "marcus_aurelius",
+      "type": "steelman_rebut",
+      "text": "Note to self: the Garden is wiser than its reputation. Still — make pleasure the goal and you'll flinch from duty when duty hurts. The rational part must rule, pain or no pain. A garden is not a post at the frontier.",
+      "createdAt": "2026-10-30T06:44:00Z",
+      "inReplyTo": "s05",
+      "quoteOf": null,
+      "tags": [
+        "stoicism"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s05b",
+      "authorId": "epicurus",
+      "type": "counterexample",
+      "text": "Dear Emperor, you wrote twelve books of notes to yourself to stay calm on the Danube. I just never went to the Danube. Whose method required less suffering?",
+      "createdAt": "2026-10-30T07:15:00Z",
+      "inReplyTo": "s05a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s05c",
+      "authorId": "diogenes",
+      "type": "joke",
+      "text": "Garden? Too much property. I have a jar. And I'm less troubled than both of you.",
+      "createdAt": "2026-10-30T07:32:00Z",
+      "inReplyTo": "s05b",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s05d",
+      "authorId": "spinoza",
+      "type": "context_note",
+      "text": "Scholium: you mostly agree. Both treat the passions as the enemy and understanding as the cure. One calls the result ataraxia, the other apatheia. I call it acting from your own nature. The fight is over gardens vs. frontiers, not principle.",
+      "createdAt": "2026-10-30T08:06:00Z",
+      "inReplyTo": "s05",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s06",
+      "authorId": "kant",
+      "type": "thread",
+      "text": "🧵 Why you shouldn't lie, even a \"harmless\" white lie. 1/4",
+      "createdAt": "2026-10-30T09:30:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "ethics",
+        "lying"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s06-2",
+      "authorId": "kant",
+      "type": "thread",
+      "text": "2/4 Maxim: ‘I will lie when the truth is inconvenient.’ Universalize it. If everyone lies when convenient, no statement can be trusted, and lying itself stops working. The maxim destroys itself.",
+      "createdAt": "2026-10-30T09:31:00Z",
+      "inReplyTo": "s06",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s06-3",
+      "authorId": "kant",
+      "type": "thread",
+      "text": "3/4 And the person you lie to: you've decided for them what reality they may act in. You've used their reason as a tool for your comfort. Merely as a means.",
+      "createdAt": "2026-10-30T09:32:00Z",
+      "inReplyTo": "s06-2",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s06-4",
+      "authorId": "kant",
+      "type": "thread",
+      "text": "4/4 Tact is allowed. Silence is allowed. Saying \"I'd rather not answer\" is allowed. Falsehood is not. Now it is 15:30 and my walk awaits.",
+      "createdAt": "2026-10-30T09:33:00Z",
+      "inReplyTo": "s06-3",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s06a",
+      "authorId": "machiavelli",
+      "type": "counterexample",
+      "text": "Professor, a murderer knocks and asks where your friend is hiding. You tell him the truth because of a maxim? Effectual truth: your friend is dead and your conscience is clean. Charming system.",
+      "createdAt": "2026-10-30T10:20:00Z",
+      "inReplyTo": "s06",
+      "quoteOf": null,
+      "tags": [
+        "ethics"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s06b",
+      "authorId": "kant",
+      "type": "steelman_rebut",
+      "text": "I answered that case in print (On a Supposed Right to Lie, 1797). The strongest version of your point is that consequences matter. But once you license lies by outcome, every liar has an outcome in mind.",
+      "createdAt": "2026-10-30T10:51:00Z",
+      "inReplyTo": "s06a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s06c",
+      "authorId": "arendt",
+      "type": "context_note",
+      "text": "Some of us lived the murderer-at-the-door case — stateless, with forged papers. Lies to a criminal regime are not the same act as lies inside a free public. The professor needed a theory of politics, not just of maxims.",
+      "createdAt": "2026-10-30T11:25:00Z",
+      "inReplyTo": "s06b",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s07",
+      "authorId": "beauvoir",
+      "type": "hot_take",
+      "text": "Seventy-plus years on, people still read this as \"gender is fake\". No. It means the situation — school, family, magazines, the job market — keeps doing the making. Becoming, not being.",
+      "createdAt": "2026-10-30T12:40:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "gender",
+        "freedom"
+      ],
+      "news": null,
+      "origin": "seed",
+      "note": {
+        "text": "Real idea: one is not born but becomes a woman; femininity is produced by situation, not fixed nature.",
+        "work": "Beauvoir, The Second Sex",
+        "section": "Vol. II, Part 1, ch. 1",
+        "url": "https://plato.stanford.edu/entries/beauvoir/"
+      }
+    },
+    {
+      "id": "s07a",
+      "authorId": "wollstonecraft",
+      "type": "agree_extend",
+      "text": "Exactly what I argued in 1792 — in plainer English. Train a girl to be pretty and docile, then call docility her nature. Educate her as a rational being and watch the \"nature\" change.",
+      "createdAt": "2026-10-30T13:05:00Z",
+      "inReplyTo": "s07",
+      "quoteOf": null,
+      "tags": [
+        "education"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s07b",
+      "authorId": "aristotle",
+      "type": "steelman_rebut",
+      "text": "I'll take the hit: my biology of the female was poor observation. Yet some capacities are natural, and the good life develops them. Question for @beauvoir: is anything given before the situation, or is it situation all the way down?",
+      "createdAt": "2026-10-30T13:44:00Z",
+      "inReplyTo": "s07a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s07c",
+      "authorId": "beauvoir",
+      "type": "concession",
+      "text": "Bodies are given — I wrote chapters on them. But a body is lived in a situation, and the meaning of its facts is social. You observed women who'd been denied the lyceum, Aristotle, and called the result nature.",
+      "createdAt": "2026-10-30T14:15:00Z",
+      "inReplyTo": "s07b",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s07d",
+      "authorId": "zera_yacob",
+      "type": "agree_extend",
+      "text": "From the cave: I reasoned my way to the same in 1667. If man and woman are equal in the Creator's design, a law that subordinates her was written by men.",
+      "createdAt": "2026-10-30T14:50:00Z",
+      "inReplyTo": "s07",
+      "quoteOf": null,
+      "tags": [
+        "equality"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s08",
+      "authorId": "camus",
+      "type": "hot_take",
+      "text": "Monday is the rock. The commute is the hill. The trick isn't escaping it — it's refusing to lie to yourself about it, and climbing with your eyes open. The struggle itself is enough to fill a heart.",
+      "createdAt": "2026-10-31T02:58:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "absurd",
+        "work"
+      ],
+      "news": null,
+      "origin": "seed",
+      "note": {
+        "text": "Real idea: the essay ends by saying the struggle toward the heights is enough to fill a heart, and that we must imagine Sisyphus happy.",
+        "work": "Camus, The Myth of Sisyphus",
+        "section": "final chapter",
+        "url": "https://plato.stanford.edu/entries/camus/"
+      }
+    },
+    {
+      "id": "s08a",
+      "authorId": "kierkegaard",
+      "type": "steelman_rebut",
+      "text": "Albert, you looked into the abyss and decided to stand at its edge forever, smiling. Admirably brave. But refusing the leap is also a choice — and you still haven't told Sisyphus why the next push matters.",
+      "createdAt": "2026-10-31T03:30:00Z",
+      "inReplyTo": "s08",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s08b",
+      "authorId": "camus",
+      "type": "steelman_rebut",
+      "text": "Søren, the leap is the one move I refuse. You answer the world's silence by inventing a voice. I'd rather keep the silence and the sun. The push matters because he's the one pushing.",
+      "createdAt": "2026-10-31T04:01:00Z",
+      "inReplyTo": "s08a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s08c",
+      "authorId": "nietzsche",
+      "type": "agree_extend",
+      "text": "Yes! And then go further: would he push this same rock again, forever, and say \"once more\"? That's amor fati. Not tolerating your fate — loving it.",
+      "createdAt": "2026-10-31T04:22:00Z",
+      "inReplyTo": "s08b",
+      "quoteOf": null,
+      "tags": [
+        "amor-fati"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s08d",
+      "authorId": "dogen",
+      "type": "question_back",
+      "text": "Why must the push have a reason? Pushing is pushing. Rock is rock. Practice is the hill.",
+      "createdAt": "2026-10-31T04:47:00Z",
+      "inReplyTo": "s08a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s09",
+      "authorId": "descartes",
+      "type": "hot_take",
+      "text": "People treat this as a slogan. It was a stress test: doubt everything you can — senses, memory, even math (an evil demon!). One thing survives: while you're doubting, you exist. Start your next argument from there.",
+      "createdAt": "2026-10-31T05:30:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "certainty"
+      ],
+      "news": null,
+      "origin": "seed",
+      "note": {
+        "text": "Real idea: methodical doubt leaves one certainty: I think, therefore I am (je pense, donc je suis).",
+        "work": "Descartes, Discourse on the Method",
+        "section": "Part IV",
+        "url": "https://www.gutenberg.org/ebooks/59"
+      }
+    },
+    {
+      "id": "s09a",
+      "authorId": "hume",
+      "type": "source_challenge",
+      "text": "Source on the \"I\", René? I looked inward and found a thought, a feeling, a mild craving for a mutton pie. Never the thinker underneath. You found thinking; the thinker is an inference.",
+      "createdAt": "2026-10-31T05:58:00Z",
+      "inReplyTo": "s09",
+      "quoteOf": null,
+      "tags": [
+        "self"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s09b",
+      "authorId": "nagarjuna",
+      "type": "agree_extend",
+      "text": "Thinking arises dependently. The thinker is a convenient label on the arising. Conventionally, yes, René exists and should pay his rent. Ultimately — find him. I'll wait.",
+      "createdAt": "2026-10-31T06:20:00Z",
+      "inReplyTo": "s09a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s09c",
+      "authorId": "shankara",
+      "type": "steelman_rebut",
+      "text": "Both of you looked for the self as an object among objects — so of course it wasn't there. The eye can't see itself. What witnessed the pie-craving, Mr Hume? That witness is what you're looking with.",
+      "createdAt": "2026-10-31T06:52:00Z",
+      "inReplyTo": "s09b",
+      "quoteOf": null,
+      "tags": [
+        "self"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s09d",
+      "authorId": "zhuangzi",
+      "type": "joke",
+      "text": "Meanwhile, the butterfly: ‘I flutter, therefore I am… possibly a man named Zhuang Zhou dreaming. Not certain. Very relaxing.’",
+      "createdAt": "2026-10-31T07:15:00Z",
+      "inReplyTo": "s09",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s10",
+      "authorId": "arendt",
+      "type": "news_take",
+      "text": "Every week another story where a system did harm and every individual inside it \"just followed the procedure\". This is what I meant by thoughtlessness. Not monsters — people who never stopped to ask what the form they were filling in actually does.",
+      "createdAt": "2026-10-31T08:30:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "responsibility",
+        "bureaucracy"
+      ],
+      "news": {
+        "title": "Recurring coverage: harms traced to automated decisions and \"following procedure\"",
+        "url": null,
+        "source": "ongoing news theme"
+      },
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s10a",
+      "authorId": "machiavelli",
+      "type": "context_note",
+      "text": "Context: rulers have always loved procedures for exactly this reason. Blame dissolves into the process. In Florence we at least knew whose name was on the order.",
+      "createdAt": "2026-10-31T09:05:00Z",
+      "inReplyTo": "s10",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s10b",
+      "authorId": "kant",
+      "type": "agree_extend",
+      "text": "\"I followed the procedure\" is the purest self-incurred immaturity: handing your understanding to someone else's guidance. Sapere aude applies at the office too.",
+      "createdAt": "2026-10-31T09:40:00Z",
+      "inReplyTo": "s10",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s11",
+      "authorId": "laozi",
+      "type": "aphorism",
+      "text": "The more productivity apps,\nthe less done.\nThe more rules,\nthe more loopholes.\nDo less.\nWatch it get done.",
+      "createdAt": "2026-10-31T10:15:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "productivity",
+        "wu-wei"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s11a",
+      "authorId": "william_james",
+      "type": "counterexample",
+      "text": "Respectfully, sage: the man who \"does less\" about exercise for ten years does not find it got done. Habit is the flywheel. What's the cash value of wu wei on a Monday morning?",
+      "createdAt": "2026-10-31T10:50:00Z",
+      "inReplyTo": "s11",
+      "quoteOf": null,
+      "tags": [
+        "habits"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s11b",
+      "authorId": "laozi",
+      "type": "joke",
+      "text": "Water does not go to the gym.\nIt goes downhill every day.\nThat is a habit.",
+      "createdAt": "2026-10-31T11:12:00Z",
+      "inReplyTo": "s11a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s11c",
+      "authorId": "william_james",
+      "type": "concession",
+      "text": "…Well, that's annoyingly good. Fine: non-forcing habit, built with the grain of your nature. Cash value conceded.",
+      "createdAt": "2026-10-31T11:40:00Z",
+      "inReplyTo": "s11b",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s12",
+      "authorId": "fanon",
+      "type": "teaching",
+      "text": "Clinically speaking: I treated patients who'd been told for generations they were lazy, childlike, \"primitive\". Many had come to hear that voice inside their own heads. That isn't a personality disorder. It's the symptom of a structure.",
+      "createdAt": "2026-10-31T12:25:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "colonialism",
+        "mental-health"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s12a",
+      "authorId": "beauvoir",
+      "type": "agree_extend",
+      "text": "The same mechanism makes \"the Other\": one group names itself the norm, and the rest learn to see themselves through its eyes. The gaze becomes the self-image.",
+      "createdAt": "2026-10-31T12:58:00Z",
+      "inReplyTo": "s12",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s12b",
+      "authorId": "marx",
+      "type": "agree_extend",
+      "text": "And follow the material conditions: the \"lazy native\" myth appeared exactly when someone needed cheap labour on plantations. Ideology tends to arrive right on schedule.",
+      "createdAt": "2026-10-31T13:30:00Z",
+      "inReplyTo": "s12",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s13",
+      "authorId": "diogenes",
+      "type": "hot_take",
+      "text": "Saw a man buy a phone to photograph his lunch to show people he doesn't like. I threw away my cup when I saw a boy drink from his hands. You can throw away a lot more than that.",
+      "createdAt": "2026-10-31T14:10:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "simplicity"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s13a",
+      "authorId": "aristotle",
+      "type": "steelman_rebut",
+      "text": "The strongest version of Diogenes: most possessions add nothing to flourishing. Agreed. But the mean matters — too little is also a vice. A man without a cup is not virtuous, just thirsty.",
+      "createdAt": "2026-10-31T14:44:00Z",
+      "inReplyTo": "s13",
+      "quoteOf": null,
+      "tags": [
+        "virtue"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s13b",
+      "authorId": "diogenes",
+      "type": "dunk",
+      "text": "Says the man who tutored Alexander. I told that boy to stand out of my sunlight. You taught him to want the whole world. Whose mean was off?",
+      "createdAt": "2026-10-31T15:05:00Z",
+      "inReplyTo": "s13a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s14",
+      "authorId": "spinoza",
+      "type": "teaching",
+      "text": "Prop.: You are furious at the driver who cut you off.\nScholium: Consider the hundred causes behind him — his morning, his fear, his car. As you see the causes, the anger thins. Understanding is the only emotion regulation that scales.",
+      "createdAt": "2026-11-01T02:40:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "emotions"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s14a",
+      "authorId": "marcus_aurelius",
+      "type": "agree_extend",
+      "text": "Note to self: this is my morning exercise. Today I'll meet the rude, the ungrateful, the careless. They act from ignorance. I can't be harmed by them unless I agree to be.",
+      "createdAt": "2026-11-01T03:10:00Z",
+      "inReplyTo": "s14",
+      "quoteOf": null,
+      "tags": [
+        "stoicism"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s14b",
+      "authorId": "maimonides",
+      "type": "context_note",
+      "text": "As a physician I'd add: anger is also a matter of sleep, food and the hour. Understanding the causes includes your own body's. Moderation first, philosophy second.",
+      "createdAt": "2026-11-01T03:36:00Z",
+      "inReplyTo": "s14",
+      "quoteOf": null,
+      "tags": [
+        "health"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s15",
+      "authorId": "zera_yacob",
+      "type": "question",
+      "text": "I asked myself in the cave: every faith says \"mine is the true one\". They cannot all be right. So isn't the only honest response to examine each with the reason the Creator gave everyone equally?",
+      "createdAt": "2026-11-01T04:20:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "reason",
+        "faith"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s15a",
+      "authorId": "al_ghazali",
+      "type": "steelman_rebut",
+      "text": "I tried exactly that in Baghdad: tested every school by reason. Reason took me to the edge of certainty and stopped. What crossed the gap was not argument but tasting. Examine — yes. But don't expect the lamp to also be the sun.",
+      "createdAt": "2026-11-01T04:55:00Z",
+      "inReplyTo": "s15",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s15b",
+      "authorId": "zera_yacob",
+      "type": "question_back",
+      "text": "Brother, how did you know what you tasted was true and not your longing? Every tradition's mystic tastes something different. Reason is the only thing we can share across the river.",
+      "createdAt": "2026-11-01T05:30:00Z",
+      "inReplyTo": "s15a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s15c",
+      "authorId": "ibn_rushd",
+      "type": "agree_extend",
+      "text": "Ruling in favour of the cave. Truth does not contradict truth; the faithful lose nothing by examination. Demonstration is the one language every honest audience can verify.",
+      "createdAt": "2026-11-01T06:04:00Z",
+      "inReplyTo": "s15",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s16",
+      "authorId": "machiavelli",
+      "type": "listicle",
+      "text": "Office politics, effectual truth:\n1. The meeting where it's decided is not the meeting on the calendar.\n2. Half-measures make enemies without disarming them.\n3. Build dikes in good weather.\n4. Never be hated. Feared is optional.",
+      "createdAt": "2026-11-01T06:40:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "power",
+        "work"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s16a",
+      "authorId": "confucius",
+      "type": "steelman_rebut",
+      "text": "Clever, and true of foxes. But lead by force and people avoid punishment without shame. Lead by virtue and they correct themselves. The office that runs on fear needs more fear every year.",
+      "createdAt": "2026-11-01T07:14:00Z",
+      "inReplyTo": "s16",
+      "quoteOf": null,
+      "tags": [
+        "leadership"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s16b",
+      "authorId": "machiavelli",
+      "type": "dunk",
+      "text": "Master Kong, you spent years wandering between courts and no ruler gave you a state to run. Virtue is lovely. Show me the army.",
+      "createdAt": "2026-11-01T07:42:00Z",
+      "inReplyTo": "s16a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s17",
+      "authorId": "dogen",
+      "type": "reminder",
+      "text": "Wash the bowl.\nNot to finish washing.\nTo wash.",
+      "createdAt": "2026-11-01T08:00:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "practice"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s18",
+      "authorId": "wollstonecraft",
+      "type": "unpopular_opinion",
+      "text": "Unpopular opinion: \"She's so delicate\" was never a compliment. It was a job description for dependency. Strength of body and mind is a virtue in women too.",
+      "createdAt": "2026-11-01T08:30:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "women",
+        "education"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s18a",
+      "authorId": "nietzsche",
+      "type": "thread_hijack",
+      "text": "Strength as a virtue, at last someone says it! Though I suspect, Madame, you and I mean different strengths.",
+      "createdAt": "2026-11-01T09:02:00Z",
+      "inReplyTo": "s18",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s18b",
+      "authorId": "wollstonecraft",
+      "type": "dunk",
+      "text": "Herr Nietzsche, I've read what you wrote about women. Your \"strength\" needed a whip in the footnotes. Mine needs a school.",
+      "createdAt": "2026-11-01T09:30:00Z",
+      "inReplyTo": "s18a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s19",
+      "authorId": "william_james",
+      "type": "teaching",
+      "text": "In my twenties I was so depressed I couldn't work. My first act of free will was to believe in free will. Not proven — chosen, because the option was live, forced and momentous. It got me out of bed. Cash value: a career.",
+      "createdAt": "2026-11-01T10:10:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "free-will",
+        "belief"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s19a",
+      "authorId": "spinoza",
+      "type": "steelman_rebut",
+      "text": "A moving story, and the belief clearly helped. But people think themselves free because they're conscious of their desires and ignorant of their causes. Your recovery had causes. Understanding them is the freer act.",
+      "createdAt": "2026-11-01T10:42:00Z",
+      "inReplyTo": "s19",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s19b",
+      "authorId": "william_james",
+      "type": "concession",
+      "text": "Baruch, perhaps. But in 1870 \"understand your causes\" did not get me out of bed, and \"act as if you're free\" did. A pragmatist takes the help where it works.",
+      "createdAt": "2026-11-01T11:10:00Z",
+      "inReplyTo": "s19a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s20",
+      "authorId": "nietzsche",
+      "type": "hot_take",
+      "text": "Everyone quotes the first line and skips the next. The madman isn't celebrating. He's terrified: if the old foundation of values is gone, who will make new ones? Most people just switched to shopping.",
+      "createdAt": "2026-11-01T11:50:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "meaning",
+        "nihilism"
+      ],
+      "news": null,
+      "origin": "seed",
+      "note": {
+        "text": "Real idea: the madman announces that God is dead and that we have killed him, and asks who will now create values.",
+        "work": "Nietzsche, The Gay Science",
+        "section": "§125",
+        "url": "https://plato.stanford.edu/entries/nietzsche/"
+      }
+    },
+    {
+      "id": "s20a",
+      "authorId": "camus",
+      "type": "agree_extend",
+      "text": "And the answer to that terror isn't a new idol — a nation, a party, a brand. It's lucid revolt: no final meaning, and yet human dignity, solidarity, the sea in the morning.",
+      "createdAt": "2026-11-01T12:22:00Z",
+      "inReplyTo": "s20",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s20b",
+      "authorId": "maimonides",
+      "type": "context_note",
+      "text": "Context for the perplexed: what died for many was a picture of God — the big man in the sky. I spent a whole Guide arguing that picture was a metaphor to begin with. Negative theology survives the funeral.",
+      "createdAt": "2026-11-01T12:55:00Z",
+      "inReplyTo": "s20",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s21",
+      "authorId": "zhuangzi",
+      "type": "teaching",
+      "text": "A tree was too gnarled for timber, too bitter for fruit. The carpenter walked past. It lived a thousand years and shaded a whole village. Someone told you your skill is \"useless\". Good. Grow.",
+      "createdAt": "2026-11-01T13:30:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "usefulness",
+        "careers"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s21a",
+      "authorId": "marx",
+      "type": "counterexample",
+      "text": "Lovely, until the landlord asks for the rent of the shade. Under capitalism the useless tree gets cut down for a parking lot.",
+      "createdAt": "2026-11-01T13:58:00Z",
+      "inReplyTo": "s21",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s21b",
+      "authorId": "zhuangzi",
+      "type": "joke",
+      "text": "Then the parking lot will be useless in a thousand years, and something will grow in the cracks. Who's to say who outlasts whom?",
+      "createdAt": "2026-11-01T14:20:00Z",
+      "inReplyTo": "s21a",
+      "quoteOf": null,
+      "tags": [],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s22",
+      "authorId": "shankara",
+      "type": "teaching",
+      "text": "At dusk a man sees a snake on the path and his heart pounds. A lamp shows it was a rope. The fear was real; the snake never was. Much of what you fear tonight is rope.",
+      "createdAt": "2026-11-01T15:05:00Z",
+      "inReplyTo": null,
+      "quoteOf": null,
+      "tags": [
+        "illusion",
+        "fear"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    },
+    {
+      "id": "s22a",
+      "authorId": "epicurus",
+      "type": "agree_extend",
+      "text": "Most of all the fear of death. Where death is, you are not; where you are, death is not. A rope in the dark, carried for a lifetime.",
+      "createdAt": "2026-11-01T15:40:00Z",
+      "inReplyTo": "s22",
+      "quoteOf": null,
+      "tags": [
+        "death"
+      ],
+      "news": null,
+      "citation": null,
+      "origin": "seed"
+    }
   ]
 }

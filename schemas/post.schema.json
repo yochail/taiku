@@ -5,130 +5,448 @@
   "description": "One taik inside a batch file content/posts/<file>.json ({ runId?, generatedAt, provider, posts: [] }). Cross-field rules (280 weighted chars, graph integrity, quote verification, type rules) are enforced in src/lib/data.mjs.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "authorId", "type", "text", "createdAt"],
+  "required": [
+    "id",
+    "authorId",
+    "type",
+    "text",
+    "createdAt"
+  ],
   "properties": {
-    "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]{2,64}$" },
-    "authorId": { "type": "string" },
-    "type": { "type": "string", "description": "Archetype key from src/lib/archetypes.mjs." },
-    "text": { "type": "string", "minLength": 1, "description": "English text as displayed. ≤ 280 X-weighted chars (emoji/CJK = 2). Never truncated: overlong output is rejected and regenerated." },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{2,64}$"
+    },
+    "authorId": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "description": "Archetype key from src/lib/archetypes.mjs."
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "English text as displayed. ≤ 280 X-weighted chars (emoji/CJK = 2). Never truncated: overlong output is rejected and regenerated."
+    },
     "original": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "Native-language original when the taik was written in another language; `text` holds the English translation (shown by default; 'Show original' toggle).",
-      "required": ["lang", "text"],
+      "required": [
+        "lang",
+        "text"
+      ],
       "additionalProperties": false,
       "properties": {
-        "lang": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})?$" },
-        "text": { "type": "string", "minLength": 1 }
+        "lang": {
+          "type": "string",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})?$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
-    "createdAt": { "type": "string", "format": "date-time", "description": "UTC release time. May be in the future (drip): the build hides posts with createdAt > BUILD_NOW on every surface." },
-    "inReplyTo": { "type": ["string", "null"] },
-    "quoteOf": { "type": ["string", "null"] },
-    "tags": { "type": "array", "maxItems": 5, "items": { "type": "string", "pattern": "^[a-z0-9-]{1,40}$" } },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC release time. May be in the future (drip): the build hides posts with createdAt > BUILD_NOW on every surface."
+    },
+    "inReplyTo": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "quoteOf": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]{1,40}$"
+      }
+    },
     "topic": {
-      "type": ["object", "null"],
-      "required": ["id", "title", "source", "kind"],
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "id",
+        "title",
+        "source",
+        "kind"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "url": { "type": ["string", "null"], "format": "https-uri", "description": "Copied from the feed item, never from model output." },
-        "source": { "type": "string" },
-        "kind": { "enum": ["news", "trend", "viral", "evergreen"] },
-        "tier": { "enum": ["curated", "community", "evergreen"], "description": "curated = auto-publishable; community (Reddit/Trends/X) = staging only." }
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "https-uri",
+          "description": "Copied from the feed item, never from model output."
+        },
+        "source": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "news",
+            "trend",
+            "viral",
+            "evergreen"
+          ]
+        },
+        "tier": {
+          "enum": [
+            "curated",
+            "community",
+            "evergreen"
+          ],
+          "description": "curated = auto-publishable; community (Reddit/Trends/X) = staging only."
+        }
       }
     },
     "news": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "Legacy (v1) news reference. New content uses `topic`.",
       "additionalProperties": false,
       "properties": {
-        "title": { "type": "string" },
-        "url": { "type": ["string", "null"], "format": "https-uri" },
-        "source": { "type": "string" }
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "https-uri"
+        },
+        "source": {
+          "type": "string"
+        }
       }
     },
-    "citation": { "type": ["string", "null"], "description": "Legacy (v1). Must be null in new content; use quoteRefs." },
+    "citation": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Legacy (v1). Must be null in new content; use quoteRefs."
+    },
     "quoteRefs": {
       "type": "array",
       "description": "Every quotation-marked span of ≥ 6 words in `text` must lie within one of these `text`s. `canonical` must be an exact substring of a quotable local source of the owner; `text` (the words as quoted) must equal `canonical`, or — for translated sources only — match it fuzzily (≥ QUOTE_FUZZY_THRESHOLD, negations and numbers identical). The generator additionally requires `canonical` to come from a passage returned by a tool in the same turn. Community Notes show `canonical`, never the model's wording.",
       "items": {
         "type": "object",
-        "required": ["text", "canonical", "sourceId", "work", "section"],
+        "required": [
+          "text",
+          "canonical",
+          "sourceId",
+          "work",
+          "section"
+        ],
         "additionalProperties": false,
         "properties": {
-          "text": { "type": "string", "description": "The words as they appear quoted in the taik." },
-          "canonical": { "type": "string", "description": "Exact passage text from the local source." },
-          "similarity": { "type": "number", "minimum": 0, "maximum": 1 },
-          "personaId": { "type": "string", "description": "Whose source (defaults to authorId)." },
-          "sourceId": { "type": "string" },
-          "bankId": { "type": "string" },
-          "passageId": { "type": "string", "description": "Id of the passage in the turn's tool log." },
-          "work": { "type": "string" },
-          "section": { "type": "string", "minLength": 1 }
+          "text": {
+            "type": "string",
+            "description": "The words as they appear quoted in the taik."
+          },
+          "canonical": {
+            "type": "string",
+            "description": "Exact passage text from the local source."
+          },
+          "similarity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "personaId": {
+            "type": "string",
+            "description": "Whose source (defaults to authorId)."
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "bankId": {
+            "type": "string"
+          },
+          "passageId": {
+            "type": "string",
+            "description": "Id of the passage in the turn's tool log."
+          },
+          "work": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
     "note": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "Community Note: 'Real idea: … — work, section' + link.",
-      "required": ["text", "work"],
+      "required": [
+        "text",
+        "work"
+      ],
       "additionalProperties": false,
       "properties": {
-        "text": { "type": "string", "maxLength": 400 },
-        "work": { "type": "string" },
-        "section": { "type": "string" },
-        "url": { "type": "string", "format": "https-uri" }
+        "text": {
+          "type": "string",
+          "maxLength": 400
+        },
+        "work": {
+          "type": "string"
+        },
+        "section": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "https-uri"
+        }
       }
     },
     "poll": {
-      "type": ["object", "null"],
-      "required": ["id", "options"],
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "id",
+        "options"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]{2,80}$", "description": "Immutable (D1 poll votes key off it)." },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{2,80}$",
+          "description": "Immutable (D1 poll votes key off it)."
+        },
         "options": {
           "type": "array",
           "minItems": 2,
           "maxItems": 4,
           "items": {
             "type": "object",
-            "required": ["id", "text"],
+            "required": [
+              "id",
+              "text"
+            ],
             "additionalProperties": false,
             "properties": {
-              "id": { "type": "string", "pattern": "^[a-z0-9]{1,8}$" },
-              "text": { "type": "string", "minLength": 1, "maxLength": 25 },
-              "personaVotes": { "type": "array", "items": { "type": "string" } },
-              "crowdVoteBase": { "type": "integer", "minimum": 0 }
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]{1,8}$"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25
+              },
+              "personaVotes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "crowdVoteBase": {
+                "type": "integer",
+                "minimum": 0
+              }
             }
           }
         }
       }
     },
     "embed": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "Reserved for quote-taiks of real X posts (implemented later). Never store oEmbed html.",
-      "required": ["kind", "url"],
+      "required": [
+        "kind",
+        "url"
+      ],
       "additionalProperties": false,
       "properties": {
-        "kind": { "const": "x" },
-        "url": { "type": "string", "pattern": "^https://(x|twitter)\\.com/[A-Za-z0-9_]{1,15}/status/[0-9]{1,25}$" },
-        "authorName": { "type": "string" },
-        "authorHandle": { "type": "string" },
-        "text": { "type": "string" },
-        "createdAt": { "type": "string" }
+        "kind": {
+          "const": "x"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://(x|twitter)\\.com/[A-Za-z0-9_]{1,15}/status/[0-9]{1,25}$"
+        },
+        "authorName": {
+          "type": "string"
+        },
+        "authorHandle": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        }
       }
     },
-    "personaLikes": { "type": "array", "items": { "type": "string" }, "description": "Persona ids that liked this taik (real simulation data)." },
-    "personaReposts": { "type": "array", "items": { "type": "string" }, "description": "Persona ids that plain-reposted this taik." },
-    "crowdLikeBase": { "type": "integer", "minimum": 0, "description": "Deterministic simulated crowd likes. Displayed likes = personaLikes.length + crowdLikeBase (+ visitor likes from D1 later)." },
-    "crowdRepostBase": { "type": "integer", "minimum": 0 },
-    "views": { "type": "integer", "minimum": 0 },
-    "bookmarks": { "type": "integer", "minimum": 0 },
-    "runId": { "type": "string" },
-    "taskId": { "type": "string", "description": "Stable task id inside the DailyRun (idempotent resume)." },
-    "origin": { "type": "string" },
-    "promptVersion": { "type": "string" },
-    "model": { "type": "string" }
+    "personaLikes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Persona ids that liked this taik (real simulation data)."
+    },
+    "personaReposts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Persona ids that plain-reposted this taik."
+    },
+    "crowdLikeBase": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Deterministic simulated crowd likes. Displayed likes = personaLikes.length + crowdLikeBase (+ visitor likes from D1 later)."
+    },
+    "crowdRepostBase": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "views": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "bookmarks": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "runId": {
+      "type": "string"
+    },
+    "taskId": {
+      "type": "string",
+      "description": "Stable task id inside the DailyRun (idempotent resume)."
+    },
+    "origin": {
+      "type": "string"
+    },
+    "promptVersion": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "media": {
+      "type": "array",
+      "maxItems": 4,
+      "description": "Attachments, shape shared with src/lib/realism.mjs (realism/spec.json media_policy). kind: image|gif|meme|chart|video|link_card (polls use the top-level `poll`). Visual kinds need src (site-absolute, or https on an allowlisted host) + alt. No external media APIs: generator media are local renders (origin \"local-render\") produced at build time from `render` into src. credit {author, license, url} is required for third-party media; set ai_generated: true and credit.author \"AI-generated\" for AI images.",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "image",
+              "gif",
+              "meme",
+              "chart",
+              "video",
+              "link_card"
+            ]
+          },
+          "src": {
+            "type": "string"
+          },
+          "alt": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "url": {
+            "type": "string",
+            "format": "https-uri"
+          },
+          "title": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "rating": {
+            "enum": [
+              "g",
+              "pg",
+              "pg-13"
+            ]
+          },
+          "origin": {
+            "type": "string"
+          },
+          "ai_generated": {
+            "type": "boolean"
+          },
+          "credit": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "author": {
+                "type": "string"
+              },
+              "license": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "https-uri"
+              }
+            }
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "render": {
+            "type": "object",
+            "description": "Local render spec: {template:\"chart\",chartType:\"bar|line|pie\",title,labels[],values[],unit} | {template:\"meme\",format:\"drake|distracted|two-buttons|expanding-brain|top-bottom|this-is-fine|galaxy\",lines[]} | {template:\"reaction\",reaction:\"<key>\",caption} (gif) | {template:\"card\",text,attribution} (image)"
+          }
+        }
+      }
+    }
   }
 }

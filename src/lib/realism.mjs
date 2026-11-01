@@ -74,8 +74,9 @@ export function classify(post, byId) {
 }
 
 export function mediaOf(post) {
-  if (Array.isArray(post.media)) return post.media.filter(Boolean);
-  return post.media ? [post.media] : [];
+  const items = Array.isArray(post.media) ? post.media.filter(Boolean) : post.media ? [post.media] : [];
+  // Taiku stores polls in the top-level `poll` field; count them as a poll attachment.
+  return post.poll ? [...items, { kind: 'poll', options: post.poll.options }] : items;
 }
 
 /** Hard safety/attribution rules for one media item. Returns a list of problems. */
