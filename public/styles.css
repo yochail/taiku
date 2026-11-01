@@ -118,7 +118,9 @@ a:hover { text-decoration: underline; }
 .pager { display: flex; justify-content: space-between; padding: 16px; }
 
 .profile { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
-.banner { --c: #64748b; height: 150px; background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 40%, #000)); }
+.banner { --c: #64748b; height: 150px; background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 40%, #000)); background-size: cover; background-position: center; }
+img.avatar { object-fit: cover; padding: 0; background: var(--c, #64748b); }
+.credit { color: var(--muted); font-size: 12px; margin-top: 16px; }
 .profile-top { padding: 0 16px; margin-top: -64px; }
 .profile .p-name { margin: 8px 16px 0; font-size: 22px; }
 .profile .handle { margin: 0 16px; }
