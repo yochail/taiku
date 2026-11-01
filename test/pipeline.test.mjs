@@ -91,12 +91,16 @@ test('idempotent + resumable: rerunning the same date skips done tasks and never
   assert.ok(manifest.nonce, 'nonce is logged');
   const b = await run({ root, nonce: undefined });
   assert.equal(b.manifest.nonce, manifest.nonce, 'resume reuses the logged nonce');
-  const failedFirst = a.manifest.tasks.filter((t) => t.status === 'failed').length;
-  assert.ok(b.manifest.budget.used <= failedFirst, 'no LLM calls on a complete rerun (only failed tasks are retried)');
+  // Every task finished in run A is resumed with no LLM call. Only the rest (failed, plus their
+  // dropped/blocked descendants) runs again, and the whole budget goes to them.
+  const doneA = new Set(a.manifest.tasks.filter((t) => t.status === 'done').map((t) => t.taskId));
+  const redone = b.manifest.tasks.filter((t) => doneA.has(t.taskId) && (!t.resumed || (t.calls ?? 0) > 0));
+  assert.deepEqual(redone.map((t) => t.taskId), [], 'no LLM calls for tasks already done (only failed tasks are retried)');
+  if (a.manifest.tasks.every((t) => doneA.has(t.taskId))) assert.equal(b.manifest.budget.used, 0, 'a complete day reruns with zero LLM calls');
   const second = read(paths.posts).posts.map((p) => p.id);
   assert.deepEqual(second, first);
   assert.equal(new Set(second).size, second.length);
-  assert.ok(b.manifest.tasks.every((t) => t.status !== 'done' || t.resumed));
+  assert.ok(b.manifest.tasks.every((t) => t.status !== 'done' || t.resumed || !doneA.has(t.taskId)));
   assert.equal(a.manifest.tasks[0].taskId, b.manifest.tasks[0].taskId, 'stable task ids');
   // replay with the logged nonce in a new root gives the same plan
   const c = await run({ root: freshRoot(), nonce: manifest.nonce });
