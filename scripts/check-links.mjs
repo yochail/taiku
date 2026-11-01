@@ -6,7 +6,7 @@
 // Exit 0 unless --strict and some URL is dead.
 import fs from 'node:fs';
 import { CARD_KINDS, loadPosts } from '../src/lib/data.mjs';
-import { UA } from '../src/lib/unfurl.mjs';
+import { safeFetch } from '../src/lib/safe-fetch.mjs';
 import { hash8 } from '../src/lib/pipeline-util.mjs';
 
 const args = process.argv.slice(2);
@@ -25,9 +25,9 @@ const urls = [...where.keys()].sort((a, b) => hash8(`${day}:${a}`).localeCompare
 
 async function probe(url) {
   try {
-    const res = await fetch(url, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow', signal: AbortSignal.timeout(12000) });
-    res.body?.cancel().catch(() => {});
-    return { url, status: res.status, verdict: res.ok ? 'ok' : [401, 403, 429].includes(res.status) ? 'blocked' : 'dead' };
+    const res = await safeFetch(url, { timeoutMs: 12000, maxBytes: 4096 });
+    const live = res.status >= 200 && res.status < 300;
+    return { url, status: res.status, verdict: live ? 'ok' : [401, 403, 429].includes(res.status) ? 'blocked' : 'dead' };
   } catch (e) {
     return { url, status: 0, verdict: 'dead', error: String(e?.cause?.code ?? e?.name ?? e) };
   }

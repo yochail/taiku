@@ -5,8 +5,15 @@
 import fs from 'node:fs';
 import { sitePath } from './site.mjs';
 import { safeUrl } from './data.mjs';
-import { decode } from './news.mjs';
-import { UA } from './unfurl.mjs';
+import { decode, sanitizeUntrusted } from './news.mjs';
+import { safeFetch } from './safe-fetch.mjs';
+
+// Only these hosts are ever called. oEmbed is used for data only: its `html` is parsed for text
+// server-side and never rendered, and widgets.js is never loaded.
+export const OEMBED_HOSTS = ['publish.twitter.com', 'embed.bsky.app'];
+export const API_HOSTS = ['public.api.bsky.app'];
+const TEXT_MAX = 560;
+const clean = (s, max = TEXT_MAX) => sanitizeUntrusted(s, max);
 
 const BSKY = 'https://public.api.bsky.app/xrpc';
 const X_STATUS = /^https:\/\/(?:www\.|mobile\.)?(?:twitter|x)\.com\/([A-Za-z0-9_]{1,15})\/status(?:es)?\/(\d{5,25})/;
@@ -42,9 +49,15 @@ export function allowedAccount(accounts, platform, handle) {
   return accounts.find((a) => a.platform === platform && norm(a.handle) === norm(handle)) ?? null;
 }
 
-const getJson = async (fetchImpl, url, timeoutMs) => {
-  const res = await fetchImpl(url, { headers: { 'user-agent': UA, accept: 'application/json' }, signal: AbortSignal.timeout(timeoutMs) });
-  return { status: res.status, body: res.ok ? await res.json() : null };
+const getJson = async (fetchImpl, url, timeoutMs, lookup) => {
+  const res = await safeFetch(url, { fetchImpl, ...(lookup ? { lookup } : {}), hosts: [...OEMBED_HOSTS, ...API_HOSTS], expect: 'json', timeoutMs, maxBytes: 256 * 1024 });
+  let body = null;
+  try {
+    body = res.ok ? JSON.parse(res.text) : null;
+  } catch {
+    body = null;
+  }
+  return { status: res.status, body };
 };
 
 /** Parse the oEmbed blockquote: <p>TEXT</p>&mdash; Name (@handle) <a href="…/status/ID">Date</a>. */
@@ -58,15 +71,16 @@ export function parseOembed(doc) {
   return { text, handle, author_name: decode(doc?.author_name ?? ''), created_at: Number.isFinite(t) ? new Date(t).toISOString().slice(0, 10) : null };
 }
 
-export async function fetchXPost(url, { fetchImpl = globalThis.fetch, timeoutMs = 8000 } = {}) {
+export async function fetchXPost(url, { fetchImpl = globalThis.fetch, timeoutMs = 8000, lookup } = {}) {
   const m = String(url).match(X_STATUS);
   if (!m) return null;
   const canon = `https://x.com/${m[1]}/status/${m[2]}`;
-  const { status, body } = await getJson(fetchImpl, `https://publish.twitter.com/oembed?omit_script=1&dnt=1&url=${encodeURIComponent(canon)}`, timeoutMs);
+  const { status, body } = await getJson(fetchImpl, `https://publish.twitter.com/oembed?omit_script=1&dnt=1&url=${encodeURIComponent(canon)}`, timeoutMs, lookup);
   if (!body) return { ok: false, status };
   const o = parseOembed(body);
-  if (!o.text || !o.handle) return { ok: false, status };
-  return { ok: true, status, post: { kind: 'x_post', url: `https://x.com/${o.handle}/status/${m[2]}`, author_name: o.author_name, handle: o.handle, text: o.text, created_at: o.created_at } };
+  const text = clean(o.text);
+  if (!text || !/^[A-Za-z0-9_]{1,15}$/.test(o.handle ?? '')) return { ok: false, status };
+  return { ok: true, status, post: { kind: 'x_post', url: `https://x.com/${o.handle}/status/${m[2]}`, author_name: clean(o.author_name, 80), handle: o.handle, text, created_at: o.created_at } };
 }
 
 const bskyPost = (p) => {
@@ -75,10 +89,10 @@ const bskyPost = (p) => {
   return {
     kind: 'bsky_post',
     url: `https://bsky.app/profile/${p.author.handle}/post/${rkey}`,
-    author_name: p.author.displayName || p.author.handle,
+    author_name: clean(p.author.displayName || p.author.handle, 80),
     handle: p.author.handle,
     ...(safeUrl(p.author.avatar ?? '') ? { avatar_url: p.author.avatar } : {}),
-    text: String(p.record?.text ?? ''),
+    text: clean(p.record?.text ?? ''),
     created_at: p.record?.createdAt ?? p.indexedAt,
     ...(safeUrl(thumb ?? '') ? { media_thumb: thumb } : {}),
     metrics: { likes: p.likeCount ?? 0, reposts: p.repostCount ?? 0, replies: p.replyCount ?? 0, quotes: p.quoteCount ?? 0 },
@@ -86,27 +100,27 @@ const bskyPost = (p) => {
   };
 };
 
-export async function fetchBskyPost(url, { fetchImpl = globalThis.fetch, timeoutMs = 8000 } = {}) {
+export async function fetchBskyPost(url, { fetchImpl = globalThis.fetch, timeoutMs = 8000, lookup } = {}) {
   const m = String(url).match(BSKY_POST);
   if (!m) return null;
   let did = m[1];
   if (!did.startsWith('did:')) {
-    const r = await getJson(fetchImpl, `${BSKY}/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(did)}`, timeoutMs);
+    const r = await getJson(fetchImpl, `${BSKY}/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(did)}`, timeoutMs, lookup);
     if (!r.body?.did) return { ok: false, status: r.status };
     did = r.body.did;
   }
-  const r = await getJson(fetchImpl, `${BSKY}/app.bsky.feed.getPosts?uris=${encodeURIComponent(`at://${did}/app.bsky.feed.post/${m[2]}`)}`, timeoutMs);
+  const r = await getJson(fetchImpl, `${BSKY}/app.bsky.feed.getPosts?uris=${encodeURIComponent(`at://${did}/app.bsky.feed.post/${m[2]}`)}`, timeoutMs, lookup);
   const p = r.body?.posts?.[0];
-  if (!p?.record?.text) return { ok: false, status: r.status };
+  if (!p?.record?.text || !clean(p.record.text)) return { ok: false, status: r.status };
   return { ok: true, status: r.status, post: bskyPost(p) };
 }
 
 /** Recent original posts (no replies/reposts) from allowlisted Bluesky accounts, newest first. */
-export async function fetchBskyCandidates(accounts, { fetchImpl = globalThis.fetch, timeoutMs = 8000, perAccount = 10, log = () => {} } = {}) {
+export async function fetchBskyCandidates(accounts, { fetchImpl = globalThis.fetch, timeoutMs = 8000, perAccount = 10, log = () => {}, lookup } = {}) {
   const out = [];
   for (const a of accounts.filter((x) => x.platform === 'bluesky')) {
     try {
-      const r = await getJson(fetchImpl, `${BSKY}/app.bsky.feed.getAuthorFeed?actor=${encodeURIComponent(a.handle)}&filter=posts_no_replies&limit=${perAccount}`, timeoutMs);
+      const r = await getJson(fetchImpl, `${BSKY}/app.bsky.feed.getAuthorFeed?actor=${encodeURIComponent(a.handle)}&filter=posts_no_replies&limit=${perAccount}`, timeoutMs, lookup);
       for (const item of r.body?.feed ?? []) if (!item.reason && item.post?.record?.text && norm(item.post.author.handle) === norm(a.handle)) out.push({ ...bskyPost(item.post), account: a.kind });
     } catch (e) {
       log(`bsky ${a.handle}: ${e.name}`);

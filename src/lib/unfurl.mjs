@@ -5,10 +5,11 @@ import path from 'node:path';
 import { sitePath } from './site.mjs';
 import { safeUrl } from './data.mjs';
 import { domainOf, decode, sanitizeUntrusted } from './news.mjs';
+import { safeFetch } from './safe-fetch.mjs';
 
 export const UNFURL_CACHE = () => sitePath('content', 'state', 'unfurl-cache.json');
 export const UA = 'Mozilla/5.0 (compatible; TaikuBot/1.0; +https://taiku.app)';
-const MAX_BYTES = 600_000;
+const MAX_BYTES = 512 * 1024;
 
 export function loadUnfurlCache(file = UNFURL_CACHE()) {
   try {
@@ -66,27 +67,11 @@ export function parseMeta(html, baseUrl) {
   };
 }
 
-async function readCapped(res) {
-  const reader = res.body?.getReader?.();
-  if (!reader) return (await res.text()).slice(0, MAX_BYTES);
-  const chunks = [];
-  let size = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    size += value.length;
-    if (size >= MAX_BYTES || /<\/head>/i.test(Buffer.from(value).toString('latin1'))) break;
-  }
-  reader.cancel().catch(() => {});
-  return Buffer.concat(chunks.map((c) => Buffer.from(c))).toString('utf8');
-}
-
 /**
  * Unfurl one URL through the cache. Failed fetches are cached too (status, ok:false) and retried after
  * retryDays. offline: cache only. Returns the cache entry {url, ok, status, fetchedAt, meta} or null.
  */
-export async function unfurl(rawUrl, { cache, fetchImpl = globalThis.fetch, timeoutMs = 8000, offline = false, retryDays = 7, now = Date.now() } = {}) {
+export async function unfurl(rawUrl, { cache, fetchImpl = globalThis.fetch, lookup, timeoutMs = 8000, offline = false, retryDays = 7, now = Date.now() } = {}) {
   const url = safeUrl(rawUrl);
   if (!url) return null;
   const hit = cache?.items[url];
@@ -94,13 +79,11 @@ export async function unfurl(rawUrl, { cache, fetchImpl = globalThis.fetch, time
   if (offline || !fetchImpl) return hit ?? null;
   let entry;
   try {
-    const res = await fetchImpl(url, { headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml' }, redirect: 'follow', signal: AbortSignal.timeout(timeoutMs) });
-    const ok = res.ok && /html/i.test(res.headers?.get?.('content-type') ?? 'text/html');
-    const meta = ok ? parseMeta(await readCapped(res), res.url || url) : null;
-    if (!ok) res.body?.cancel?.().catch?.(() => {});
-    entry = { url, ok: Boolean(ok && meta?.title), status: res.status, fetchedAt: new Date(now).toISOString(), meta };
+    const res = await safeFetch(url, { fetchImpl, ...(lookup ? { lookup } : {}), expect: 'html', timeoutMs, maxBytes: MAX_BYTES, stopAt: /<\/head>/i });
+    const meta = res.ok ? parseMeta(res.text, res.url) : null;
+    entry = { url, ok: Boolean(res.ok && meta?.title), status: res.status, fetchedAt: new Date(now).toISOString(), meta, ...(res.error ? { error: res.error } : {}) };
   } catch (e) {
-    entry = { url, ok: false, status: 0, error: String(e?.name ?? 'error'), fetchedAt: new Date(now).toISOString(), meta: null };
+    entry = { url, ok: false, status: 0, error: e?.name === 'BlockedUrlError' ? e.message : String(e?.name ?? 'error'), fetchedAt: new Date(now).toISOString(), meta: null };
   }
   if (cache) cache.items[url] = entry;
   return entry;

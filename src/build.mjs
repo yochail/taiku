@@ -3,7 +3,8 @@
 // content/posts/*.json, writes indexable HTML to dist/.
 import fs from 'node:fs';
 import path from 'node:path';
-import { displayName, publicFile, ROOT, SITE_DIR, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
+import { displayName, publicFile, ROOT, SITE_DIR, loadPersonas, loadPosts, validate, indexPosts, safeUrl } from './lib/data.mjs';
+import { sanitizeUntrusted } from './lib/news.mjs';
 import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderText, slugify } from './lib/util.mjs';
 import { writeMediaFiles } from './lib/media.mjs';
 import { PostPack } from './lib/postpack.mjs';
@@ -144,11 +145,21 @@ const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); 
 const LINK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5zM8 9h8M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 
 /** X-style link card: big thumbnail on top when there is one, otherwise a compact row with an icon. */
-function linkCard({ url: href, title, domain, site_name: site, description, src: src0, width: w0, height: h0, alt, image, icon }) {
+// Fetched card/post fields are untrusted: every URL goes through safeUrl() (or is a same-site path) and
+// every fetched string through sanitizeUntrusted() at render time, whatever the stored data says.
+const imgUrl = (u) => (typeof u === 'string' && /^\/(?!\/)/.test(u) ? u : safeUrl(u));
+const num = (v) => (Number.isInteger(v) && v > 0 && v < 10000 ? v : undefined);
+
+function linkCard({ url: href0, title: title0, domain, site_name: site0, description: desc0, src: src0, width: w0, height: h0, alt, image, icon: icon0 }) {
+  const href = safeUrl(href0);
+  const title = title0 ? sanitizeUntrusted(title0, 200) : '';
+  const site = site0 ? sanitizeUntrusted(site0, 80) : '';
+  const description = desc0 ? sanitizeUntrusted(desc0, 300) : '';
+  const icon = imgUrl(icon0);
   if (!title && !href) return '';
-  const src = image?.url ?? src0;
-  const width = image ? image.width : w0;
-  const height = image ? image.height : h0;
+  const src = imgUrl(image?.url ?? src0);
+  const width = num(image ? image.width : w0);
+  const height = num(image ? image.height : h0);
   const dom = domain || (href ? hostOf(href) : '') || site || 'news';
   const size = width && height ? ` width="${width}" height="${height}"` : '';
   const img = src
@@ -160,8 +171,12 @@ function linkCard({ url: href, title, domain, site_name: site, description, src:
 }
 
 /** Quote of a real public post (x_post / bsky_post): exact fetched text, links out to the original. */
-function realPostHtml(m) {
-  if (!m.url || !m.text) return '';
+function realPostHtml(m0) {
+  const url = safeUrl(m0.url);
+  const text = sanitizeUntrusted(m0.text ?? '', 560);
+  const handle = /^[A-Za-z0-9_.:-]{1,64}$/.test(m0.handle ?? '') ? m0.handle : '';
+  if (!url || !text || !handle) return '';
+  const m = { ...m0, url, text, handle, author_name: sanitizeUntrusted(m0.author_name ?? '', 80), avatar_url: safeUrl(m0.avatar_url), media_thumb: safeUrl(m0.media_thumb) };
   const net = m.kind === 'x_post' ? 'X' : 'Bluesky';
   const when = Number.isFinite(Date.parse(m.created_at ?? '')) ? new Date(m.created_at).toISOString().slice(0, 10) : '';
   const av = m.avatar_url ? `<img class="rp-avatar" src="${esc(m.avatar_url)}" alt="" width="20" height="20" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : '';
