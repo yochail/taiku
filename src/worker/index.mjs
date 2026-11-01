@@ -62,7 +62,9 @@ export default {
     for (const [k, v] of Object.entries(meta.headers ?? {})) headers.set(k, v);
     headers.set('cache-control', BROWSER_CACHE);
     headers.set('etag', etag);
-    if (request.headers.get('if-none-match') === etag) return new Response(null, { status: 304, headers });
+    // Weak comparison (RFC 9110): Cloudflare weakens the ETag to W/"…" when it compresses the body.
+    const inm = (request.headers.get('if-none-match') ?? '').split(',').map((v) => v.trim().replace(/^W\//, ''));
+    if (inm.includes(etag) || inm.includes('*')) return new Response(null, { status: 304, headers });
     return new Response(request.method === 'HEAD' ? null : res.body, { status: 200, headers });
   },
 };

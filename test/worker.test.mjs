@@ -73,6 +73,7 @@ test('Worker applies _headers, ETag/304, HEAD, redirects and 404s like the asset
   assert.equal(res.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
   const etag = res.headers.get('etag');
   assert.equal((await get(`/p/${id}/`, { headers: { 'if-none-match': etag } })).status, 304);
+  assert.equal((await get(`/p/${id}/`, { headers: { 'if-none-match': `"x", W/${etag}` } })).status, 304);
   const head = await get(`/p/${id}/`, { method: 'HEAD' });
   assert.equal(head.status, 200);
   assert.equal(await head.text(), '');
