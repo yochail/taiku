@@ -14,12 +14,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ROOT, loadPersonas, validate } from '../src/lib/data.mjs';
+import { SITE_DIR, loadPersonas, validate } from '../src/lib/data.mjs';
 import { loadOtherPosts, outputPaths } from '../src/lib/run.mjs';
 import { readJson, writeJsonAtomic } from '../src/lib/pipeline-util.mjs';
 
 export function parseArgs(argv) {
-  const o = { date: null, topics: [], all: false, list: false, dryRun: false, mock: false, root: ROOT };
+  const o = { date: null, topics: [], all: false, list: false, dryRun: false, mock: false, root: SITE_DIR };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--all') o.all = true;

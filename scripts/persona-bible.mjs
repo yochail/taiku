@@ -1,7 +1,7 @@
 // Generates docs/persona-bible.md from personas/*.json (the canonical source). Run: npm run docs:personas
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadPersonas, ROOT } from '../src/lib/data.mjs';
+import { loadPersonas, SITE_DIR } from '../src/lib/data.mjs';
 
 const personas = loadPersonas();
 const byId = new Map(personas.map((p) => [p.id, p]));
@@ -45,7 +45,7 @@ for (const p of personas) {
   );
 }
 
-const file = path.join(ROOT, 'docs', 'persona-bible.md');
+const file = path.join(SITE_DIR, 'docs', 'persona-bible.md');
 fs.mkdirSync(path.dirname(file), { recursive: true });
 fs.writeFileSync(file, out.join('\n'));
 console.log(`✔ wrote ${path.relative(ROOT, file)} (${personas.length} personas)`);

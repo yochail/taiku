@@ -1,13 +1,13 @@
 // Network-realism: measure a corpus against realism/spec.json and sample generator choices from it.
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT } from './data.mjs';
+import { sitePath } from './site.mjs';
 import { rng as makeRng } from './util.mjs';
 import { renderProblems } from './media.mjs';
 import { behaviorOf } from './behavior.mjs';
 import { withDisplayStats } from './crowd.mjs';
 
-export const SPEC_PATH = path.join(ROOT, 'realism', 'spec.json');
+export const SPEC_PATH = sitePath('realism', 'spec.json');
 export const VISUAL_KINDS = new Set(['image', 'gif', 'meme', 'chart', 'video']);
 const MINUTE = 60_000;
 

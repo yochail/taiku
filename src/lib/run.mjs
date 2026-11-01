@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { ROOT, loadPersonas, personaKind, safeUrl, validate } from './data.mjs';
+import { SITE_DIR, loadPersonas, personaKind, safeUrl, validate } from './data.mjs';
 import { POST_ARCHETYPES, REPLY_ARCHETYPES } from './archetypes.mjs';
 import { behaviorOf } from './behavior.mjs';
 import { crowdFor, loadDistribution } from './crowd.mjs';
@@ -293,7 +293,7 @@ export function wireText(topic, persona, rand = Math.random) {
 export async function runDaily(opts = {}) {
   const t0 = Date.now();
   const env = opts.env ?? process.env;
-  const root = opts.root ?? ROOT;
+  const root = opts.root ?? SITE_DIR;
   const log = opts.quiet ? () => {} : (opts.log ?? ((m) => console.error(m)));
   const mock = Boolean(opts.mock);
   const dryRun = Boolean(opts.dryRun);

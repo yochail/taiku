@@ -3,11 +3,12 @@
 // content/posts/*.json, writes indexable HTML to dist/.
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
+import { ROOT, SITE_DIR, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
 import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderText, slugify } from './lib/util.mjs';
 import { writeMediaFiles } from './lib/media.mjs';
+import { OUT_DIR } from './lib/site.mjs';
 
-const OUT = path.join(ROOT, process.env.OUT_DIR || 'dist');
+const OUT = OUT_DIR;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const PAGE_SIZE = 25;
 const BUILD_TIME = new Date().toISOString();
@@ -801,6 +802,7 @@ function seoFiles() {
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 fs.cpSync(path.join(ROOT, 'public'), OUT, { recursive: true });
+if (SITE_DIR !== ROOT && fs.existsSync(path.join(SITE_DIR, 'public'))) fs.cpSync(path.join(SITE_DIR, 'public'), OUT, { recursive: true });
 const mediaOut = writeMediaFiles(posts, OUT);
 mediaByPost = mediaOut.byPost;
 feedPages();

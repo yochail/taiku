@@ -2,9 +2,10 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, loadPersonas, loadPosts } from '../src/lib/data.mjs';
+import { loadPersonas, loadPosts } from '../src/lib/data.mjs';
+import { OUT_DIR } from '../src/lib/site.mjs';
 
-const DIST = path.join(ROOT, 'dist');
+const DIST = OUT_DIR;
 const failures = [];
 const must = (cond, msg) => { if (!cond) failures.push(msg); };
 const exists = (rel) => fs.existsSync(path.join(DIST, rel));

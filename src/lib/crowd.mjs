@@ -1,15 +1,11 @@
 // Displayed engagement = real persona engagement + a deterministic, seeded crowd sampled from
-// realism/spec.json (via config/distribution.json). Visitor likes (D1, later) add on top.
-import fs from 'node:fs';
-import path from 'node:path';
-import { ROOT } from './data.mjs';
-import { createSampler, loadSpec } from './realism.mjs';
+// the site's realism/spec.json. Visitor likes (D1, later) add on top.
+import { createSampler, loadSpec, SPEC_PATH } from './realism.mjs';
 
 let cached;
 export function loadDistribution() {
   if (!cached) {
-    const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'distribution.json'), 'utf8'));
-    cached = loadSpec(path.join(ROOT, cfg.spec));
+    cached = loadSpec(SPEC_PATH);
   }
   return cached;
 }

@@ -4,7 +4,7 @@
 // taken from that log (never from model output).
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, isTranslatedSource, normalizeQuoteText } from './data.mjs';
+import { SITE_DIR, isTranslatedSource, normalizeQuoteText } from './data.mjs';
 import { looksLikeInjection, sanitizeUntrusted, wrapUntrusted } from './news.mjs';
 import { bm25Index } from './pipeline-util.mjs';
 
@@ -74,7 +74,7 @@ function windows(par) {
 
 const corpusCache = new Map();
 /** All quotable passages of a persona: quotables + quote_bank + local excerpt windows. */
-export function passagesFor(persona, { root = ROOT, maxLocal = 4000 } = {}) {
+export function passagesFor(persona, { root = SITE_DIR, maxLocal = 4000 } = {}) {
   if (corpusCache.has(persona)) return corpusCache.get(persona);
   const out = [];
   for (const q of persona.quotables ?? []) {

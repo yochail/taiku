@@ -1,13 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { POST_ARCHETYPES, REPLY_ARCHETYPES, ALL_TYPES } from './archetypes.mjs';
 import { validateSchema, loadSchema } from './schema.mjs';
 import { findTells } from './tells.mjs';
+import { ROOT, SITE_DIR, sitePath } from './site.mjs';
 
-export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const PERSONAS_DIR = path.join(ROOT, 'personas');
-export const POSTS_DIR = path.join(ROOT, 'content', 'posts');
+export { ROOT, SITE_DIR };
+export const PERSONAS_DIR = sitePath('personas');
+export const POSTS_DIR = sitePath('content', 'posts');
+/** A public/ asset path: the site pack's public/ overlays the platform's. */
+export const publicFile = (p) => [sitePath('public', p), path.join(ROOT, 'public', p)].find((f) => fs.existsSync(f)) ?? path.join(ROOT, 'public', p);
 
 // ---------------------------------------------------------------------------
 // Length: X's weighted count (twitter-text v3): most Latin/Greek/Cyrillic/Hebrew/Arabic
@@ -76,7 +78,7 @@ const sourceCache = new Map();
 export function readSourceText(relPath) {
   if (!relPath) return null;
   if (!sourceCache.has(relPath)) {
-    const abs = path.join(ROOT, relPath);
+    const abs = path.join(SITE_DIR, relPath);
     sourceCache.set(relPath, fs.existsSync(abs) ? normWs(fs.readFileSync(abs, 'utf8')) : null);
   }
   return sourceCache.get(relPath);
@@ -252,7 +254,7 @@ function validatePersonas(personas, errors) {
     validatePersonaKind(p, errors);
     for (const t of p.tools ?? []) if (!PERSONA_TOOLS.includes(t)) errors.push(`persona ${p.id}: unknown tool ${t}`);
     for (const img of [p.avatar?.image, p.avatar?.banner, ...Object.values(p.avatar?.srcset ?? {})].filter(Boolean)) {
-      if (!fs.existsSync(path.join(ROOT, 'public', img))) errors.push(`persona ${p.id}: missing image public${img}`);
+      if (!fs.existsSync(publicFile(img))) errors.push(`persona ${p.id}: missing image public${img}`);
     }
     if (p.avatar?.image && !(p.attribution?.author || p.attribution?.source)) errors.push(`persona ${p.id}: image without attribution`);
     if (p.attribution?.source && !(p.attribution.license && p.attribution.author)) errors.push(`persona ${p.id}: attribution needs license and author`);
@@ -271,7 +273,7 @@ function validatePersonas(personas, errors) {
     const srcIds = new Set((p.sources ?? []).map((s) => s.id));
     for (const s of p.sources ?? []) {
       if (s.local && !s.local.startsWith(`sources/${p.id}/`)) errors.push(`persona ${p.id}: source ${s.id} local path must be under sources/${p.id}/`);
-      if (s.local && !fs.existsSync(path.join(ROOT, s.local))) errors.push(`persona ${p.id}: source ${s.id} file missing: ${s.local} (run npm run sources:fetch)`);
+      if (s.local && !fs.existsSync(path.join(SITE_DIR, s.local))) errors.push(`persona ${p.id}: source ${s.id} file missing: ${s.local} (run npm run sources:fetch)`);
     }
     if (p.quote_policy === 'paraphrase_only' && (p.quote_bank ?? []).length) errors.push(`persona ${p.id}: paraphrase_only persona must have an empty quote_bank`);
     const bankIds = new Set();

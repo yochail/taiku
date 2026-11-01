@@ -4,10 +4,9 @@
 // lintBatch() and createStyleTracker(). LLM items that fail are regenerated; pool items are dropped.
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { sitePath } from './site.mjs';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const HOUSE_STYLE_FILE = path.join(ROOT, 'prompts', 'house-style.md');
+export const HOUSE_STYLE_FILE = sitePath('prompts', 'house-style.md');
 
 let cached = null;
 /** The house-style block for system prompts (everything from the "HOUSE STYLE" line on). */

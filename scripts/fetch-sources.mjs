@@ -19,10 +19,9 @@
 //     keepUnderscores: false }      // Gutenberg _italic_ markers are stripped unless true
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { SITE_DIR as ROOT, sitePath } from '../src/lib/site.mjs';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PERSONAS_DIR = path.join(ROOT, 'personas');
+const PERSONAS_DIR = sitePath('personas');
 const HEADER_MARK = '# taiku-source:';
 
 const args = process.argv.slice(2);

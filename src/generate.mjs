@@ -19,7 +19,7 @@
 // written by a cloud run (origin "cloudflare"), it logs "local run present, skipping" and exits 0
 // without any LLM call.
 import { loadDistribution } from './lib/crowd.mjs';
-import { ROOT } from './lib/data.mjs';
+import { SITE_DIR } from './lib/data.mjs';
 import { isoDate, localDate } from './lib/pipeline-util.mjs';
 import { gateDay } from './lib/daygate.mjs';
 import { loadPersonas } from './lib/data.mjs';
@@ -103,7 +103,7 @@ async function main() {
   if (!isoDate(opts.date)) throw new Error(`bad --date ${opts.date}`);
   const offline = opts.mock || (opts.dryRun && !opts.live);
   if (!offline && !opts.topicsOnly) {
-    const local = localDailyFile(ROOT, opts.date);
+    const local = localDailyFile(SITE_DIR, opts.date);
     if (local && local.origin !== 'cloudflare') {
       if (!opts.force) {
         console.log(`local run present, skipping (${local.file}: origin ${local.origin ?? '?'}, ${local.posts} posts)`);
@@ -114,7 +114,7 @@ async function main() {
     }
   }
   if (opts.repair) {
-    const paths = outputPaths(ROOT, opts.date, { mock: opts.mock, suffix: opts.suffix ?? null });
+    const paths = outputPaths(SITE_DIR, opts.date, { mock: opts.mock, suffix: opts.suffix ?? null });
     if (!fs.existsSync(paths.posts)) throw new Error(`--repair: ${paths.posts} does not exist; run the day first`);
     const posts = JSON.parse(fs.readFileSync(paths.posts, 'utf8')).posts ?? [];
     const g = gateDay({ posts, context: loadOtherPosts(paths.postsDir, [paths.posts]), personas: loadPersonas(), spec, label: paths.posts });
