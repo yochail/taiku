@@ -91,7 +91,8 @@ test('idempotent + resumable: rerunning the same date skips done tasks and never
   assert.ok(manifest.nonce, 'nonce is logged');
   const b = await run({ root, nonce: undefined });
   assert.equal(b.manifest.nonce, manifest.nonce, 'resume reuses the logged nonce');
-  assert.equal(b.manifest.budget.used, 0, 'no LLM calls on a complete rerun');
+  const failedFirst = a.manifest.tasks.filter((t) => t.status === 'failed').length;
+  assert.ok(b.manifest.budget.used <= failedFirst, 'no LLM calls on a complete rerun (only failed tasks are retried)');
   const second = read(paths.posts).posts.map((p) => p.id);
   assert.deepEqual(second, first);
   assert.equal(new Set(second).size, second.length);

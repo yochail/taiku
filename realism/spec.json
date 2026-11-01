@@ -32,8 +32,8 @@
       "quote": { "none": 0.8, "image": 0.06, "meme": 0.05, "gif": 0.03, "chart": 0.03, "link_card": 0.03, "poll": 0.0, "video": 0.0 }
     },
     "length_chars": {
-      "_note": "Target length buckets [min, max, weight]. Real X skews shorter (mode 33 chars); Taiku is educational so it is shifted up but keeps a real short tail. Never exceed 280; never truncate.",
-      "buckets": [[1, 40, 0.18], [41, 80, 0.24], [81, 140, 0.3], [141, 200, 0.16], [201, 260, 0.09], [261, 280, 0.03]]
+      "_note": "Target length buckets [min, max, weight], sampled per item and multiplied by persona x_behavior. Real X energy, not lecture energy: mode about 33 chars, 12% over 140, 5% over 190, 1% at 280 (twitter2018len). Never exceed 280; never truncate.",
+      "buckets": [[1, 40, 0.32], [41, 80, 0.28], [81, 140, 0.26], [141, 200, 0.09], [201, 260, 0.04], [261, 280, 0.01]]
     },
     "diurnal_local": {
       "_note": "Relative posting weight per local hour 0-23 in reference_timezone (circadian shape per golder2011 and pfeffer2023 Fig. 1).",
@@ -100,10 +100,10 @@
     "media.safety_violations": { "_def": "media items with unknown kind, missing alt, third-party without credit+license, AI image without ai_generated flag, non-allowlisted or non-https remote src, or rating above max_rating", "min": 0, "max": 0, "severity": "fail", "confidence": "hard rule", "sources": [] },
 
     "length.max_chars": { "min": 1, "max": 280, "severity": "fail", "confidence": "hard rule", "sources": [] },
-    "length.median_chars": { "min": 55, "max": 140, "target": 100, "min_n": 30, "severity": "warn", "confidence": "medium (X mode is 33; shifted up for teaching)", "sources": ["twitter2018len"] },
-    "length.short_share": { "_def": "share <= 40 chars (posts with text)", "min": 0.08, "max": 0.42, "target": 0.27, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["twitter2018len"] },
-    "length.over_140_share": { "min": 0.12, "max": 0.4, "target": 0.28, "min_n": 30, "severity": "warn", "confidence": "medium (X: 12%)", "sources": ["twitter2018len"] },
-    "length.near_limit_share": { "_def": "share >= 261 chars", "min": 0.0, "max": 0.06, "target": 0.03, "min_n": 30, "severity": "warn", "confidence": "medium (X: 1% hit 280)", "sources": ["twitter2018len"] },
+    "length.median_chars": { "min": 55, "max": 95, "target": 70, "min_n": 30, "severity": "warn", "confidence": "medium (X mode is 33)", "sources": ["twitter2018len"] },
+    "length.short_share": { "_def": "share <= 40 chars (posts with text)", "min": 0.2, "max": 0.5, "target": 0.32, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["twitter2018len"] },
+    "length.over_140_share": { "min": 0.08, "max": 0.2, "target": 0.14, "min_n": 30, "severity": "warn", "confidence": "medium (X: 12%)", "sources": ["twitter2018len"] },
+    "length.near_limit_share": { "_def": "share >= 261 chars", "min": 0.0, "max": 0.04, "target": 0.01, "min_n": 30, "severity": "warn", "confidence": "medium (X: 1% hit 280)", "sources": ["twitter2018len"] },
 
     "threads.zero_reply_root_share": { "min": 0.3, "max": 0.7, "target": 0.5, "min_n": 20, "severity": "warn", "confidence": "medium (most X posts get no reply; Taiku wants debate so capped at 70%)", "sources": ["nishi2016", "goel2016"] },
     "threads.depth1_share_of_conversations": { "_def": "share of roots with replies whose max reply depth is 1", "min": 0.35, "max": 0.8, "target": 0.55, "min_n": 15, "severity": "warn", "confidence": "medium", "sources": ["nishi2016"] },
