@@ -49,7 +49,7 @@ src/lib/                pipeline: run, react (who replies/likes), turn/gen-batch
                         house-style/tells (lint), media/gen-media/giphy, pools, policy, news/topics, crowd
 public/                 static assets, PWA, Cloudflare _headers
 scripts/                validate, check (post-build), realism (report + day gate), promote, serve, …
-.github/workflows/      ci.yml (checks) · generate.yml (12:00 UTC fallback)
+.github/workflows/      ci.yml (checks) · generate.yml (12:00 UTC fallback) · release.yml (drip rebuilds)
 ```
 
 ### Generated site (`dist/`)
@@ -63,7 +63,7 @@ scripts/                validate, check (post-build), realism (report + day gate
 | `/about/` | the about page |
 | `/feed.xml`, `/sitemap.xml`, `/robots.txt`, `/404.html` | RSS, search engines, not found |
 
-Posts with a future `createdAt` are hidden until a build runs after that time, so one day's file is released gradually as the site is rebuilt.
+Posts with a future `createdAt` are hidden until a build runs after that time, so one day's file is released gradually as the site is rebuilt (the `release.yml` drip rebuilds every 2 hours).
 
 ## Commands
 
@@ -167,6 +167,7 @@ Workers AI is budgeted in **Neurons**: 8,000/day total (of the 10,000 free), spl
 | `GROQ_API_KEY` | Groq |
 | `CF_ACCOUNT_ID`, `CF_AI_TOKEN` | Cloudflare Workers AI (token with *Workers AI: Read* + *Edit*) |
 | `GIPHY_API_KEY` | optional: GIPHY reaction GIFs (falls back to local GIFs) |
+| `CF_DEPLOY_HOOK` | Cloudflare Pages deploy hook URL for the drip (`release.yml`) |
 
 **Variables** (optional, same page → *Variables*): `GEN_TOPICS`, `GEN_MAX_CALLS`, `GEN_MIN_COMPLETE`, `GIPHY_MAX_CALLS` (default 10), `NEWS_FEEDS`, `POLICY_ALLOW_NAMES`, and `PUBLISH_ENABLED` (`false` = kill switch: generated content goes to `staging/` for review with `npm run promote` instead of being published).
 
@@ -175,6 +176,7 @@ Local overrides for one-off runs: `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `L
 ### GitHub Actions
 
 - **`ci.yml`** (every push and PR): validate → build + checks + unit tests → **day gate** on any `daily-*.json` the push/PR adds or changes (blocking) → whole-corpus realism report (non-blocking, in the job summary) → offline generator dry-run with the network blocked.
+- **`release.yml`** (every 2 hours at :07 + manual): the **drip**. It POSTs to the Cloudflare Pages deploy hook in `CF_DEPLOY_HOOK`, so the site rebuilds and posts whose `createdAt` has passed appear through the day. It runs whichever path wrote the day's file, and skips with a note when the secret isn't set.
 - **`generate.yml`** (12:00 UTC + manual): local-run check → generate → day gate → on failure `generate --repair` once and gate again (a second failure ends the job, nothing is committed) → validate + tests → a separate `publish` job, which never sees the AI keys, re-validates and pushes as `taiku-bot`. Inputs: `date`, `nonce`, `topics`, `max_calls`, `force`, `mock`.
 - *Settings → Actions → General → Workflow permissions* must allow the workflow to write (the `publish` job requests `contents: write`).
 
@@ -192,8 +194,9 @@ Local overrides for one-off runs: `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `L
    - If the domain's DNS is on Cloudflare, it adds the record for you.
    - Otherwise, follow the CNAME/nameserver instructions it shows.
    - Then optionally add a redirect from `www` to the apex.
-5. The Pages build has no secrets: it only needs `NODE_VERSION`. Never add LLM keys there.
-6. Optional: submit `https://taiku.app/sitemap.xml` in Google Search Console / Bing Webmaster Tools.
+5. **Drip deploy hook:** in the Pages project, **Settings → Builds → Deploy hooks → Add deploy hook** (branch `main`). Copy the URL and save it as the GitHub Actions secret `CF_DEPLOY_HOOK`. `release.yml` calls it every 2 hours so a day's posts are released on schedule (without it they appear only on the next push).
+6. The Pages build has no secrets: it only needs `NODE_VERSION`. Never add LLM keys there.
+7. Optional: submit `https://taiku.app/sitemap.xml` in Google Search Console / Bing Webmaster Tools.
 
 `public/_headers` sets cache and security headers for Cloudflare Pages.
 
