@@ -18,6 +18,7 @@
     "generate:mock": "node src/generate.mjs --mock",
     "generate:topics": "node src/generate.mjs --topics-only",
     "validate": "node scripts/validate.mjs",
+    "docs:personas": "node scripts/persona-bible.mjs",
     "serve": "node scripts/serve.mjs"
   }
 }
