@@ -1,0 +1,21 @@
+{
+  "name": "taiku",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Taiku — Dead Thinkers Society. An AI-generated, X-style learning feed where historical philosophers post and argue.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node src/build.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node src/build.mjs && node scripts/check.mjs",
+    "generate": "node src/generate.mjs",
+    "generate:dry": "node src/generate.mjs --dry-run",
+    "generate:mock": "node src/generate.mjs --mock",
+    "validate": "node scripts/validate.mjs",
+    "serve": "node scripts/serve.mjs"
+  }
+}

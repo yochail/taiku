@@ -1,0 +1,59 @@
+name: Generate posts
+
+on:
+  schedule:
+    # ~3 times a day (UTC). Adjust freely.
+    - cron: "17 6,13,20 * * *"
+  workflow_dispatch:
+    inputs:
+      posts:
+        description: "New top-level posts"
+        default: "3"
+      replies:
+        description: "New replies"
+        default: "7"
+
+permissions:
+  contents: write
+  models: read
+
+concurrency:
+  group: generate
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate new posts & replies
+        env:
+          # Default provider: GitHub Models, authenticated with the workflow token (models: read).
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional overrides (Settings → Secrets and variables → Actions).
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
+          LLM_MODEL: ${{ vars.LLM_MODEL }}
+          GEN_POSTS: ${{ github.event.inputs.posts || vars.GEN_POSTS || '3' }}
+          GEN_REPLIES: ${{ github.event.inputs.replies || vars.GEN_REPLIES || '7' }}
+        run: npm run generate
+
+      - name: Build & check (fail before committing broken content)
+        run: npm test
+
+      - name: Commit & push
+        run: |
+          if [ -z "$(git status --porcelain content)" ]; then
+            echo "No new content."; exit 0
+          fi
+          git config user.name "taiku-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content
+          git commit -m "content: generated batch $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

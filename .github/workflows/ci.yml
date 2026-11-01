@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate content
+        run: npm run validate
+      - name: Build & check
+        run: npm test
+      - name: Generator dry-run (mock, no key, writes nothing)
+        run: npm run generate:dry -- --posts 2 --replies 3
