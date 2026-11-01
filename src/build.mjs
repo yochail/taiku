@@ -426,7 +426,7 @@ function imageCredit(a) {
   if (!c) return '';
   if (!c.source) return `<p class="credit">Profile image: ${esc(c.author || 'AI-generated')}.</p>`;
   const lic = c.licenseUrl ? `<a href="${esc(c.licenseUrl)}" rel="license noopener" target="_blank">${esc(c.license)}</a>` : esc(c.license);
-  return `<p class="credit">Profile image: <a href="${esc(c.source)}" rel="noopener" target="_blank">${esc(c.title)}</a>, ${esc(c.author)}${c.date ? ` (${esc(c.date)})` : ''}. ${lic}, via Wikimedia Commons${c.modified ? `; ${esc(c.modified)}` : ''}.</p>`;
+  return `<p class="credit">Profile image: <a href="${esc(c.source)}" rel="noopener" target="_blank">${esc(c.title)}</a>, ${esc(c.author)}${c.date ? ` (${esc(c.date)})` : ''}. ${lic}, via Wikimedia Commons${c.modified ? `; ${esc(c.modified)}` : ''}.${c.note ? ` ${esc(c.note)}` : ''}</p>`;
 }
 
 function profilePages() {
