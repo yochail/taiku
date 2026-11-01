@@ -58,6 +58,11 @@ export function validate(personas, posts) {
     handles.add(p.handle);
     for (const a of p.post_archetypes ?? []) if (!POST_ARCHETYPES[a]) errors.push(`persona ${p.id}: unknown post archetype ${a}`);
     for (const a of p.reply_archetypes ?? []) if (!REPLY_ARCHETYPES[a]) errors.push(`persona ${p.id}: unknown reply archetype ${a}`);
+    for (const img of [p.avatar?.image, p.avatar?.banner].filter(Boolean)) {
+      if (!fs.existsSync(path.join(ROOT, 'public', img))) errors.push(`persona ${p.id}: missing image ${img}`);
+    }
+    if (p.avatar?.image && !p.attribution?.author && !p.attribution?.source) errors.push(`persona ${p.id}: image without attribution`);
+    if (p.attribution?.source && !(p.attribution.license && p.attribution.author)) errors.push(`persona ${p.id}: attribution needs license and author`);
   }
   for (const p of personas) {
     for (const rel of [...(p.allies ?? []), ...(p.rivals ?? [])]) {

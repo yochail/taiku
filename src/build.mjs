@@ -46,6 +46,7 @@ function stats(post) {
 
 function avatar(persona, size = '') {
   const a = persona.avatar ?? {};
+  if (a.image) return `<img class="avatar ${size}" src="${esc(a.image)}" alt="" width="400" height="400" loading="lazy" decoding="async">`;
   return `<span class="avatar ${size}" style="--c:${esc(a.color || '#64748b')}" aria-hidden="true">${esc(a.emoji || a.initials || persona.name[0])}</span>`;
 }
 
@@ -57,7 +58,7 @@ const ICONS = {
 };
 
 function aiBadge() {
-  return '<span class="ai-badge" title="This persona and all its posts are AI-generated">AI</span>';
+  return ''; // per-persona badges dropped by user decision; site-wide disclosure lives in footer and /about
 }
 
 function postHead(post, author, { focal = false } = {}) {
@@ -360,13 +361,21 @@ function relChips(list, label) {
     .join('')}</div>`;
 }
 
+function imageCredit(a) {
+  const c = a.attribution;
+  if (!c) return '';
+  if (!c.source) return `<p class="credit">Profile image: ${esc(c.author || 'AI-generated')}.</p>`;
+  const lic = c.licenseUrl ? `<a href="${esc(c.licenseUrl)}" rel="license noopener" target="_blank">${esc(c.license)}</a>` : esc(c.license);
+  return `<p class="credit">Profile image: <a href="${esc(c.source)}" rel="noopener" target="_blank">${esc(c.title)}</a>, ${esc(c.author)}${c.date ? ` (${esc(c.date)})` : ''}. ${lic}, via Wikimedia Commons${c.modified ? `; ${esc(c.modified)}` : ''}.</p>`;
+}
+
 function profilePages() {
   for (const a of personas) {
     const mine = posts.filter((p) => p.authorId === a.id).sort(newestFirst);
     const rootsN = mine.filter((p) => !p.inReplyTo).length;
     const header = `<div class="topbar"><a class="back" href="/thinkers/" aria-label="Back">←</a><div><h1>${esc(a.name)}</h1><span class="sub">${plural(mine.length, 'post')}</span></div></div>
     <section class="profile">
-      <div class="banner" style="--c:${esc(a.avatar.color)}"></div>
+      <div class="banner" style="--c:${esc(a.avatar.color)}${a.avatar.banner ? `;background-image:url('${esc(a.avatar.banner)}')` : ''}"></div>
       <div class="profile-top">${avatar(a, 'xl')}</div>
       <h2 class="p-name">${esc(a.name)} ${aiBadge()}</h2>
       <div class="handle">@${esc(a.handle)}</div>
@@ -384,6 +393,7 @@ function profilePages() {
       <h3>Favorite topics</h3><p class="tags">${a.favorite_topics.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</p>
       <h3>Pet peeves</h3><ul>${a.pet_peeves.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
       ${relChips(a.allies, 'Allies')}${relChips(a.rivals, 'Rivals')}
+      ${imageCredit(a)}
     </section>`;
     const feed = mine.length
       ? `<h2 class="section-h">Posts &amp; replies</h2><div class="feed">${mine.map((p) => postCard(p, { showReplying: true, participants: !p.inReplyTo, threadLink: true })).join('')}</div>`
