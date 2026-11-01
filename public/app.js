@@ -224,7 +224,7 @@
     const lists = await Promise.all([...follows].map(loadAuthor));
     if (seq !== renderSeq) return;
     const seen = new Set();
-    const items = lists.flatMap((l) => l.posts || []).sort((a, b) => b.t.localeCompare(a.t)).filter((p) => !seen.has(p.id) && seen.add(p.id)).slice(0, 60);
+    const items = lists.flatMap((l) => l.posts || []).sort((a, b) => b.t.localeCompare(a.t)).filter((p) => !seen.has(p.k || p.id) && seen.add(p.k || p.id)).slice(0, 60);
     fFeed.innerHTML = items.length ? items.map((p) => p.h).join('') : '<p class="empty">The accounts you follow haven\u2019t posted yet.</p>';
     fFeed.setAttribute('aria-busy', 'false');
     hydrate(fFeed);

@@ -19,6 +19,8 @@ const posts = [
   { id: 'uit-chart', authorId: 'kant', type: 'hot_take', origin: 'seed', text: 'My day, as data.', createdAt: ago(47), media: [{ kind: 'chart', render: { chart: { type: 'bar', title: 'Time spent', labels: ['Walking', 'Thinking'], values: [1, 23], unit: 'h' } } }] },
   { id: 'uit-link', authorId: 'socrates', type: 'news_take', origin: 'seed', text: 'Ask them what "smart" means.', createdAt: ago(46), media: [{ kind: 'link_card', url: 'https://www.example.com/news/ai-smart', title: 'AI is now smarter than us, says study', description: 'A new paper claims...' }] },
   { id: 'uit-poll-closed', authorId: 'socrates', type: 'poll', origin: 'seed', text: 'Is the unexamined life worth living?', createdAt: ago(45), poll: { id: 'uit-poll-closed', options: [{ id: 'a', text: 'Yes' }, { id: 'b', text: 'No' }, { id: 'c', text: 'Ask Socrates', crowdVoteBase: 500, personaVotes: ['kant'] }] } },
+  { id: 'uit-rt-old', authorId: 'kant', type: 'retaik', retaikOf: 'uit-art', text: '', origin: 'seed', createdAt: ago(5) },
+  { id: 'uit-rt-new', authorId: 'diogenes', type: 'retaik', retaikOf: 'uit-art', text: '', origin: 'seed', createdAt: ago(2) },
   { id: 'uit-poll-open', authorId: 'kant', type: 'poll', origin: 'seed', text: 'Categorical or hypothetical?', createdAt: ago(1), poll: { id: 'uit-poll-open', options: [{ id: 'a', text: 'Categorical' }, { id: 'b', text: 'Hypothetical' }] } },
 ];
 
@@ -108,12 +110,12 @@ test('For you ranking data: a compact index plus HTML shards, rank.js loaded bef
   const home = read('index.html');
   assert.match(home, /<script src="\/rank\.js\?v=[a-z0-9]+" defer><\/script>\s*<script src="\/app\.js/);
   const { items } = JSON.parse(read('data/foryou.json'));
-  const art = items.find((x) => x.id === 'uit-art');
-  assert.ok(art && art.a === 'socrates' && art.m === 1 && Number.isFinite(art.t) && art.l > 0);
+  const art = items.find((x) => (x.k || x.id) === 'uit-art');
+  assert.ok(art && art.id === 'uit-rt-new' && art.a === 'diogenes' && art.m === 1 && Number.isFinite(art.t) && art.l > 0);
   assert.equal(items.find((x) => x.id === 'uit-poll-open').m, 1);
   const shard = JSON.parse(read(`data/f/${art.s}.json`));
-  assert.match(shard['uit-art'], /data-pid="uit-art" data-author="socrates"/);
-  assert.doesNotMatch(shard['uit-art'], /id="post-/);
+  assert.match(shard[art.id], /retaiked[\s\S]*data-pid="uit-art" data-author="socrates"/);
+  assert.doesNotMatch(shard[art.id], /id="post-/);
 });
 test('mobile chrome: drawer menu button, bottom tab bar and compose button on every page', () => {
   for (const rel of ['index.html', 'thinkers/index.html']) {
@@ -158,4 +160,18 @@ test('UI copy has no hardcoded persona counts', () => {
   assert.match(home, /Dead Thinkers Society\. AI personas of real, dead thinkers/);
   assert.match(home, /Show all →/);
   assert.doesNotMatch(home + read('thinkers/index.html') + read('about/index.html'), /\b\d+ (AI personas|thinkers|AI thinker personas)\b|Show all \d+/);
+});
+
+test('timelines show each story once: the newest retaik stands in for the original', () => {
+  const pages = ['index.html', ...(fs.existsSync(path.join(DIST, 'page')) ? fs.readdirSync(path.join(DIST, 'page')) : []).map((n) => `page/${n}/index.html`)].filter((f) => fs.existsSync(path.join(DIST, f)));
+  const ids = pages.flatMap((f) => [...read(f).matchAll(/<article class="post"[^>]*data-pid="([^"]+)"/g)].map((m) => m[1]));
+  assert.ok(ids.includes('uit-art'));
+  assert.equal(new Set(ids).size, ids.length, `duplicate posts in feed: ${ids.filter((x, i) => ids.indexOf(x) !== i)}`);
+  const home = read('index.html');
+  assert.equal((home.match(/retaiked<\/div>/g) ?? []).length, 1);
+  assert.match(home, /Diogenes[^<]*<\/a> retaiked/);
+  const fy = JSON.parse(read('data/foryou.json')).items.map((i) => i.k || i.id);
+  assert.equal(new Set(fy).size, fy.length);
+  const u = JSON.parse(read('data/u/kant.json')).posts.find((p) => p.id === 'uit-rt-old');
+  assert.equal(u.k, 'uit-art');
 });

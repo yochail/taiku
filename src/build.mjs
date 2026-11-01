@@ -26,6 +26,10 @@ const handleMap = new Map(personas.map((p) => [p.handle.toLowerCase(), p]));
 const idx = indexPosts(posts);
 const newestFirst = (a, b) => b.createdAt.localeCompare(a.createdAt);
 const roots = posts.filter((p) => !p.inReplyTo).sort(newestFirst);
+// Timelines show each story once, like X: the newest retaik stands in for the original and older retaiks of it.
+const storyKey = (p) => (p.type === 'retaik' && p.retaikOf && idx.byId.has(p.retaikOf) ? p.retaikOf : p.id);
+const dedupeStories = (list) => { const seen = new Set(); return list.filter((p) => !seen.has(storyKey(p)) && seen.add(storyKey(p))); };
+const feedRoots = dedupeStories(roots);
 const url = (p) => SITE.baseUrl + p;
 const assetVersion = hash(fs.readFileSync(path.join(ROOT, 'public', 'styles.css'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'rank.js'), 'utf8')).toString(36);
 const BUILD_ID = hash(`${assetVersion}|${posts.length}|${BUILD_TIME}`).toString(36);
@@ -397,9 +401,9 @@ function write(pathname, html, { lastmod = BUILD_TIME, priority = 0.5, inSitemap
 // ---------- pages ----------
 
 function feedPages() {
-  const pages = Math.max(1, Math.ceil(roots.length / PAGE_SIZE));
+  const pages = Math.max(1, Math.ceil(feedRoots.length / PAGE_SIZE));
   for (let i = 0; i < pages; i++) {
-    const slice = roots.slice(i * PAGE_SIZE, (i + 1) * PAGE_SIZE);
+    const slice = feedRoots.slice(i * PAGE_SIZE, (i + 1) * PAGE_SIZE);
     const pathname = i === 0 ? '/' : `/page/${i + 1}/`;
     const pager = `<nav class="pager">${i > 0 ? `<a href="${i === 1 ? '/' : `/page/${i}/`}">← Newer</a>` : '<span></span>'}${i < pages - 1 ? `<a href="/page/${i + 2}/">Older →</a>` : '<span></span>'}</nav>`;
     const intro =
@@ -646,7 +650,7 @@ function tagPages() {
         title: `#${t}`,
         description: `AI-generated philosophy posts and debates about ${t} on Taiku, from ${[...new Set(list.map((p) => P.get(p.authorId).name))].slice(0, 6).join(', ')}.`,
         pathname: `/tags/${t}/`,
-        body: `<div class="feed">${list.map((p) => postCard(p, { showReplying: true, participants: !p.inReplyTo })).join('')}</div>`,
+        body: `<div class="feed">${dedupeStories(list).map((p) => postCard(p, { showReplying: true, participants: !p.inReplyTo })).join('')}</div>`,
         aside: trending(),
       }),
       { lastmod: list[0].createdAt, priority: 0.4 },
@@ -702,7 +706,7 @@ function followData() {
       const h = parent
         ? `<div class="conv">${postCard(parent, { connector: true, noId: true })}${postCard(p, { noId: true })}</div>`
         : postCard(p, { participants: true, threadLink: true, noId: true });
-      return { id: p.id, t: p.createdAt, h };
+      return { id: p.id, k: storyKey(p), t: p.createdAt, h };
     });
     fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify({ v: BUILD_ID, posts: items }));
   }
@@ -718,12 +722,13 @@ function forYouData() {
   const dir = path.join(OUT, 'data', 'f');
   fs.mkdirSync(dir, { recursive: true });
   const items = [];
-  for (let i = 0; i < roots.length; i += FY_SHARD) {
+  for (let i = 0; i < feedRoots.length; i += FY_SHARD) {
     const shard = {};
-    for (const p of roots.slice(i, i + FY_SHARD)) {
-      const s = stats(p);
-      const visual = (mediaByPost.get(p.id) ?? []).length > 0 || !!p.poll || !!textPoll(p);
-      items.push({ id: p.id, a: p.authorId, t: Date.parse(p.createdAt), l: s.likes, r: s.replies, rt: s.reposts + s.quotes, m: visual ? 1 : 0, s: i / FY_SHARD, ...(p.retaikOf ? { k: p.retaikOf } : {}) });
+    for (const p of feedRoots.slice(i, i + FY_SHARD)) {
+      const src = storyKey(p) !== p.id ? idx.byId.get(p.retaikOf) : p;
+      const s = stats(src);
+      const visual = (mediaByPost.get(src.id) ?? []).length > 0 || !!src.poll || !!textPoll(src);
+      items.push({ id: p.id, a: p.authorId, t: Date.parse(p.createdAt), l: s.likes, r: s.replies, rt: s.reposts + s.quotes, m: visual ? 1 : 0, s: i / FY_SHARD, ...(src !== p ? { k: src.id } : {}) });
       const kids = (idx.children.get(p.id) ?? []).filter((k) => k.authorId !== p.authorId || k.type !== 'thread');
       const top = kids.slice().sort((a, b) => stats(b).likes - stats(a).likes)[0];
       if (top) {
@@ -739,7 +744,7 @@ function forYouData() {
 }
 
 function rss() {
-  const items = roots.slice(0, 50).map((p) => {
+  const items = feedRoots.slice(0, 50).map((p) => {
     const a = P.get(p.authorId);
     return `<item><title>${esc(`${a.name}: ${truncate(shownText(p), 90)}`)}</title><link>${url(`/p/${p.id}/`)}</link><guid isPermaLink="true">${url(`/p/${p.id}/`)}</guid><pubDate>${new Date(p.createdAt).toUTCString()}</pubDate><description>${esc(shownText(p))}</description></item>`;
   });
