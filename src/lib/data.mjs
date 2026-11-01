@@ -11,7 +11,40 @@ const REQUIRED_PERSONA_FIELDS = [
   'id', 'name', 'handle', 'avatar', 'lifespan', 'region', 'tradition', 'school', 'headline', 'bio',
   'core_ideas', 'key_works', 'voice', 'favorite_topics', 'pet_peeves', 'post_archetypes',
   'reply_archetypes', 'argument_style', 'news_lens', 'allies', 'rivals', 'never', 'sample_posts',
+  'modernity', 'reactivity', 'topic_affinity', 'native_language', 'sensitive_notes', 'quotables', 'sources',
+  'search_hints', 'tools', 'system_prompt',
 ];
+
+export const TOPIC_KEYS = ['politics', 'world', 'tech', 'science', 'economy', 'culture', 'sports', 'religion', 'memes'];
+export const PERSONA_TOOLS = ['search_sources', 'get_quote', 'search_news'];
+
+function validateSkill(p, errors) {
+  const e = (m) => errors.push(`persona ${p.id}: ${m}`);
+  for (const k of ['modernity', 'reactivity']) {
+    if (p[k] !== undefined && !(Number.isInteger(p[k]) && p[k] >= 1 && p[k] <= 5)) e(`${k} must be an integer 1-5`);
+  }
+  if (p.topic_affinity) {
+    for (const k of TOPIC_KEYS) {
+      const v = p.topic_affinity[k];
+      if (typeof v !== 'number' || v < 0 || v > 1) e(`topic_affinity.${k} must be a number 0-1`);
+    }
+    for (const k of Object.keys(p.topic_affinity)) if (!TOPIC_KEYS.includes(k)) e(`unknown topic_affinity key ${k}`);
+  }
+  if (p.native_language && !(p.native_language.name && p.native_language.phrases?.every((x) => x.text && x.translation))) {
+    e('native_language needs name and phrases[{text, translation}]');
+  }
+  for (const q of p.quotables ?? []) {
+    if (!q.text || !q.citation || !/^https:\/\//.test(q.source_url ?? '')) e(`quotable needs text, citation, https source_url: ${q.text?.slice(0, 40)}`);
+  }
+  for (const s of p.sources ?? []) {
+    if (!s.title || !['primary', 'reference'].includes(s.kind) || !/^https:\/\//.test(s.url ?? '')) e(`bad source: ${s.title ?? s.url}`);
+  }
+  if (p.sources && !p.sources.some((s) => s.reading_list)) e('at least one source must have reading_list: true');
+  for (const t of p.tools ?? []) if (!PERSONA_TOOLS.includes(t)) e(`unknown tool ${t}`);
+  if (p.system_prompt && !(Array.isArray(p.system_prompt) && p.system_prompt.every((x) => typeof x === 'string' && x.trim()))) {
+    e('system_prompt must be an array of non-empty strings');
+  }
+}
 
 export function loadPersonas(dir = PERSONAS_DIR) {
   return fs
@@ -47,10 +80,11 @@ export function validate(personas, posts) {
   const handles = new Set();
   for (const p of personas) {
     for (const k of REQUIRED_PERSONA_FIELDS) {
-      if (p[k] === undefined || p[k] === null || (Array.isArray(p[k]) && p[k].length === 0 && !['never'].includes(k))) {
+      if (p[k] === undefined || p[k] === null || (Array.isArray(p[k]) && p[k].length === 0 && !['never', 'sensitive_notes'].includes(k))) {
         errors.push(`persona ${p._file}: missing "${k}"`);
       }
     }
+    validateSkill(p, errors);
     if (p._file !== `${p.id}.json`) errors.push(`persona ${p._file}: filename must be ${p.id}.json`);
     if (ids.has(p.id)) errors.push(`duplicate persona id ${p.id}`);
     if (handles.has(p.handle)) errors.push(`duplicate handle ${p.handle}`);
