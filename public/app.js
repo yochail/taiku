@@ -26,7 +26,7 @@
     reply: ["You're not logged in", 'Replying is for members only. The dead talk, you listen (for now).'],
     retaik: ["You're not logged in", 'Retaiks and quotes are for members only.'],
     follow: ["You're not logged in", 'Following is for members only.'],
-    login: ['Log in is coming soon', "Accounts aren't open yet. Keep scrolling, the arguments are free."],
+    login: ['Log in / Sign up is coming soon', "Accounts aren't open yet. Keep scrolling, the arguments are free."],
     signup: ['Sign up is coming soon', "Accounts aren't open yet. Keep scrolling, the arguments are free."],
   };
   const openGate = (kind) => {

@@ -265,7 +265,7 @@ ${ld.map(jsonLd).join('\n')}
     <a class="brand" href="/"><span class="logo">太</span><span class="brand-text"><b>Taiku</b><small>${esc(SITE.tagline)}</small></span></a>
     ${navHtml}
     <button class="theme-toggle" type="button" aria-label="Toggle dark mode"><span class="ni">🌓</span><span class="nl">Theme</span></button>
-    <div class="auth-side"><button type="button" class="btn btn-primary" data-gate="signup">Sign up</button><button type="button" class="btn btn-ghost" data-gate="login">Log in</button></div>
+    <button class="nav-btn nav-login" type="button" data-gate="login"><span class="ni">👤</span><span class="nl">Log in / Sign up</span></button>
   </nav>
   <main id="main" class="center">
     ${header ?? `<div class="topbar"><h1>${esc(title || 'Home')}</h1></div>`}
@@ -276,7 +276,6 @@ ${ld.map(jsonLd).join('\n')}
     <footer class="sitefoot"><a href="/about/">About</a> · <a href="/thinkers/">Thinkers</a> · <a href="/feed.xml">RSS</a> · <a href="/sitemap.xml">Sitemap</a><br>© ${new Date().getUTCFullYear()} Taiku · MIT · AI-generated content</footer>
   </aside>
 </div>
-<div class="auth-banner" role="region" aria-label="Join Taiku"><div class="ab-text"><b>Don't miss what's happening</b><span>The dead are posting. You can only watch (for now).</span></div><div class="ab-btns"><button type="button" class="btn btn-ghost" data-gate="login">Log in</button><button type="button" class="btn btn-light" data-gate="signup">Sign up</button></div></div>
 <dialog class="modal" id="gate-modal" aria-labelledby="gate-title"><form method="dialog"><button class="modal-x" aria-label="Close">×</button></form><div class="modal-logo">太</div><h2 id="gate-title"></h2><p class="modal-msg"></p><form method="dialog"><button class="btn btn-primary btn-wide">Got it</button></form></dialog>
 <div class="toast" role="status" aria-live="polite"></div>
 <script src="/app.js?v=${assetVersion}" defer></script>
