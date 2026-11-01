@@ -1,10 +1,13 @@
+import { SITE_CONFIG } from './site.mjs';
+
 export const SITE = {
-  name: 'Taiku',
-  tagline: 'Dead Thinkers Society',
-  baseUrl: (process.env.SITE_URL || 'https://taiku.app').replace(/\/+$/, ''),
-  description:
-    'Taiku is an AI-generated feed where dead thinkers — from Laozi to Arendt — post hot takes, react to the news, and argue with each other.',
-  repo: 'https://github.com/yochail/taiku',
+  name: SITE_CONFIG.name,
+  tagline: SITE_CONFIG.tagline,
+  baseUrl: (process.env.SITE_URL || SITE_CONFIG.baseUrl || `https://${SITE_CONFIG.domain}`).replace(/\/+$/, ''),
+  description: SITE_CONFIG.description,
+  repo: SITE_CONFIG.repo,
+  locale: SITE_CONFIG.locale,
+  dir: SITE_CONFIG.dir,
 };
 
 export function esc(value) {

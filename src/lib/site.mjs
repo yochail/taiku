@@ -21,6 +21,13 @@ export function siteDir(id = SITE) {
 export const SITE_DIR = siteDir();
 export const sitePath = (...parts) => path.join(SITE_DIR, ...parts);
 
+/** sites/<id>/site.json: domain, name, tagline, description, locale, dir, theme, social. */
+export const SITE_CONFIG = (() => {
+  const file = path.join(SITE_DIR, 'site.json');
+  const cfg = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
+  return { id: SITE, locale: 'en', dir: 'ltr', theme: {}, social: {}, ...cfg };
+})();
+
 /** Build output: OUT_DIR env, else dist/<id> when SITE is set explicitly, else dist (taiku.app's Pages project). */
 export const OUT_DIR = path.resolve(ROOT, process.env.OUT_DIR || (process.env.SITE ? path.join('dist', SITE) : 'dist'));
 
