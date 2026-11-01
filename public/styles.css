@@ -360,3 +360,29 @@ button.act { background: none; border: 0; font: inherit; cursor: pointer; border
 .offline-msg h2 { margin: 0; font-size: 24px; }
 .offline-msg p { margin: 0; max-width: 34ch; color: var(--muted); }
 .nav-install[hidden] { display: none !important; }
+
+/* Search: sidebar box, search page header, results */
+.search-form { margin: 0; }
+.sbox { display: flex; align-items: center; gap: 12px; height: 42px; padding: 0 16px; border-radius: 999px; background: var(--bg2); border: 1px solid transparent; color: var(--muted); cursor: text; }
+.sbox:focus-within { border-color: #1d9bf0; background: var(--bg); color: #1d9bf0; }
+.sbox svg { width: 18px; height: 18px; flex: none; }
+.sbox input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; color: var(--fg); font: inherit; font-size: 15px; outline: none; }
+.sbox input::placeholder { color: var(--muted); }
+.sbox input::-webkit-search-cancel-button { filter: grayscale(1); }
+.search-side { position: sticky; top: 0; z-index: 2; margin: -12px -20px 12px; padding: 6px 20px; background: var(--bg); }
+.search-top { flex-direction: column; align-items: stretch; gap: 0; padding: 0; }
+.st-row { display: flex; align-items: center; gap: 16px; padding: 6px 16px; }
+.st-row .search-form { flex: 1; min-width: 0; }
+.st-row .menu-btn + .search-form .sbox { height: 38px; }
+.search-tabs[hidden], .search-explore[hidden] { display: none; }
+.search-tabs { border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.search-tabs [role='tab'] { min-width: 72px; }
+.search-explore .panel { background: none; border-radius: 0; border-bottom: 1px solid var(--line); margin: 0; }
+.search-explore .panel h2 { font-size: 20px; margin: 0; padding: 4px 16px 8px; }
+.search-results .section-h { border-bottom: 0; font-size: 20px; }
+.search-results > .more { border-bottom: 1px solid var(--line); color: #1d9bf0; }
+.search-empty { max-width: 340px; margin: 32px auto; padding: 0 16px; }
+.search-empty h2 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; overflow-wrap: anywhere; }
+.search-empty p { color: var(--muted); margin: 0; }
+.search-more { display: block; width: 100%; padding: 16px; border: 0; border-bottom: 1px solid var(--line); background: none; color: #1d9bf0; font: inherit; font-size: 15px; cursor: pointer; }
+.search-more:hover { background: color-mix(in srgb, var(--fg) 4%, transparent); }

@@ -305,7 +305,7 @@
     }).catch(() => watchSeen(fyFeed));
   }
 
-  const tabs = [...document.querySelectorAll('.feed-tabs [role="tab"]')];
+  const tabs = [...document.querySelectorAll('.feed-tabs:not(.search-tabs) [role="tab"]')];
   const selectTab = (name, focus) => {
     root.dataset.tab = name;
     try { localStorage.setItem('feedTab', name); } catch (e) {}
@@ -386,6 +386,146 @@
     });
   }
 
+  // Search (static): a lazily loaded index and HTML shards from /data; the query lives in the URL (?q=&f=).
+  const sRes = document.getElementById('search-results');
+  if (sRes) {
+    const FILTERS = ['top', 'live', 'user', 'media'];
+    const sTabs = [...document.querySelectorAll('.search-tabs [role="tab"]')];
+    const tablist = document.querySelector('.search-tabs');
+    const explore = document.querySelector('.search-explore');
+    const inputs = [...document.querySelectorAll('.search-form input[name="q"]')];
+    const fold = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    let index = null;
+    const loadIndex = () => (index ??= Promise.all([fetch(`/data/search.json?v=${build}`).then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status))))), loadPeople()]).then(([d, ppl]) =>
+      d.posts.map(([id, a, text, t, l, m, s]) => ({ id, a, text, t, l, m, s, who: fold(`${ppl[a]?.n || ''} ${ppl[a]?.h || ''}`) }))));
+    const sShards = new Map();
+    const sShard = (n) => {
+      if (!sShards.has(n)) sShards.set(n, fetch(`/data/s/${n}.json?v=${build}`).then((r) => r.json()).catch(() => ({})));
+      return sShards.get(n);
+    };
+    const parse = (raw) => {
+      const terms = [], from = [];
+      String(raw).replace(/"([^"]+)"|(\S+)/g, (_, ph, w) => {
+        const t = fold(ph || w);
+        const m = t.match(/^from:@?([\w]+)$/);
+        if (m) from.push(m[1]);
+        else if (t.replace(/^@/, '')) terms.push(t.replace(/^@/, ''));
+        return '';
+      });
+      return { terms, from, res: terms.map((t) => new RegExp(`(^|[^\\p{L}\\p{N}])${reEsc(t)}`, 'u')) };
+    };
+    const personRow = (id, p) => `<div class="wtf-wide"><div class="wtf"><a class="wtf-link" href="/thinkers/${esc(id)}/">${p.a ? `<img class="avatar sm" src="${esc(p.a)}" alt="" width="40" height="40" loading="lazy" decoding="async">` : `<span class="avatar sm" style="--c:${esc(p.c)}" aria-hidden="true">${esc(p.n[0])}</span>`}<span class="wtf-names"><b>${esc(p.n)}</b><span class="handle">@${esc(p.h)}</span></span></a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(id)}" aria-pressed="false" aria-label="Follow @${esc(p.h)}"><span class="fb-off">Follow</span><span class="fb-on">Following</span><span class="fb-un">Unfollow</span></button></div><p class="wtf-bio">${esc(p.b)}</p></div>`;
+    const matchPeople = async (qq) => {
+      const ppl = await loadPeople();
+      return Object.entries(ppl)
+        .map(([id, p]) => {
+          const who = fold(`${p.n} ${p.h}`), bio = fold(p.b);
+          if (qq.from.length && !qq.from.some((h) => fold(p.h) === h)) return null;
+          let sc = 0;
+          for (const re of qq.res) { if (re.test(who)) sc += 3; else if (re.test(bio)) sc += 1; else return null; }
+          return { id, p, sc: sc + Math.log10(1 + (p.fr || 0)) / 10 };
+        })
+        .filter(Boolean).sort((x, y) => y.sc - x.sc);
+    };
+    const matchPosts = async (qq, f) => {
+      const rows = await loadIndex();
+      const now = Date.now();
+      const out = [];
+      for (const r of rows) {
+        if (qq.from.length && !qq.from.some((h) => r.who.split(' ').pop() === h)) continue;
+        if (f === 'media' && r.m !== 2) continue;
+        let rel = 0, ok = true;
+        for (const re of qq.res) { const a = re.test(r.text), b = re.test(r.who); if (!a && !b) { ok = false; break; } rel += a ? 1 : 0.5; }
+        if (ok) out.push({ r, sc: rel * 3 + Math.log1p(r.l) + 3 * Math.exp(-(now - r.t) / 6048e5) });
+      }
+      if (f !== 'top') return out.map((x) => x.r).sort((x, y) => y.t - x.t);
+      // Top: best first, but each further post by the same author ranks a little lower so one account can't fill the page.
+      const per = new Map();
+      return out.sort((x, y) => y.sc - x.sc)
+        .map((x) => { const n = per.get(x.r.a) || 0; per.set(x.r.a, n + 1); return { r: x.r, sc: x.sc - n * 1.5 }; })
+        .sort((x, y) => y.sc - x.sc).map((x) => x.r);
+    };
+    let q = '', f = 'top', results = [], shown = 0, runSeq = 0;
+    const moreBtn = document.createElement('button');
+    moreBtn.type = 'button';
+    moreBtn.className = 'search-more';
+    moreBtn.textContent = 'Show more';
+    const PAGE = 20;
+    const page = async () => {
+      const seq = runSeq;
+      const slice = results.slice(shown, shown + PAGE);
+      shown += slice.length;
+      const html = await Promise.all(slice.map(async (r) => (await sShard(r.s))[r.id] || ''));
+      if (seq !== runSeq) return;
+      const frag = document.createElement('div');
+      frag.innerHTML = html.join('');
+      hydrate(frag);
+      moreBtn.remove();
+      sRes.append(...frag.childNodes);
+      if (shown < results.length) sRes.append(moreBtn);
+    };
+    moreBtn.addEventListener('click', page);
+    if ('IntersectionObserver' in window) new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting) && moreBtn.isConnected) page(); }, { rootMargin: '600px' }).observe(moreBtn);
+    const run = async () => {
+      const seq = ++runSeq;
+      inputs.forEach((i) => { i.value = q; });
+      sTabs.forEach((t) => { const on = t.dataset.f === f; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
+      tablist.hidden = !q;
+      explore.hidden = !!q;
+      document.title = q ? `${q} - Search | Taiku` : 'Search | Taiku';
+      sRes.innerHTML = '';
+      results = []; shown = 0;
+      if (!q) return;
+      const qq = parse(q);
+      sRes.setAttribute('aria-busy', 'true');
+      try {
+        const people = f === 'user' || f === 'top' ? await matchPeople(qq) : [];
+        const found = f === 'user' ? [] : await matchPosts(qq, f);
+        if (seq !== runSeq) return;
+        const top = f === 'top' ? people.slice(0, 3) : people;
+        if (top.length) {
+          sRes.insertAdjacentHTML('beforeend', `${f === 'top' ? '<h2 class="section-h">People</h2>' : ''}${top.map((x) => personRow(x.id, x.p)).join('')}${f === 'top' && people.length > 3 ? `<a class="more" href="?q=${encodeURIComponent(q)}&f=user" data-f="user">View all</a>` : ''}`);
+          hydrate(sRes);
+        }
+        results = found;
+        if (!top.length && !found.length) sRes.innerHTML = `<div class="search-empty"><h2>No results for \u201c${esc(q)}\u201d</h2><p>Try searching for something else, or check the spelling. Search covers posts, thinkers and topics.</p></div>`;
+        else await page();
+      } catch (err) {
+        sRes.innerHTML = '<p class="empty">Search is unavailable right now. Please try again.</p>';
+      }
+      sRes.setAttribute('aria-busy', 'false');
+    };
+    const go = (nq, nf, push) => {
+      q = String(nq || '').trim().slice(0, 120);
+      f = FILTERS.includes(nf) ? nf : 'top';
+      const u = q ? `/search/?q=${encodeURIComponent(q)}${f !== 'top' ? `&f=${f}` : ''}` : '/search/';
+      history[push ? 'pushState' : 'replaceState'](null, '', u);
+      run();
+    };
+    document.querySelectorAll('.search-form').forEach((form) => form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = form.querySelector('input[name="q"]').value;
+      go(v, v.trim() === q ? f : 'top', true);
+      form.querySelector('input').blur();
+    }));
+    sTabs.forEach((t) => {
+      t.addEventListener('click', () => go(q, t.dataset.f, false));
+      t.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        const i = (sTabs.indexOf(t) + (e.key === 'ArrowRight' ? 1 : sTabs.length - 1)) % sTabs.length;
+        go(q, sTabs[i].dataset.f, false);
+        sTabs[i].focus();
+      });
+    });
+    sRes.addEventListener('click', (e) => {
+      const a = e.target.closest('a[data-f]');
+      if (a) { e.preventDefault(); go(q, a.dataset.f, false); window.scrollTo(0, 0); }
+    });
+    const fromUrl = () => { const p = new URLSearchParams(location.search); go(p.get('q'), p.get('f'), false); };
+    window.addEventListener('popstate', fromUrl);
+    fromUrl();
+  }
   // PWA: offline-capable service worker, plus an "Install app" menu item when the browser allows it.
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {});

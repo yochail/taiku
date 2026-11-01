@@ -175,3 +175,26 @@ test('timelines show each story once: the newest retaik stands in for the origin
   const u = JSON.parse(read('data/u/kant.json')).posts.find((p) => p.id === 'uit-rt-old');
   assert.equal(u.k, 'uit-art');
 });
+test('search: lazy index + HTML shards, /search/ page with X tabs, sidebar box and tab-bar link', () => {
+  const idx = JSON.parse(read('data/search.json'));
+  const row = idx.posts.find((r) => r[0] === 'uit-art');
+  assert.ok(row, 'post indexed');
+  const [id, author, text, t, , m, shard] = row;
+  assert.equal(author, 'socrates');
+  assert.equal(text, text.toLowerCase());
+  assert.ok(Number.isFinite(t) && m === 2);
+  assert.ok(JSON.parse(read(`data/s/${shard}.json`))[id].includes(`data-pid="${id}"`));
+  assert.ok(!idx.posts.some((r) => r[0] === 'uit-rt-old' || r[0] === 'uit-rt-new'), 'retaiks are not indexed');
+  assert.ok(idx.posts.every((r, i, a) => !i || a[i - 1][3] >= r[3]), 'index is newest first');
+  const page = read('search/index.html');
+  assert.match(page, /<meta name="robots" content="noindex">/);
+  assert.match(page, /<form class="search-form search-main" action="\/search\/" method="get" role="search">/);
+  for (const l of ['Top', 'Latest', 'People', 'Media']) assert.match(page, new RegExp(`role="tab" data-f="[a-z]+"[^>]*><span>${l}</span>`));
+  assert.match(page, /id="search-results"/);
+  assert.doesNotMatch(page, /search-side/);
+  const home = read('index.html');
+  assert.match(home, /class="search-form search-side" action="\/search\/"/);
+  assert.match(home, /<nav class="tabbar"[^>]*><a href="\/"[^>]*>[\s\S]*?<a href="\/search\/" aria-label="Search"/);
+  assert.match(home, /href="\/search\/"><span class="ni">/);
+  assert.doesNotMatch(read('sitemap.xml'), /\/search\//);
+});

@@ -185,7 +185,7 @@ function tabbar(pathname) {
   const cur = (on) => (on ? ' aria-current="page"' : '');
   return [
     `<a href="/" aria-label="Home"${cur(pathname === '/' || /^\/page\//.test(pathname))}>${ICONS.home}</a>`,
-    `<a href="/thinkers/" aria-label="Explore thinkers"${cur(pathname.startsWith('/thinkers/'))}>${ICONS.search}</a>`,
+    `<a href="/search/" aria-label="Search"${cur(pathname === '/search/')}>${ICONS.search}</a>`,
     `<button type="button" data-gate="notifications" aria-label="Notifications">${ICONS.bell}</button>`,
     `<button type="button" data-gate="messages" aria-label="Messages">${ICONS.mail}</button>`,
   ].join('');
@@ -319,6 +319,7 @@ function layout({ title, description, pathname, body, ld = [], ogType = 'website
   const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
   const nav = [
     ['/', 'Home', '🏠'],
+    ['/search/', 'Explore', '🔍'],
     ['/thinkers/', 'Thinkers', '🏛️'],
     ['/about/', 'About', 'ℹ️'],
   ];
@@ -375,6 +376,7 @@ ${ld.map(jsonLd).join('\n')}
     ${body}
   </main>
   <aside class="rightbar">
+    ${pathname === '/search/' ? '' : searchBox('search-side')}
     ${aside ?? ''}
     <footer class="sitefoot"><a href="/about/">About</a> · <a href="/thinkers/">Thinkers</a> · <a href="/feed.xml">RSS</a> · <a href="/sitemap.xml">Sitemap</a><br>© ${new Date().getUTCFullYear()} Taiku · MIT · AI-generated content</footer>
   </aside>
@@ -686,6 +688,38 @@ function notFound() {
   write('/404.html', layout({ title: 'Not found', description: 'Page not found.', pathname: '/404.html', noindex: true, body: '<p class="empty">“I know that I know nothing” — and neither does this URL. <a href="/">Back to the feed</a>.</p>' }), { inSitemap: false });
 }
 
+/** Search: a compact client-side index (/data/search.json) plus newest-first HTML shards (/data/s/<n>.json). */
+const SEARCH_SHARD = 25;
+const fold = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+function searchData() {
+  const dir = path.join(OUT, 'data', 's');
+  fs.mkdirSync(dir, { recursive: true });
+  const list = posts.filter((p) => p.type !== 'retaik' && P.get(p.authorId)).sort(newestFirst);
+  const rows = [];
+  for (let i = 0; i < list.length; i += SEARCH_SHARD) {
+    const shard = {};
+    for (const p of list.slice(i, i + SEARCH_SHARD)) {
+      const items = mediaByPost.get(p.id) ?? [];
+      const extra = [p.topic?.title, p.news?.title, ...(p.tags ?? []).map((t) => `#${t}`), ...items.map((m) => m.alt ?? m.title ?? '')];
+      const m = items.some((x) => VISUAL.has(x.kind) && x.src) ? 2 : items.length || p.poll || textPoll(p) ? 1 : 0;
+      rows.push([p.id, p.authorId, fold([p.text, ...extra].filter(Boolean).join(' ')), Date.parse(p.createdAt), stats(p).likes, m, i / SEARCH_SHARD]);
+      shard[p.id] = postCard(p, { showReplying: true, noId: true });
+    }
+    fs.writeFileSync(path.join(dir, `${i / SEARCH_SHARD}.json`), JSON.stringify(shard));
+  }
+  fs.writeFileSync(path.join(OUT, 'data', 'search.json'), JSON.stringify({ v: BUILD_ID, posts: rows }));
+}
+
+const SEARCH_TABS = [['top', 'Top'], ['live', 'Latest'], ['user', 'People'], ['media', 'Media']];
+function searchBox(cls = '') {
+  return `<form class="search-form${cls ? ` ${cls}` : ''}" action="/search/" method="get" role="search"><label class="sbox">${ICONS.search}<input type="search" name="q" placeholder="Search" aria-label="Search Taiku" autocomplete="off" enterkeyhint="search" maxlength="120"></label></form>`;
+}
+function searchPage() {
+  const header = `<div class="topbar search-top"><div class="st-row">${MENU_BTN}${searchBox('search-main')}</div><h1 class="sr-only">Search</h1><div class="feed-tabs search-tabs" role="tablist" aria-label="Search results" hidden>${SEARCH_TABS.map(([f, l], i) => `<button type="button" role="tab" data-f="${f}" aria-selected="${i === 0}" aria-controls="search-results"${i ? ' tabindex="-1"' : ''}><span>${l}</span></button>`).join('')}</div></div>`;
+  const body = `<div class="search-results" id="search-results" role="tabpanel" aria-live="polite" aria-busy="false"></div>
+<div class="search-explore">${trending()}${whoToFollow('search')}</div>`;
+  write('/search/', layout({ title: 'Search', description: 'Search posts, thinkers and topics on Taiku.', pathname: '/search/', noindex: true, header, body, aside: whoToFollow('search-aside') }), { inSitemap: false });
+}
 /** PWA: offline fallback page and a service worker whose cache name follows the build. */
 function pwa() {
   write('/offline.html', layout({ title: 'Offline', description: 'You are offline.', pathname: '/offline.html', noindex: true, body: '<div class="offline-msg"><span class="logo">太</span><h2>You’re offline</h2><p>The dead can wait. Reconnect and pull to refresh — pages you already opened still work.</p><a class="btn" href="/">Try again</a></div>' }), { inSitemap: false });
@@ -776,9 +810,11 @@ thinkersPage();
 const tagCount = tagPages();
 aboutPage();
 notFound();
+searchPage();
 pwa();
 followData();
 forYouData();
+searchData();
 rss();
 seoFiles();
 console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags, ${mediaOut.written} rendered media)`);
