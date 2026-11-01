@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Writes/updates ONLY the `x_behavior` key of every personas/<id>.json from DEFAULT_X_BEHAVIOR
-// (src/lib/behavior.mjs). Text-level edit: all other keys and their formatting are left untouched.
+// Writes/updates ONLY the `x_behavior` key of personas/<id>.json from defaultBehaviorFor()
+// (src/lib/behavior.mjs: generic profile scaled by reactivity/modernity; news wires never reply).
+// Text-level edit: all other keys and their formatting are left untouched. Keyed on persona id.
 //   node scripts/sync-x-behavior.mjs            # add missing x_behavior blocks
 //   node scripts/sync-x-behavior.mjs --force    # overwrite existing blocks with the defaults
 //   node scripts/sync-x-behavior.mjs --check    # validate only
@@ -8,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { PERSONAS_DIR } from '../src/lib/data.mjs';
-import { DEFAULT_X_BEHAVIOR, GENERIC_X_BEHAVIOR, validateBehavior } from '../src/lib/behavior.mjs';
+import { defaultBehaviorFor, GENERIC_X_BEHAVIOR, validateBehavior } from '../src/lib/behavior.mjs';
 
 const force = process.argv.includes('--force');
 const checkOnly = process.argv.includes('--check');
@@ -27,14 +28,10 @@ for (const f of fs.readdirSync(PERSONAS_DIR).filter((x) => x.endsWith('.json')).
   const before = JSON.parse(text);
   const id = before.id;
   if (checkOnly || (before.x_behavior && !force)) {
-    errors.push(...validateBehavior(id, before.x_behavior ? { ...GENERIC_X_BEHAVIOR, ...before.x_behavior } : null));
+    errors.push(...validateBehavior(id, before.x_behavior ? { ...defaultBehaviorFor(before), ...before.x_behavior } : null));
     continue;
   }
-  const def = DEFAULT_X_BEHAVIOR[id];
-  if (!def) {
-    errors.push(`${id}: no DEFAULT_X_BEHAVIOR entry`);
-    continue;
-  }
+  const def = defaultBehaviorFor(before);
   errors.push(...validateBehavior(id, def));
   const eol = text.includes('\r\n') ? '\r\n' : '\n';
   const block = render(def, eol);

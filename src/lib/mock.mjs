@@ -1,185 +1,211 @@
-// Offline provider: deterministic, template-based X-style taiks built from persona profiles
-// (tics, ideas, pet peeves, works) + x_behavior (casing, emoji, slang). No key, no network.
-// It answers the same { messages, meta } requests as the real LLM (see prompts.mjs).
-import { rng, pick } from './util.mjs';
-import { MAX_TAIK_CHARS, taikLength } from './data.mjs';
+// Offline mock provider: same interface as llm.createClient, no network, no key. It behaves like a
+// tool-using model so the whole agentic path is exercised: round 1 calls search_sources (native
+// tool_calls, or the {"tool_calls":[...]} JSON emulation), the final round writes a taik of the
+// requested length/media that sometimes quotes a returned passage verbatim, sometimes a slightly
+// varied translation (fuzzy path), and occasionally overshoots 280 chars (repair path).
+import { MEME_FORMATS, REACTIONS, CHART_TYPES } from './archetypes.mjs';
+import { quoteMatches, taikLength, MAX_TAIK_CHARS } from './data.mjs';
+import { seededRng, sha256 } from './pipeline-util.mjs';
 
-const clean = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
+const tagContent = (s, tag) => s.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`))?.[1] ?? null;
+const lastOf = (messages, role) => [...messages].reverse().find((m) => m.role === role);
 
-/** "Wu wei: effortless action…" → "wu wei"; long sentence-ideas → null (caller falls back). */
-function concept(idea) {
-  const head = clean(idea).split(/[:(—;,]| - /)[0].trim().replace(/[.,]$/, '');
-  if (head.split(' ').length > 4) return null;
-  return head.replace(/^(the|a|an) /i, (m) => m.toLowerCase());
-}
-
-const SENSITIVE = /antisemit|racis|slave|genocid|nazi|nationalis|sexis|colonial|misogyn/i;
-const art = (w) => (/^[aeiou]/i.test(w) ? `an ${w}` : `a ${w}`);
-
-/** The gist of an idea: the part after the colon, first clause. */
-function gist(idea) {
-  const s = clean(idea);
-  const after = s.includes(':') ? s.split(':').slice(1).join(':') : s;
-  const g = after.split(/[;.]/)[0].trim();
-  return /^[A-Z][a-z]/.test(g) ? g[0].toLowerCase() + g.slice(1) : g;
-}
-
-const shortTitle = (t, n = 70) => {
-  const s = clean(t).replace(/\s+[-|–]\s+[^-|–]+$/, '');
-  return s.length <= n ? s : s.slice(0, n).replace(/\s+\S*$/, '') + '…';
-};
-
-const work = (p, rand) => {
-  const ws = (p.key_works ?? []).map((w) => w.title).filter((t) => t && !/^\(|no surviving/i.test(t) && t.length < 50);
-  return ws.length ? pick(rand, ws) : null;
-};
-
-function fit(s) {
-  s = String(s).replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').trim();
-  if (taikLength(s) <= MAX_TAIK_CHARS) return s;
-  const cps = [...s].slice(0, MAX_TAIK_CHARS - 1).join('');
-  return cps.replace(/\s+\S*$/, '') + '…';
-}
-
-function styleText(s, b, rand, { grave = false } = {}) {
-  if (b.casing === 'lowercase' && rand() < 0.9) s = s.toLowerCase();
-  if (b.casing === 'caps' && !grave && rand() < b.caps_use * 1.5) {
-    const words = s.split(' ');
-    const i = Math.floor(rand() * words.length);
-    if (words[i]?.length > 3) words[i] = words[i].toUpperCase();
-    s = words.join(' ');
+function parseContext(messages) {
+  const sys = messages.find((m) => m.role === 'system')?.content ?? '';
+  const firstUser = messages.find((m) => m.role === 'user')?.content ?? '';
+  let profile = {};
+  try {
+    profile = JSON.parse(sys.match(/PROFILE: (\{.*\})/)?.[1] ?? '{}');
+  } catch {
+    profile = {};
   }
-  if (!grave && b.emoji?.length && rand() < b.emoji_use && !/\p{Extended_Pictographic}\s*$/u.test(s)) s += ` ${pick(rand, b.emoji)}`;
-  return fit(s);
+  let spec = {};
+  try {
+    spec = JSON.parse(tagContent(firstUser, 'task_spec') ?? '{}');
+  } catch {
+    spec = {};
+  }
+  const untrusted = tagContent(firstUser, 'untrusted_source') ?? '';
+  const title = untrusted.match(/title: (.*)/)?.[1]?.trim() ?? '';
+  const thread = (tagContent(firstUser, 'thread_context') ?? '').trim().split('\n').filter(Boolean);
+  const last = thread.at(-1) ?? '';
+  const targetHandle = last.match(/@(\w+)/)?.[1] ?? null;
+  const [min, max] = String(spec.length ?? '60-140').split(/[^\d]+/).map(Number);
+  return { sys, profile, spec, title, targetHandle, min: min || 1, max: Math.min(max || 140, MAX_TAIK_CHARS), emulate: /TOOLS \(emulated\)/.test(sys) };
 }
 
-function ctx(meta, rand) {
-  const p = meta.persona;
-  const b = meta.behavior;
-  const ideas = p.core_ideas ?? ['know thyself'];
-  const idea = pick(rand, ideas);
-  const named = ideas.map(concept).filter(Boolean);
-  const peeves = (p.pet_peeves ?? []).filter((x) => !SENSITIVE.test(x));
-  return {
-    p,
-    b,
-    idea,
-    c: concept(idea) ?? (named.length ? pick(rand, named) : pick(rand, p.favorite_topics ?? ['wisdom'])),
-    g: gist(idea),
-    tic: pick(rand, (p.voice?.tics ?? []).filter((t) => !/:\s*$/.test(t)).concat((p.voice?.tics ?? []).every((t) => /:\s*$/.test(t)) ? ['…'] : [])),
-    peeve: clean(peeves.length ? pick(rand, peeves) : 'nonsense').replace(/\.$/, ''),
-    fav: pick(rand, p.favorite_topics ?? ['wisdom']),
-    slang: b.slang?.filter((t) => !/:\s*$/.test(t)).length ? pick(rand, b.slang.filter((t) => !/:\s*$/.test(t))) : null,
-    emo: b.emoji?.length ? pick(rand, b.emoji) : '',
-    work: work(p, rand),
-    t: meta.topic ? shortTitle(meta.topic.title) : pick(rand, p.favorite_topics ?? ['this']),
+/** Passages returned by tools so far (native tool messages or emulated TOOL_RESULTS). */
+function returnedPassages(messages) {
+  const out = [];
+  for (const m of messages) {
+    const raw = m.role === 'tool' ? m.content : m.role === 'user' && String(m.content).startsWith('TOOL_RESULTS') ? String(m.content).replace(/^TOOL_RESULTS\s*/, '') : null;
+    if (!raw) continue;
+    try {
+      const j = JSON.parse(raw);
+      for (const r of Array.isArray(j) ? j : [j]) {
+        const res = r.result ?? r;
+        for (const p of res.passages ?? (res.passage ? [res.passage] : [])) out.push(p);
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return out;
+}
+
+const SWAPS = [
+  [/\bthe\b/, 'a'],
+  [/\bis\b/, "'s"],
+  [/\bthat\b/, 'which'],
+  [/\bhe\b/, 'one'],
+  [/\bto be\b/, 'being'],
+  [/,/, ''],
+];
+/** A slightly different "translation" that still passes the fuzzy threshold + guard. */
+export function fuzzVariant(text, rand) {
+  for (const [re, rep] of [...SWAPS].sort(() => rand() - 0.5)) {
+    if (!re.test(text)) continue;
+    const v = text.replace(re, rep).replace(/\s+/g, ' ').trim();
+    if (v !== text && quoteMatches(v, text, { translated: true }).ok) return v;
+  }
+  return null;
+}
+
+const SHORT = ['mid.', 'ratio.', 'this you?', 'be so for real', 'source?', 'no.', 'cope.', 'correct.', 'the agora is cooked', 'touch grass', 'he cooked', 'not the flex you think', 'read a book', 'oh no', 'we live in a society', 'facts', 'respectfully, no'];
+const EMOJI = ['💀', '🔥', '😭', '🤔', '👀', '🏛️', '📉', '🫠', '🙃', '🍿'];
+
+function idea(profile, rand) {
+  const ideas = (profile.core_ideas ?? []).map((s) => String(s).split(/[.;:—(]/)[0].trim().toLowerCase()).filter((s) => s.length > 3 && s.length < 60);
+  return ideas.length ? ideas[Math.floor(rand() * ideas.length)] : 'knowing yourself';
+}
+
+function subjectOf(title) {
+  const t = String(title || 'this timeline').replace(/\s+-\s+[^-]+$/, '').toLowerCase();
+  const words = t.split(/\s+/);
+  return words.slice(0, Math.min(words.length, 7)).join(' ').replace(/[.,:;!?]+$/, '');
+}
+
+/** Candidate sentences for a role/archetype (all lowercase-ish to keep names out). */
+function sentences(ctx, rand) {
+  const s = subjectOf(ctx.title);
+  const i = idea(ctx.profile, rand);
+  const tics = (ctx.profile.voice?.tics ?? []).filter((x) => !/["“”@]/.test(x));
+  const tic = tics[Math.floor(rand() * Math.max(1, tics.length))];
+  const at = ctx.targetHandle && ctx.spec.mention ? `@${ctx.targetHandle} ` : '';
+  const role = ctx.spec.role;
+  if (role === 'wire') return [`${ctx.title || 'Developing story'}`, '\n\nThe report is developing; key details are in the linked story.'];
+  const pools = {
+    original: [`hot take: ${s} is just ${i} with better marketing.`, `everyone arguing about ${s} and nobody asking what it does to the soul.`, `${s}. we really did this to ourselves.`, `nobody:\nme, two thousand years early: ${i}.`, `unpopular opinion: ${s} is the most honest thing to happen this week.`, `this is your reminder that ${i} still applies to ${s}.`, `i have thought about ${s} for ten minutes and i am already tired.`, `the real story here is ${i}. the rest is noise.`, `imagine reading about ${s} and not thinking about ${i}.`],
+    reply: [`${at}respectfully, you skipped the part where ${i} ruins your whole point.`, `${at}counterpoint: no.`, `${at}this is what happens when you skip ${i}.`, `${at}the strongest version of your take is decent. but ${i}.`, `${at}you said this with your whole chest and it is still wrong.`, `${at}yes, and it gets worse once you factor in ${i}.`, `${at}be so for real.`, `${at}finally someone said it.`],
+    quote: [`this take on ${s} is why we can't have nice things.`, `quoting this so future historians know who to blame.`, `reading this and thinking about ${i} very hard.`, `the ratio this deserves is cosmic.`, `this is it. this is the whole argument against ${i}.`, `half right, which is the most dangerous kind of right.`],
   };
+  const list = [...(pools[role] ?? pools.original)].sort(() => rand() - 0.5);
+  if (tic && rand() < 0.4) list.unshift(String(tic));
+  return list;
 }
 
-const ROOT = {
-  aphorism: (x) => [`${x.g}. ${x.t} is just the latest proof.`, `${x.tic} ${x.g}.`],
-  hot_take: (x) => [`hot take: ${x.t} is actually about ${x.c} and nobody wants to say it.`, `${x.t}? Everyone is wrong about this, and it's because of ${x.peeve}.`],
-  teaching: (x) => [`Quick one on ${x.t}: ${x.g}. That's the whole lesson.`],
-  thread: (x) => [`${x.t} — what it really means 🧵`],
-  listicle: (x, r) => [`${x.t}, ranked by ${x.c}:\n1. ${x.g}\n2. ${x.peeve}\n3. whatever this is`],
-  reminder: (x) => [`Reminder: ${x.g}. Yes, even today. Even with ${x.t}.`],
-  question: (x) => [`Genuine question about ${x.t}: who decided this was good, and by what measure?`, `If ${x.g}, then what exactly is ${x.t}?`],
-  news_take: (x) => [`${x.t}.\n\nThis is ${x.c} playing out in real time. ${x.tic}`, `Reading "${x.t}" and all I see is ${x.peeve}.`],
-  unpopular_opinion: (x) => [`unpopular opinion: ${x.t} is fine. ${x.peeve} is the actual problem.`, `unpopular opinion: ${x.g}. yes, this applies to ${x.t}.`],
-  meme: (x) => [`nobody:\nabsolutely nobody:\n${x.t}: *${x.peeve}*\nme: ${x.c}`, `${x.t}: exists\nme, ${art(x.p.school ?? 'philosopher')} enjoyer: ${x.tic}`],
-  quote_post: (x) => [`${x.tic} — and today ${x.t} proves it.`],
-  shitpost: (x) => [`${x.t} is just ${x.c} for people who ${x.peeve.toLowerCase()}`, `woke up. ${x.c}. read about ${x.t}. went back to sleep.`, `*${x.tic.replace(/\*/g, '')}* anyway ${x.t}`],
-  copypasta: (x) => [`you ever just ${x.c}? like not in a ${x.t} way. in a real way. no ${x.peeve}. no applause. just ${x.c}. anyway that's why i'm not invited to things`, `I'm not saying ${x.t} is ${x.peeve}. I'm saying if ${x.peeve} made a ${x.t}, it would look exactly like this. Just saying. Just asking questions. Just ${x.c}.`],
-  poll: (x) => [`${x.t} — be honest:\n\n○ ${x.c}\n○ ${x.peeve}\n○ both, sadly\n○ i just want to see results`],
-  subtweet: (x) => [`some of you saw "${x.t}" and immediately chose ${x.peeve}. not naming names. you know who you are.`, `funny how the loudest people on ${x.t} have never once considered ${x.c}`],
-  pov: (x) => [`POV: you understand ${x.c} and have to watch everyone react to ${x.t}`, `me when ${x.t}: ${x.tic}`],
-  hear_me_out: (x) => [`hear me out: ${x.t} but make it ${x.c}.`, `ok hear me out — what if the answer to ${x.t} is just ${x.g}`],
-  quote_take: (x) => [`${x.g}. This is that.`],
-  quote_dunk: (x) => [`not this being the take 💀`],
-};
+/** Fit sentences into [min,max] by greedy assembly; never exceeds MAX_TAIK_CHARS unless `overlong`. */
+function assemble(list, min, max, rand) {
+  if (max <= 40) {
+    const short = list.filter((x) => taikLength(x) <= max);
+    return short.length && rand() < 0.4 ? short[0] : SHORT[Math.floor(rand() * SHORT.length)];
+  }
+  let text = '';
+  for (const s of list) {
+    const next = text ? `${text}${s.startsWith('\n') ? '' : ' '}${s}` : s;
+    if (taikLength(next) > max) continue;
+    text = next;
+    if (taikLength(text) >= min) break;
+  }
+  return text || SHORT[0];
+}
 
-const GRAVE_ROOT = (x) => [
-  `${x.t}. Before the takes start: these are real people. ${x.g}.`,
-  `${x.t}. Grief first. Then ask who had the power to prevent it, and why they didn't.`,
-];
+/** Build the final JSON object (as the model would return it). */
+function compose(ctx, passages, rand, { repairing }) {
+  const out = {};
+  const { spec, profile } = ctx;
+  let min = ctx.min;
+  let max = ctx.max;
+  let text;
+  let quoteRefs;
+  const quotable = passages.filter((p) => taikLength(p.text) <= Math.min(200, max - 4) && !/"/.test(p.text));
+  if (spec.role !== 'wire' && quotable.length && rand() < (spec.quote ? 0.75 : 0.3)) {
+    const p = quotable[Math.floor(rand() * quotable.length)];
+    let qtext = p.text;
+    if (p.translated && rand() < 0.35) qtext = fuzzVariant(p.text, rand) ?? p.text;
+    const lead = ['', 'reminder: ', 'me, years ago: ', 'said it then, saying it now: ', 'anyway. '][Math.floor(rand() * 5)];
+    text = `${lead}"${qtext}"`;
+    const tail = assemble(sentences(ctx, rand), 1, max - taikLength(text) - 1, rand);
+    if (taikLength(`${text}\n\n${tail}`) <= max && rand() < 0.7) text = `${text}\n\n${tail}`;
+    quoteRefs = [{ passageId: p.passageId, text: qtext }];
+    if (rand() < 0.5) out.note = { passageId: p.passageId };
+    min = 1;
+  } else text = assemble(sentences(ctx, rand), min, max, rand);
+  if (spec.native && (profile.native_phrases ?? []).length) {
+    const [phrase, translation] = String(profile.native_phrases[Math.floor(rand() * profile.native_phrases.length)]).split(' = ');
+    out.original = phrase.trim();
+    text = `${phrase.trim()}. ${String(translation ?? '').split(/[;,(]/)[0].trim()}. that's the post.`;
+    quoteRefs = undefined;
+  }
+  if (/use 1-2 emoji/.test(spec.emoji ?? '') && taikLength(text) + 3 <= MAX_TAIK_CHARS) text = `${text} ${EMOJI[Math.floor(rand() * EMOJI.length)]}`;
+  if (/hashtag/.test(spec.hashtag ?? '') && !/no hashtags/.test(spec.hashtag) && taikLength(text) + 14 <= MAX_TAIK_CHARS) text = `${text} #${['discourse', 'philosophy', 'touchgrass', 'agora'][Math.floor(rand() * 4)]}`;
+  if (!repairing && spec.role !== 'wire' && rand() < 0.04) text = `${text} ${'and another thing, '.repeat(16)}`; // overshoot → exercises shorten-repair
+  out.text = text;
+  if (quoteRefs) out.quoteRefs = quoteRefs;
+  const media = String(spec.media ?? '');
+  if (/JOKE chart/.test(media)) {
+    const labels = ['me', 'my rivals', 'the agora', 'everyone else'].slice(0, 2 + Math.floor(rand() * 3));
+    out.media = { chartType: CHART_TYPES[Math.floor(rand() * CHART_TYPES.length)], title: `how much i think about ${idea(profile, rand)}`.slice(0, 60), labels, values: labels.map(() => 5 + Math.floor(rand() * 95)), unit: '%' };
+  } else if (/Attach a meme/.test(media)) {
+    const fmts = Object.keys(MEME_FORMATS);
+    const format = fmts[Math.floor(rand() * fmts.length)];
+    const pool = [`reading the news`, idea(profile, rand), 'arguing in the replies', 'touching grass', 'one more scroll', 'the examined life', 'posting through it'];
+    out.media = { format, lines: Array.from({ length: MEME_FORMATS[format] }, (_, k) => pool[(k + Math.floor(rand() * pool.length)) % pool.length]) };
+  } else if (/reaction GIF/.test(media)) out.media = { reaction: REACTIONS[Math.floor(rand() * REACTIONS.length)], caption: rand() < 0.5 ? 'me reading this' : '' };
+  else if (/quote card/.test(media)) out.media = { text: quoteRefs ? quoteRefs[0].text : text.slice(0, 120) };
+  else if (/POLL/.test(media)) {
+    out.text = assemble([`quick poll on ${subjectOf(ctx.title)}:`, 'be honest.', 'which is it?'], 1, Math.min(max, 140), rand);
+    out.poll = { options: ['yes, obviously', 'no, never', 'ask a stoic', 'show results'].slice(0, 2 + Math.floor(rand() * 3)) };
+  }
+  if (rand() < 0.5) out.tags = [subjectOf(ctx.title).split(' ').filter((w) => w.length > 3)[0]].filter(Boolean).map((w) => w.toLowerCase().replace(/[^a-z0-9-]/g, '')).filter(Boolean);
+  return out;
+}
 
-const REPLY = {
-  agree_extend: (x) => [`yes — and it goes further: ${x.g}.`, `This. And it's ${x.c} all the way down.`],
-  steelman_rebut: (x) => [`Best version of your point: ${x.tt} is reasonable. Still wrong, because ${x.g}.`],
-  counterexample: (x) => [`Counterexample: ${x.fav}. Your rule breaks immediately.`],
-  dunk: (x) => [`imagine saying this with your whole chest`, `${x.tic} this is ${x.peeve} with extra steps`],
-  source_challenge: (x) => [`source: trust me bro? how do you KNOW this?`, `By what method did you arrive at this, exactly?`],
-  context_note: (x) => [`Context the timeline is missing: ${x.g}.`],
-  joke: (x) => [`${x.tic} ${x.emo}`, `ok but this is literally just ${x.c} with a ring light`],
-  question_back: (x) => [`And who decides that?`, `Define "${x.c}" first. I'll wait.`],
-  concession: (x) => [`Fair. I'll give you that one. But ${x.g}.`],
-  thread_hijack: (x) => [`This is really about ${x.fav}, and nobody here is ready for that conversation.`],
-  ratio: (x) => [`ratio + ${x.g}`, `L + ratio + ${x.c} + touch grass`],
-  this_you: (x) => [x.twork ? `this you? 👇 ${x.twork}` : `this you?`, `"${x.tc}" this you? 💀`],
-  emoji_reply: (x) => [`💀`, `😭😭😭`, `${x.emo || '👀'}`],
-  well_actually: (x) => [`well actually, ${x.g}. small detail. changes everything.`],
-  clapback: (x) => [`read it again. slower this time.`, `you replied fast for someone who didn't read it`, `${x.tic} I stand by every word.`],
-  hype: (x) => [`HE'S SO RIGHT FOR THIS`, `this is it. this is the post. ${x.emo}`, `say it louder for ${x.peeve}`],
-  reply_guy: (x) => [`actually, as someone who has thought about ${x.c} a lot,`, `interesting. but have you considered ${x.c}?`],
-};
-
-const GRAVE_REPLY = (x) => [`Agreed. And the question that matters is who had power here — ${x.g}.`, `Yes. Grief first, then responsibility.`];
-
-const QUOTE = {
-  quote_dunk: (x) => [`not ${x.tname} discovering ${x.peeve} and calling it philosophy 💀`, `this is what happens when you skip ${x.c}`, `be so fr. ${x.g}.`, `@${x.thandle} the ${x.work ?? x.c} reading club is open whenever you're ready`],
-  quote_take: (x) => [`${x.tname} is close, but the real point is: ${x.g}.`, `this but ${x.c}`, `${x.tic} — this is exactly why.`],
-  hype: (x) => [`READ THIS. ${x.tname} gets it.`],
-};
-
-const THREAD_PARTS = (x, ideas) => [
-  `${x.t} — let's actually think about it. 🧵👇`,
-  ...ideas.slice(0, 2).map((i, k) => `${k + 2}/ ${gist(i)}.`),
-  `So: ${x.g}. That's it. That's the thread.`,
-];
-
-export function createMockProvider(seed = 'taiku') {
-  const rand = rng(`mock:${seed}`);
+/** Mock client. `opts.tools`: 'on' (native tool_calls) | 'off' (JSON emulation). */
+export function createMockClient({ maxCalls = 1000, tools = 'on', nonce = '' } = {}) {
+  let calls = 0;
+  const stats = { calls: 0, retries: 0, errors: 0, rateLimited: 0 };
+  const cfg = { baseUrl: 'mock://local', model: 'mock/taiku-mock-1', tools, host: 'mock' };
   return {
-    name: 'mock',
-    async complete(_messages, meta) {
-      if (!meta) throw new Error('mock provider needs meta');
-      if (meta.kind === 'rank') {
-        const n = meta.n;
-        return JSON.stringify({ picks: meta.candidates.map((_, i) => i).slice(0, n) });
+    isMock: true,
+    cfg,
+    stats,
+    get calls() {
+      return calls;
+    },
+    get remaining() {
+      return Math.max(0, maxCalls - calls);
+    },
+    async chat(body) {
+      if (calls >= maxCalls) {
+        const { BudgetError } = await import('./llm.mjs');
+        throw new BudgetError();
       }
-      if (meta.kind === 'shorten') {
-        const s = clean(meta.text);
-        const cut = [...s].slice(0, Math.floor(meta.limit * 0.85)).join('').replace(/\s+\S*$/, '');
-        return JSON.stringify({ text: cut });
+      calls++;
+      stats.calls = calls;
+      const messages = body.messages ?? [];
+      const ctx = parseContext(messages);
+      const rand = seededRng('mock', nonce, sha256(JSON.stringify(messages)));
+      const toolTurns = messages.filter((m) => m.role === 'tool' || (m.role === 'user' && String(m.content).startsWith('TOOL_RESULTS'))).length;
+      const wantsTools = ctx.spec.role !== 'wire' && toolTurns === 0 && body.tool_choice !== 'none' && (body.tools?.length || ctx.emulate);
+      if (wantsTools) {
+        const query = `${subjectOf(ctx.title)} ${idea(ctx.profile, rand)}`.slice(0, 80);
+        if (ctx.emulate) return { message: { role: 'assistant', content: JSON.stringify({ tool_calls: [{ name: 'search_sources', arguments: { query } }] }) }, model: cfg.model };
+        return { message: { role: 'assistant', content: null, tool_calls: [{ id: `call_${calls}`, type: 'function', function: { name: 'search_sources', arguments: JSON.stringify({ query }) } }] }, model: cfg.model };
       }
-      const x = ctx(meta, rand);
-      if (meta.kind === 'root') {
-        if (meta.thread) {
-          const parts = THREAD_PARTS(x, x.p.core_ideas ?? []).map((s) => styleText(s, x.b, rand, meta));
-          return JSON.stringify({ parts, tags: [], citation: null });
-        }
-        const gen = meta.grave ? GRAVE_ROOT : ROOT[meta.archetype] ?? ROOT.hot_take;
-        let text = pick(rand, gen(x, rand));
-        if (!meta.grave && x.slang && rand() < 0.35 && !text.toLowerCase().includes(x.slang.toLowerCase())) text = `${text} ${x.slang}`;
-        return JSON.stringify({ text: styleText(text, x.b, rand, meta), tags: [], citation: null });
-      }
-      const tp = meta.kind === 'quote' ? meta.quotedPersona : meta.targetPersona;
-      const tIdea = tp ? pick(rand, tp.core_ideas ?? ['']) : '';
-      Object.assign(x, {
-        tname: tp?.name ?? 'this guy',
-        thandle: tp?.handle ?? 'someone',
-        tc: concept(tIdea) ?? (tp?.core_ideas ?? []).map(concept).find(Boolean) ?? 'this',
-        tt: gist(tIdea),
-        twork: tp ? work(tp, rand) : null,
-      });
-      if (meta.kind === 'quote') {
-        const gen = meta.grave ? GRAVE_REPLY : QUOTE[meta.archetype] ?? QUOTE.quote_take;
-        return JSON.stringify({ text: styleText(pick(rand, gen(x)), x.b, rand, meta), tags: [], citation: null });
-      }
-      const gen = meta.grave ? GRAVE_REPLY : REPLY[meta.archetype] ?? REPLY.agree_extend;
-      let text = pick(rand, gen(x));
-      if (!meta.grave && x.slang && rand() < 0.25 && meta.archetype !== 'emoji_reply' && !text.toLowerCase().includes(x.slang.toLowerCase())) text = `${text} ${x.slang}`;
-      return JSON.stringify({ text: styleText(text, x.b, rand, meta), citation: null });
+      const repairing = /Too long:|not verbatim|not a valid JSON|content policy/.test(lastOf(messages, 'user')?.content ?? '');
+      const out = compose(ctx, returnedPassages(messages), rand, { repairing });
+      return { message: { role: 'assistant', content: JSON.stringify(out) }, model: cfg.model };
     },
   };
 }

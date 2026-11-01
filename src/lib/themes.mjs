@@ -40,3 +40,26 @@ export function themesOf(text) {
 export function isGrave(text) {
   return GRAVE.test(String(text ?? ''));
 }
+
+/** Theme → TOPIC_KEYS (data.mjs) bucket, for persona.topic_affinity matching. */
+export const THEME_TOPIC = {
+  ai: 'tech', tech: 'tech', politics: 'politics', war: 'world', economy: 'economy', labor: 'economy', science: 'science',
+  health: 'science', climate: 'science', religion: 'religion', culture: 'culture', sports: 'sports', media: 'culture',
+  law: 'politics', rights: 'politics', education: 'culture', space: 'science', death: 'religion', love: 'culture',
+  food: 'culture', cities: 'economy', wellness: 'culture', status: 'memes',
+};
+const VIRAL = /\b(viral|meme\w*|trend\w*|tiktok|reddit|lol|wild|internet|fans?|stan\w*|drama|reacts?|challenge)\b/i;
+
+/**
+ * Sparse topic vector { topicKey: weight } for a text, optionally seeded with section/extra keys.
+ * Unknown/empty text falls back to a flat 'culture'+'memes' vector so cosine stays defined.
+ */
+export function topicVector(text, extra = []) {
+  const v = {};
+  const add = (k, w) => { if (k) v[k] = (v[k] ?? 0) + w; };
+  for (const t of themesOf(text)) add(THEME_TOPIC[t], 1);
+  if (VIRAL.test(String(text ?? ''))) add('memes', 0.7);
+  for (const k of extra) add(THEME_TOPIC[k] ?? k, 1.5);
+  if (!Object.keys(v).length) { v.culture = 0.6; v.memes = 0.4; }
+  return v;
+}

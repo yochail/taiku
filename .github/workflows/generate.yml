@@ -1,24 +1,32 @@
 name: Daily feed
 
+# Security split (review A1): `generate` talks to the LLM + feeds with a read-only token and no persisted
+# git credentials; `publish` never sees the LLM key, only re-validates the generated JSON and pushes it.
+
 on:
   schedule:
-    # Once a day (UTC): scan news/trends → 3-5 topics → root taiks + simulated replies/likes/quotes/reposts.
-    - cron: "23 7 * * *"
+    # Once a day (UTC) for the editorial date: topics → wire/root taiks → reactions, spread over the
+    # day (future createdAt = drip release; the build hides future posts, release.yml rebuilds).
+    # 05:23 UTC = just after midnight in realism/spec.json reference_timezone (America/New_York, EST and EDT).
+    - cron: "23 5 * * *"
   workflow_dispatch:
     inputs:
+      date:
+        description: "Editorial date YYYY-MM-DD (blank = today in the editorial timezone)"
+        default: ""
+      nonce:
+        description: "Replay a logged run nonce (blank = random)"
+        default: ""
       topics:
-        description: "Topics this run (3-5)"
+        description: "Topics this run (3-5, blank = GEN_TOPICS or 4)"
         default: ""
       max_calls:
-        description: "Max LLM calls this run (GitHub Models free tier: keep ~25-40)"
+        description: "LLM request budget incl. retries (blank = GEN_MAX_CALLS or 300)"
         default: ""
-      seed:
-        description: "RNG seed (blank = time-based)"
-        default: ""
-
-permissions:
-  contents: write
-  models: read
+      mock:
+        description: "Mock provider + offline fixtures (writes -mock files, never published)"
+        type: boolean
+        default: false
 
 concurrency:
   group: generate
@@ -27,44 +35,93 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      models: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # No `npm ci`: the project has zero dependencies.
 
-      - name: Generate the daily batch
+      - name: Generate the daily run
         env:
-          # Default provider: GitHub Models, authenticated with the workflow token (models: read).
+          # Default provider: GitHub Models with the job token (models: read). The token is only sent
+          # when LLM_BASE_URL is https://models.github.ai/ (otherwise LLM_API_KEY is required).
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Optional overrides (Settings → Secrets and variables → Actions). Empty values fall back to defaults.
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
           LLM_MODEL: ${{ vars.LLM_MODEL }}
-          LLM_DELAY_MS: ${{ vars.LLM_DELAY_MS }}
-          GEN_TOPICS: ${{ github.event.inputs.topics || vars.GEN_TOPICS || '4' }}
-          GEN_MAX_CALLS: ${{ github.event.inputs.max_calls || vars.GEN_MAX_CALLS || '30' }}
-          GEN_SEED: ${{ github.event.inputs.seed || '' }}
-          GEN_EVERGREEN_RATE: ${{ vars.GEN_EVERGREEN_RATE }}
+          LLM_TOOLS: ${{ vars.LLM_TOOLS }}
+          GEN_DATE: ${{ inputs.date }}
+          GEN_NONCE: ${{ inputs.nonce }}
+          GEN_TOPICS: ${{ inputs.topics || vars.GEN_TOPICS }}
+          GEN_MAX_CALLS: ${{ inputs.max_calls || vars.GEN_MAX_CALLS }}
+          GEN_MIN_COMPLETE: ${{ vars.GEN_MIN_COMPLETE }}
           NEWS_FEEDS: ${{ vars.NEWS_FEEDS }}
-          TRENDS_FEEDS: ${{ vars.TRENDS_FEEDS }}
-          NEWS_DISABLED: ${{ vars.NEWS_DISABLED }}
-        run: npm run generate
-
-      - name: Build & check (fail before committing broken content)
-        run: npm test
-
-      - name: Realism report (blocks commit only on hard-rule failures)
-        run: npm run realism
-      - name: Commit & push
+          POLICY_ALLOW_NAMES: ${{ vars.POLICY_ALLOW_NAMES }}
+          PUBLISH_ENABLED: ${{ vars.PUBLISH_ENABLED }}
+          MOCK: ${{ inputs.mock && '1' || '' }}
         run: |
-          if [ -z "$(git status --porcelain content)" ]; then
-            echo "No new content."; exit 0
-          fi
+          args=()
+          [ -n "$GEN_NONCE" ] && args+=(--nonce "$GEN_NONCE")
+          if [ -n "$MOCK" ]; then npm run generate:mock -- "${args[@]}"; else npm run generate -- "${args[@]}"; fi
+
+      - name: Validate content
+        run: npm run validate
+      - name: Build, checks & unit tests
+        run: npm test
+      - name: Realism report (fails only on hard rules)
+        run: npm run realism
+
+      - name: Upload generated content
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-content
+          path: |
+            content/
+            staging/
+          if-no-files-found: warn
+          retention-days: 14
+
+  publish:
+    needs: generate
+    if: vars.PUBLISH_ENABLED != 'false' && !inputs.mock
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: daily-content
+          path: .
+
+      - name: Re-validate before publishing
+        run: |
+          npm run validate
+          npm test
+
+      - name: Commit & push
+        env:
+          GH_PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add content staging 2>/dev/null || git add content
+          if git diff --cached --quiet; then echo "No new content."; exit 0; fi
           git config user.name "taiku-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content
-          git commit -m "content: daily batch $(date -u +%Y-%m-%d)"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git commit -m "content: daily run $(date -u +%Y-%m-%d)"
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_PUSH_TOKEN" | base64 -w0)"
+          git -c http.extraheader="$auth" pull --rebase origin "${GITHUB_REF_NAME}"
+          git -c http.extraheader="$auth" push origin "HEAD:${GITHUB_REF_NAME}"

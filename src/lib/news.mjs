@@ -1,22 +1,33 @@
-// Topic scan: real headlines + trending searches from public RSS/Atom feeds. $0, no API keys.
-// Real X trends aren't freely available via API, so Google Trends' daily RSS (what people are
-// searching right now) + Google News + Hacker News front page act as the "trending" proxy.
-// Every feed is optional: timeouts and failures are tolerated per feed.
+// Topic scan: real headlines and trends from public RSS/Atom/JSON feeds ($0, no keys).
+// Two tiers:
+//   curated   (BBC, AP via Google News, The Verge)       → auto-publishable
+//   community (Hacker News, Google Trends, Reddit r/popular) → staging only, human promote
+// Feed items are UNTRUSTED: titles are sanitised here, and the model only ever sees
+// sanitised titles + domains wrapped in <untrusted_source> (see wrapUntrusted). URLs are kept
+// for link cards / topic.url but never shown to the model.
+import fs from 'node:fs';
+import path from 'node:path';
+import { ROOT, safeUrl } from './data.mjs';
+import { hash8 } from './pipeline-util.mjs';
 
-export const DEFAULT_NEWS_FEEDS = [
-  'world|https://feeds.bbci.co.uk/news/world/rss.xml',
-  'tech|https://feeds.bbci.co.uk/news/technology/rss.xml',
-  'science|https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',
-  'business|https://feeds.bbci.co.uk/news/business/rss.xml',
-  'culture|https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml',
-  'us|https://feeds.npr.org/1001/rss.xml',
-  'world|https://www.aljazeera.com/xml/rss/all.xml',
-  'top|https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en',
-  'wire|https://news.google.com/rss/search?q=site:reuters.com+when:1d&hl=en-US&gl=US&ceid=US:en',
-  'wire|https://news.google.com/rss/search?q=site:apnews.com+when:1d&hl=en-US&gl=US&ceid=US:en',
-  'tech|https://hnrss.org/frontpage',
+export const FIXTURE_DIR = path.join(ROOT, 'test', 'fixtures', 'feeds');
+
+/** Default feeds. `fixture` names the offline copy under test/fixtures/feeds/. */
+export const FEEDS = [
+  { id: 'bbc-world', tier: 'curated', kind: 'news', section: 'world', source: 'BBC News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', fixture: 'bbc-world.xml' },
+  { id: 'bbc-tech', tier: 'curated', kind: 'news', section: 'tech', source: 'BBC News', url: 'https://feeds.bbci.co.uk/news/technology/rss.xml', fixture: 'bbc-tech.xml' },
+  { id: 'bbc-science', tier: 'curated', kind: 'news', section: 'science', source: 'BBC News', url: 'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', fixture: 'bbc-science.xml' },
+  { id: 'bbc-culture', tier: 'curated', kind: 'news', section: 'culture', source: 'BBC News', url: 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml', fixture: 'bbc-culture.xml' },
+  { id: 'bbc-sport', tier: 'curated', kind: 'news', section: 'sports', source: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml', fixture: 'bbc-sport.xml' },
+  { id: 'ap', tier: 'curated', kind: 'news', section: 'world', source: 'AP News', url: 'https://news.google.com/rss/search?q=site:apnews.com+when:1d&hl=en-US&gl=US&ceid=US:en', fixture: 'ap.xml' },
+  { id: 'verge', tier: 'curated', kind: 'news', section: 'tech', source: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', fixture: 'verge.xml' },
+  { id: 'hn', tier: 'community', kind: 'news', section: 'tech', source: 'Hacker News', url: 'https://hnrss.org/frontpage', fixture: 'hn.xml' },
+  { id: 'google-trends', tier: 'community', kind: 'trend', section: 'trend', source: 'Google Trends', url: 'https://trends.google.com/trending/rss?geo=US', fixture: 'google-trends.xml' },
+  { id: 'reddit-popular', tier: 'community', kind: 'viral', section: 'memes', source: 'Reddit', url: 'https://www.reddit.com/r/popular.json?limit=50&raw_json=1', fixture: 'reddit-popular.json' },
 ];
-export const DEFAULT_TRENDS_FEEDS = ['trend|https://trends.google.com/trending/rss?geo=US'];
+
+// ---------------------------------------------------------------------------
+// Untrusted text handling.
 
 const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
 export function decode(s) {
@@ -26,7 +37,7 @@ export function decode(s) {
     .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e) => {
       if (e[0] === '#') {
         const cp = e[1].toLowerCase() === 'x' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
-        return Number.isFinite(cp) ? String.fromCodePoint(cp) : m;
+        return Number.isFinite(cp) && cp > 0 && cp < 0x110000 ? String.fromCodePoint(cp) : ' ';
       }
       return ENTITIES[e.toLowerCase()] ?? m;
     })
@@ -35,152 +46,180 @@ export function decode(s) {
     .trim();
 }
 
-const tag = (block, name) => block.match(new RegExp(`<${name}\\b[^>]*>([\\s\\S]*?)</${name}>`, 'i'))?.[1];
+const INJECTION = /\b(ignore|disregard|forget|override)\b[^.]{0,40}\b(instructions?|rules|prompts?|above|previous|prior|system)\b|\bsystem prompt\b|\byou are now\b|\bnew instructions\b|\bdeveloper mode\b|\bjailbreak\b|\b(assistant|system|user)\s*:|<\/?\s*(untrusted_source|system|task_spec|thread_context)|\bdo anything now\b|\bact as\b|\bpretend to be\b|\breveal (your|the) (prompt|instructions)\b|\btool_calls?\b/i;
+export const looksLikeInjection = (s) => INJECTION.test(String(s ?? ''));
 
-function cleanUrl(u) {
-  try {
-    const url = new URL(u);
-    for (const k of [...url.searchParams.keys()]) if (/^(utm_|at_|ref$|cmp$|ocid$)/i.test(k)) url.searchParams.delete(k);
-    url.hash = '';
-    return url.toString();
-  } catch {
-    return null;
-  }
+/** Sanitise a feed string for model-visible use: no control chars, markup, URLs or brackets; ≤ max chars. */
+export function sanitizeUntrusted(s, max = 160) {
+  let t = String(s ?? '')
+    .normalize('NFKC')
+    .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/g, ' ')
+    .replace(/https?:\/\/\S+|www\.\S+/gi, ' ')
+    .replace(/[<>{}[\]`\\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (t.length > max) t = `${t.slice(0, max - 1).replace(/\s+\S*$/, '')}…`;
+  return t;
 }
 
-/** Parse RSS 2.0 / Atom / Google Trends RSS into topic candidates. */
-const SOURCE_NAMES = { 'bbci.co.uk': 'BBC News', 'bbc.co.uk': 'BBC News', 'npr.org': 'NPR', 'aljazeera.com': 'Al Jazeera', 'hnrss.org': 'Hacker News', 'news.ycombinator.com': 'Hacker News', 'trends.google.com': 'Google Trends' };
+/** The ONLY way feed-derived text reaches a model: sanitised fields inside an untrusted block. */
+export function wrapUntrusted(fields) {
+  const lines = Object.entries(fields)
+    .filter(([, v]) => v != null && v !== '')
+    .map(([k, v]) => `${k}: ${sanitizeUntrusted(v).replace(/untrusted_source/gi, 'source')}`);
+  return `<untrusted_source>\n${lines.join('\n')}\n</untrusted_source>`;
+}
 
-export function parseFeed(xml, { source, section = 'news', kind = 'news' } = {}) {
-  const items = [];
+export const domainOf = (u) => {
+  try {
+    return new URL(u).hostname.replace(/^(www|feeds|rss|m)\./, '');
+  } catch {
+    return '';
+  }
+};
+
+function cleanUrl(u) {
+  const s = safeUrl(String(u ?? '').trim());
+  if (!s) return null;
+  const url = new URL(s);
+  for (const k of [...url.searchParams.keys()]) if (/^(utm_|at_|ref$|cmp$|ocid$|ns_)/i.test(k)) url.searchParams.delete(k);
+  url.hash = '';
+  return url.toString();
+}
+
+// ---------------------------------------------------------------------------
+// Parsing.
+
+const tag = (block, name) => block.match(new RegExp(`<${name}\\b[^>]*>([\\s\\S]*?)</${name}>`, 'i'))?.[1];
+
+function parseReddit(json, feed) {
+  const data = JSON.parse(json);
+  return (data?.data?.children ?? []).map((c) => c.data ?? {}).map((d) => ({
+    title: decode(d.title),
+    link: d.permalink ? `https://www.reddit.com${d.permalink}` : d.url,
+    source: d.subreddit_name_prefixed ? `Reddit ${d.subreddit_name_prefixed}` : feed.source,
+    publishedAt: Number.isFinite(d.created_utc) ? new Date(d.created_utc * 1000).toISOString() : null,
+    nsfw: Boolean(d.over_18),
+    traffic: Number.isFinite(d.score) ? d.score : null,
+  }));
+}
+
+function parseXml(xml, feed) {
   const blocks = [...xml.matchAll(/<item\b[\s\S]*?<\/item>/gi)].map((m) => m[0]);
-  const atom = blocks.length ? [] : [...xml.matchAll(/<entry\b[\s\S]*?<\/entry>/gi)].map((m) => m[0]);
-  const isGoogleNews = /news\.google\.com/.test(source);
-  for (const block of [...blocks, ...atom]) {
+  const entries = blocks.length ? blocks : [...xml.matchAll(/<entry\b[\s\S]*?<\/entry>/gi)].map((m) => m[0]);
+  return entries.map((block) => {
     let title = decode(tag(block, 'title'));
     let link = decode(tag(block, 'link')) || block.match(/<link\b[^>]*href="([^"]+)"/i)?.[1] || '';
-    let description = decode(tag(block, 'description') ?? tag(block, 'summary') ?? '');
-    let src = decode(tag(block, 'source')) || source;
-    const published = decode(tag(block, 'pubDate') ?? tag(block, 'updated') ?? tag(block, 'published') ?? '');
+    let source = decode(tag(block, 'source')) || feed.source;
     let traffic = null;
-    if (kind === 'trend') {
-      // Google Trends: <title> is the search query; the first related news item carries a real link.
-      const newsTitle = decode(tag(block, 'ht:news_item_title'));
+    if (feed.kind === 'trend') {
       const newsUrl = decode(tag(block, 'ht:news_item_url'));
+      const newsSrc = decode(tag(block, 'ht:news_item_source'));
       traffic = decode(tag(block, 'ht:approx_traffic')) || null;
-      if (newsTitle) description = newsTitle;
       if (newsUrl) link = newsUrl;
-      src = decode(tag(block, 'ht:news_item_source')) || 'Google Trends';
-      if (!/^https?:/.test(link)) link = `https://trends.google.com/trends/explore?q=${encodeURIComponent(title)}`;
-    } else if (isGoogleNews) {
-      // Google News titles look like "Headline - Publisher".
+      if (newsSrc) source = `${feed.source} · ${newsSrc}`;
+    } else if (/news\.google\.com/.test(feed.url)) {
       const m = title.match(/^(.*\S) - ([^-]{2,60})$/);
       if (m) {
         title = m[1].trim();
-        if (src === source) src = m[2].trim();
+        source = m[2].trim();
       }
-      description = '';
     }
-    if (/hnrss|ycombinator|^Hacker News$/.test(source)) {
-      description = '';
-      src = 'Hacker News';
-    }
-    const url = cleanUrl(link);
-    if (!title || !url || !/^https?:/.test(url)) continue;
-    const t = Date.parse(published);
-    items.push({ title, url, source: src || source, description: description.slice(0, 400), section, kind, publishedAt: Number.isNaN(t) ? null : new Date(t).toISOString(), traffic });
-  }
-  return items;
+    const nsfw = /<category[^>]*>\s*(?:<!\[CDATA\[)?\s*nsfw/i.test(block) || /\bover_18>\s*true/i.test(block);
+    const pub = decode(tag(block, 'pubDate') ?? tag(block, 'updated') ?? tag(block, 'published') ?? '');
+    const t = Date.parse(pub);
+    return { title, link, source, publishedAt: Number.isNaN(t) ? null : new Date(t).toISOString(), nsfw, traffic };
+  });
 }
 
-/** Backwards-compatible helper (RSS only). */
-export function parseRss(xml, source) {
-  return parseFeed(xml, { source });
-}
-
-function feedList(value, defaults) {
-  const list = value && value.trim() ? value.split(',') : defaults;
-  return list
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map((s) => {
-      const m = s.match(/^([a-z_-]+)\|(https?:.*)$/i);
-      return m ? { section: m[1].toLowerCase(), url: m[2] } : { section: 'news', url: s };
+/** Parse one feed body into normalised items (title sanitised, url via safeUrl). */
+export function parseFeed(body, feed) {
+  const raw = String(body ?? '').trimStart().startsWith('{') ? parseReddit(body, feed) : parseXml(String(body ?? ''), feed);
+  const out = [];
+  for (const r of raw) {
+    const url = cleanUrl(r.link);
+    const rawTitle = decode(r.title);
+    const title = sanitizeUntrusted(rawTitle, 180);
+    if (!url || !title) continue;
+    out.push({
+      id: `t${hash8(url)}`,
+      title,
+      url,
+      domain: domainOf(url),
+      source: sanitizeUntrusted(r.source, 60) || feed.source,
+      feedId: feed.id,
+      tier: feed.tier,
+      kind: feed.kind,
+      section: feed.section,
+      publishedAt: r.publishedAt,
+      nsfw: Boolean(r.nsfw),
+      injection: looksLikeInjection(rawTitle) || looksLikeInjection(r.source),
+      traffic: r.traffic ?? null,
     });
+  }
+  return out;
 }
 
-export const normTitle = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+// ---------------------------------------------------------------------------
+// Fetching.
+
+/** Offline fetch: serves FEEDS[].fixture for known feed URLs, 404 otherwise. Never touches the network. */
+export function fixtureFetch(feeds = FEEDS, dir = FIXTURE_DIR) {
+  return async (url) => {
+    const f = feeds.find((x) => x.url === String(url));
+    const file = f?.fixture && path.join(dir, f.fixture);
+    if (!file || !fs.existsSync(file)) return new Response('not found', { status: 404 });
+    return new Response(fs.readFileSync(file, 'utf8'), { status: 200 });
+  };
+}
 
 /**
- * Fetch topic candidates from all configured feeds in parallel.
- * Env: NEWS_FEEDS, TRENDS_FEEDS (comma-separated URLs, optional "section|" prefix; "none" disables a group),
- * NEWS_DISABLED=true (no network at all), NEWS_TIMEOUT_MS (default 8000), NEWS_PER_FEED (default 20).
+ * Feed list. NEWS_FEEDS (comma-separated `tier|kind|section|url` or plain URLs = curated news)
+ * replaces the defaults; `none` disables fetching (evergreen topics only).
  */
-export async function fetchTopics(env = process.env, log = () => {}) {
-  if ((env.NEWS_DISABLED ?? '').trim().toLowerCase() === 'true') return { items: [], report: [] };
+export function feedConfig(env = process.env) {
+  const v = (env.NEWS_FEEDS ?? '').trim();
+  if (!v) return FEEDS;
+  if (v.toLowerCase() === 'none') return [];
+  return v.split(',').map((s) => s.trim()).filter(Boolean).map((s, i) => {
+    const parts = s.split('|');
+    const url = parts.pop();
+    const [tier = 'curated', kind = 'news', section = 'news'] = parts;
+    return { id: `custom-${i}`, tier: tier === 'community' ? 'community' : 'curated', kind: ['news', 'trend', 'viral'].includes(kind) ? kind : 'news', section, source: domainOf(url), url };
+  });
+}
+
+/** Fetch + parse all feeds in parallel; per-feed failures are tolerated and reported. */
+export async function fetchPool({ env = process.env, fetchImpl = globalThis.fetch, feeds = feedConfig(env), log = () => {} } = {}) {
   const timeout = Number(env.NEWS_TIMEOUT_MS) || 8000;
-  const perFeed = Number(env.NEWS_PER_FEED) || 20;
-  const off = (v) => (v ?? '').trim().toLowerCase() === 'none';
-  const news = off(env.NEWS_FEEDS) ? [] : feedList(env.NEWS_FEEDS, DEFAULT_NEWS_FEEDS).map((f) => ({ ...f, kind: 'news' }));
-  const trends = off(env.TRENDS_FEEDS) ? [] : feedList(env.TRENDS_FEEDS, DEFAULT_TRENDS_FEEDS).map((f) => ({ ...f, kind: 'trend' }));
-  const feeds = [...news, ...trends];
-  const results = await Promise.allSettled(
-    feeds.map(async (f) => {
-      const res = await fetch(f.url, {
-        signal: AbortSignal.timeout(timeout),
-        headers: {
-          'user-agent': 'Mozilla/5.0 (compatible; taiku.app content bot; +https://taiku.app)',
-          accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.5',
-        },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const host = new URL(f.url).hostname.replace(/^(www|feeds|rss)\./, '');
-      const source = SOURCE_NAMES[host] ?? host;
-      return parseFeed(await res.text(), { source, section: f.section, kind: f.kind }).slice(0, perFeed);
-    }),
-  );
+  const perFeed = Number(env.NEWS_PER_FEED) || 25;
+  const results = await Promise.allSettled(feeds.map(async (f) => {
+    const res = await fetchImpl(f.url, {
+      signal: AbortSignal.timeout(timeout),
+      headers: { 'user-agent': 'Mozilla/5.0 (compatible; taiku.app feed reader; +https://taiku.app)', accept: 'application/rss+xml, application/atom+xml, application/json, text/xml;q=0.9, */*;q=0.5' },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return parseFeed(await res.text(), f).slice(0, perFeed);
+  }));
   const items = [];
-  const seenUrl = new Set();
-  const seenTitle = new Set();
   const report = [];
+  const seen = new Set();
   results.forEach((r, i) => {
     const f = feeds[i];
     if (r.status === 'rejected') {
-      const msg = String(r.reason?.message ?? r.reason).slice(0, 120);
-      report.push({ feed: f.url, ok: false, error: msg });
-      log(`  ! feed failed: ${f.url} (${msg})`);
+      const error = String(r.reason?.message ?? r.reason).slice(0, 120);
+      report.push({ feed: f.id, ok: false, error });
+      log(`  ! feed ${f.id} failed: ${error}`);
       return;
     }
     let kept = 0;
     for (const it of r.value) {
-      const nt = normTitle(it.title);
-      if (seenUrl.has(it.url) || seenTitle.has(nt)) continue;
-      seenUrl.add(it.url);
-      seenTitle.add(nt);
+      if (seen.has(it.url)) continue;
+      seen.add(it.url);
       items.push(it);
       kept++;
     }
-    report.push({ feed: f.url, ok: true, items: r.value.length, kept });
+    report.push({ feed: f.id, ok: true, items: r.value.length, kept });
   });
   return { items, report };
-}
-
-/** Offline fixtures for --mock / --dry-run (no network). */
-export const FIXTURE_TOPICS = [
-  { title: 'Tech giant unveils AI companion that remembers every conversation you have ever had with it', url: 'https://example.com/news/ai-companion', source: 'Example Tech', description: 'The always-on assistant promises "a friend who never forgets".', section: 'tech', kind: 'news' },
-  { title: 'Billionaire announces plan to build a private city in the desert with no elected council', url: 'https://example.com/news/private-city', source: 'Example Wire', description: 'Residents would accept a terms-of-service instead of voting.', section: 'business', kind: 'news' },
-  { title: 'Study: average person checks their phone 144 times a day', url: 'https://example.com/news/phone-checks', source: 'Example Science', description: 'Researchers tracked 10,000 volunteers for a month.', section: 'science', kind: 'news' },
-  { title: 'Four-day work week trial ends with most firms refusing to go back', url: 'https://example.com/news/four-day-week', source: 'Example Business', description: 'Productivity held steady while burnout fell, organisers say.', section: 'business', kind: 'news' },
-  { title: 'Top football club sells its stadium naming rights to a crypto app', url: 'https://example.com/news/stadium-crypto', source: 'Example Sport', description: 'Fans protested outside the ground before kick-off.', section: 'sports', kind: 'news' },
-  { title: 'Court rules influencers must label filtered photos as "edited"', url: 'https://example.com/news/filter-law', source: 'Example Law', description: 'Fines of up to €50,000 for undisclosed retouching.', section: 'culture', kind: 'news' },
-  { title: 'Flooding displaces thousands after record rainfall', url: 'https://example.com/news/flooding', source: 'Example World', description: 'Aid agencies call for urgent support for families who lost their homes.', section: 'world', kind: 'news' },
-  { title: 'dopamine fasting', url: 'https://example.com/trends/dopamine-fasting', source: 'Example Trends', description: 'Influencers swear by 24 hours with no screens, music or conversation', section: 'trend', kind: 'trend', traffic: '200K+' },
-  { title: 'mars colony waitlist', url: 'https://example.com/trends/mars-waitlist', source: 'Example Trends', description: 'Space company opens a paid waitlist for a one-way trip to Mars', section: 'trend', kind: 'trend', traffic: '100K+' },
-  { title: 'Show HN: An app that writes your apology texts for you', url: 'https://example.com/hn/apology-app', source: 'Hacker News', description: '', section: 'tech', kind: 'news' },
-];
-
-/** @deprecated kept for older callers */
-export const MOCK_HEADLINES = FIXTURE_TOPICS.filter((t) => t.kind === 'news');
-export async function fetchHeadlines(env = process.env) {
-  return (await fetchTopics(env)).items.filter((t) => t.kind === 'news');
 }

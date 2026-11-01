@@ -1,159 +1,123 @@
-// Topic selection: score scanned headlines/trends, skip what the feed already covered,
-// keep sections diverse, keep grave news rare and serious, and sprinkle in an evergreen
-// shitpost topic so the feed isn't only news.
-import { themesOf, isGrave } from './themes.mjs';
-import { hash, slugify } from './util.mjs';
+// Topic picking: filter the feed pool (tragedy, NSFW, injection, duplicates), score items
+// (source weight × recency × how many personas care), then pick 3–5 with diversity (MMR over
+// topic vectors and feeds). Evergreen fallbacks fill a thin day. Writes content/topics/<date>.json.
+import { TOPIC_KEYS } from './data.mjs';
+import { isGrave, topicVector } from './themes.mjs';
+import { hash8, sha256, tokens } from './pipeline-util.mjs';
 
-const STOP = new Set('the a an and or but of to in on at for with from by is are was were be been it its this that these those as about after before over into new says say said will would could should has have had not no you your our their his her they them we us who what why how when where which than then more most just also very can may might out up down off amid near says live update updates video watch'.split(' '));
+export const MIN_TOPICS = 3;
+export const MAX_TOPICS = 5;
 
-export function tokens(text) {
-  return new Set(
-    String(text ?? '')
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, ' ')
-      .split(/[\s-]+/)
-      .filter((w) => w.length >= 4 && !STOP.has(w))
-      .map((w) => w.slice(0, 6)),
-  );
+/** NSFW keywords (feed titles). Reddit over_18 is honoured separately. */
+const NSFW = /\b(nsfw|porn\w*|nude\w*|naked|onlyfans|sex\w*|xxx|fetish\w*|erotic\w*|hentai|strip(?:per|club)|escort\w*|boob\w*|horny|nip+les?|genital\w*|gore|gory|beheading|dismember\w*|corpse\w*|not safe for work|you should not open at work)\b/i;
+export const isNsfw = (item) => Boolean(item.nsfw) || NSFW.test(item.title ?? '');
+
+const SOURCE_WEIGHT = { curated: 1, community: 0.85, evergreen: 0.5 };
+const KIND_BONUS = { news: 1, trend: 1.05, viral: 1.1, evergreen: 1 };
+
+/** Evergreen shitpost topics (no URL) used when the day's pool is thin. */
+export const EVERGREEN = [
+  { title: 'Monday motivation posts', keys: ['memes', 'culture'] },
+  { title: 'Is a hot dog a sandwich', keys: ['memes', 'culture'] },
+  { title: 'Inbox zero as a lifestyle', keys: ['tech', 'economy'] },
+  { title: 'Gym selfies and the meaning of discipline', keys: ['sports', 'culture'] },
+  { title: 'Group chats that never stop', keys: ['memes', 'tech'] },
+  { title: 'People who reply-all', keys: ['memes', 'economy'] },
+];
+
+export function cosine(a, b) {
+  let dot = 0;
+  let na = 0;
+  let nb = 0;
+  for (const k of TOPIC_KEYS) {
+    const x = a?.[k] ?? 0;
+    const y = b?.[k] ?? 0;
+    dot += x * y;
+    na += x * x;
+    nb += y * y;
+  }
+  return na && nb ? dot / Math.sqrt(na * nb) : 0;
 }
 
 const jaccard = (a, b) => {
-  if (!a.size || !b.size) return 0;
+  const A = new Set(tokens(a));
+  const B = new Set(tokens(b));
+  if (!A.size || !B.size) return 0;
   let i = 0;
-  for (const x of a) if (b.has(x)) i++;
-  return i / (a.size + b.size - i);
+  for (const w of A) if (B.has(w)) i++;
+  return i / (A.size + B.size - i);
 };
 
-export const EVERGREEN_TOPICS = [
-  { title: 'people who clap when the plane lands', themes: ['cities', 'culture'] },
-  { title: 'the 5am club', themes: ['wellness', 'labor'] },
-  { title: 'LinkedIn thought leaders', themes: ['labor', 'status', 'media'] },
-  { title: 'main character syndrome', themes: ['culture', 'wellness', 'status'] },
-  { title: 'dating apps', themes: ['love', 'tech'] },
-  { title: 'gym mirror selfies', themes: ['wellness', 'status', 'culture'] },
-  { title: '"do your own research"', themes: ['science', 'media'] },
-  { title: 'unread notifications', themes: ['tech', 'wellness'] },
-  { title: 'the group chat at 2am', themes: ['love', 'tech', 'culture'] },
-  { title: 'brunch', themes: ['food', 'status'] },
-  { title: 'being "busy"', themes: ['labor', 'wellness', 'status'] },
-  { title: 'Monday', themes: ['labor', 'wellness'] },
-  { title: 'doomscrolling in bed', themes: ['tech', 'wellness', 'media'] },
-  { title: 'reply guys', themes: ['media', 'culture'] },
-  { title: 'pineapple on pizza', themes: ['food', 'culture'] },
-  { title: 'astrology girlies vs. the rationalists', themes: ['science', 'religion', 'culture'] },
-  { title: 'productivity apps that make you less productive', themes: ['tech', 'wellness', 'labor'] },
-  { title: 'touching grass', themes: ['wellness', 'climate'] },
-  { title: 'sourdough starters', themes: ['food', 'wellness'] },
-  { title: 'philosophy bros who only read the Wikipedia summary', themes: ['education', 'media', 'culture'] },
-];
-
-export function topicId(t) {
-  return `${slugify(t.title).slice(0, 40).replace(/-+$/, '')}-${hash(t.url || t.title).toString(36).slice(0, 5)}`;
-}
-
-/** Persona keyword bags (built once). */
-export function personaBag(p) {
-  return tokens([...(p.favorite_topics ?? []), p.news_lens, ...(p.pet_peeves ?? []), ...(p.core_ideas ?? []), p.school].join(' '));
-}
-
-/** 0..1: how much this persona would care about this topic. */
-export function relevance(persona, behavior, bag, topic) {
-  const themes = topic.themes ?? [];
-  const beats = behavior.beats ?? [];
-  const beatHits = themes.filter((t) => beats.includes(t)).length;
-  const beat = themes.length ? Math.min(1, beatHits / Math.min(2, themes.length)) : 0;
-  let kw = 0;
-  for (const w of topic.tokens ?? tokens(`${topic.title} ${topic.description ?? ''}`)) if (bag.has(w)) kw++;
-  return Math.min(1, 0.65 * beat + 0.35 * Math.min(1, kw / 2) + 0.05);
-}
-
-/** Titles/URLs the feed already covered recently (from existing posts). */
-export function coveredTopics(posts, now, days = 7) {
-  const urls = new Set();
-  const titles = [];
-  for (const p of posts) {
-    if (now - Date.parse(p.createdAt) > days * 86400_000) continue;
-    for (const t of [p.topic, p.news]) {
-      if (!t) continue;
-      if (t.url) urls.add(t.url);
-      if (t.title) titles.push(tokens(t.title));
-    }
-  }
-  return { urls, titles };
-}
-
-/** Enrich + score candidates. */
-export function scoreCandidates(items, { personas, behaviors, bags, covered, now }) {
-  const out = [];
-  const seen = [];
+/** Split the pool into kept items and dropped items with a reason. */
+export function filterPool(items) {
+  const kept = [];
+  const dropped = [];
   for (const it of items) {
-    if (!it.title || it.title.length < 4) continue;
-    const tk = tokens(`${it.title} ${it.description ?? ''}`);
-    const titleTk = tokens(it.title);
-    if (covered.urls.has(it.url) || covered.titles.some((t) => jaccard(t, titleTk) >= 0.45)) continue;
-    if (seen.some((t) => jaccard(t, titleTk) >= 0.5)) continue; // same story from two outlets
-    seen.push(titleTk);
-    const text = `${it.title} ${it.description ?? ''}`;
-    const themes = themesOf(text);
-    const grave = isGrave(text);
-    const t = { ...it, themes, grave, tokens: tk };
-    const rels = personas.map((p) => relevance(p, behaviors.get(p.id), bags.get(p.id), t)).sort((a, b) => b - a);
-    const fit = (rels[0] + rels[1] + rels[2]) / 3;
-    const ripeness = Math.min(1, themes.length * 0.28);
-    const ageH = it.publishedAt ? (now - Date.parse(it.publishedAt)) / 3600_000 : 12;
-    const fresh = ageH < 0 ? 1 : Math.max(0.2, 1 - ageH / 72);
-    let score = 0.4 * ripeness + 0.45 * fit + 0.15 * fresh;
-    if (it.kind === 'trend') score += 0.08 + (parseInt(String(it.traffic ?? '').replace(/\D/g, ''), 10) >= 100 ? 0.05 : 0);
-    if (/\blive\b|as it happened|\/videos?\//i.test(`${it.title} ${it.url}`)) score -= 0.12;
-    if (/\b(quiz|crossword|horoscope|deal of the day|coupon)\b/i.test(it.title)) score -= 0.3;
-    if (grave) score *= 0.55;
-    out.push({ ...t, score: Math.round(score * 1000) / 1000 });
+    const reason = it.injection ? 'injection' : isNsfw(it) ? 'nsfw' : isGrave(it.title) ? 'tragedy' : tokens(it.title).length < 1 ? 'empty' : kept.some((k) => jaccard(k.title, it.title) >= 0.6) ? 'duplicate' : null;
+    if (reason) dropped.push({ id: it.id, feedId: it.feedId, reason });
+    else kept.push(it);
   }
-  return out.sort((a, b) => b.score - a.score);
+  return { kept, dropped };
 }
 
-/**
- * Pick n topics: greedy by score with diversity penalties (section/source/theme), max one grave
- * topic, and (with probability evergreenRate) one evergreen shitpost topic.
- */
-export function selectTopics(cands, n, rand, { evergreenRate = 0.5, preferred = null } = {}) {
-  const picked = [];
-  const wantEvergreen = rand() < evergreenRate ? 1 : 0;
-  const pool = [...cands];
-  if (preferred?.length) {
-    for (const p of preferred) {
-      if (picked.length >= n - wantEvergreen) break;
-      const i = pool.indexOf(p);
-      if (i >= 0 && !(p.grave && picked.some((x) => x.grave))) picked.push(...pool.splice(i, 1));
-    }
-  }
-  while (picked.length < n - wantEvergreen && pool.length) {
-    let best = null;
-    let bestScore = -Infinity;
-    for (const c of pool.slice(0, 40)) {
-      if (c.grave && picked.some((x) => x.grave)) continue;
-      let s = c.score * (0.7 + 0.6 * rand());
-      for (const p of picked) {
-        if (p.section === c.section) s *= 0.55;
-        if (p.source === c.source) s *= 0.8;
-        const overlap = c.themes.filter((x) => p.themes.includes(x)).length;
-        s *= 1 - Math.min(0.6, 0.2 * overlap);
+/** Score kept items. `ref` (ms) anchors recency (defaults to the freshest item, so fixtures work any day). */
+export function scorePool(items, personas, { ref } = {}) {
+  const times = items.map((i) => Date.parse(i.publishedAt)).filter(Number.isFinite);
+  const anchor = ref ?? (times.length ? Math.max(...times) : Date.now());
+  const thinkers = personas.filter((p) => (p.kind ?? 'thinker') !== 'news');
+  return items.map((it) => {
+    const keys = topicVector(`${it.title}`, [it.section].filter((s) => TOPIC_KEYS.includes(s)));
+    const sims = thinkers.map((p) => cosine(p.topic_affinity, keys)).sort((a, b) => b - a);
+    const top = sims.slice(0, Math.max(3, Math.ceil(sims.length / 6)));
+    const care = top.length ? top.reduce((s, v) => s + v, 0) / top.length : 0.5;
+    const t = Date.parse(it.publishedAt);
+    const ageH = Number.isFinite(t) ? Math.max(0, (anchor - t) / 3.6e6) : 24;
+    const recency = Math.max(0.3, Math.exp(-ageH / 36));
+    const score = (SOURCE_WEIGHT[it.tier] ?? 0.7) * (KIND_BONUS[it.kind] ?? 1) * recency * (0.4 + care);
+    return { ...it, keys, score: Math.round(score * 1000) / 1000 };
+  });
+}
+
+/** Greedy MMR pick: relevance minus redundancy against already-picked topics (vector + same feed). */
+export function pickTopics(scored, n, { lambda = 0.55 } = {}) {
+  const pool = [...scored].sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+  const picks = [];
+  while (picks.length < n && pool.length) {
+    let best = 0;
+    let bestVal = -Infinity;
+    pool.forEach((c, i) => {
+      const red = picks.length ? Math.max(...picks.map((p) => cosine(p.keys, c.keys) + (p.feedId === c.feedId ? 0.3 : 0) + (p.tier === c.tier && c.tier === 'community' ? 0.15 : 0))) : 0;
+      const val = c.score - lambda * red * c.score;
+      if (val > bestVal) {
+        bestVal = val;
+        best = i;
       }
-      if (s > bestScore) [best, bestScore] = [c, s];
-    }
-    if (!best) break;
-    picked.push(best);
-    pool.splice(pool.indexOf(best), 1);
+    });
+    picks.push(pool.splice(best, 1)[0]);
   }
-  const evergreen = [...EVERGREEN_TOPICS];
-  while (picked.length < n && evergreen.length) {
-    const e = evergreen.splice(Math.floor(rand() * evergreen.length), 1)[0];
-    picked.push({ title: e.title, url: null, source: null, description: '', section: 'evergreen', kind: 'evergreen', themes: e.themes, grave: false, tokens: tokens(e.title), score: 0.5 });
-  }
-  return picked.map((t) => ({ ...t, id: topicId(t) }));
+  return picks;
 }
 
-/** Public, storable shape of a topic (post.topic). */
-export function topicRef(t) {
-  return { id: t.id, title: t.title, url: t.url ?? null, source: t.source ?? null, kind: t.kind };
+export const topicCount = (v) => Math.min(MAX_TOPICS, Math.max(MIN_TOPICS, Number(v) || 4));
+
+/** Full selection: filter → score → MMR, then evergreen fill. Returns { picks, dropped, poolHash }. */
+export function selectTopics(items, personas, { n = 4, date, rand = Math.random } = {}) {
+  const { kept, dropped } = filterPool(items);
+  const scored = scorePool(kept, personas);
+  const picks = pickTopics(scored, topicCount(n));
+  const ever = [...EVERGREEN].sort(() => rand() - 0.5);
+  while (picks.length < MIN_TOPICS && ever.length) {
+    const e = ever.shift();
+    picks.push({ id: `e${hash8(`${date}:${e.title}`)}`, title: e.title, url: null, domain: '', source: 'Taiku', feedId: 'evergreen', tier: 'evergreen', kind: 'evergreen', section: e.keys[0], publishedAt: null, keys: topicVector(e.title, e.keys), score: 0.2 });
+  }
+  const poolHash = sha256(items.map((i) => `${i.url}\t${i.title}`).sort().join('\n')).slice(0, 16);
+  return { picks: picks.map(publicTopic), dropped, poolHash, kept: scored };
 }
+
+/** The shape stored in content/topics/<date>.json and copied into posts' topic{}. */
+export function publicTopic(t) {
+  return { id: t.id, title: t.title, url: t.url ?? null, source: t.source, domain: t.domain ?? '', feedId: t.feedId, tier: t.tier, kind: t.kind, section: t.section ?? null, publishedAt: t.publishedAt ?? null, score: t.score, keys: t.keys };
+}
+
+/** topic{} for a post (schema: id, title, url, source, kind, tier). */
+export const postTopic = (t) => ({ id: t.id, title: t.title, url: t.url ?? null, source: t.source, kind: t.kind, tier: t.tier });

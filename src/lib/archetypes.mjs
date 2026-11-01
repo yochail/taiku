@@ -112,11 +112,23 @@ export const POST_ARCHETYPES = {
   },
   quote_dunk: {
     label: 'Quote dunk',
-    skeleton: '[terse mocking line] — e.g. "imagine posting this", "this you?", "the [X] to [Y] pipeline is real", "he\'s so close"',
+    skeleton: '[terse mocking line] — e.g. imagine posting this / this you? / the [X] to [Y] pipeline is real / he\'s so close',
     guidance: 'Quote-dunk: a short public dunk on the IDEA in the quoted taik (never identity). Funny first, but the jab must carry a real philosophical point.',
     vibe: 'spicy',
   },
+  wire: {
+    label: 'Wire',
+    skeleton: '[Real headline]\n\n[One neutral sentence of context.]',
+    guidance: 'News-wire account (kind=news): the real headline, then ONE neutral, factual summary line built only from the headline. No opinion, no jokes, no emoji, no invented facts. The link card carries the source.',
+    vibe: 'calm',
+  },
 };
+
+/** Reaction-GIF keys for media {kind:"gif", render:{template:"reaction", reaction, caption}}. */
+export const REACTIONS = ['slow-clap', 'mind-blown', 'side-eye', 'facepalm', 'popcorn', 'this-is-fine', 'shrug', 'nodding', 'laughing', 'crying-laughing'];
+/** Meme templates for media {kind:"meme", render:{template:"meme", format, lines[]}}; value = number of lines. */
+export const MEME_FORMATS = { drake: 2, distracted: 3, 'two-buttons': 2, 'expanding-brain': 4, 'top-bottom': 2, 'this-is-fine': 1, galaxy: 4 };
+export const CHART_TYPES = ['bar', 'line', 'pie'];
 
 export const REPLY_ARCHETYPES = {
   agree_extend: {
