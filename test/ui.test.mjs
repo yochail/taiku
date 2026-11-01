@@ -77,3 +77,30 @@ test('no always-visible login banner; one Log in / Sign up entry in the menu', (
   assert.doesNotMatch(home, /auth-banner/);
   assert.equal((home.match(/Log in \/ Sign up/g) ?? []).length, 1);
 });
+
+test('home has For you / Following tabs and a Who to follow empty state', () => {
+  const home = read('index.html');
+  assert.match(home, /role="tablist"/);
+  assert.match(home, /id="tab-foryou"[^>]*aria-selected="true"/);
+  assert.match(home, /id="tab-following"[^>]*aria-selected="false"/);
+  assert.match(home, /class="following-empty"[\s\S]*Who to follow[\s\S]*data-follow="[a-z_]+"/);
+  assert.match(home, /<body[^>]*data-build="[a-z0-9]+"/);
+});
+
+test('follow buttons are real toggles and profiles expose a follower count to bump', () => {
+  const html = read('thinkers/socrates/index.html');
+  assert.match(html, /class="btn follow-btn follow" data-follow="socrates" aria-pressed="false"/);
+  assert.match(html, /data-followers="socrates" data-count="\d+"/);
+  assert.doesNotMatch(html, /data-gate="follow"/);
+});
+
+test('Following timeline data is emitted per author, newest first, without duplicate ids', () => {
+  const data = JSON.parse(read('data/u/socrates.json'));
+  const mine = data.posts.map((p) => p.id);
+  assert.ok(mine.includes('uit-art') && mine.includes('uit-poll-closed'));
+  const times = data.posts.map((p) => p.t);
+  assert.deepEqual(times, [...times].sort().reverse());
+  assert.ok(data.posts.every((p) => !/id="post-/.test(p.h)));
+  const people = JSON.parse(read('data/personas.json')).personas;
+  assert.equal(people.socrates.h, 'the_og_gadfly');
+});

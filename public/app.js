@@ -66,8 +66,6 @@
     b.classList.toggle('on', on);
     b.setAttribute('aria-pressed', String(on));
   };
-  document.querySelectorAll('[data-like]').forEach(paintLike);
-  document.querySelectorAll('[data-bookmark]').forEach(paintMark);
 
   // Polls: one local vote per poll, results revealed after voting or once the poll has closed.
   const votes = store.get('pollVotes', {});
@@ -96,7 +94,6 @@
     const h = Math.floor(left / 3600000);
     poll.querySelector('.poll-state').textContent = closed ? 'Final results' : h >= 24 ? `${plural(Math.floor(h / 24), 'day')} left` : h >= 1 ? `${plural(h, 'hour')} left` : `${plural(Math.max(1, Math.round(left / 60000)), 'minute')} left`;
   };
-  document.querySelectorAll('.poll[data-poll]').forEach(paintPoll);
 
   document.addEventListener('click', (e) => {
     const opt = e.target.closest('.poll-opt');
@@ -146,12 +143,150 @@
   });
 
   // Relative timestamps for recent posts.
-  const now = Date.now();
-  document.querySelectorAll('time[data-rel]').forEach((t) => {
-    const d = Date.parse(t.getAttribute('datetime'));
-    const s = Math.round((now - d) / 1000);
-    if (s < 0 || s > 86400 * 6) return;
-    t.textContent = s < 3600 ? `${Math.max(1, Math.round(s / 60))}m` : s < 86400 ? `${Math.round(s / 3600)}h` : `${Math.round(s / 86400)}d`;
-    t.title = new Date(d).toLocaleString();
+  const relTimes = (scope) => {
+    const now = Date.now();
+    scope.querySelectorAll('time[data-rel]').forEach((t) => {
+      const d = Date.parse(t.getAttribute('datetime'));
+      const s = Math.round((now - d) / 1000);
+      if (s < 0 || s > 86400 * 6) return;
+      t.textContent = s < 3600 ? `${Math.max(1, Math.round(s / 60))}m` : s < 86400 ? `${Math.round(s / 3600)}h` : `${Math.round(s / 86400)}d`;
+      t.title = new Date(d).toLocaleString();
+    });
+  };
+
+  // Follows live in a first-party cookie (taiku_follows, 1 year) mirrored to localStorage.
+  const COOKIE = 'taiku_follows';
+  const readFollows = () => {
+    const m = document.cookie.match(/(?:^|;\s*)taiku_follows=([^;]*)/);
+    const list = m ? decodeURIComponent(m[1]).split('.').filter(Boolean) : store.get('follows', []);
+    return new Set(list.filter((id) => /^[a-z0-9_-]+$/.test(id)));
+  };
+  const follows = readFollows();
+  const saveFollows = () => {
+    const v = [...follows].join('.');
+    document.cookie = `${COOKIE}=${encodeURIComponent(v)}; Max-Age=31536000; Path=/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+    store.set('follows', [...follows]);
+  };
+  if (follows.size) saveFollows();
+  const paintFollow = (b) => {
+    const on = follows.has(b.dataset.follow);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+    b.setAttribute('aria-label', `${on ? 'Unfollow' : 'Follow'} ${b.getAttribute('aria-label').replace(/^(Unfollow|Follow) /, '')}`);
+  };
+  const paintFollowers = (el) => { el.textContent = fmt(Number(el.dataset.count || 0) + (follows.has(el.dataset.followers) ? 1 : 0)); };
+
+  function hydrate(scope) {
+    scope.querySelectorAll('[data-like]').forEach(paintLike);
+    scope.querySelectorAll('[data-bookmark]').forEach(paintMark);
+    scope.querySelectorAll('.poll[data-poll]').forEach(paintPoll);
+    scope.querySelectorAll('[data-follow]').forEach(paintFollow);
+    scope.querySelectorAll('[data-followers]').forEach(paintFollowers);
+    relTimes(scope);
+  }
+  hydrate(document);
+
+  // Home timelines: For you (static) and Following (client-side, from /data/u/<id>.json).
+  const build = document.body.dataset.build || '';
+  const fFeed = document.querySelector('.following-feed');
+  const authorCache = new Map();
+  const loadAuthor = (id) => {
+    if (!authorCache.has(id)) authorCache.set(id, fetch(`/data/u/${encodeURIComponent(id)}.json?v=${build}`).then((r) => (r.ok ? r.json() : { posts: [] })).catch(() => ({ posts: [] })));
+    return authorCache.get(id);
+  };
+  let renderSeq = 0;
+  async function renderFollowing() {
+    if (!fFeed) return;
+    const seq = ++renderSeq;
+    root.dataset.following = follows.size ? 'some' : 'none';
+    if (!follows.size) { fFeed.innerHTML = ''; return; }
+    fFeed.setAttribute('aria-busy', 'true');
+    const lists = await Promise.all([...follows].map(loadAuthor));
+    if (seq !== renderSeq) return;
+    const seen = new Set();
+    const items = lists.flatMap((l) => l.posts || []).sort((a, b) => b.t.localeCompare(a.t)).filter((p) => !seen.has(p.id) && seen.add(p.id)).slice(0, 60);
+    fFeed.innerHTML = items.length ? items.map((p) => p.h).join('') : '<p class="empty">The accounts you follow haven\u2019t posted yet.</p>';
+    fFeed.setAttribute('aria-busy', 'false');
+    hydrate(fFeed);
+  }
+  const tabs = [...document.querySelectorAll('.feed-tabs [role="tab"]')];
+  const selectTab = (name, focus) => {
+    root.dataset.tab = name;
+    try { localStorage.setItem('feedTab', name); } catch (e) {}
+    tabs.forEach((t) => {
+      const on = t.dataset.tab === name;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      if (on && focus) t.focus();
+    });
+    if (name === 'following') renderFollowing();
+  };
+  if (tabs.length) {
+    selectTab(root.dataset.tab === 'following' ? 'following' : 'foryou');
+    tabs.forEach((t) => {
+      t.addEventListener('click', () => { const was = root.dataset.tab; selectTab(t.dataset.tab); if (was === t.dataset.tab) window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      t.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        const i = (tabs.indexOf(t) + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+        selectTab(tabs[i].dataset.tab, true);
+      });
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const fb = e.target.closest('[data-follow]');
+    if (!fb) return;
+    e.preventDefault();
+    const id = fb.dataset.follow;
+    const on = !follows.has(id);
+    on ? follows.add(id) : follows.delete(id);
+    saveFollows();
+    document.querySelectorAll(`[data-follow="${CSS.escape(id)}"]`).forEach(paintFollow);
+    document.querySelectorAll(`[data-followers="${CSS.escape(id)}"]`).forEach(paintFollowers);
+    toast(on ? 'Followed. Their posts now show in Following.' : 'Unfollowed');
+    if (root.dataset.tab === 'following') renderFollowing();
+    else if (fFeed) root.dataset.following = follows.size ? 'some' : 'none';
   });
+
+  // Hovercards on avatars and names (mouse only; profiles have the same info for keyboard/touch users).
+  let people = null;
+  const loadPeople = () => (people ??= fetch(`/data/personas.json?v=${build}`).then((r) => r.json()).then((d) => d.personas).catch(() => ({})));
+  let card = null, showT = 0, hideT = 0, anchor = null;
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const hideCard = () => { clearTimeout(showT); hideT = setTimeout(() => { if (card) card.hidden = true; anchor = null; }, 250); };
+  const showCard = async (a) => {
+    const m = a.getAttribute('href').match(/^\/thinkers\/([^/]+)\/$/);
+    if (!m) return;
+    const p = (await loadPeople())[m[1]];
+    if (!p || anchor !== a) return;
+    if (!card) {
+      card = document.createElement('div');
+      card.className = 'hovercard';
+      card.addEventListener('mouseenter', () => clearTimeout(hideT));
+      card.addEventListener('mouseleave', hideCard);
+      document.body.appendChild(card);
+    }
+    const href = `/thinkers/${m[1]}/`;
+    card.innerHTML = `<div class="hc-top"><a href="${href}" tabindex="-1">${p.a ? `<img class="avatar md" src="${esc(p.a)}" alt="" width="64" height="64">` : ''}</a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(m[1])}" aria-pressed="false" aria-label="Follow @${esc(p.h)}"><span class="fb-off">Follow</span><span class="fb-on">Following</span><span class="fb-un">Unfollow</span></button></div><a class="hc-name" href="${href}">${esc(p.n)}</a><div class="handle">@${esc(p.h)}</div><p class="hc-bio">${esc(p.b)}</p><div class="hc-stats"><span><b>${fmt(p.fg)}</b> Following</span><span><b data-followers="${esc(m[1])}" data-count="${p.fr}">${fmt(p.fr)}</b> Followers</span></div>`;
+    hydrate(card);
+    const r = a.getBoundingClientRect();
+    card.hidden = false;
+    const top = r.bottom + window.scrollY + 8;
+    const left = Math.min(Math.max(8, r.left + window.scrollX - 20), window.scrollX + document.documentElement.clientWidth - card.offsetWidth - 8);
+    card.style.top = `${top}px`;
+    card.style.left = `${left}px`;
+  };
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.addEventListener('mouseover', (e) => {
+      const a = e.target.closest('.post .avatar-link, .post-head .name, .wtf-link');
+      if (!a || a === anchor) { if (a) clearTimeout(hideT); return; }
+      clearTimeout(hideT); clearTimeout(showT);
+      anchor = a;
+      showT = setTimeout(() => showCard(a), 450);
+    });
+    document.addEventListener('mouseout', (e) => {
+      const a = e.target.closest('.post .avatar-link, .post-head .name, .wtf-link');
+      if (a && !a.contains(e.relatedTarget)) hideCard();
+    });
+  }
 })();

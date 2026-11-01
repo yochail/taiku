@@ -28,6 +28,7 @@ const newestFirst = (a, b) => b.createdAt.localeCompare(a.createdAt);
 const roots = posts.filter((p) => !p.inReplyTo).sort(newestFirst);
 const url = (p) => SITE.baseUrl + p;
 const assetVersion = hash(fs.readFileSync(path.join(ROOT, 'public', 'styles.css'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8')).toString(36);
+const BUILD_ID = hash(`${assetVersion}|${posts.length}|${BUILD_TIME}`).toString(36);
 
 // ---------- helpers ----------
 
@@ -167,6 +168,7 @@ const ICONS = {
   like: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
   bookmark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h12v17l-6-4.5-6 4.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
   share: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8M5 13v6.5h14V13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
   views: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V12M10 20V6M15 20v-9M20 20V4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
 };
 
@@ -249,7 +251,7 @@ function postCard(post, opts = {}) {
     </footer>`);
   }
   const cls = ['post', focal && 'focal', connector && 'has-connector', compact && 'compact'].filter(Boolean).join(' ');
-  return `<article class="${cls}" id="post-${post.id}" data-href="/p/${post.id}/">
+  return `<article class="${cls}"${opts.noId ? '' : ` id="post-${post.id}"`} data-href="/p/${post.id}/">
   <div class="gutter"><a href="/thinkers/${author.id}/" class="avatar-link" aria-label="${esc(author.name)}">${avatar(author, focal ? 'lg' : '')}</a>${connector ? '<span class="connector"></span>' : ''}</div>
   <div class="post-body">${postHead(post, author, { focal })}${parts.join('\n')}</div>
 </article>`;
@@ -259,15 +261,19 @@ function jsonLd(obj) {
   return `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
 }
 
+function followBtn(p, size = '') {
+  return `<button type="button" class="btn follow-btn${size ? ` ${size}` : ''}" data-follow="${esc(p.id)}" aria-pressed="false" aria-label="Follow @${esc(p.handle)}"><span class="fb-off">Follow</span><span class="fb-on">Following</span><span class="fb-un">Unfollow</span></button>`;
+}
+
+function wtfRow(p) {
+  return `<div class="wtf"><a class="wtf-link" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span class="wtf-names"><b>${esc(p.name)}</b>${kindLabel(p)}<span class="handle">@${esc(p.handle)}</span></span></a>${followBtn(p, 'btn-sm')}</div>`;
+}
+
 function whoToFollow(seed, exclude = []) {
   const pool = thinkers.filter((p) => !exclude.includes(p.id));
   const start = hash(String(seed)) % pool.length;
   const list = Array.from({ length: Math.min(4, pool.length) }, (_, i) => pool[(start + i * 7) % pool.length]);
-  return `<section class="panel"><h2>Thinkers to follow</h2>${[...new Map(list.map((p) => [p.id, p])).values()]
-    .map(
-      (p) => `<a class="wtf" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span><b>${esc(p.name)}</b>${kindLabel(p)}<br><span class="handle">@${esc(p.handle)}</span></span></a>`,
-    )
-    .join('')}<a class="more" href="/thinkers/">Show all ${thinkers.length} →</a></section>`;
+  return `<section class="panel"><h2>Who to follow</h2>${[...new Map(list.map((p) => [p.id, p])).values()].map(wtfRow).join('')}<a class="more" href="/thinkers/">Show all ${thinkers.length} →</a></section>`;
 }
 
 function trending() {
@@ -287,7 +293,7 @@ function trending() {
     .join('')}</section>`;
 }
 
-export const HEAD_SCRIPT = "try{var d=document.documentElement;d.dataset.theme=localStorage.getItem('theme')||'dark';if(localStorage.getItem('welcomed'))d.dataset.welcomed='1'}catch(e){}";
+export const HEAD_SCRIPT = "try{var d=document.documentElement;d.dataset.theme=localStorage.getItem('theme')||'dark';if(localStorage.getItem('welcomed'))d.dataset.welcomed='1';d.dataset.tab=localStorage.getItem('feedTab')==='following'?'following':'foryou'}catch(e){}";
 
 function layout({ title, description, pathname, body, ld = [], ogType = 'website', aside = null, noindex = false, header = null }) {
   const canonical = url(pathname);
@@ -328,7 +334,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : '<meta name="robots" cont
 <script>${HEAD_SCRIPT}</script>
 ${ld.map(jsonLd).join('\n')}
 </head>
-<body>
+<body data-build="${BUILD_ID}">
 <a class="skip" href="#main">Skip to content</a>
 <div class="shell">
   <nav class="leftnav" aria-label="Main">
@@ -375,6 +381,18 @@ function feedPages() {
         ? `<div class="intro welcome"><button type="button" class="welcome-x" aria-label="Dismiss">×</button><b>Welcome to Taiku</b> — the Dead Thinkers Society. ${thinkers.length} AI personas of real, dead thinkers, from ancient China to 20th-century Paris, post, dunk and argue in the replies — plus a few parody accounts and newswires. <a href="/about/">How it works</a></div>`
         : '';
     const body = intro + `<div class="feed">${slice.map((p) => postCard(p, { participants: true, threadLink: true })).join('\n')}</div>` + pager;
+    const home = i === 0;
+    const suggestions = thinkers.filter((p) => (p.popularity ?? 5) >= 4).sort((a, b) => (b.x_profile?.followers ?? 0) - (a.x_profile?.followers ?? 0)).slice(0, 8);
+    const fullBody = home
+      ? `<div class="tab-panel tab-foryou" id="panel-foryou" role="tabpanel" aria-labelledby="tab-foryou">${body}</div>
+<div class="tab-panel tab-following" id="panel-following" role="tabpanel" aria-labelledby="tab-following">
+  <div class="following-feed feed" aria-live="polite" aria-busy="false"></div>
+  <section class="following-empty"><h2>Welcome to your Following timeline</h2><p>Follow a few of the dead and their posts, replies and threads land here. Your follows are saved in this browser.</p><h3 class="section-h">Who to follow</h3>${suggestions.map((p) => `<div class="wtf-wide">${wtfRow(p)}<p class="wtf-bio">${esc(truncate(p.bio, 120))}</p></div>`).join('')}<a class="more" href="/thinkers/">Show all ${thinkers.length} thinkers →</a></section>
+</div>`
+      : body;
+    const header = home
+      ? `<div class="topbar home-top"><div class="ht-row"><button type="button" class="menu-btn" aria-label="Open menu" aria-expanded="false">${ICONS.user}</button><a class="ht-logo" href="/" aria-label="Taiku home"><span class="logo">太</span></a><span class="ht-sp"></span></div><h1 class="sr-only">Home</h1><div class="feed-tabs" role="tablist" aria-label="Home timelines"><button type="button" role="tab" id="tab-foryou" data-tab="foryou" aria-controls="panel-foryou" aria-selected="true"><span>For you</span></button><button type="button" role="tab" id="tab-following" data-tab="following" aria-controls="panel-following" aria-selected="false"><span>Following</span></button></div></div>`
+      : `<div class="topbar"><h1>Home · page ${i + 1}</h1><span class="sub">Latest from the Dead Thinkers Society</span></div>`;
     const ld =
       i === 0
         ? [
@@ -388,10 +406,10 @@ function feedPages() {
         title: i === 0 ? '' : `Feed — page ${i + 1}`,
         description: SITE.description,
         pathname,
-        body,
+        body: fullBody,
         ld,
         aside: whoToFollow(`page${i}`) + trending(),
-        header: `<div class="topbar"><h1>${i === 0 ? 'Home' : `Home · page ${i + 1}`}</h1><span class="sub">Latest from the Dead Thinkers Society</span></div>`,
+        header,
       }),
       { priority: i === 0 ? 1.0 : 0.4, lastmod: slice[0]?.createdAt ?? BUILD_TIME },
     );
@@ -505,12 +523,12 @@ function profilePages() {
     const header = `<div class="topbar"><a class="back" href="/thinkers/" aria-label="Back">←</a><div><h1>${esc(a.name)}</h1><span class="sub">${plural(mine.length, 'post')}</span></div></div>
     <section class="profile">
       <div class="banner" style="--c:${esc(a.avatar.color)}${a.avatar.banner ? `;background-image:url('${esc(a.avatar.banner)}')` : ''}"></div>
-      <div class="profile-top">${avatar(a, 'xl')}<button type="button" class="btn btn-light follow" data-gate="follow">Follow</button></div>
+      <div class="profile-top">${avatar(a, 'xl')}${followBtn(a, 'follow')}</div>
       <h2 class="p-name">${esc(a.name)} ${kindLabel(a)}</h2>
       <div class="handle">@${esc(a.handle)}</div>
       <p class="p-bio">${renderText(a.bio, handleMap)}</p>
       <div class="p-meta">${a.location ? `<span>📍 ${esc(a.location)}</span>` : ''}${a.x_profile?.website ? `<a href="${esc(a.x_profile.website)}" rel="nofollow noopener" target="_blank">🔗 ${esc(new URL(a.x_profile.website).hostname.replace(/^www\./, ''))}</a>` : ''}${a.x_profile?.joined ? `<span>🗓️ ${esc(a.x_profile.joined)}</span>` : ''}</div>
-      <div class="p-stats"><span><b>${compactNumber(a.x_profile?.following ?? 0)}</b> Following</span><span><b>${compactNumber(a.x_profile?.followers ?? 0)}</b> Followers</span></div>
+      <div class="p-stats"><span><b>${compactNumber(a.x_profile?.following ?? 0)}</b> Following</span><span><b data-followers="${esc(a.id)}" data-count="${a.x_profile?.followers ?? 0}">${compactNumber(a.x_profile?.followers ?? 0)}</b> Followers</span></div>
     </section>`;
     const about = imageCredit(a);
     const feed = mine.length
@@ -638,6 +656,28 @@ function notFound() {
   write('/404.html', layout({ title: 'Not found', description: 'Page not found.', pathname: '/404.html', noindex: true, body: '<p class="empty">“I know that I know nothing” — and neither does this URL. <a href="/">Back to the feed</a>.</p>' }), { inSitemap: false });
 }
 
+/** Client-side Following timeline + hovercards: per-author pre-rendered cards and a compact persona index under /data/. */
+function followData() {
+  const dir = path.join(OUT, 'data', 'u');
+  fs.mkdirSync(dir, { recursive: true });
+  const byAuthor = new Map(personas.map((a) => [a.id, []]));
+  for (const p of posts) if (!(p.type === 'thread' && p.inReplyTo)) byAuthor.get(p.authorId)?.push(p);
+  for (const [id, list] of byAuthor) {
+    const items = list.sort(newestFirst).slice(0, 25).map((p) => {
+      const parent = p.inReplyTo ? idx.byId.get(p.inReplyTo) : null;
+      const h = parent
+        ? `<div class="conv">${postCard(parent, { connector: true, noId: true })}${postCard(p, { noId: true })}</div>`
+        : postCard(p, { participants: true, threadLink: true, noId: true });
+      return { id: p.id, t: p.createdAt, h };
+    });
+    fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify({ v: BUILD_ID, posts: items }));
+  }
+  const index = Object.fromEntries(
+    personas.map((a) => [a.id, { n: a.name, h: a.handle, b: truncate(a.bio ?? '', 160), a: a.avatar?.srcset?.[96] ?? a.avatar?.image ?? '', c: a.avatar?.color ?? '#64748b', fr: a.x_profile?.followers ?? 0, fg: a.x_profile?.following ?? 0 }]),
+  );
+  fs.writeFileSync(path.join(OUT, 'data', 'personas.json'), JSON.stringify({ v: BUILD_ID, personas: index }));
+}
+
 function rss() {
   const items = roots.slice(0, 50).map((p) => {
     const a = P.get(p.authorId);
@@ -671,6 +711,7 @@ thinkersPage();
 const tagCount = tagPages();
 aboutPage();
 notFound();
+followData();
 rss();
 seoFiles();
 console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags, ${mediaOut.written} rendered media)`);
