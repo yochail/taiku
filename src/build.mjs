@@ -8,7 +8,7 @@ import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderTe
 import { writeMediaFiles } from './lib/media.mjs';
 import { PostPack } from './lib/postpack.mjs';
 import { OUT_DIR, SITE_CONFIG } from './lib/site.mjs';
-import { t, fmtNumber, clientStrings, DIR } from './lib/i18n.mjs';
+import { t, fmtNumber, clientStrings, DIR, CA, HTML_CA, cw, CONTENT_LOCALE } from './lib/i18n.mjs';
 
 /** User-facing UI strings in one place (i18n-ready). */
 const STR = {
@@ -233,7 +233,7 @@ function kindLabel(a) {
 function postHead(post, author, { focal = false } = {}) {
   const time = `<time datetime="${esc(post.createdAt)}" data-rel>${esc(focal ? longDate(post.createdAt) : shortDate(post.createdAt))}</time>`;
   return `<header class="post-head">
-    <a class="name" href="/thinkers/${author.id}/">${esc(displayName(author))}</a>${kindLabel(author)}
+    <a class="name"${CA} href="/thinkers/${author.id}/">${esc(displayName(author))}</a>${kindLabel(author)}
     <a class="handle" href="/thinkers/${author.id}/" tabindex="-1">@${esc(author.handle)}</a>${focal ? '' : `<span class="dot">·</span><a class="time" href="/p/${post.id}/">${time}</a>`}
   </header>`;
 }
@@ -243,15 +243,15 @@ function quoteEmbed(qid) {
   if (!q) return '';
   const qa = P.get(q.authorId);
   return `<a class="quote-embed" href="/p/${q.id}/">
-    <span class="qe-head">${avatar(qa, 'xs')}<b>${esc(displayName(qa))}</b> <span class="handle">@${esc(qa.handle)}</span> · ${esc(shortDate(q.createdAt))}</span>
-    <span class="qe-text">${esc(truncate(shownText(q), 260))}</span>
+    <span class="qe-head">${avatar(qa, 'xs')}<b${CA}>${esc(displayName(qa))}</b> <span class="handle">@${esc(qa.handle)}</span> · ${esc(shortDate(q.createdAt))}</span>
+    <span class="qe-text"${CA}>${esc(truncate(shownText(q), 260))}</span>
   </a>`;
 }
 
 function postCard(post, opts = {}) {
   if (post.type === 'retaik' && post.retaikOf && idx.byId.get(post.retaikOf)) {
     const ra = P.get(post.authorId);
-    return `<div class="retaik-row"><div class="retaik-head">${ICONS.repost}${t('post.retaiked', { name: `<a href="/thinkers/${ra.id}/">${esc(displayName(ra))}</a>` })}</div>${postCard(idx.byId.get(post.retaikOf), { ...opts, focal: false, noId: true })}</div>`;
+    return `<div class="retaik-row"><div class="retaik-head">${ICONS.repost}${t('post.retaiked', { name: `<a href="/thinkers/${ra.id}/"${CA}>${esc(displayName(ra))}</a>` })}</div>${postCard(idx.byId.get(post.retaikOf), { ...opts, focal: false, noId: true })}</div>`;
   }
   const { focal = false, connector = false, showReplying = false, participants = false, threadLink = false, compact = false } = opts;
   const author = P.get(post.authorId);
@@ -263,10 +263,10 @@ function postCard(post, opts = {}) {
     parts.push(`<div class="replying">${t('post.replyingTo')} <a href="/thinkers/${pa.id}/">@${esc(pa.handle)}</a></div>`);
   }
   const shownBody = textPoll(post)?.text ?? post.text;
-  if (shownBody) parts.push(`<div class="text${focal ? ' text-lg' : ''}">${renderText(shownBody, handleMap)}</div>`);
+  if (shownBody) parts.push(`<div class="text${focal ? ' text-lg' : ''}"${CA}>${renderText(shownBody, handleMap)}</div>`);
   const media = mediaHtml(post);
   if (media) parts.push(media);
-  if (post.citation) parts.push(`<div class="cite">📖 ${t('post.quotedFrom')} <cite>${esc(post.citation)}</cite></div>`);
+  if (post.citation) parts.push(`<div class="cite">📖 ${t('post.quotedFrom')} <cite${CA}>${esc(post.citation)}</cite></div>`);
   if (post.news?.title && !(mediaByPost.get(post.id) ?? []).some((m) => m.kind === 'link_card')) {
     parts.push(linkCard({ url: post.news.url, title: post.news.title, domain: (post.news.url ? hostOf(post.news.url) : '') || post.news.source }));
   } else if (post.topic?.url && post.topic.title && !(mediaByPost.get(post.id) ?? []).some((m) => m.kind === 'link_card')) {
@@ -281,7 +281,7 @@ function postCard(post, opts = {}) {
     const desc = convo(post);
     const ids = [...new Set(desc.map((d) => d.authorId).filter((id) => id !== post.authorId))];
     if (ids.length) {
-      const names = ids.slice(0, 2).map((id) => esc(P.get(id).name)).join(', ');
+      const names = ids.slice(0, 2).map((id) => cw(esc(P.get(id).name))).join(', ');
       const more = ids.length > 2 ? ` +${ids.length - 2}` : '';
       parts.push(`<a class="participants" href="/p/${post.id}/">${ids.slice(0, 4).map((id) => avatar(P.get(id), 'xs')).join('')}<span>${t('post.weighedIn', { n: desc.length, names: names + more })}</span></a>`);
     }
@@ -318,7 +318,7 @@ function followBtn(p, size = '') {
 }
 
 function wtfRow(p) {
-  return `<div class="wtf"><a class="wtf-link" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span class="wtf-names"><b>${esc(displayName(p))}</b>${kindLabel(p)}<span class="handle">@${esc(p.handle)}</span></span></a>${followBtn(p, 'btn-sm')}</div>`;
+  return `<div class="wtf"><a class="wtf-link" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span class="wtf-names"><b${CA}>${esc(displayName(p))}</b>${kindLabel(p)}<span class="handle">@${esc(p.handle)}</span></span></a>${followBtn(p, 'btn-sm')}</div>`;
 }
 
 function whoToFollow(seed, exclude = []) {
@@ -338,10 +338,10 @@ function trending() {
     .sort((a, b) => b[1] - a[1] || b[0].createdAt.localeCompare(a[0].createdAt))
     .slice(0, 4);
   return `<section class="panel"><h2>${t('trend.debates')}</h2>${debates
-    .map(([r, n]) => `<a class="trend" href="/p/${r.id}/"><span class="t-meta">${esc(P.get(r.authorId).name)} · ${t('trend.replies', { n })}</span><span class="t-title">${esc(truncate(shownText(r), 80))}</span></a>`)
+    .map(([r, n]) => `<a class="trend" href="/p/${r.id}/"><span class="t-meta">${cw(esc(P.get(r.authorId).name))} · ${t('trend.replies', { n })}</span><span class="t-title"${CA}>${esc(truncate(shownText(r), 80))}</span></a>`)
     .join('')}</section>
   <section class="panel"><h2>${t('trend.topics')}</h2>${top
-    .map(([tag, n]) => `<a class="trend" href="/tags/${tag}/"><span class="t-title">#${esc(tag)}</span><span class="t-meta">${t('count.posts', { n })}</span></a>`)
+    .map(([tag, n]) => `<a class="trend" href="/tags/${tag}/"><span class="t-title"${CA}>#${esc(tag)}</span><span class="t-meta">${t('count.posts', { n })}</span></a>`)
     .join('')}</section>`;
 }
 
@@ -359,7 +359,7 @@ function layout({ title, description, pathname, body, ld = [], ogType = 'website
     .map(([href, label, icon]) => `<a href="${href}"${pathname === href ? ' aria-current="page"' : ''}><span class="ni">${icon}</span><span class="nl">${label}</span></a>`)
     .join('');
   return `<!doctype html>
-<html lang="${esc(SITE.locale)}"${DIR === 'rtl' ? ' dir="rtl"' : ''}>
+<html lang="${esc(SITE.locale)}"${DIR === 'rtl' ? ' dir="rtl"' : ''}${HTML_CA}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -458,7 +458,7 @@ function feedPages() {
       ? `<div class="tab-panel tab-foryou" id="panel-foryou" role="tabpanel" aria-labelledby="tab-foryou">${body}</div>
 <div class="tab-panel tab-following" id="panel-following" role="tabpanel" aria-labelledby="tab-following">
   <div class="following-feed feed" aria-live="polite" aria-busy="false"></div>
-  <section class="following-empty"><h2>${t('following.emptyTitle')}</h2><p>${t('following.emptyText')}</p><h3 class="section-h">${t('wtf.title')}</h3>${suggestions.map((p) => `<div class="wtf-wide">${wtfRow(p)}<p class="wtf-bio">${esc(truncate(p.bio, 120))}</p></div>`).join('')}<a class="more" href="/thinkers/">${t('following.showAll')}</a></section>
+  <section class="following-empty"><h2>${t('following.emptyTitle')}</h2><p>${t('following.emptyText')}</p><h3 class="section-h">${t('wtf.title')}</h3>${suggestions.map((p) => `<div class="wtf-wide">${wtfRow(p)}<p class="wtf-bio"${CA}>${esc(truncate(p.bio, 120))}</p></div>`).join('')}<a class="more" href="/thinkers/">${t('following.showAll')}</a></section>
 </div>`
       : body;
     const header = home
@@ -566,7 +566,7 @@ function postPages() {
 }
 
 function authorPanel(a) {
-  return `<section class="panel author-panel"><a class="wtf" href="/thinkers/${a.id}/">${avatar(a, 'sm')}<span><b>${esc(displayName(a))}</b>${kindLabel(a)}<br><span class="handle">@${esc(a.handle)}</span></span></a><p>${esc(a.headline)}</p><p class="muted">${esc(a.lifespan)} · ${esc(a.region)}</p></section>`;
+  return `<section class="panel author-panel"><a class="wtf" href="/thinkers/${a.id}/">${avatar(a, 'sm')}<span><b${CA}>${esc(displayName(a))}</b>${kindLabel(a)}<br><span class="handle">@${esc(a.handle)}</span></span></a><p${CA}>${esc(a.headline)}</p><p class="muted">${esc(a.lifespan)} · ${cw(esc(a.region))}</p></section>`;
 }
 
 function relChips(list, label) {
@@ -574,9 +574,21 @@ function relChips(list, label) {
   return `<div class="rel"><h3>${label}</h3>${list
     .map((r) => {
       const o = P.get(r.id);
-      return `<a class="chip" href="/thinkers/${o.id}/" title="${esc(r.why)}">${avatar(o, 'xs')}${esc(displayName(o))}</a>`;
+      return `<a class="chip" href="/thinkers/${o.id}/" title="${esc(r.why)}">${avatar(o, 'xs')}${cw(esc(displayName(o)))}</a>`;
     })
     .join('')}</div>`;
+}
+
+/** Wikipedia article in the content language (persona field wikipedia_<lang>, e.g. wikipedia_he), if any. */
+const wikiLocal = (a) => a[`wikipedia_${CONTENT_LOCALE.split('-')[0]}`] || null;
+
+/** Educational About block (who they were, key works, Wikipedia), in the content language. Opt-in per pack: site.json profile.about. */
+function aboutSection(a) {
+  if (!SITE_CONFIG.profile?.about) return '';
+  const works = (a.key_works ?? []).slice(0, 6).map((w) => `<li${CA}>${esc(w.title)}${w.year ? ` (${esc(w.year)})` : ''}</li>`).join('');
+  const wiki = wikiLocal(a) || a.wikipedia;
+  if (!a.background && !works && !wiki) return '';
+  return `<section class="p-about"><h2>${t('profile.about')}</h2>${a.background ? `<p${CA}>${esc(a.background)}</p>` : ''}${works ? `<h3>${t('profile.works')}</h3><ul>${works}</ul>` : ''}${wiki ? `<p><a href="${esc(wiki)}" rel="noopener" target="_blank">${t('profile.wikipedia')}</a></p>` : ''}</section>`;
 }
 
 function imageCredit(a) {
@@ -605,14 +617,14 @@ function profileHeader(a, { count, back = '/thinkers/', backLabel = STR.back } =
   const av = avatar(a, 'xl');
   const banner = `<div class="banner" style="--c:${esc(a.avatar.color)}${a.avatar.banner ? `;background-image:url('${esc(a.avatar.banner)}')` : ''}"></div>`;
   const g = graph;
-  return `<div class="topbar"><a class="back" href="${back}" aria-label="${esc(backLabel)}">←</a><div class="tb-title"><h1>${esc(displayName(a))}</h1><span class="sub">${t('count.posts', { n: count })}</span></div></div>
+  return `<div class="topbar"><a class="back" href="${back}" aria-label="${esc(backLabel)}">←</a><div class="tb-title"><h1${CA}>${esc(displayName(a))}</h1><span class="sub">${t('count.posts', { n: count })}</span></div></div>
     <section class="profile">
       ${a.avatar.banner ? `<button type="button" class="banner-btn" data-zoom="${esc(a.avatar.banner)}" data-zoom-alt="${esc(STR.bannerOf(a.name))}" aria-label="${esc(STR.viewBanner)}">${banner}</button>` : banner}
       <div class="profile-top">${full ? `<button type="button" class="p-avatar-btn" data-zoom="${esc(full)}" data-zoom-alt="${esc(a.name)}" aria-label="${esc(STR.viewPhoto)}">${av}</button>` : av}${followBtn(a, 'follow')}</div>
-      <h2 class="p-name">${esc(displayName(a))}${kindLabel(a)}</h2>
+      <h2 class="p-name">${cw(esc(displayName(a)))}${kindLabel(a)}</h2>
       <div class="handle">@${esc(a.handle)}</div>
-      <p class="p-bio">${renderText(a.bio, handleMap)}</p>
-      <div class="p-meta">${a.location ? `<span>📍 ${esc(a.location)}</span>` : ''}${a.x_profile?.website ? `<a href="${esc(a.x_profile.website)}" rel="nofollow noopener" target="_blank">🔗 ${esc(new URL(a.x_profile.website).hostname.replace(/^www\./, ''))}</a>` : ''}${a.x_profile?.joined ? `<span>🗓️ ${esc(a.x_profile.joined)}</span>` : ''}</div>
+      <p class="p-bio"${CA}>${renderText(a.bio, handleMap)}</p>
+      <div class="p-meta">${a.location ? `<span>📍 ${cw(esc(a.location))}</span>` : ''}${a.x_profile?.website ? `<a href="${esc(a.x_profile.website)}" rel="nofollow noopener" target="_blank">🔗 ${esc(new URL(a.x_profile.website).hostname.replace(/^www\./, ''))}</a>` : ''}${a.x_profile?.joined ? `<span>🗓️ ${esc(a.x_profile.joined)}</span>` : ''}</div>
       <div class="p-stats"><a href="/thinkers/${a.id}/following/"><b>${compactNumber(Math.max(a.x_profile?.following ?? 0, g.following.get(a.id).size))}</b> ${STR.following}</a><a href="/thinkers/${a.id}/followers/"><b data-followers="${esc(a.id)}" data-count="${a.x_profile?.followers ?? 0}">${compactNumber(a.x_profile?.followers ?? 0)}</b> ${STR.followers}</a></div>
     </section>`;
 }
@@ -652,7 +664,7 @@ function profilePages() {
         birthDate: a.birth_display || undefined,
         deathDate: a.death_display || undefined,
         knowsAbout: a.favorite_topics,
-        sameAs: a.wikipedia ? [a.wikipedia] : undefined,
+        sameAs: [a.wikipedia, wikiLocal(a)].filter(Boolean).length ? [...new Set([a.wikipedia, wikiLocal(a)].filter(Boolean))] : undefined,
       },
     };
     const header = profileHeader(a, { count: mine.length });
@@ -667,7 +679,7 @@ function profilePages() {
           title: main ? t('profile.title', { name: a.name, handle: a.handle }) : `${STR.tabTitle[key]} · ${a.name} (@${a.handle})`,
           description: `${a.headline} ${a.bio}`,
           pathname: `/thinkers/${a.id}/${sub}`,
-          body: (main ? imageCredit(a) : '') + feed,
+          body: (main ? aboutSection(a) + imageCredit(a) : '') + feed,
           ld: main ? [ld] : [],
           ogType: 'profile',
           header,
@@ -680,7 +692,7 @@ function profilePages() {
     for (const kind of ['following', 'followers']) {
       const rel = graph[kind].get(a.id);
       const tabs = `<nav class="p-tabs" aria-label="${esc(STR.followLists)}">${['followers', 'following'].map((k) => `<a href="/thinkers/${a.id}/${k}/"${k === kind ? ' aria-current="page"' : ''}>${STR[k]}</a>`).join('')}</nav>`;
-      const rows = [...rel].map(([id, why]) => { const p = P.get(id); return `<div class="wtf-wide">${wtfRow(p)}<p class="wtf-bio">${esc(why || truncate(p.bio, 120))}</p></div>`; }).join('');
+      const rows = [...rel].map(([id, why]) => { const p = P.get(id); return `<div class="wtf-wide">${wtfRow(p)}<p class="wtf-bio"${CA}>${esc(why || truncate(p.bio, 120))}</p></div>`; }).join('');
       const note = `<p class="fl-note">${esc(STR.followNote(kind, a, compactNumber(kind === 'followers' ? a.x_profile?.followers ?? 0 : a.x_profile?.following ?? 0)))}</p>`;
       write(
         `/thinkers/${a.id}/${kind}/`,
@@ -688,7 +700,7 @@ function profilePages() {
           title: `${STR[kind]} · ${a.name} (@${a.handle})`,
           description: t(kind === 'followers' ? 'follow.descFollowers' : 'follow.descFollowing', { name: a.name }),
           pathname: `/thinkers/${a.id}/${kind}/`,
-          header: `<div class="topbar"><a class="back" href="/thinkers/${a.id}/" aria-label="${esc(STR.back)}">←</a><div class="tb-title"><h1>${esc(displayName(a))}</h1><span class="sub">@${esc(a.handle)}</span></div></div>${tabs}`,
+          header: `<div class="topbar"><a class="back" href="/thinkers/${a.id}/" aria-label="${esc(STR.back)}">←</a><div class="tb-title"><h1${CA}>${esc(displayName(a))}</h1><span class="sub">@${esc(a.handle)}</span></div></div>${tabs}`,
           body: rows ? rows + note : `<div class="p-empty"><h2>${esc(STR.noFollows(kind, a.handle))}</h2></div>`,
           aside,
           noindex: true,
@@ -709,7 +721,7 @@ function thinkersPage() {
     .map(
       ([g, list]) => `<h2 class="section-h">${esc(g)}</h2><div class="thinker-grid">${list
         .map(
-          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b>${esc(displayName(a))}</b>${kindLabel(a)} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta">${esc(a.location ?? '')}</span><span class="tc-head">${esc(a.bio)}</span></span></a>`,
+          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b${CA}>${esc(displayName(a))}</b>${kindLabel(a)} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta"${CA}>${esc(a.location ?? '')}</span><span class="tc-head"${CA}>${esc(a.bio)}</span></span></a>`,
         )
         .join('')}</div>`,
     )
@@ -871,7 +883,7 @@ function rss() {
   });
   fs.writeFileSync(
     path.join(OUT, 'feed.xml'),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel><title>${esc(t('rss.title'))}</title><link>${url('/')}</link><description>${esc(SITE.description)}</description><language>${esc(SITE.locale)}</language>${items.join('')}</channel></rss>\n`,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel><title>${esc(t('rss.title'))}</title><link>${url('/')}</link><description>${esc(SITE.description)}</description><language>${esc(CONTENT_LOCALE)}</language>${items.join('')}</channel></rss>\n`,
   );
 }
 

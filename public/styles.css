@@ -442,3 +442,10 @@ button.act { background: none; border: 0; font: inherit; cursor: pointer; border
 }
 /* RTL: mirror direction-bearing glyphs. */
 [dir='rtl'] .topbar .back { transform: scaleX(-1); }
+
+/* Profile About (opt-in per pack: site.json profile.about) */
+.p-about { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.p-about h2 { font-size: 17px; margin: 0 0 6px; }
+.p-about h3 { font-size: 15px; margin: 12px 0 4px; }
+.p-about p { margin: 0 0 8px; }
+.p-about ul { margin: 0 0 8px; padding-inline-start: 20px; }

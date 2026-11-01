@@ -22,11 +22,28 @@ export function siteDir(id = SITE) {
 export const SITE_DIR = siteDir();
 export const sitePath = (...parts) => path.join(SITE_DIR, ...parts);
 
-/** sites/<id>/site.json: domain, name, tagline, description, locale, dir, theme, social. */
+const RTL_LANGS = /^(he|iw|ar|fa|ur|yi|ps|sd|ug|dv)\b/i;
+export const dirOf = (locale) => (RTL_LANGS.test(locale) ? 'rtl' : 'ltr');
+
+/**
+ * Locales from site.json. ui_locale/ui_dir: app chrome, i18n strings, <html lang/dir>, dates (default en/ltr).
+ * content_locale/content_dir: posts, names, bios, profiles and About text (default: same as the UI).
+ * Legacy locale/dir mean the whole site (UI and content) is in that locale.
+ */
+export function resolveLocales(cfg) {
+  const ui = cfg.ui_locale ?? cfg.locale ?? 'en';
+  const uiDir = cfg.ui_dir ?? (cfg.ui_locale == null && cfg.dir ? cfg.dir : dirOf(ui));
+  const content = cfg.content_locale ?? ui;
+  const contentDir = cfg.content_dir ?? (cfg.content_locale == null ? uiDir : dirOf(content));
+  for (const l of [ui, content]) if (!/^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(l)) throw new Error(`invalid locale "${l}" in site.json`);
+  return { ui_locale: ui, ui_dir: uiDir, content_locale: content, content_dir: contentDir, locale: ui, dir: uiDir };
+}
+
+/** sites/<id>/site.json: domain, name, tagline, description, ui_locale, content_locale, theme, social. */
 export const SITE_CONFIG = (() => {
   const file = path.join(SITE_DIR, 'site.json');
   const cfg = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
-  return { id: SITE, locale: 'en', dir: 'ltr', theme: {}, social: {}, ...cfg };
+  return { id: SITE, theme: {}, social: {}, ...cfg, ...resolveLocales(cfg) };
 })();
 
 /** Build output: OUT_DIR env, else dist/<id> when SITE is set explicitly, else dist (taiku.app's Pages project). */

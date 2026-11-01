@@ -11,6 +11,8 @@
     return String(x).replace(/\{(\w+)\}/g, (m, n) => (n in v ? v[n] : n === 'site' ? SITE_NAME : m));
   };
   const RTL = root.dir === 'rtl';
+  // Content language attrs when posts/names/bios differ from the UI language (build sets data-clang/data-cdir on <html>).
+  const CA = root.dataset.clang ? ` lang="${root.dataset.clang}" dir="${root.dataset.cdir === 'rtl' ? 'rtl' : 'ltr'}"` : '';
   const store = {
     get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -404,7 +406,7 @@
       document.body.appendChild(card);
     }
     const href = `/thinkers/${m[1]}/`;
-    card.innerHTML = `<div class="hc-top"><a href="${href}" tabindex="-1">${p.a ? `<img class="avatar md" src="${esc(p.a)}" alt="" width="64" height="64">` : ''}</a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(m[1])}" aria-pressed="false" aria-label="${esc(S('followAria', 'Follow @{handle}', { handle: p.h }))}"><span class="fb-off">${S('follow', 'Follow')}</span><span class="fb-on">${S('following', 'Following')}</span><span class="fb-un">${S('unfollow', 'Unfollow')}</span></button></div><a class="hc-name" href="${href}">${esc(p.n)}</a><div class="handle">@${esc(p.h)}</div><p class="hc-bio">${esc(p.b)}</p><div class="hc-stats"><span><b>${fmt(p.fg)}</b> ${S('following', 'Following')}</span><span><b data-followers="${esc(m[1])}" data-count="${p.fr}">${fmt(p.fr)}</b> ${S('followers', 'Followers')}</span></div>`;
+    card.innerHTML = `<div class="hc-top"><a href="${href}" tabindex="-1">${p.a ? `<img class="avatar md" src="${esc(p.a)}" alt="" width="64" height="64">` : ''}</a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(m[1])}" aria-pressed="false" aria-label="${esc(S('followAria', 'Follow @{handle}', { handle: p.h }))}"><span class="fb-off">${S('follow', 'Follow')}</span><span class="fb-on">${S('following', 'Following')}</span><span class="fb-un">${S('unfollow', 'Unfollow')}</span></button></div><a class="hc-name"${CA} href="${href}">${esc(p.n)}</a><div class="handle">@${esc(p.h)}</div><p class="hc-bio"${CA}>${esc(p.b)}</p><div class="hc-stats"><span><b>${fmt(p.fg)}</b> ${S('following', 'Following')}</span><span><b data-followers="${esc(m[1])}" data-count="${p.fr}">${fmt(p.fr)}</b> ${S('followers', 'Followers')}</span></div>`;
     hydrate(card);
     const r = a.getBoundingClientRect();
     card.hidden = false;
@@ -456,7 +458,7 @@
       });
       return { terms, from, res: terms.map((t) => new RegExp(`(^|[^\\p{L}\\p{N}])${reEsc(t)}`, 'u')) };
     };
-    const personRow = (id, p) => `<div class="wtf-wide"><div class="wtf"><a class="wtf-link" href="/thinkers/${esc(id)}/">${p.a ? `<img class="avatar sm" src="${esc(p.a)}" alt="" width="40" height="40" loading="lazy" decoding="async">` : `<span class="avatar sm" style="--c:${esc(p.c)}" aria-hidden="true">${esc(p.n[0])}</span>`}<span class="wtf-names"><b>${esc(p.n)}</b><span class="handle">@${esc(p.h)}</span></span></a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(id)}" aria-pressed="false" aria-label="${esc(S('followAria', 'Follow @{handle}', { handle: p.h }))}"><span class="fb-off">${S('follow', 'Follow')}</span><span class="fb-on">${S('following', 'Following')}</span><span class="fb-un">${S('unfollow', 'Unfollow')}</span></button></div><p class="wtf-bio">${esc(p.b)}</p></div>`;
+    const personRow = (id, p) => `<div class="wtf-wide"><div class="wtf"><a class="wtf-link" href="/thinkers/${esc(id)}/">${p.a ? `<img class="avatar sm" src="${esc(p.a)}" alt="" width="40" height="40" loading="lazy" decoding="async">` : `<span class="avatar sm" style="--c:${esc(p.c)}" aria-hidden="true">${esc(p.n[0])}</span>`}<span class="wtf-names"><b${CA}>${esc(p.n)}</b><span class="handle">@${esc(p.h)}</span></span></a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(id)}" aria-pressed="false" aria-label="${esc(S('followAria', 'Follow @{handle}', { handle: p.h }))}"><span class="fb-off">${S('follow', 'Follow')}</span><span class="fb-on">${S('following', 'Following')}</span><span class="fb-un">${S('unfollow', 'Unfollow')}</span></button></div><p class="wtf-bio"${CA}>${esc(p.b)}</p></div>`;
     const matchPeople = async (qq) => {
       const ppl = await loadPeople();
       return Object.entries(ppl)

@@ -7,6 +7,16 @@ import { ROOT, SITE_DIR, SITE_CONFIG } from './site.mjs';
 const read = (f) => (fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {});
 export const LOCALE = SITE_CONFIG.locale || 'en';
 export const DIR = SITE_CONFIG.dir === 'rtl' ? 'rtl' : 'ltr';
+// Content (posts, names, bios, profiles, About) may be in another language than the chrome. When it is,
+// content elements carry CA (lang + dir) and <html> carries HTML_CA so app.js can tag what it renders.
+// Empty when content and UI match, so single-locale sites render exactly as before.
+export const CONTENT_LOCALE = SITE_CONFIG.content_locale;
+export const CONTENT_DIR = SITE_CONFIG.content_dir === 'rtl' ? 'rtl' : 'ltr';
+const SPLIT = CONTENT_LOCALE.split('-')[0] !== LOCALE.split('-')[0] || CONTENT_DIR !== DIR;
+export const CA = SPLIT ? ` lang="${CONTENT_LOCALE}" dir="${CONTENT_DIR}"` : '';
+export const HTML_CA = SPLIT ? ` data-clang="${CONTENT_LOCALE}" data-cdir="${CONTENT_DIR}"` : '';
+/** Wrap inline content (a name inside a chrome sentence) in an isolated span when locales differ. */
+export const cw = (html) => (CA ? `<span${CA}>${html}</span>` : html);
 const LANG = LOCALE.split('-')[0];
 
 export function loadStrings(lang = LANG, siteDir = SITE_DIR) {
