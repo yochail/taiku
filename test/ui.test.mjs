@@ -1,0 +1,79 @@
+// Builds the site from a tiny fixture post set (never touches content/) and checks the X-style UI.
+import { test, before, after } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { ROOT } from '../src/lib/data.mjs';
+
+const POSTS = path.join(ROOT, 'test', '.ui-fixture-posts');
+const OUT = 'dist-ui-test';
+const DIST = path.join(ROOT, OUT);
+const read = (rel) => fs.readFileSync(path.join(DIST, rel), 'utf8');
+const ago = (h) => new Date(Date.now() - h * 3600000).toISOString();
+
+const posts = [
+  { id: 'uit-art', authorId: 'socrates', type: 'hot_take', origin: 'seed', text: 'Look at this & tell me the hemlock was worth it.', createdAt: ago(50), media: [{ kind: 'image', render: { art: 'death-of-socrates' } }] },
+  { id: 'uit-meme', authorId: 'diogenes', type: 'meme', origin: 'seed', text: 'Every symposium, every time.', createdAt: ago(49), media: [{ kind: 'meme', render: { template: 'plato-vs-aristotle', captions: { up: 'The Forms', down: 'Lunch' } } }] },
+  { id: 'uit-giphy', authorId: 'nietzsche', type: 'joke', origin: 'seed', text: 'Me reading Kant.', createdAt: ago(48), media: [{ kind: 'gif', src: 'https://media.giphy.com/media/abc123/giphy.gif', width: 480, height: 270, alt: 'A man slowly clapping', origin: 'giphy', rating: 'g', credit: { author: 'GIPHY', url: 'https://giphy.com/gifs/abc123' } }] },
+  { id: 'uit-chart', authorId: 'kant', type: 'hot_take', origin: 'seed', text: 'My day, as data.', createdAt: ago(47), media: [{ kind: 'chart', render: { chart: { type: 'bar', title: 'Time spent', labels: ['Walking', 'Thinking'], values: [1, 23], unit: 'h' } } }] },
+  { id: 'uit-link', authorId: 'socrates', type: 'news_take', origin: 'seed', text: 'Ask them what "smart" means.', createdAt: ago(46), media: [{ kind: 'link_card', url: 'https://www.example.com/news/ai-smart', title: 'AI is now smarter than us, says study', description: 'A new paper claims...' }] },
+  { id: 'uit-poll-closed', authorId: 'socrates', type: 'poll', origin: 'seed', text: 'Is the unexamined life worth living?', createdAt: ago(45), poll: { id: 'uit-poll-closed', options: [{ id: 'a', text: 'Yes' }, { id: 'b', text: 'No' }, { id: 'c', text: 'Ask Socrates', crowdVoteBase: 500, personaVotes: ['kant'] }] } },
+  { id: 'uit-poll-open', authorId: 'kant', type: 'poll', origin: 'seed', text: 'Categorical or hypothetical?', createdAt: ago(1), poll: { id: 'uit-poll-open', options: [{ id: 'a', text: 'Categorical' }, { id: 'b', text: 'Hypothetical' }] } },
+];
+
+before(() => {
+  fs.mkdirSync(POSTS, { recursive: true });
+  fs.writeFileSync(path.join(POSTS, 'ui-fixture.json'), JSON.stringify({ posts }, null, 2));
+  execFileSync(process.execPath, [path.join(ROOT, 'src', 'build.mjs')], { env: { ...process.env, POSTS_DIR: POSTS, OUT_DIR: OUT }, stdio: 'pipe' });
+});
+after(() => {
+  if (process.env.KEEP_UI_TEST) return;
+  fs.rmSync(POSTS, { recursive: true, force: true });
+  fs.rmSync(DIST, { recursive: true, force: true });
+});
+
+test('images render as lazy, sized, rounded media cards with alt text and a credit line', () => {
+  const html = read('p/uit-art/index.html');
+  assert.match(html, /class="media-grid n1"/);
+  assert.match(html, /<img src="\/media\/art\/death-of-socrates\.jpg" alt="[^"]+" loading="lazy" decoding="async" width="\d+" height="\d+">/);
+  assert.match(html, /<figcaption><a href="https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
+  assert.match(html, /class="alt-badge" data-alt="/);
+});
+
+test('memes and charts render as generated images; GIPHY GIFs get a GIF badge and attribution', () => {
+  const meme = read('p/uit-meme/index.html');
+  const m = meme.match(/<img src="(\/media\/gen\/meme-[^"]+\.svg)"/);
+  assert.ok(m, 'meme image');
+  assert.ok(fs.existsSync(path.join(DIST, m[1])), 'meme svg written');
+  assert.match(read('p/uit-chart/index.html'), /media-chart"[^>]*><img src="\/media\/gen\/chart-[^"]+\.svg"[^>]*alt="bar chart/);
+  const gif = read('p/uit-giphy/index.html');
+  assert.match(gif, /<span class="media-badge">GIF<\/span>/);
+  assert.match(gif, /Powered by GIPHY/);
+});
+
+test('link cards show domain and headline', () => {
+  const html = read('p/uit-link/index.html');
+  assert.match(html, /<a class="link-card" href="https:\/\/www\.example\.com\/news\/ai-smart"[^>]*>.*<span class="lc-domain">example\.com<\/span><span class="lc-title">AI is now smarter than us, says study<\/span>/s);
+});
+
+test('polls render X-style with deterministic counts, final results or time left', () => {
+  const closed = read('p/uit-poll-closed/index.html');
+  assert.match(closed, /class="poll closed" data-poll="uit-poll-closed"/);
+  assert.match(closed, /Final results/);
+  assert.match(closed, /data-opt="c" data-votes="501"/);
+  const pcts = [...closed.matchAll(/<span class="po-pct">(\d+)%<\/span>/g)].map((x) => Number(x[1]));
+  assert.equal(pcts.length, 3);
+  assert.ok(Math.abs(pcts.reduce((a, b) => a + b, 0) - 100) <= 2);
+  assert.equal(read('p/uit-poll-closed/index.html'), closed);
+  const open = read('p/uit-poll-open/index.html');
+  assert.match(open, /class="poll" data-poll="uit-poll-open"/);
+  assert.match(open, /\d+ hours? left|\d+ minutes? left/);
+  assert.doesNotMatch(open, /class="poll-opt[^"]*"[^>]*disabled/);
+});
+
+test('no always-visible login banner; one Log in / Sign up entry in the menu', () => {
+  const home = read('index.html');
+  assert.doesNotMatch(home, /auth-banner/);
+  assert.equal((home.match(/Log in \/ Sign up/g) ?? []).length, 1);
+});

@@ -31,11 +31,14 @@
   };
   const openGate = (kind) => {
     const [t, m] = GATES[kind] ?? GATES.login;
+    openInfo(t, m);
+  };
+  function openInfo(t, m) {
     if (!modal || typeof modal.showModal !== 'function') return toast(m);
     modal.querySelector('#gate-title').textContent = t;
     modal.querySelector('.modal-msg').textContent = m;
     if (!modal.open) modal.showModal();
-  };
+  }
   if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); });
 
   const toastEl = document.querySelector('.toast');
@@ -66,7 +69,48 @@
   document.querySelectorAll('[data-like]').forEach(paintLike);
   document.querySelectorAll('[data-bookmark]').forEach(paintMark);
 
+  // Polls: one local vote per poll, results revealed after voting or once the poll has closed.
+  const votes = store.get('pollVotes', {});
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  const paintPoll = (poll) => {
+    const id = poll.dataset.poll;
+    const mine = votes[id];
+    const left = Date.parse(poll.dataset.ends) - Date.now();
+    const closed = !(left > 0);
+    const opts = [...poll.querySelectorAll('.poll-opt')];
+    const counts = opts.map((o) => Number(o.dataset.votes) + (o.dataset.opt === mine ? 1 : 0));
+    const total = counts.reduce((a, b) => a + b, 0);
+    const max = Math.max(...counts);
+    opts.forEach((o, i) => {
+      const pct = total ? Math.round((counts[i] / total) * 100) : 0;
+      o.querySelector('.po-bar').style.width = `${pct}%`;
+      o.querySelector('.po-pct').textContent = `${pct}%`;
+      o.classList.toggle('lead', counts[i] === max);
+      o.classList.toggle('mine', o.dataset.opt === mine);
+      o.disabled = closed || mine != null;
+      o.setAttribute('aria-label', mine != null || closed ? `${o.querySelector('.po-label').textContent}, ${pct}%` : o.querySelector('.po-label').textContent);
+    });
+    poll.classList.toggle('closed', closed);
+    poll.classList.toggle('voted', mine != null);
+    poll.querySelector('.poll-total').textContent = `${total.toLocaleString('en-US')} votes`;
+    const h = Math.floor(left / 3600000);
+    poll.querySelector('.poll-state').textContent = closed ? 'Final results' : h >= 24 ? `${plural(Math.floor(h / 24), 'day')} left` : h >= 1 ? `${plural(h, 'hour')} left` : `${plural(Math.max(1, Math.round(left / 60000)), 'minute')} left`;
+  };
+  document.querySelectorAll('.poll[data-poll]').forEach(paintPoll);
+
   document.addEventListener('click', (e) => {
+    const opt = e.target.closest('.poll-opt');
+    if (opt) {
+      const poll = opt.closest('.poll');
+      if (!opt.disabled && votes[poll.dataset.poll] == null) {
+        votes[poll.dataset.poll] = opt.dataset.opt;
+        store.set('pollVotes', votes);
+        document.querySelectorAll(`.poll[data-poll="${CSS.escape(poll.dataset.poll)}"]`).forEach(paintPoll);
+      }
+      return;
+    }
+    const alt = e.target.closest('[data-alt]');
+    if (alt) { openInfo('Image description', alt.dataset.alt); return; }
     const like = e.target.closest('[data-like]');
     if (like) {
       const id = like.dataset.like;

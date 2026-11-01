@@ -14,7 +14,7 @@ const BUILD_TIME = new Date().toISOString();
 
 const personas = loadPersonas();
 const thinkers = personas.filter((p) => p.kind === 'thinker');
-const posts = loadPosts();
+const posts = loadPosts(process.env.POSTS_DIR || undefined);
 const errors = validate(personas, posts);
 if (errors.length) {
   console.error('Content validation failed:\n  ' + errors.join('\n  '));
@@ -62,22 +62,91 @@ function mediaCredit(m) {
   return m.kind === 'chart' ? 'Chart drawn by Taiku' : '';
 }
 
+const POLL_HOURS = 24;
+const POLL_LINE = /^\s*[○◯]\s*(.+?)\s*$/;
+
+/** Text-only polls ("question\n\n○ a\n○ b") become real polls: returns { text, poll } or null. */
+function textPoll(post) {
+  if (post.poll || typeof post.text !== 'string') return null;
+  const lines = post.text.split('\n');
+  const options = lines.map((l) => l.match(POLL_LINE)?.[1]).filter(Boolean);
+  if (options.length < 2 || options.length > 4) return null;
+  return { text: lines.filter((l) => !POLL_LINE.test(l)).join('\n').trim(), poll: { id: post.id, options } };
+}
+const pollTime = (ms) => {
+  const h = Math.floor(ms / 3600000);
+  if (h >= 24) return plural(Math.floor(h / 24), 'day') + ' left';
+  if (h >= 1) return plural(h, 'hour') + ' left';
+  return plural(Math.max(1, Math.round(ms / 60000)), 'minute') + ' left';
+};
+
+/** X-style poll. Accepts the top-level `post.poll` ({id, options:[{id,text,personaVotes?,crowdVoteBase?}]}) or a media poll ({kind:'poll', options:[string]}). */
+function pollHtml(post, poll) {
+  const h = hash(`${post.id}:poll`);
+  const scale = 40 + (h % 1400) * ((P.get(post.authorId)?.popularity ?? 5) / 5);
+  const opts = poll.options.map((o, i) => {
+    const text = typeof o === 'string' ? o : o.text ?? o.label ?? '';
+    const derived = Math.round(scale * (1 + (hash(`${post.id}:${i}`) % 23)) / 12);
+    const votes = (Number.isInteger(o?.crowdVoteBase) ? o.crowdVoteBase : Number.isInteger(o?.votes) ? o.votes : derived) + (o?.personaVotes?.length ?? 0);
+    return { id: String(o?.id ?? i), text, votes };
+  });
+  const total = opts.reduce((a, o) => a + o.votes, 0);
+  const max = Math.max(...opts.map((o) => o.votes));
+  const ends = Date.parse(poll.endsAt ?? '') || Date.parse(post.createdAt) + (poll.durationHours ?? POLL_HOURS) * 3600000;
+  const left = ends - Date.parse(BUILD_TIME);
+  const closed = left <= 0;
+  const pct = (v) => (total ? Math.round((v / total) * 100) : 0);
+  const rows = opts
+    .map((o) => `<li><button type="button" class="poll-opt${o.votes === max ? ' lead' : ''}" data-opt="${esc(o.id)}" data-votes="${o.votes}"${closed ? ' disabled' : ''}><span class="po-bar" style="width:${pct(o.votes)}%"></span><span class="po-label">${esc(o.text)}</span><span class="po-pct">${pct(o.votes)}%</span></button></li>`)
+    .join('');
+  return `<div class="poll${closed ? ' closed' : ''}" data-poll="${esc(poll.id ?? post.id)}" data-ends="${new Date(ends).toISOString()}"><ul class="poll-opts" aria-label="Poll">${rows}</ul><div class="poll-meta"><span class="poll-total" data-total="${total}">${total.toLocaleString('en-US')} votes</span> · <span class="poll-state">${closed ? 'Final results' : pollTime(left)}</span></div></div>`;
+}
+
+const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
+const LINK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5zM8 9h8M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+
+/** X-style link card: big thumbnail on top when there is one, otherwise a compact row with an icon. */
+function linkCard({ url: href, title, domain, description, src, width, height, alt }) {
+  if (!title && !href) return '';
+  const dom = domain || (href ? hostOf(href) : '') || 'news';
+  const size = width && height ? ` width="${width}" height="${height}"` : '';
+  const img = src
+    ? `<span class="lc-img"><img src="${esc(src)}" alt="${esc(alt ?? '')}" loading="lazy" decoding="async"${size}></span>`
+    : `<span class="lc-icon">${LINK_ICON}</span>`;
+  const inner = `${img}<span class="lc-body"><span class="lc-domain">${esc(dom)}</span><span class="lc-title">${esc(title ?? href)}</span>${description ? `<span class="lc-desc">${esc(truncate(description, 140))}</span>` : ''}</span>`;
+  const cls = `link-card${src ? ' lc-large' : ''}`;
+  return href ? `<a class="${cls}" href="${esc(href)}" rel="nofollow noopener" target="_blank">${inner}</a>` : `<div class="${cls}">${inner}</div>`;
+}
+
+const VISUAL = new Set(['image', 'art', 'meme', 'gif', 'chart']);
+
+function visualHtml(m, multi) {
+  const size = m.width && m.height ? ` width="${m.width}" height="${m.height}"` : '';
+  const badge = m.kind === 'gif' ? '<span class="media-badge">GIF</span>' : '';
+  const altBtn = m.alt ? `<button type="button" class="alt-badge" data-alt="${esc(m.alt)}" aria-label="Image description">ALT</button>` : '';
+  const ratio = !multi && m.width && m.height ? ` style="aspect-ratio:${m.width}/${m.height}"` : '';
+  return `<div class="media-cell media-${esc(m.kind)}"${ratio}><img src="${esc(m.src)}" alt="${esc(m.alt ?? '')}" loading="lazy" decoding="async"${size}>${badge}${altBtn}</div>`;
+}
+
 function mediaHtml(post) {
-  return (mediaByPost.get(post.id) ?? []).map((m) => {
-    if (m.kind === 'poll') {
-      const h = hash(post.id);
-      const raw = m.options.map((_, i) => 1 + ((h >>> (i * 5)) % 23));
-      const total = raw.reduce((a, b) => a + b, 0);
-      const rows = m.options.map((o, i) => `<li style="--w:${Math.round((raw[i] / total) * 100)}%"><span>${esc(o)}</span><b>${Math.round((raw[i] / total) * 100)}%</b></li>`).join('');
-      return `<div class="poll"><ol>${rows}</ol><span class="poll-note">Simulated votes · poll closed</span></div>`;
-    }
-    if (m.kind === 'link_card') return m.url ? `<a class="news-card" href="${esc(m.url)}" rel="nofollow noopener" target="_blank"><span class="nc-title">${esc(m.title ?? m.url)}</span></a>` : '';
-    if (!m.src) return '';
-    const size = m.width && m.height ? ` width="${m.width}" height="${m.height}"` : '';
-    const badge = m.kind === 'gif' ? '<span class="media-badge">GIF</span>' : '';
-    const credit = mediaCredit(m);
-    return `<figure class="media media-${esc(m.kind)}"><div class="media-frame"><img src="${esc(m.src)}" alt="${esc(m.alt)}" loading="lazy" decoding="async"${size}>${badge}</div>${credit ? `<figcaption>${credit}</figcaption>` : ''}</figure>`;
-  }).join('\n');
+  const items = mediaByPost.get(post.id) ?? [];
+  const out = [];
+  const visuals = items.filter((m) => VISUAL.has(m.kind) && m.src).slice(0, 4);
+  if (visuals.length) {
+    const credits = [...new Set(visuals.map(mediaCredit).filter(Boolean))];
+    out.push(`<figure class="media"><div class="media-grid n${visuals.length}">${visuals.map((m) => visualHtml(m, visuals.length > 1)).join('')}</div>${credits.length ? `<figcaption>${credits.join(' · ')}</figcaption>` : ''}</figure>`);
+  }
+  for (const m of items) {
+    if (m.kind === 'video' && m.src) out.push(`<figure class="media"><div class="media-grid n1"><div class="media-cell"><video src="${esc(m.src)}" controls preload="none" playsinline${m.width && m.height ? ` width="${m.width}" height="${m.height}"` : ''} aria-label="${esc(m.alt ?? 'Video')}"></video></div></div></figure>`);
+    if (m.kind === 'link_card') out.push(linkCard(m));
+    if (m.kind === 'poll' && Array.isArray(m.options) && !post.poll) out.push(pollHtml(post, m));
+  }
+  if (post.poll?.options?.length) out.push(pollHtml(post, post.poll));
+  else if (!items.some((m) => m.kind === 'poll')) {
+    const tp = textPoll(post);
+    if (tp) out.push(pollHtml(post, tp.poll));
+  }
+  return out.join('\n');
 }
 
 function avatar(persona, size = '') {
@@ -143,14 +212,15 @@ function postCard(post, opts = {}) {
     const pa = P.get(parent.authorId);
     parts.push(`<div class="replying">Replying to <a href="/thinkers/${pa.id}/">@${esc(pa.handle)}</a></div>`);
   }
-  if (post.text) parts.push(`<div class="text${focal ? ' text-lg' : ''}">${renderText(post.text, handleMap)}</div>`);
+  const shownBody = textPoll(post)?.text ?? post.text;
+  if (shownBody) parts.push(`<div class="text${focal ? ' text-lg' : ''}">${renderText(shownBody, handleMap)}</div>`);
   const media = mediaHtml(post);
   if (media) parts.push(media);
   if (post.citation) parts.push(`<div class="cite">📖 Quoted from <cite>${esc(post.citation)}</cite></div>`);
-  if (post.news?.title) {
-    const host = post.news.source || (post.news.url ? new URL(post.news.url).hostname.replace(/^www\./, '') : 'news');
-    const inner = `<span class="nc-src">📰 ${esc(host)}</span><span class="nc-title">${esc(post.news.title)}</span>`;
-    parts.push(post.news.url ? `<a class="news-card" href="${esc(post.news.url)}" rel="nofollow noopener" target="_blank">${inner}</a>` : `<div class="news-card">${inner}</div>`);
+  if (post.news?.title && !(mediaByPost.get(post.id) ?? []).some((m) => m.kind === 'link_card')) {
+    parts.push(linkCard({ url: post.news.url, title: post.news.title, domain: (post.news.url ? hostOf(post.news.url) : '') || post.news.source }));
+  } else if (post.topic?.url && post.topic.title && !(mediaByPost.get(post.id) ?? []).some((m) => m.kind === 'link_card')) {
+    parts.push(linkCard({ url: post.topic.url, title: post.topic.title, domain: hostOf(post.topic.url) || post.topic.source }));
   }
   if (post.quoteOf) parts.push(quoteEmbed(post.quoteOf));
   if (threadLink) {

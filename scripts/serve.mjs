@@ -4,11 +4,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT } from '../src/lib/data.mjs';
 
-const DIST = path.join(ROOT, 'dist');
+const DIST = path.join(ROOT, process.env.OUT_DIR || 'dist');
 const PORT = Number(process.env.PORT || 8080);
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.xml': 'application/xml', '.txt': 'text/plain', '.json': 'application/json',
+  '.webp': 'image/webp', '.jpg': 'image/jpeg', '.webmanifest': 'application/manifest+json', '.gif': 'image/gif',
 };
 
 http.createServer((req, res) => {
