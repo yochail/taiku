@@ -84,6 +84,36 @@ export function ruleOfThree(text) {
   return /(?:^|[\s.!?])(\p{Lu}[\p{L}'’-]*)\.\s+(\p{Lu}[\p{L}'’-]*)\.\s+(\p{Lu}[\p{L}'’-]*)\.(?:\s|$)/u.test(t);
 }
 
+const QUOTED = /"[^"\n]*"|\u201c[^\u201d\n]*\u201d/g;
+const TAG = /#[\p{L}_][\p{L}\p{N}_]*/u;
+
+/** Strip em-dashes and hashtags from text outside quotation marks (cited quotes stay verbatim). */
+function stripSegment(s) {
+  return s
+    .replace(new RegExp(`(?:\\s*${TAG.source})+\\s*$`, 'u'), '') // trailing hashtag cluster
+    .replace(new RegExp(`(^|[\\s(])#([\\p{L}_][\\p{L}\\p{N}_]*)`, 'gu'), '$1$2') // inline #Word -> Word
+    .replace(/^\s*[\u2014\u2015]+\s*/, '')
+    .replace(/\s*[\u2014\u2015]+\s*$/, '')
+    .replace(/\s*(?:[\u2014\u2015]|\s\u2013\s)\s*(?=[\p{Ll}\p{N}"\u201c'(])/gu, ', ')
+    .replace(/\s*(?:[\u2014\u2015]|\s\u2013\s)\s*/g, '. ');
+}
+
+/**
+ * Deterministic house-style strip applied to every generated taik before the lint: no em-dashes,
+ * no hashtags (outside quoted spans). Whitespace is tidied; line breaks are kept.
+ */
+export function stripTells(text) {
+  const t = String(text ?? '');
+  let out = '';
+  let last = 0;
+  for (const m of t.matchAll(QUOTED)) {
+    out += stripSegment(t.slice(last, m.index)) + m[0];
+    last = m.index + m[0].length;
+  }
+  out += stripSegment(t.slice(last));
+  return out.replace(/[ \t]{2,}/g, ' ').replace(/ +([,.!?])/g, '$1').replace(/,\s*,/g, ',').replace(/\.\s*\./g, '.').replace(/[ \t]+\n/g, '\n').trim();
+}
+
 /**
  * Lint one taik. Returns a list of problems (empty = clean). Media-only / empty text is clean.
  * persona: { name, handle } for the "starts with own name" rule.

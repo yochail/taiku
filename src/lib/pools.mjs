@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { REACTION_STANCES, reactionEntryProblems, reactionKind } from './data.mjs';
 import { affinityFromCosine, cosineVec, tagOverlap, tokens } from './embed.mjs';
-import { lintTaik } from './house-style.mjs';
+import { lintTaik, stripTells } from './house-style.mjs';
 import { readJson, sha256, writeJsonAtomic } from './pipeline-util.mjs';
 
 export const COOLDOWN_DAYS = 14;
@@ -56,7 +56,8 @@ export function loadPools(personas, { root = null, log = () => {} } = {}) {
     const list = [];
     const extra = root ? readJson(poolFile(root, p.id))?.entries ?? [] : [];
     for (const [src, arr] of [['persona', p.reaction_pool ?? []], ['pool', extra]]) {
-      for (const e of arr) {
+      for (const raw of arr) {
+        const e = typeof raw?.text === 'string' ? { ...raw, text: stripTells(raw.text) } : raw;
         const kind = reactionKind(e);
         if (!kind) continue;
         if (src === 'pool' && entryProblems(e, p).length) {

@@ -4,7 +4,7 @@
 // log (canonical comes from the log, never the model), and the policy gate.
 import { MAX_TAIK_CHARS, normalizeQuoteText, quoteMatches, quotedSpans, safeUrl, taikLength } from './data.mjs';
 import { materializeFor } from './gen-media.mjs';
-import { houseStyleRepair, lintTaik } from './house-style.mjs';
+import { houseStyleRepair, lintTaik, stripTells } from './house-style.mjs';
 import { BudgetError, parseJsonLoose } from './llm.mjs';
 import { checkPost, repairHint } from './policy.mjs';
 import { formatRepair, quoteRepair, shortenRepair, systemMessage, targetCeiling, targetRepair, userMessage } from './prompts.mjs';
@@ -83,7 +83,8 @@ const tagsOf = (t) => [...new Set((Array.isArray(t) ? t : []).map((x) => String(
  */
 export async function validateItem(out, { task, persona, passages, policyCtx, ctx = {}, tracker = null, rand = Math.random, giphy = null }) {
   if (!out || typeof out !== 'object' || typeof out.text !== 'string' || !out.text.trim()) return { problem: formatRepair(), kind: 'format' };
-  const text = out.text.replace(/\r\n?/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  const text = stripTells(out.text.replace(/\r\n?/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim());
+  if (!text) return { problem: formatRepair(), kind: 'format' };
   const len = taikLength(text);
   if (len > MAX_TAIK_CHARS) return { problem: shortenRepair(len, task.length.min, Math.min(task.length.max, MAX_TAIK_CHARS)), kind: 'length' };
   if (task.length && task.role !== 'wire' && len > targetCeiling(task.length)) return { problem: targetRepair(len, task.length.min, task.length.max), kind: 'length' };

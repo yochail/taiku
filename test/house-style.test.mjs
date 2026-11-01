@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createStyleTracker, endsWithMoral, endsWithQuestion, houseStyle, lintBatch, lintTaik, ruleOfThree } from '../src/lib/house-style.mjs';
+import { createStyleTracker, endsWithMoral, endsWithQuestion, houseStyle, lintBatch, lintTaik, ruleOfThree, stripTells } from '../src/lib/house-style.mjs';
+import { validateItem } from '../src/lib/turn.mjs';
+import { policyContext } from '../src/lib/policy.mjs';
 import { batchMessages, microMessages, systemMessage } from '../src/lib/prompts.mjs';
 import { loadPersonas } from '../src/lib/data.mjs';
 
@@ -82,4 +84,17 @@ test('run-level tracker flags question endings once the share is too high', () =
   tr.add('x.');
   tr.add('y.');
   assert.deepEqual(tr.check('who?'), [], '3 of 8 is fine');
+});
+
+test('stripTells removes em-dashes and hashtags outside quotes; validateItem applies it before the lint', async () => {
+  assert.equal(stripTells('ok so — this is wrong #stoic #philosophy'), 'ok so, this is wrong');
+  assert.equal(stripTells('Virtue—not pleasure. #Ethics'), 'Virtue, not pleasure.');
+  assert.equal(stripTells('wait — What?'), 'wait. What?');
+  assert.equal(stripTells('#Kant was right'), 'Kant was right');
+  assert.equal(stripTells('we are #1'), 'we are #1');
+  assert.equal(stripTells('He said "a — b c d" lol'), 'He said "a — b c d" lol');
+  const task = { role: 'original', length: { min: 1, max: 280 } };
+  const v = await validateItem({ text: 'pleasure — the absence of pain — is the point #Epicurus' }, { task, persona: { name: 'Epicurus', handle: 'epicurus' }, passages: new Map(), policyCtx: policyContext(loadPersonas()) });
+  assert.equal(v.problem, null);
+  assert.equal(v.fields.text, 'pleasure, the absence of pain, is the point');
 });

@@ -3,7 +3,7 @@
 // fresh (out-of-cooldown) entries, appended to content/pools/<id>.json.
 import { BudgetError, parseJsonLoose } from './llm.mjs';
 import { microMessages } from './prompts.mjs';
-import { lintTaik } from './house-style.mjs';
+import { lintTaik, stripTells } from './house-style.mjs';
 import { checkPost } from './policy.mjs';
 import { taikLength } from './data.mjs';
 import { appendPoolEntries, entryProblems, reactionId } from './pools.mjs';
@@ -24,7 +24,7 @@ export function microReplyProblems(text, { form = 'short', persona, policyCtx })
   if (taikLength(t) > (FORM_MAX[form] ?? 40)) out.push('too long for its form');
   if (form === 'few_words' && t.split(/\s+/).length > 3) out.push('more than 3 words');
   if (form === 'emoji_only' && /[\p{L}\p{N}]/u.test(t)) out.push('not emoji-only');
-  if (/https?:|#\w/.test(t)) out.push('no links/hashtags');
+  if (/https?:/.test(t)) out.push('no links');
   out.push(...lintTaik(t, persona));
   if (policyCtx && !checkPost({ text: t }, policyCtx, {}).ok) out.push('policy');
   return out;
@@ -53,7 +53,7 @@ export async function runMicro({ client, requests = [], refills = [], byId, poli
   for (const r of Array.isArray(out?.replies) ? out.replies : []) {
     const req = reqById.get(String(r?.id));
     if (!req || res.replies.has(req.id)) continue;
-    const text = String(r.text ?? '').replace(/\s+/g, ' ').trim();
+    const text = stripTells(String(r.text ?? '').replace(/\s+/g, ' ').trim());
     if (microReplyProblems(text, { form: req.form, persona: req.persona, policyCtx }).length) res.rejected++;
     else res.replies.set(req.id, text);
   }
@@ -66,7 +66,7 @@ export async function runMicro({ client, requests = [], refills = [], byId, poli
     for (const raw of Array.isArray(block.entries) ? block.entries : []) {
       const kind = KINDS.find((k) => typeof raw?.[k] === 'string');
       if (!kind) { res.rejected++; continue; }
-      const e = { [kind]: raw[kind].trim(), stance: raw.stance, tags: Array.isArray(raw.tags) ? raw.tags.map((t) => String(t).toLowerCase()) : [], tone: String(raw.tone ?? '').toLowerCase() };
+      const e = { [kind]: kind === 'text' ? stripTells(raw[kind]) : raw[kind].trim(), stance: raw.stance, tags: Array.isArray(raw.tags) ? raw.tags.map((t) => String(t).toLowerCase()) : [], tone: String(raw.tone ?? '').toLowerCase() };
       const rid = reactionId(e);
       if (seen.has(rid) || entryProblems(e, ref.persona).length) { res.rejected++; continue; }
       seen.add(rid);

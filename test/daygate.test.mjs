@@ -137,8 +137,10 @@ test('repair: flagged tasks are regenerated to their new target; everything else
   const afterPosts = JSON.parse(fs.readFileSync(fileOf(date), 'utf8')).posts;
   const byId = new Map(afterPosts.map((p) => [p.id, p]));
   for (const p of long) assert.ok([...byId.get(p.id).text].length <= 60, `${p.id} shortened: ${byId.get(p.id).text}`);
-  const others = beforePosts.filter((p) => !long.includes(p));
-  assert.ok(others.every((p) => byId.get(p.id)?.text === p.text), 'cached items resume unchanged');
+  // Plain retaik rows are re-derived from the day's engagement (which the shortened items change); authored items must not move.
+  const others = beforePosts.filter((p) => !long.includes(p) && !p.retaikOf);
+  const changed = others.filter((p) => byId.get(p.id)?.text !== p.text).map((p) => `${p.id} [${p.text}] -> [${byId.get(p.id)?.text}]`);
+  assert.deepEqual(changed, [], 'cached items resume unchanged');
   days.set(date, afterPosts);
 });
 
