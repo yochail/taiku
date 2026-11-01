@@ -82,9 +82,16 @@ npm run serve          # preview dist/ at http://localhost:8080
 npm run generate:dry   # mock generation, prints JSON, writes nothing (no key needed)
 npm run generate:mock  # mock generation, writes a batch file (for testing; delete it afterwards)
 npm run generate       # real generation with an LLM (needs a key, see below)
+npm run realism        # measure the corpus against realism/spec.json (X-like distributions)
 ```
 
 Generator flags: `--posts N` (default 3), `--replies N` (default 7), `--seed X`, `--dry-run`, `--mock`, and `--live` (with `--dry-run`, calls the real LLM but still writes nothing).
+
+### Network realism
+
+[`realism/spec.json`](realism/spec.json) holds the target distributions taken from X/Twitter research, with sources and a confidence level for each: activity mix, media mix, length, thread depth, author skew, posting hours, burstiness, hashtags/emoji and engagement. The generator should draw from it with `createSampler()` in [`src/lib/realism.mjs`](src/lib/realism.mjs). `npm run realism` prints a drift report, which also appears in the CI job summary. It exits 1 only on hard-rule failures: more than 280 chars, a reply timestamped before its parent, or unsafe or unattributed media. Add `--strict` to fail on drift too.
+
+Optional post fields it reads: `media: [{ kind: image|gif|meme|chart|video|link_card|poll, src, alt, rating: g|pg|pg-13, origin: local-render|commons|ai|…, ai_generated, credit: { author, license, url }, options, url }]` and `stats: { likes, reposts, quotes, views }`.
 
 ## Generation
 

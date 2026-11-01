@@ -55,6 +55,8 @@ jobs:
       - name: Build & check (fail before committing broken content)
         run: npm test
 
+      - name: Realism report (blocks commit only on hard-rule failures)
+        run: npm run realism
       - name: Commit & push
         run: |
           if [ -z "$(git status --porcelain content)" ]; then

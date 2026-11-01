@@ -18,7 +18,15 @@ jobs:
           node-version: 22
       - name: Validate content
         run: npm run validate
-      - name: Build & check
+      - name: Build, checks & unit tests
         run: npm test
+      - name: Realism report (fails on hard rules; drift is a warning in the job summary)
+        run: npm run realism -- --json realism-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: realism-report
+          path: realism-report.json
+          if-no-files-found: ignore
       - name: Generator dry-run (offline fixtures + mock provider, network blocked, writes nothing)
         run: npm run generate:dry -- --seed ci --summary-only
