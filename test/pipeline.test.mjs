@@ -191,9 +191,19 @@ test('a policy failure fails the whole topic', async () => {
   assert.ok(r.manifest.tasks.some((t) => t.topicId === topic.id && t.status === 'blocked'));
 });
 
+// Hermetic pool: fixed clock (DATE), seeded RNG (seed/nonce), fresh root (no usage state), and a
+// synthetic lint-clean pool so the result never depends on the real personas' reaction_pool content.
+const SYN_TEXT = { agree: ['yes. this', 'exactly', 'finally someone'], disagree: ['no', 'wrong again', 'absolutely not'], mock: ['lol', 'sure buddy', 'cope'], awe: ['wow', 'oh my', 'chills'], confused: ['huh', 'wait what', 'explain'], hype: ['LETS GO', 'huge', 'yes yes yes'] };
+const SYN_EMOJI = { agree: '👍', disagree: '🙄', mock: '🤡', awe: '🤯', confused: '🤔', hype: '🔥' };
+const synPool = () => Object.entries(SYN_TEXT).flatMap(([stance, texts]) => [
+  ...Array.from({ length: 6 }, (_, i) => ({ text: `${texts[i % 3]}${i >= 3 ? '!' : ''}`, stance, tags: ['misc'], tone: 'dry' })),
+  ...Array.from({ length: 3 }, () => ({ emoji: SYN_EMOJI[stance], stance, tags: ['misc'], tone: 'dry' })),
+  ...Array.from({ length: 3 }, () => ({ gif_query: `${stance} reaction`, stance, tags: ['misc'], tone: 'dry' })),
+]);
+
 test('pool reactions: picks store reactionId + stance and land in the usage state; exhausted pools fall back to the LLM', async () => {
   const root = freshRoot();
-  const r = await run({ root });
+  const r = await run({ root, personas: base.map((p) => ({ ...p, reaction_pool: synPool() })) });
   assert.equal(r.status, 'complete');
   const pooled = r.published.filter((p) => p.reactionId);
   assert.ok(pooled.length > 0, 'some reactions come from the pools');

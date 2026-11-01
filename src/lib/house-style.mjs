@@ -13,7 +13,7 @@ let cached = null;
 /** The house-style block for system prompts (everything from the "HOUSE STYLE" line on). */
 export function houseStyle() {
   if (cached === null) {
-    const md = fs.existsSync(HOUSE_STYLE_FILE) ? fs.readFileSync(HOUSE_STYLE_FILE, 'utf8') : '';
+    const md = fs.existsSync(HOUSE_STYLE_FILE) ? fs.readFileSync(HOUSE_STYLE_FILE, 'utf8').replace(/\r\n?/g, '\n') : ''; // CRLF checkouts must give the same prompt (and mock output) as LF
     const i = md.indexOf('HOUSE STYLE');
     cached = (i >= 0 ? md.slice(i) : md).trim();
   }
