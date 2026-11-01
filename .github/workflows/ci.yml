@@ -58,5 +58,8 @@ jobs:
             realism-report.json
             day-gate.json
           if-no-files-found: ignore
+      - name: Link check, sample of card URLs (non-blocking; bot-blocked 401/403 counted separately)
+        continue-on-error: true
+        run: npm run links:check -- --sample 40 --summary "$GITHUB_STEP_SUMMARY"
       - name: Generator dry-run (offline fixtures + mock provider, network blocked, writes nothing)
         run: npm run generate:dry -- --seed ci --summary-only

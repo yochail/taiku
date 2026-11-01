@@ -144,16 +144,29 @@ const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); 
 const LINK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5zM8 9h8M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 
 /** X-style link card: big thumbnail on top when there is one, otherwise a compact row with an icon. */
-function linkCard({ url: href, title, domain, description, src, width, height, alt }) {
+function linkCard({ url: href, title, domain, site_name: site, description, src: src0, width: w0, height: h0, alt, image, icon }) {
   if (!title && !href) return '';
-  const dom = domain || (href ? hostOf(href) : '') || 'news';
+  const src = image?.url ?? src0;
+  const width = image ? image.width : w0;
+  const height = image ? image.height : h0;
+  const dom = domain || (href ? hostOf(href) : '') || site || 'news';
   const size = width && height ? ` width="${width}" height="${height}"` : '';
   const img = src
-    ? `<span class="lc-img"><img src="${esc(src)}" alt="${esc(alt ?? '')}" loading="lazy" decoding="async"${size}></span>`
-    : `<span class="lc-icon">${LINK_ICON}</span>`;
+    ? `<span class="lc-img"><img src="${esc(src)}" alt="${esc(alt ?? '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"${size}></span>`
+    : `<span class="lc-icon">${icon ? `<img class="lc-favicon" src="${esc(icon)}" alt="" width="32" height="32" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : LINK_ICON}</span>`;
   const inner = `${img}<span class="lc-body"><span class="lc-domain">${esc(dom)}</span><span class="lc-title">${esc(title ?? href)}</span>${description ? `<span class="lc-desc">${esc(truncate(description, 140))}</span>` : ''}</span>`;
   const cls = `link-card${src ? ' lc-large' : ''}`;
   return href ? `<a class="${cls}" href="${esc(href)}" rel="nofollow noopener" target="_blank">${inner}</a>` : `<div class="${cls} lc-static" title="${esc(STR.linkUnavailable)}">${inner}</div>`;
+}
+
+/** Quote of a real public post (x_post / bsky_post): exact fetched text, links out to the original. */
+function realPostHtml(m) {
+  if (!m.url || !m.text) return '';
+  const net = m.kind === 'x_post' ? 'X' : 'Bluesky';
+  const when = Number.isFinite(Date.parse(m.created_at ?? '')) ? new Date(m.created_at).toISOString().slice(0, 10) : '';
+  const av = m.avatar_url ? `<img class="rp-avatar" src="${esc(m.avatar_url)}" alt="" width="20" height="20" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : '';
+  const thumb = m.media_thumb ? `<span class="lc-img"><img src="${esc(m.media_thumb)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></span>` : '';
+  return `<a class="real-post quote" href="${esc(m.url)}" rel="nofollow noopener" target="_blank"><span class="rp-head">${av}<b>${esc(m.author_name || m.handle)}</b> <span class="rp-handle">@${esc(m.handle)}</span>${when ? ` · <time datetime="${esc(when)}">${esc(when)}</time>` : ''} <span class="rp-net">${net}</span></span><span class="rp-text">${esc(truncate(m.text, 400))}</span>${thumb}</a>`;
 }
 
 const VISUAL = new Set(['image', 'art', 'meme', 'gif', 'chart']);
@@ -177,6 +190,7 @@ function mediaHtml(post) {
   for (const m of items) {
     if (m.kind === 'video' && m.src) out.push(`<figure class="media"><div class="media-grid n1"><div class="media-cell"><video src="${esc(m.src)}" controls preload="none" playsinline${m.width && m.height ? ` width="${m.width}" height="${m.height}"` : ''} aria-label="${esc(m.alt ?? t('media.video'))}"></video></div></div></figure>`);
     if (m.kind === 'link_card') out.push(linkCard(m));
+    if (m.kind === 'x_post' || m.kind === 'bsky_post') out.push(realPostHtml(m));
     if (m.kind === 'poll' && Array.isArray(m.options) && !post.poll) out.push(pollHtml(post, m));
   }
   if (post.poll?.options?.length) out.push(pollHtml(post, post.poll));
@@ -271,9 +285,10 @@ function postCard(post, opts = {}) {
   const media = mediaHtml(post);
   if (media) parts.push(media);
   if (post.citation) parts.push(`<div class="cite">📖 ${t('post.quotedFrom')} <cite${CA}>${esc(post.citation)}</cite></div>`);
-  if (post.news?.title && !(mediaByPost.get(post.id) ?? []).some((m) => m.kind === 'link_card')) {
+  const hasCard = (mediaByPost.get(post.id) ?? []).some((m) => ['link_card', 'x_post', 'bsky_post'].includes(m.kind));
+  if (post.news?.title && post.news.url && !hasCard) {
     parts.push(linkCard({ url: post.news.url, title: post.news.title, domain: (post.news.url ? hostOf(post.news.url) : '') || post.news.source }));
-  } else if (post.topic?.url && post.topic.title && !(mediaByPost.get(post.id) ?? []).some((m) => m.kind === 'link_card')) {
+  } else if (post.topic?.url && post.topic.title && !hasCard) {
     parts.push(linkCard({ url: post.topic.url, title: post.topic.title, domain: hostOf(post.topic.url) || post.topic.source }));
   }
   if (post.quoteOf) parts.push(quoteEmbed(post.quoteOf));

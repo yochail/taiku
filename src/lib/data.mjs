@@ -324,7 +324,56 @@ function validatePersonas(personas, errors) {
  * children strictly after parents), thread/reply depth caps; quotation-marked spans must be
  * verified verbatim against the author's quotable local sources; persona refs exist.
  */
-export function validate(personas, posts) {
+export const CARD_KINDS = new Set(['link_card', 'x_post', 'bsky_post']);
+
+/** Every URL the fetch cache (content/state/unfurl-cache.json) vouches for: requested, canonical and real-post URLs. */
+export function cachedUrls(file = sitePath('content', 'state', 'unfurl-cache.json')) {
+  const out = new Set();
+  let items = {};
+  try {
+    items = JSON.parse(fs.readFileSync(file, 'utf8')).items ?? {};
+  } catch {
+    return out;
+  }
+  for (const [k, v] of Object.entries(items)) {
+    out.add(k);
+    if (v?.meta?.url) out.add(v.meta.url);
+    if (v?.post?.url) out.add(v.post.url);
+  }
+  return out;
+}
+
+/**
+ * Link cards and real-post quotes must point at URLs that were actually fetched (never invented);
+ * x_post/bsky_post text must equal the fetched text. knownUrls defaults to the on-disk fetch cache; a
+ * link card may also carry the post's own news/topic URL (it came from the fetched feed). RFC 2606
+ * reserved domains (example.com, *.test, *.example, *.invalid) are fixtures and always pass.
+ */
+const RESERVED_HOST = /(^|\.)(example\.(com|net|org)|test|example|invalid|localhost)$/i;
+const reservedUrl = (u) => {
+  try {
+    return RESERVED_HOST.test(new URL(u).hostname);
+  } catch {
+    return false;
+  }
+};
+export function cardProblems(post, { knownUrls, cache = null } = {}) {
+  const out = [];
+  const own = new Set([post.news?.url, post.topic?.url].filter(Boolean));
+  for (const m of post.media ?? []) {
+    if (!CARD_KINDS.has(m.kind)) continue;
+    if (!m.url) out.push(`${m.kind} without url`);
+    else if (!knownUrls.has(m.url) && !(m.kind === 'link_card' && own.has(m.url)) && !reservedUrl(m.url)) out.push(`${m.kind} url not in the fetch cache: ${m.url}`);
+    if (m.kind !== 'link_card') {
+      if (!m.handle || !m.text) out.push(`${m.kind} needs handle and the fetched text`);
+      const hit = cache?.items?.[m.url]?.post;
+      if (hit && hit.text !== m.text) out.push(`${m.kind} text differs from the fetched post`);
+    }
+  }
+  return out;
+}
+
+export function validate(personas, posts, { knownUrls = cachedUrls() } = {}) {
   const errors = [];
   const ids = validatePersonas(personas, errors);
   const byPersona = new Map(personas.map((p) => [p.id, p]));
@@ -344,6 +393,7 @@ export function validate(personas, posts) {
       errors.push(`${where}: text too long (${taikLength(post.text)} > ${MAX_TAIK_CHARS} weighted chars)`);
     if (post.original?.text && taikLength(post.original.text) > MAX_TAIK_CHARS) errors.push(`${where}: original text too long`);
     if (!ALL_TYPES[post.type]) errors.push(`${where}: unknown type ${post.type}`);
+    for (const e of cardProblems(post, { knownUrls })) errors.push(`${where}: ${e}`);
     const mediaOnly = Array.isArray(post.media) && post.media.length > 0;
     if (post.text === '' && !mediaOnly && post.type !== 'retaik') errors.push(`${where}: empty text (allowed only for media-only replies and plain retaiks)`);
     if ((post.type === 'retaik') !== Boolean(post.retaikOf)) errors.push(`${where}: retaik type and retaikOf go together`);

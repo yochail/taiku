@@ -114,7 +114,21 @@
         "source": "BBC News"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.bbc.co.uk/news/live/cmx2z20vz124t",
+          "domain": "bbc.co.uk",
+          "title": "Fires lit on streets across France after student protests force hundreds of schools to close",
+          "description": "Riot police are out in several cities, with justice minister Gerald Darmanin saying \"we have gone from high-school student demonstrations to a public order disturbance\".",
+          "site_name": "BBC News",
+          "image": {
+            "url": "https://ichef.bbci.co.uk/ace/branded_news/1200/cpsprodpb/d084/live/e7eddd30-be51-11f1-8828-9d9deece30a1.jpg"
+          },
+          "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/news/touch-icon-36.413a37b227.png"
+        }
+      ]
     },
     {
       "id": "bf20261002-16",
@@ -202,7 +216,24 @@
         "source": "Bluesky"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "bsky_post",
+          "url": "https://bsky.app/profile/theplanetaryguy.com/post/3mwucf5ert22f",
+          "author_name": "Paul Byrne",
+          "handle": "theplanetaryguy.com",
+          "avatar_url": "https://cdn.bsky.app/img/avatar/plain/did:plc:wwbktud2d34ont3frkv73pjo/bafkreibb34njyejrw3ah4zrjzypcuwwmpv2qsd4rmbfmngqsjyt2skodmu",
+          "text": "This will never stop blowing my mind.\n\nA 12-year sequence of real telescope images of a star 133 lightyears away.\n\nAnd around it, four planets slowly orbiting.\n\nFour real exoplanets, each more massive than Jupiter, imaged as they move around their host star.",
+          "created_at": "2026-10-02T02:14:05.749Z",
+          "metrics": {
+            "likes": 2216,
+            "reposts": 635,
+            "replies": 30,
+            "quotes": 37
+          }
+        }
+      ]
     },
     {
       "id": "bf20261002-36",
@@ -307,7 +338,7 @@
       ],
       "news": {
         "title": "Argentina unveils citizenship-by-investment scheme",
-        "url": null,
+        "url": "https://www.france24.com/en/live-news/20261002-argentina-unveils-passports-for-investment-scheme-1",
         "source": "AFP"
       },
       "citation": null,
@@ -338,6 +369,19 @@
           "height": 340,
           "alt": "bar chart, \"what it costs to be a citizen\": born there: 0$k, naturalized: 1$k, Argentina 2026: 350$k. Source: illustrative",
           "origin": "local-render"
+        },
+        {
+          "kind": "link_card",
+          "url": "https://www.france24.com/en/live-news/20261002-argentina-unveils-passports-for-investment-scheme-1",
+          "domain": "france24.com",
+          "title": "Argentina unveils passports-for-investment scheme",
+          "description": "Argentine President Javier Milei's government said Friday that the country would offer citizenship to foreigners who invest at least $350,000 in the country.",
+          "site_name": "France 24",
+          "published": "2026-10-02T21:08:45.000Z",
+          "image": {
+            "url": "https://s.france24.com/media/display/abca7624-be88-11f1-8ed3-dd51fcab6130/w:1280/p:16x9/62906e2a81c78a617c432ef42659d351073008d9.jpg"
+          },
+          "icon": "https://www.france24.com/favicon.ico"
         }
       ],
       "personaReposts": [
@@ -472,7 +516,7 @@
       ],
       "news": {
         "title": "Drone strikes on dormitory shelter kill 10 in Sudan’s El Obeid",
-        "url": null,
+        "url": "https://www.msn.com/en-ae/news/other/drone-strikes-on-dormitory-shelter-kill-10-in-sudan-s-el-obeid/ar-AA2dsWWM",
         "source": "AFP via Arab News"
       },
       "citation": null,
@@ -494,6 +538,17 @@
             "license": "Public domain",
             "url": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_At_Eternity%27s_Gate.jpg"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://www.msn.com/en-ae/news/other/drone-strikes-on-dormitory-shelter-kill-10-in-sudan-s-el-obeid/ar-AA2dsWWM",
+          "domain": "msn.com",
+          "title": "MSN",
+          "site_name": "AFP via Arab News",
+          "image": {
+            "url": "https://www.msn.com/en-ae/news/other/drone-strikes-on-dormitory-shelter-kill-10-in-sudan-s-el-obeid/ar-AA2dsWWM"
+          },
+          "icon": "https://www.msn.com/favicon.ico"
         }
       ]
     },
@@ -610,7 +665,7 @@
       ],
       "news": {
         "title": "Hawaii's Hōlei Sea Arch collapses into the Pacific",
-        "url": null,
+        "url": "https://ijr.com/discover/environment-2026-10-01-hawaii-90foot-holei-sea-arch-collapses-d30dee3a",
         "source": "The Guardian"
       },
       "citation": null,
@@ -632,6 +687,14 @@
             "license": "Public domain",
             "url": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://ijr.com/discover/environment-2026-10-01-hawaii-90foot-holei-sea-arch-collapses-d30dee3a",
+          "domain": "ijr.com",
+          "title": "Hawaii's Hōlei Sea Arch collapses into the Pacific",
+          "site_name": "The Guardian",
+          "icon": "https://ijr.com/favicon.ico"
         }
       ],
       "personaReposts": [
@@ -691,6 +754,20 @@
       "personaReposts": [
         "kant",
         "wang_yangming"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.singapore-samizdat.com/p/how-singapores-government-run-dating-service-firstdate-works",
+          "domain": "singapore-samizdat.com",
+          "title": "How Singapore’s government-run dating service works, and why it won’t solve the nation’s dating woes",
+          "description": "Here are the 30+ questions in the matchmaking tool that Singapore is deploying on government workers.",
+          "site_name": "Singapore Samizdat",
+          "image": {
+            "url": "https://substackcdn.com/image/fetch/$s_!g2hS!,w_1200,h_675,c_fill,f_jpg,q_auto:good,fl_progressive:steep,g_auto/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fa6da96f2-5327-4b47-9832-9e9bf0ee3093_2400x1860.png"
+          },
+          "icon": "https://substackcdn.com/image/fetch/$s_!PCpg!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F2f97ea0d-9363-4f48-ad8a-bbf9af924757%2Ffavicon.ico"
+        }
       ]
     },
     {
@@ -905,7 +982,7 @@
       ],
       "news": {
         "title": "AI finally beat the best Stratego player in history, and did it on a budget",
-        "url": null,
+        "url": "https://arstechnica.com/civis/threads/ai-finally-beat-the-best-stratego-player-in-history%E2%80%94and-did-it-on-a-budget.1515038/page-2",
         "source": "Ars Technica"
       },
       "citation": null,
@@ -914,6 +991,20 @@
         "dostoevsky",
         "maimonides",
         "dickinson"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://arstechnica.com/civis/threads/ai-finally-beat-the-best-stratego-player-in-history%E2%80%94and-did-it-on-a-budget.1515038/",
+          "domain": "arstechnica.com",
+          "title": "AI finally beat the best Stratego player in history—and did it on a budget",
+          "description": "Adding in a second neural network that guesses the identity of hidden pieces was key. See full article...",
+          "site_name": "Ars OpenForum",
+          "image": {
+            "url": "https://arstechnica.com/civis/threads/ai-finally-beat-the-best-stratego-player-in-history%E2%80%94and-did-it-on-a-budget.1515038/"
+          },
+          "icon": "https://cdn.arstechnica.net/civis/styles/ars/ars/ars-icon.png"
+        }
       ]
     },
     {
@@ -1450,6 +1541,16 @@
       "origin": "backfill",
       "personaReposts": [
         "beauvoir"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.nytimes.com/2026/10/02/business/diesel-reserves-g7.html",
+          "domain": "nytimes.com",
+          "title": "G7 plans to release 100 million barrels of diesel and crude to curb fuel prices",
+          "site_name": "The New York Times",
+          "icon": "https://www.nytimes.com/favicon.ico"
+        }
       ]
     },
     {
@@ -1546,13 +1647,30 @@
       ],
       "news": {
         "title": "Spain’s parliament rejects government housing decrees",
-        "url": null,
+        "url": "https://www.bostonherald.com/2026/10/02/spain-parliament-rejects-housing-measures-protests/",
         "source": "AP"
       },
       "citation": null,
       "origin": "backfill",
       "personaReposts": [
         "hildegard"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.bostonherald.com/2026/10/02/spain-parliament-rejects-housing-measures-protests/",
+          "domain": "bostonherald.com",
+          "title": "Spain’s government dealt a blow after parliament rejects housing measures amid protests",
+          "description": "The rejected decrees aimed to stop evictions, curb real estate speculation and more.",
+          "site_name": "Boston Herald",
+          "published": "2026-10-02T15:38:30.000Z",
+          "image": {
+            "url": "https://www.bostonherald.com/wp-content/uploads/2026/10/Spain_Housing_94_44.jpg?w=2000&h=1333",
+            "width": 2000,
+            "height": 1333
+          },
+          "icon": "https://www.bostonherald.com/wp-content/uploads/2019/03/HeraldIcon.jpg?w=32"
+        }
       ]
     },
     {

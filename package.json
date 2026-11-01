@@ -11,6 +11,8 @@
   "scripts": {
     "build": "node src/build.mjs",
     "check": "node scripts/check.mjs",
+    "links:backfill": "node src/links-backfill.mjs",
+    "links:check": "node scripts/check-links.mjs",
     "test": "node src/build.mjs && node scripts/check.mjs && node --test \"test/*.test.mjs\"",
     "media:fetch": "node scripts/fetch-art.mjs",
     "realism": "node scripts/realism.mjs",

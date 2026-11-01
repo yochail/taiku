@@ -368,7 +368,7 @@
     "media": {
       "type": "array",
       "maxItems": 4,
-      "description": "Attachments, shape shared with src/lib/realism.mjs (realism/spec.json media_policy). kind: image|gif|meme|chart|video|link_card (polls use the top-level `poll`). Visual kinds need src (site-absolute, or https on an allowlisted host) + alt. Generator media are local renders (origin \"local-render\") produced at build time from `render` into src, or GIPHY reaction GIFs (origin \"giphy\", giphy_id, hotlinked GIPHY CDN src, attribution \"Powered by GIPHY\", credit). credit {author, license, url} is required for third-party media; set ai_generated: true and credit.author \"AI-generated\" for AI images.",
+      "description": "Attachments, shape shared with src/lib/realism.mjs (realism/spec.json media_policy). kind: image|gif|meme|chart|video|link_card|x_post|bsky_post (polls use the top-level `poll`). link_card is unfurled from the real page (src/lib/unfurl.mjs): {url, domain, title, description?, site_name?, published?, image?:{url,width,height} (hotlinked og:image), icon? (favicon fallback)}. x_post/bsky_post quote a real public post verbatim: {url, author_name, handle, avatar_url?, text, created_at, media_thumb?, metrics?, link?}. Card urls must be in content/state/unfurl-cache.json. Visual kinds need src (site-absolute, or https on an allowlisted host) + alt. Generator media are local renders (origin \"local-render\") produced at build time from `render` into src, or GIPHY reaction GIFs (origin \"giphy\", giphy_id, hotlinked GIPHY CDN src, attribution \"Powered by GIPHY\", credit). credit {author, license, url} is required for third-party media; set ai_generated: true and credit.author \"AI-generated\" for AI images.",
       "items": {
         "type": "object",
         "required": [
@@ -383,7 +383,9 @@
               "meme",
               "chart",
               "video",
-              "link_card"
+              "link_card",
+              "x_post",
+              "bsky_post"
             ]
           },
           "src": {
@@ -405,6 +407,72 @@
           },
           "description": {
             "type": "string"
+          },
+          "site_name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "published": {
+            "type": "string"
+          },
+          "image": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "https-uri"
+              },
+              "width": {
+                "type": "integer"
+              },
+              "height": {
+                "type": "integer"
+              }
+            },
+            "description": "link_card preview: hotlinked og:image/twitter:image of the article."
+          },
+          "icon": {
+            "type": "string",
+            "format": "https-uri",
+            "description": "link_card outlet favicon (fallback when there is no og:image)."
+          },
+          "author_name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "handle": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "avatar_url": {
+            "type": "string",
+            "format": "https-uri"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 3000,
+            "description": "x_post/bsky_post: exact fetched text of the real post."
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "media_thumb": {
+            "type": "string",
+            "format": "https-uri"
+          },
+          "metrics": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "link": {
+            "type": "string",
+            "format": "https-uri"
           },
           "rating": {
             "enum": [

@@ -123,6 +123,15 @@ a:hover { text-decoration: underline; }
 .lc-desc { color: var(--muted); font-size: 14px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .link-card.lc-large { flex-direction: column; }
 .lc-img img { display: block; width: 100%; height: auto; aspect-ratio: 1.91 / 1; object-fit: cover; }
+.lc-favicon { width: 32px; height: 32px; border-radius: 6px; }
+.real-post { display: block; border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; margin: 12px 0 8px; color: var(--fg); overflow: hidden; }
+.real-post:hover { background: color-mix(in srgb, var(--fg) 3%, transparent); text-decoration: none; }
+.rp-head { display: flex; align-items: center; gap: 4px; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
+.rp-head b { color: var(--fg); }
+.rp-avatar { width: 20px; height: 20px; border-radius: 50%; }
+.rp-net { margin-inline-start: auto; font-size: 12px; }
+.rp-text { display: block; margin-top: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.real-post .lc-img { display: block; margin: 8px -12px -10px; }
 .link-card.lc-large .lc-body { border-top: 1px solid var(--line); }
 .poll { margin: 12px 0 8px; }
 .poll-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }

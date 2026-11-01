@@ -120,6 +120,7 @@
       "delay_minutes": { "lognormal": { "median": 35, "sigma": 1.5 }, "max": 2880 },
       "confidence": "low (product choice)"
     },
+    "real_posts": {"_note": "Quote-taiks of real public posts (news outlets, institutions, public figures in real-accounts.json): a news-reactive original swaps its link card for a real post that shares the same article URL (or a matching headline), so it reads like a quote-retweet. Reference only: exact fetched text, attributed, never paraphrased into a real person's mouth; deleted/protected posts are skipped. Share and caps are product choices.", "share_of_news_originals": 0.15, "max_per_day": 4, "max_age_hours": 72, "min_title_overlap": 0.5, "platforms": ["bluesky", "x"], "confidence": "low (product choice)"},
     "hashtags": {
       "_note": "Hashtags written into the text. Originals follow suh2010 (10.1%); replies and quotes use fewer, so the corpus share lands near boyd2010 (5%). Count and persona multipliers are product choices. The house-style strip keeps only the sampled number of tags.",
       "rate": { "original": 0.1, "reply": 0.03, "quote": 0.06 },
@@ -202,9 +203,10 @@
     "persona_alpha": 0.002
   },
   "media_policy": {
-    "kinds": ["image", "gif", "meme", "chart", "video", "link_card", "poll"],
+    "kinds": ["image", "gif", "meme", "chart", "video", "link_card", "poll", "x_post", "bsky_post"],
     "allowed_remote_hosts": ["media.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com", "media4.giphy.com"],
     "_remote_note": "Must match the img-src CSP in public/_headers. Public-domain art is stored locally (public/media/art), so Wikimedia is not hotlinked. GIPHY must be hotlinked from its CDN (GIPHY API terms) with 'Powered by GIPHY' attribution.",
+    "link_preview": { "_note": "link_card {url, domain, title, description, site_name, published, image:{url,width,height}, icon} is unfurled from the real article page at generation time (src/lib/unfurl.mjs, cache content/state/unfurl-cache.json). og:image/twitter:image is hotlinked (never downloaded or committed), so the CSP img-src allows any https host for previews; pages that block bots fall back to feed data plus the outlet favicon (icon). x_post/bsky_post carry the exact fetched text of a real public post (oEmbed / Bluesky AppView). Every card url must be in the fetch cache (validator).","fetch_timeout_ms":8000,"retry_days":7},
     "giphy": { "attribution": "Powered by GIPHY", "api_rating": "pg-13", "max_calls_per_run": 10, "_note": "Beta keys allow ~100 calls/hour; the generator searches server-side only and caches per query." },
     "ratings": ["g", "pg", "pg-13"],
     "max_rating": "pg-13"

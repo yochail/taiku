@@ -1,0 +1,296 @@
+{
+ "_note": "Allowlist of real public accounts whose posts personas may quote (x_post/bsky_post). Only news outlets, institutions and public figures; never private individuals. Bluesky handles verified via app.bsky.feed.getAuthorFeed on 2026-11-01. Posts are quoted verbatim as references, never re-voiced.",
+ "accounts": [
+  {
+   "platform": "bluesky",
+   "handle": "apnews.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "reuters.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "nytimes.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "theguardian.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "npr.org",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "washingtonpost.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "propublica.org",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "theatlantic.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "economist.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "aljazeera.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "bloomberg.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "axios.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "politico.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "cnn.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "france24.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "newyorker.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "motherjones.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "vox.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "404media.co",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "restofworld.org",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "wired.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "theverge.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "thebaffler.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "lrb.co.uk",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "nybooks.com",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "aeon.co",
+   "kind": "news"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "nature.com",
+   "kind": "institution"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "science.org",
+   "kind": "institution"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "newscientist.com",
+   "kind": "institution"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "quantamagazine.org",
+   "kind": "institution"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "who.int",
+   "kind": "institution"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "esa.int",
+   "kind": "institution"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "nobelprize.org",
+   "kind": "institution"
+  },
+  {
+   "platform": "bluesky",
+   "handle": "theplanetaryguy.com",
+   "kind": "public_figure",
+   "note": "Paul Byrne, planetary scientist (Washington University in St. Louis)"
+  },
+  {
+   "platform": "x",
+   "handle": "AP",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "Reuters",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "BBCWorld",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "BBCBreaking",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "nytimes",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "guardian",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "NPR",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "TheEconomist",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "AJEnglish",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "FT",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "washingtonpost",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "WIRED",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "verge",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "arstechnica",
+   "kind": "news"
+  },
+  {
+   "platform": "x",
+   "handle": "NASA",
+   "kind": "institution"
+  },
+  {
+   "platform": "x",
+   "handle": "ESA",
+   "kind": "institution"
+  },
+  {
+   "platform": "x",
+   "handle": "WHO",
+   "kind": "institution"
+  },
+  {
+   "platform": "x",
+   "handle": "NobelPrize",
+   "kind": "institution"
+  },
+  {
+   "platform": "x",
+   "handle": "UN",
+   "kind": "institution"
+  },
+  {
+   "platform": "x",
+   "handle": "CERN",
+   "kind": "institution"
+  },
+  {
+   "platform": "x",
+   "handle": "NatureNews",
+   "kind": "institution"
+  },
+  {
+   "platform": "x",
+   "handle": "ScienceMagazine",
+   "kind": "institution"
+  },
+  {
+   "platform": "x",
+   "handle": "QuantaMagazine",
+   "kind": "institution"
+  },
+  {
+   "platform": "x",
+   "handle": "newscientist",
+   "kind": "news"
+  }
+ ]
+}

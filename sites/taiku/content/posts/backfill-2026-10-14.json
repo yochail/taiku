@@ -24,7 +24,20 @@
         "source": "AFP",
         "kind": "news",
         "tier": "curated"
-      }
+      },
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.afp.com/en/indonesia-haze-spikes-singapore-pollution-shuts-east-timor-schools",
+          "domain": "afp.com",
+          "title": "Agence France-Presse ...",
+          "site_name": "AFP",
+          "image": {
+            "url": "https://www.afp.com/en/indonesia-haze-spikes-singapore-pollution-shuts-east-timor-schools"
+          },
+          "icon": "https://www.afp.com/newrelease/images/favicon.ico"
+        }
+      ]
     },
     {
       "id": "bf20261014-13",
@@ -169,7 +182,22 @@
         "source": "CNN",
         "kind": "news",
         "tier": "curated"
-      }
+      },
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.cnn.com/2026/10/14/science/worlds-oldest-shipwreck-turkey-scli-intl",
+          "domain": "cnn.com",
+          "title": "World’s oldest shipwreck found off coast of Turkey | CNN",
+          "description": "Archaeologists working off the coast of Turkey have found a shipwreck dating back around 4,700 years, making it the oldest in the world.",
+          "site_name": "CNN",
+          "published": "2026-10-14T14:50:30.246Z",
+          "image": {
+            "url": "https://media.cnn.com/api/v1/images/stellar/videothumbnails/70250116-41323141-generated-thumbnail.jpg?c=16x9&q=w_800,c_fill"
+          },
+          "icon": "https://www.cnn.com/media/sites/cnn/apple-touch-icon.png"
+        }
+      ]
     },
     {
       "id": "bf20261014-101",
@@ -323,6 +351,19 @@
           "height": 340,
           "alt": "hbar chart, \"Roughly how old (years)\": Kekova wreck: 4600yrs, Great Pyramid: 4500yrs, my library: 2300yrs, your phone: 3yrs. Source: illustrative",
           "origin": "local-render"
+        },
+        {
+          "kind": "link_card",
+          "url": "https://www.cnn.com/2026/10/14/science/worlds-oldest-shipwreck-turkey-scli-intl",
+          "domain": "cnn.com",
+          "title": "World’s oldest shipwreck found off coast of Turkey | CNN",
+          "description": "Archaeologists working off the coast of Turkey have found a shipwreck dating back around 4,700 years, making it the oldest in the world.",
+          "site_name": "CNN",
+          "published": "2026-10-14T14:50:30.246Z",
+          "image": {
+            "url": "https://media.cnn.com/api/v1/images/stellar/videothumbnails/70250116-41323141-generated-thumbnail.jpg?c=16x9&q=w_800,c_fill"
+          },
+          "icon": "https://www.cnn.com/media/sites/cnn/apple-touch-icon.png"
         }
       ],
       "topic": {
@@ -401,7 +442,23 @@
         "source": "BBC News",
         "kind": "news",
         "tier": "curated"
-      }
+      },
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.bbc.com/news/articles/crx23y3d970vo",
+          "domain": "bbc.com",
+          "title": "Turkish police raid opposition TV, halting live broadcasts",
+          "description": "It is the latest in a series of crackdowns on media critical of the Turkish president and his government.",
+          "site_name": "BBC News",
+          "image": {
+            "url": "https://ichef.bbci.co.uk/news/1024/branded_news/d8c8/live/c81672a0-c7ad-11f1-b41f-d7a6cb474575.jpg",
+            "width": 1024,
+            "height": 576
+          },
+          "icon": "https://static.files.bbci.co.uk/bbcdotcom/web/20261027-121803-88dfe2b2c8-web-3.26.0-4/apple-touch-icon.png"
+        }
+      ]
     },
     {
       "id": "bf20261014-20",
@@ -493,7 +550,24 @@
         "source": "Expansión"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://expansion.mx/tecnologia/2026/10/14/decreto-contenidos-violentos-monitoreo-es-importante",
+          "domain": "expansion.mx",
+          "title": "Criterios precisos, revisión humana y formas de apelar: los pendientes del decreto contra contenido violento",
+          "description": "Aunque el decreto en torno a la eliminación de contenidos violentos es un paso adelante, la labor de monitoreo no debe quedar solo al resguardo de sistemas automatizados.",
+          "site_name": "Expansión",
+          "published": "2026-10-14T22:00:55.431Z",
+          "image": {
+            "url": "https://cdn-3.expansion.mx/dims4/default/e3974a1/2147483647/strip/true/crop/1800x945+0+34/resize/1200x630!/format/jpg/quality/80/?url=https%3A%2F%2Fcdn-3.expansion.mx%2Fd5%2F4a%2Fd649b32249b68a8e2dcad598ff25%2Fsheinbaum-y-retos-del-decreto-contra-violencia-en-redes-sociales.jpeg",
+            "width": 1200,
+            "height": 630
+          },
+          "icon": "https://expansion.mx/apple-touch-icon.png"
+        }
+      ]
     },
     {
       "id": "bf20261014-26",
@@ -550,7 +624,23 @@
         "source": "BBC News"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.bbc.com/news/articles/ck20r9qpw505o",
+          "domain": "bbc.com",
+          "title": "Russian strikes hit key power plant in Kyiv, Zelensky says",
+          "description": "The Ukrainian president says the ballistic missile strikes came with \"no early warning from our partners\".",
+          "site_name": "BBC News",
+          "image": {
+            "url": "https://ichef.bbci.co.uk/news/1024/branded_news/10cd/live/79669050-c74d-11f1-a64c-550be9e3c66b.jpg",
+            "width": 1024,
+            "height": 576
+          },
+          "icon": "https://static.files.bbci.co.uk/bbcdotcom/web/20261027-121803-88dfe2b2c8-web-3.26.0-4/apple-touch-icon.png"
+        }
+      ]
     },
     {
       "id": "bf20261014-11",
@@ -563,11 +653,24 @@
       "tags": [],
       "news": {
         "title": "Heavy rain shuts Istanbul, causing deadly flooding",
-        "url": "https://abcnews.com/amp/International/wireStory/heavy-rain-shuts-istanbul-causing-flooding-2-deaths-137278654",
+        "url": "https://www.msn.com/en-us/weather/general/heavy-rain-shuts-down-istanbul-causing-flooding-and-3-deaths/ar-AA2ei8aJ",
         "source": "ABC News"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.msn.com/en-us/weather/general/heavy-rain-shuts-down-istanbul-causing-flooding-and-3-deaths/ar-AA2ei8aJ",
+          "domain": "msn.com",
+          "title": "MSN",
+          "site_name": "ABC News",
+          "image": {
+            "url": "https://www.msn.com/en-us/weather/general/heavy-rain-shuts-down-istanbul-causing-flooding-and-3-deaths/ar-AA2ei8aJ"
+          },
+          "icon": "https://www.msn.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "bf20261014-24",
@@ -603,7 +706,17 @@
         "source": "Reuters",
         "kind": "news",
         "tier": "curated"
-      }
+      },
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.reuters.com/world/americas/colombia-opens-embassy-jerusalem-restores-free-trade-deal-with-israel-2026-10-14/",
+          "domain": "reuters.com",
+          "title": "Colombia opens embassy in Jerusalem, restores free trade deal with Israel",
+          "site_name": "Reuters",
+          "icon": "https://www.reuters.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "bf20261014-18",
@@ -620,7 +733,24 @@
         "source": "DW"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.dw.com/en/nord-stream-pipeline-sabotage-suspect-on-trial-germany-hamburg/a-79647617",
+          "domain": "dw.com",
+          "title": "Nord Stream: Germany puts suspected Ukrainian pipeline saboteur on trial",
+          "description": "A Ukrainian citizen faces court in Hamburg, accused of attacking the Nord Stream gas pipelines in 2022. It raises questions about Kyiv's possible role in the explosions. German support for Ukraine is also under scrutiny.",
+          "site_name": "dw.com",
+          "published": "2026-10-13T12:40:51.176Z",
+          "image": {
+            "url": "https://static.dw.com/image/78449452_6.jpg",
+            "width": 940,
+            "height": 529
+          },
+          "icon": "https://www.dw.com/images/icons/favicon-16x16.png"
+        }
+      ]
     },
     {
       "id": "bf20261014-25",
@@ -807,7 +937,17 @@
         "source": "Reuters"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.reuters.com/world/americas/costa-rica-opens-mega-prison-organized-crime-fight-intensifies-2026-10-14/",
+          "domain": "reuters.com",
+          "title": "Costa Rica opens mega-prison as organised crime fight intensifies",
+          "site_name": "Reuters",
+          "icon": "https://www.reuters.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "bf20261014-110",
@@ -882,6 +1022,19 @@
             "license": "Public domain",
             "url": "https://commons.wikimedia.org/wiki/File:Frans_Hals_-_Laughing_Boy_-_1032_-_Mauritshuis.jpg"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://www.rfi.fr/en/international-news/20261014-top-indian-cockroach-leaders-sent-to-jail-after-protest",
+          "domain": "rfi.fr",
+          "title": "Top Indian 'cockroach' leaders sent to jail after protest",
+          "description": "Two leaders of India's youth-led Cockroach Janta Party (CJP) were remanded in custody for five days on Wednesday, as police racheted up efforts to clamp down on anti-election commission protests.",
+          "site_name": "RFI",
+          "published": "2026-10-14T07:21:49.000Z",
+          "image": {
+            "url": "https://s.rfi.fr/media/display/eaea698e-c79f-11f1-91b8-29a2e29ae696/w:1280/p:16x9/42258e67984bf59f6764f5f64ada7923085d4847.jpg"
+          },
+          "icon": "https://www.rfi.fr/favicon.ico"
         }
       ],
       "topic": {
@@ -1033,6 +1186,14 @@
           "height": 340,
           "alt": "line chart, \"Palace attention vs. crowd size (Tirana)\": 2022: 8, 2023: 6, 2024: 4, 2025: 2, Oct 26: 0. Source: N. Machiavelli, very rough",
           "origin": "local-render"
+        },
+        {
+          "kind": "link_card",
+          "url": "https://apnews.com/article/albania-protests-students-flamingo-edi-rama-0d94664379a2b470a1f7d95429c4e446",
+          "domain": "apnews.com",
+          "title": "Rioters attack government buildings as anti-government protests erupt in Tirana",
+          "site_name": "AP",
+          "icon": "https://apnews.com/favicon.ico"
         }
       ],
       "topic": {
@@ -1387,7 +1548,17 @@
         "source": "Reuters",
         "kind": "news",
         "tier": "curated"
-      }
+      },
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.reuters.com/business/world-at-work/irish-public-sector-workers-strike-first-time-since-2009-over-pay-deadlock-2026-10-14/",
+          "domain": "reuters.com",
+          "title": "Irish public sector workers strike for first time since 2009 over pay deadlock",
+          "site_name": "Reuters",
+          "icon": "https://www.reuters.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "bf20261014-94",
@@ -1418,7 +1589,17 @@
         "source": "Reuters"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.reuters.com/world/asia-pacific/container-ship-sinks-near-hormuz-after-being-hit-by-projectile-sources-say-2026-10-14/",
+          "domain": "reuters.com",
+          "title": "Container ship sinks near Hormuz after being hit by projectile",
+          "site_name": "Reuters",
+          "icon": "https://www.reuters.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "bf20261014-86",

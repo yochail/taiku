@@ -37,6 +37,9 @@ import { defaultFill, materializeFor, planFor, schemaAllowsGiphy } from './gen-m
 import { runBatch } from './gen-batch.mjs';
 import { createStyleTracker } from './house-style.mjs';
 import { createToolbox } from './tools.mjs';
+import { loadUnfurlCache, saveUnfurlCache, unfurl, linkCardFrom, knownUrls } from './unfurl.mjs';
+import { realPostCached, realPostKind, loadRealAccounts, allowedAccount, fetchBskyCandidates, titleOverlap } from './realposts.mjs';
+import { cachedUrls } from './data.mjs';
 import { PROMPT_VERSION } from './prompts.mjs';
 import { checkPost, policyContext } from './policy.mjs';
 import { runTurn } from './turn.mjs';
@@ -434,6 +437,40 @@ export async function runDaily(opts = {}) {
   const topicById = new Map(topics.map((t) => [t.id, t]));
   log(`topics: ${topics.map((t) => `${t.tier}:${t.title.slice(0, 50)}`).join(' | ')}`);
   if (opts.topicsOnly) return { status: 'topics', exitCode: 0, topics: topicsDoc, paths, path: runPath };
+
+  // 2b) Real links: unfurl each topic URL (og: meta, hotlinked image, favicon fallback) and pick real
+  // public posts (allowlisted accounts) about the same story for quote-taiks. Offline runs use the cache only.
+  const unfurlFile = path.join(root, 'content', 'state', 'unfurl-cache.json');
+  const unfurls = loadUnfurlCache(unfurlFile);
+  const linkOpts = { cache: unfurls, offline, fetchImpl: offline ? null : opts.linkFetch ?? globalThis.fetch, timeoutMs: spec.media_policy?.link_preview?.fetch_timeout_ms ?? 8000 };
+  for (const tp of topics) {
+    const url = safeUrl(tp.url ?? '');
+    if (!url) continue;
+    const kind = realPostKind(url);
+    if (kind) {
+      const e = await realPostCached(url, linkOpts);
+      if (e?.ok && allowedAccount(loadRealAccounts(), kind === 'x_post' ? 'x' : 'bluesky', e.post.handle)) tp.card = { ...e.post };
+    } else tp.card = linkCardFrom(url, await unfurl(url, linkOpts), { title: tp.title, source: tp.source, published: tp.published ?? tp.publishedAt });
+  }
+  const rp = spec.sampling?.real_posts;
+  if (rp && !offline && opts.realPosts !== false) {
+    const accounts = loadRealAccounts().filter((a) => a.platform === 'bluesky');
+    const pick = shuffle(seededRng('real-accounts', seed, date), accounts).slice(0, 12);
+    const cands = (await fetchBskyCandidates(pick, { fetchImpl: opts.linkFetch ?? globalThis.fetch, log }).catch(() => [])).filter((c) => Date.now() - Date.parse(c.created_at) < rp.max_age_hours * 36e5);
+    const rr = seededRng('real-posts', seed, date);
+    let used = 0;
+    for (const tp of topics) {
+      if (used >= rp.max_per_day || !tp.card || tp.card.kind !== 'link_card' || rr() >= rp.share_of_news_originals) continue;
+      const match = cands.find((c) => (c.link && safeUrl(c.link) === tp.card.url) || titleOverlap(c.text, tp.title) >= rp.min_title_overlap);
+      if (!match) continue;
+      const { account, ...post } = match;
+      unfurls.items[post.url] = { url: post.url, ok: true, status: 200, fetchedAt: new Date().toISOString(), post };
+      tp.realPost = post;
+      used++;
+    }
+    if (used) log(`real posts: ${used} quote target(s)`);
+  }
+  if (!dryRun && !offline) saveUnfurlCache(unfurls, unfurlFile);
 
   // 3) Rotation + capabilities.
   const caps = { ...(prev?.modelCaps ?? {}) };
@@ -902,7 +939,8 @@ export async function runDaily(opts = {}) {
   }
   const published = fresh.filter((p) => !stagedIds.has(p.id));
   const staged = fresh.filter((p) => stagedIds.has(p.id));
-  const errors = validate(personas, [...others, ...published.map((p) => ({ ...p, _file: path.basename(paths.posts) })), ...staged.map((p) => ({ ...p, _file: 'staging' }))])
+  const known = new Set([...cachedUrls(), ...cachedUrls(unfurlFile), ...knownUrls(unfurls), ...topics.map((tp) => safeUrl(tp.url ?? '')).filter(Boolean)]);
+  const errors = validate(personas, [...others, ...published.map((p) => ({ ...p, _file: path.basename(paths.posts) })), ...staged.map((p) => ({ ...p, _file: 'staging' }))], { knownUrls: known })
     .filter((e) => !/^(persona |duplicate persona|duplicate handle)/.test(e));
   const status = errors.length ? 'invalid' : complete ? 'complete' : 'partial';
 
@@ -1050,7 +1088,7 @@ function assemblePost({ t, node, taskById, byId, topic, runId, origin, rand }) {
   if (f.quoteRefs?.length) post.quoteRefs = f.quoteRefs;
   const media = [...(f.media ?? [])];
   if (t.media === 'link_card') {
-    const card = linkCard(topic);
+    const card = t.kind !== 'wire' && topic?.realPost ? { ...topic.realPost } : topic?.card ? { ...topic.card } : linkCard(topic);
     if (card) media.push(card);
   }
   if (media.length) post.media = media.slice(0, 4);
