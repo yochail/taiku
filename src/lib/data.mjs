@@ -10,7 +10,7 @@ export const POSTS_DIR = path.join(ROOT, 'content', 'posts');
 const REQUIRED_PERSONA_FIELDS = [
   'id', 'kind', 'name', 'handle', 'avatar', 'lifespan', 'region', 'tradition', 'school', 'headline', 'bio', 'location', 'background',
   'core_ideas', 'key_works', 'voice', 'favorite_topics', 'pet_peeves', 'post_archetypes',
-  'reply_archetypes', 'argument_style', 'news_lens', 'allies', 'rivals', 'never', 'sample_posts',
+  'reply_archetypes', 'argument_style', 'news_lens', 'allies', 'rivals', 'never', 'sample_posts', 'reaction_pool',
   'modernity', 'reactivity', 'topic_affinity', 'native_language', 'sensitive_notes', 'quotables', 'sources',
   'search_hints', 'tools', 'system_prompt',
 ];
@@ -20,8 +20,47 @@ export const PERSONA_TOOLS = ['search_sources', 'get_quote', 'search_news'];
 // thinker = real deceased person; parody = fictional/abstract/historical-joke account; news = neutral fictional newswire.
 export const PERSONA_KINDS = ['thinker', 'parody', 'news'];
 export const HANDLE_RE = /^[A-Za-z0-9_]{4,15}$/;
+// Field of a thinker (required for kind=thinker).
+export const PERSONA_DOMAINS = ['philosophy', 'science', 'mathematics', 'technology', 'psychology', 'economics', 'strategy', 'politics', 'literature', 'arts', 'religion', 'medicine'];
 const ALWAYS_OPTIONAL = ['never', 'sensitive_notes'];
 const NON_THINKER_OPTIONAL = ['allies', 'rivals', 'quotables', 'key_works', 'native_language'];
+export const REACTION_STANCES = ['agree', 'disagree', 'mock', 'awe', 'confused', 'hype'];
+const REACTION_KINDS = { text: 80, emoji: 12, gif_query: 60, meme_template: 100 };
+
+// Pre-written, no-LLM micro-reactions; every one must be on brand for the persona.
+function validateReactions(p, e) {
+  const r = p.reaction_pool;
+  if (!Array.isArray(r)) return e('reaction_pool must be an array of objects');
+  const news = p.kind === 'news';
+  const seen = new Set();
+  const count = {};
+  r.forEach((x, i) => {
+    const w = `reaction_pool[${i}]`;
+    if (!x || typeof x !== 'object') return e(`${w} must be an object`);
+    const kinds = Object.keys(REACTION_KINDS).filter((k) => x[k] !== undefined);
+    if (kinds.length !== 1) return e(`${w} needs exactly one of ${Object.keys(REACTION_KINDS).join('|')}`);
+    const v = x[kinds[0]];
+    if (typeof v !== 'string' || !v.trim() || [...v].length > REACTION_KINDS[kinds[0]]) e(`${w}.${kinds[0]} must be a non-empty string ≤${REACTION_KINDS[kinds[0]]} chars`);
+    if (kinds[0] === 'meme_template' && !/^[^:]+: .+/.test(v)) e(`${w}.meme_template must look like "<Template>: <caption>"`);
+    const key = `${kinds[0]}:${v}`;
+    if (seen.has(key)) e(`${w} duplicate`);
+    seen.add(key);
+    const okStance = news ? x.stance === 'neutral' : REACTION_STANCES.includes(x.stance);
+    if (!okStance) e(`${w}.stance must be ${news ? 'neutral (news)' : REACTION_STANCES.join('|')}`);
+    if (!(Array.isArray(x.tags) && x.tags.length >= 1 && x.tags.length <= 4 && x.tags.every((t) => typeof t === 'string' && /^[a-z0-9_-]+$/.test(t)))) e(`${w}.tags must be 1-4 lowercase tags`);
+    if (typeof x.tone !== 'string' || !x.tone.trim()) e(`${w}.tone required`);
+    count[kinds[0]] = (count[kinds[0]] ?? 0) + 1;
+    count[x.stance] = (count[x.stance] ?? 0) + 1;
+  });
+  if (news) {
+    if (r.length < 20 || r.length > 200) e('news reaction_pool must have 20-200 entries');
+    return;
+  }
+  if (r.length < 60 || r.length > 200) e('reaction_pool must have 60-200 entries (each is reused at most once per 14 days)');
+  for (const s of REACTION_STANCES) if ((count[s] ?? 0) < 10) e(`reaction_pool needs ≥10 "${s}" reactions (has ${count[s] ?? 0})`);
+  for (const k of ['gif_query', 'meme_template']) if ((count[k] ?? 0) < 6) e(`reaction_pool needs ≥6 ${k}`);
+  for (const k of ['text', 'emoji']) if (!count[k]) e(`reaction_pool needs at least one ${k}`);
+}
 
 function optionalFor(p, k) {
   return ALWAYS_OPTIONAL.includes(k) || (p.kind !== 'thinker' && NON_THINKER_OPTIONAL.includes(k));
@@ -30,6 +69,9 @@ function optionalFor(p, k) {
 function validateSkill(p, errors) {
   const e = (m) => errors.push(`persona ${p.id}: ${m}`);
   if (!PERSONA_KINDS.includes(p.kind)) e(`kind must be one of ${PERSONA_KINDS.join('|')}`);
+  if (p.kind === 'thinker' && !PERSONA_DOMAINS.includes(p.domain)) e(`thinkers need domain: ${PERSONA_DOMAINS.join('|')}`);
+  if (p.domain !== undefined && p.kind !== 'thinker') e('only thinkers have a domain');
+  if (p.reaction_pool !== undefined) validateReactions(p, e);
   if (typeof p.handle === 'string' && !HANDLE_RE.test(p.handle)) e(`handle "${p.handle}" must be 4-15 chars of [A-Za-z0-9_] (X rules)`);
   if (p.active_hours_utc !== undefined) {
     const h = p.active_hours_utc;

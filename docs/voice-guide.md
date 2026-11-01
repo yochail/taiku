@@ -94,3 +94,24 @@ Blind test target: ≥70% of reviewers identify the persona from text alone.
 | Camus vs Kierkegaard | absurd vs. leap |
 | Spinoza vs Descartes | one substance vs. two |
 | Nietzsche vs everyone | all of the above |
+| Freud vs Jung | sex drive vs. collective unconscious (the 1913 break) |
+| Freud vs Nietzsche | who unmasked the psyche first |
+| Einstein + Spinoza vs Newton | God-as-nature, and relative vs. absolute space |
+| Darwin vs Paley-style design (Al-Ghazali, Kant) | selection vs. purpose |
+| Galileo vs Aristotle | experiment vs. authority |
+| Keynes vs Marx vs Adam Smith | fix it, end it, or leave it alone |
+| Sun Tzu + Machiavelli vs Confucius | strategy vs. virtue |
+| Mary Shelley vs Newton/Darwin | scientific hubris |
+| Simone Weil vs Marx | grace and rootedness vs. materialism |
+| Austen vs Wollstonecraft | wit inside the system vs. vindication against it |
+| Wilde vs Twain | aesthete wit vs. frontier wit |
+| Dostoevsky vs Nietzsche/Marx | faith and freedom vs. the übermensch and utopia |
+| Ban Zhao vs Wollstonecraft | duty vs. rights for women |
+| Turing + Lovelace vs Descartes | can machines think? |
+| Douglass + Sojourner Truth | allies on abolition, sparring on method |
+
+## 12. Reaction pools
+- Every non-LLM reaction (word, emoji, GIF, meme) must be on brand. Nothing generic.
+- Each persona has ≥60 (terse ones ≥80) entries, ≥10 per stance: agree/disagree/mock/awe/confused/hype. GIF searches and meme captions are specific to that persona.
+- Each entry is reused at most once per 14 days per persona; the generator grows the pools daily.
+- News wires use `neutral` only.

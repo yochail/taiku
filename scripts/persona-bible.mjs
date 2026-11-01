@@ -16,9 +16,9 @@ const out = [
   '',
   'Each persona file is loaded as the full system prompt for every LLM turn: `system_prompt` + the structured profile + `quotables` (the only lines the model may quote) + `sources` (for the `search_sources` / `get_quote` tools, Community Notes and the profile Reading list).',
   '',
-  '| Persona | Kind | Handle | Lifespan | School | Modernity | Reactivity | Quotables | Sources |',
-  '|---|---|---|---|---|---|---|---|---|',
-  ...personas.map((p) => `| [${p.name}](#${p.id}) | ${p.kind} | @${p.handle} | ${p.lifespan} | ${p.school} | ${p.modernity} | ${p.reactivity} | ${p.quotables.length} | ${p.sources.length} |`),
+  '| Persona | Kind | Domain | Handle | Lifespan | School | Modernity | Reactivity | Quotables | Sources |',
+  '|---|---|---|---|---|---|---|---|---|---|',
+  ...personas.map((p) => `| [${p.name}](#${p.id}) | ${p.kind} | ${p.domain ?? '—'} | @${p.handle} | ${p.lifespan} | ${p.school} | ${p.modernity} | ${p.reactivity} | ${p.quotables.length} | ${p.sources.length} |`),
   '',
 ];
 
