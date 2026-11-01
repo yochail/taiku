@@ -58,23 +58,32 @@ export function weightedPick(rand, items, weightFn) {
 }
 
 export function slugify(s) {
-  return String(s)
+  const ascii = String(s)
     .toLowerCase()
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+  if (ascii) return ascii;
+  // Non-Latin text (e.g. Hebrew): keep letters and digits, drop niqqud/cantillation marks.
+  return String(s).normalize('NFC').toLowerCase().replace(/\p{M}+/gu, '').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+const INTL = !/^en\b/.test(SITE_CONFIG.locale || 'en');
+const fmtShort = INTL && new Intl.DateTimeFormat(SITE_CONFIG.locale, { month: 'short', day: 'numeric', timeZone: 'UTC' });
+const fmtLong = INTL && new Intl.DateTimeFormat(SITE_CONFIG.locale, { hour: 'numeric', minute: '2-digit', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC', timeZoneName: 'short' });
+
 export function shortDate(iso) {
   const d = new Date(iso);
+  if (fmtShort) return fmtShort.format(d);
   return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`;
 }
 
 export function longDate(iso) {
   const d = new Date(iso);
+  if (fmtLong) return fmtLong.format(d);
   let h = d.getUTCHours();
   const m = String(d.getUTCMinutes()).padStart(2, '0');
   const ampm = h >= 12 ? 'PM' : 'AM';

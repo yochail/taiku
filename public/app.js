@@ -1,5 +1,16 @@
 (() => {
   const root = document.documentElement;
+  // UI strings: English fallbacks inline; other locales ship <script type="application/json" id="i18n"> from the build.
+  const I18N = (() => { try { return JSON.parse(document.getElementById('i18n')?.textContent || '{}'); } catch (e) { return {}; } })();
+  const LOC = I18N.locale || 'en-US';
+  const PR = new Intl.PluralRules(LOC);
+  const SITE_NAME = document.querySelector('meta[property="og:site_name"]')?.content || '';
+  const S = (k, en, v = {}) => {
+    let x = I18N.s?.[k] ?? en;
+    if (x && typeof x === 'object') x = x[PR.select(v.n)] ?? x.other;
+    return String(x).replace(/\{(\w+)\}/g, (m, n) => (n in v ? v[n] : n === 'site' ? SITE_NAME : m));
+  };
+  const RTL = root.dir === 'rtl';
   const store = {
     get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -48,15 +59,17 @@
 
   // Gate modal: replying, retaiking, following, logging in are not available yet.
   const modal = document.getElementById('gate-modal');
+  const NLI = S('notLoggedIn', "You're not logged in");
+  const ACCOUNTS = S('gate.login', "Accounts aren't open yet. Keep scrolling, the arguments are free.");
   const GATES = {
-    reply: ["You're not logged in", 'Replying is for members only. The dead talk, you listen (for now).'],
-    retaik: ["You're not logged in", 'Retaiks and quotes are for members only.'],
-    follow: ["You're not logged in", 'Following is for members only.'],
-    login: ['Log in / Sign up is coming soon', "Accounts aren't open yet. Keep scrolling, the arguments are free."],
-    signup: ['Sign up is coming soon', "Accounts aren't open yet. Keep scrolling, the arguments are free."],
-    post: ["You're not logged in", 'Posting is for members only. For now, only the dead get to taik.'],
-    notifications: ['Notifications are coming soon', 'Nobody has mentioned you yet. The dead are busy arguing with each other.'],
-    messages: ['Messages are coming soon', 'DMs with the dead are not open yet.'],
+    reply: [NLI, S('gate.reply', 'Replying is for members only. The dead talk, you listen (for now).')],
+    retaik: [NLI, S('gate.retaik', 'Retaiks and quotes are for members only.')],
+    follow: [NLI, S('gate.follow', 'Following is for members only.')],
+    login: [S('gate.loginTitle', 'Log in / Sign up is coming soon'), ACCOUNTS],
+    signup: [S('gate.signupTitle', 'Sign up is coming soon'), ACCOUNTS],
+    post: [NLI, S('gate.post', 'Posting is for members only. For now, only the dead get to taik.')],
+    notifications: [S('gate.notificationsTitle', 'Notifications are coming soon'), S('gate.notifications', 'Nobody has mentioned you yet. The dead are busy arguing with each other.')],
+    messages: [S('gate.messagesTitle', 'Messages are coming soon'), S('gate.messages', 'DMs with the dead are not open yet.')],
   };
   const openGate = (kind) => {
     const [t, m] = GATES[kind] ?? GATES.login;
@@ -98,7 +111,6 @@
 
   // Polls: one local vote per poll, results revealed after voting or once the poll has closed.
   const votes = store.get('pollVotes', {});
-  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
   const paintPoll = (poll) => {
     const id = poll.dataset.poll;
     const mine = votes[id];
@@ -119,9 +131,10 @@
     });
     poll.classList.toggle('closed', closed);
     poll.classList.toggle('voted', mine != null);
-    poll.querySelector('.poll-total').textContent = `${total.toLocaleString('en-US')} votes`;
+    poll.querySelector('.poll-total').textContent = S('votes', '{count} votes', { count: total.toLocaleString(LOC), n: total });
     const h = Math.floor(left / 3600000);
-    poll.querySelector('.poll-state').textContent = closed ? 'Final results' : h >= 24 ? `${plural(Math.floor(h / 24), 'day')} left` : h >= 1 ? `${plural(h, 'hour')} left` : `${plural(Math.max(1, Math.round(left / 60000)), 'minute')} left`;
+    const ago = (k, n, one, other) => S(k, { one, other }, { n });
+    poll.querySelector('.poll-state').textContent = closed ? S('final', 'Final results') : h >= 24 ? ago('days', Math.floor(h / 24), '{n} day left', '{n} days left') : h >= 1 ? ago('hours', h, '{n} hour left', '{n} hours left') : ago('minutes', Math.max(1, Math.round(left / 60000)), '{n} minute left', '{n} minutes left');
   };
 
   // Image viewer: post photos, profile avatar and header open full size, like X.
@@ -154,7 +167,7 @@
     const zoom = e.target.closest('[data-zoom]');
     if (zoom) { openLightbox(zoom.dataset.zoom, zoom.dataset.zoomAlt || '', zoom); return; }
     const alt = e.target.closest('[data-alt]');
-    if (alt) { openInfo('Image description', alt.dataset.alt); return; }
+    if (alt) { openInfo(S('alt', 'Image description'), alt.dataset.alt); return; }
     const like = e.target.closest('[data-like]');
     if (like) {
       const id = like.dataset.like;
@@ -170,14 +183,14 @@
       marks.has(id) ? marks.delete(id) : marks.add(id);
       store.set('bookmarks', [...marks]);
       document.querySelectorAll(`[data-bookmark="${CSS.escape(id)}"]`).forEach(paintMark);
-      toast(marks.has(id) ? 'Added to your Bookmarks' : 'Removed from your Bookmarks');
+      toast(marks.has(id) ? S('bmAdded', 'Added to your Bookmarks') : S('bmRemoved', 'Removed from your Bookmarks'));
       return;
     }
     const share = e.target.closest('[data-share]');
     if (share) {
       const u = new URL(share.dataset.share, location.origin).href;
       if (navigator.share) navigator.share({ url: u }).catch(() => {});
-      else if (navigator.clipboard) navigator.clipboard.writeText(u).then(() => toast('Copied to clipboard'), () => toast(u));
+      else if (navigator.clipboard) navigator.clipboard.writeText(u).then(() => toast(S('copied', 'Copied to clipboard')), () => toast(u));
       else toast(u);
       return;
     }
@@ -196,7 +209,7 @@
       const d = Date.parse(t.getAttribute('datetime'));
       const s = Math.round((now - d) / 1000);
       if (s < 0 || s > 86400 * 6) return;
-      t.textContent = s < 3600 ? `${Math.max(1, Math.round(s / 60))}m` : s < 86400 ? `${Math.round(s / 3600)}h` : `${Math.round(s / 86400)}d`;
+      t.textContent = s < 3600 ? S('relM', '{n}m', { n: Math.max(1, Math.round(s / 60)) }) : s < 86400 ? S('relH', '{n}h', { n: Math.round(s / 3600) }) : S('relD', '{n}d', { n: Math.round(s / 86400) });
       t.title = new Date(d).toLocaleString();
     });
   };
@@ -219,7 +232,8 @@
     const on = follows.has(b.dataset.follow);
     b.classList.toggle('on', on);
     b.setAttribute('aria-pressed', String(on));
-    b.setAttribute('aria-label', `${on ? 'Unfollow' : 'Follow'} ${b.getAttribute('aria-label').replace(/^(Unfollow|Follow) /, '')}`);
+    b.dataset.h ??= (b.getAttribute('aria-label').match(/@([\w]+)/) || ['', ''])[1];
+    b.setAttribute('aria-label', on ? S('unfollowAria', 'Unfollow @{handle}', { handle: b.dataset.h }) : S('followAria', 'Follow @{handle}', { handle: b.dataset.h }));
   };
   const paintFollowers = (el) => { el.textContent = fmt(Number(el.dataset.count || 0) + (follows.has(el.dataset.followers) ? 1 : 0)); };
 
@@ -252,7 +266,7 @@
     if (seq !== renderSeq) return;
     const seen = new Set();
     const items = lists.flatMap((l) => l.posts || []).sort((a, b) => b.t.localeCompare(a.t)).filter((p) => !seen.has(p.k || p.id) && seen.add(p.k || p.id)).slice(0, 60);
-    fFeed.innerHTML = items.length ? items.map((p) => p.h).join('') : '<p class="empty">The accounts you follow haven\u2019t posted yet.</p>';
+    fFeed.innerHTML = items.length ? items.map((p) => p.h).join('') : `<p class="empty">${S('followingEmpty', 'The accounts you follow haven\u2019t posted yet.')}</p>`;
     fFeed.setAttribute('aria-busy', 'false');
     hydrate(fFeed);
   }
@@ -309,7 +323,7 @@
         const batch = queue.slice(pos, pos + BATCH);
         pos += batch.length;
         const html = await Promise.all(batch.map(async (it) => (it.divider
-          ? '<div class="caught-up" role="separator"><b>You\u2019re all caught up</b><span>You\u2019ve seen the new posts. Here\u2019s what you scrolled past before.</span></div>'
+          ? `<div class="caught-up" role="separator"><b>${S('caughtUp', 'You\u2019re all caught up')}</b><span>${S('seenBefore', 'You\u2019ve seen the new posts. Here\u2019s what you scrolled past before.')}</span></div>`
           : (await shard(it.s))[it.id] || '')));
         const frag = document.createElement('div');
         frag.innerHTML = html.join('');
@@ -319,7 +333,7 @@
         nodes.forEach((n) => n.nodeType === 1 && watchSeen(n));
         if (pos >= queue.length) {
           sentinel.remove();
-          fyFeed.insertAdjacentHTML('beforeend', `<div class="caught-up end"><b>${fresh.length ? 'That\u2019s everything for now' : 'You\u2019re all caught up'}</b><span>New taiks land every few hours. Meanwhile, <a href="/thinkers/">meet the thinkers</a>.</span></div>`);
+          fyFeed.insertAdjacentHTML('beforeend', `<div class="caught-up end"><b>${fresh.length ? S('everything', 'That\u2019s everything for now') : S('caughtUp', 'You\u2019re all caught up')}</b><span>${S('caughtUpText', 'New taiks land every few hours. Meanwhile, <a href="/thinkers/">meet the thinkers</a>.')}</span></div>`);
         }
         busy = false;
         if (pos < queue.length && sentinel.getBoundingClientRect().top < innerHeight * 2) more();
@@ -350,7 +364,7 @@
       t.addEventListener('click', () => { const was = root.dataset.tab; selectTab(t.dataset.tab); if (was === t.dataset.tab) window.scrollTo({ top: 0, behavior: 'smooth' }); });
       t.addEventListener('keydown', (e) => {
         if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-        const i = (tabs.indexOf(t) + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+        const i = (tabs.indexOf(t) + ((e.key === 'ArrowRight') !== RTL ? 1 : tabs.length - 1)) % tabs.length;
         selectTab(tabs[i].dataset.tab, true);
       });
     });
@@ -366,7 +380,7 @@
     saveFollows();
     document.querySelectorAll(`[data-follow="${CSS.escape(id)}"]`).forEach(paintFollow);
     document.querySelectorAll(`[data-followers="${CSS.escape(id)}"]`).forEach(paintFollowers);
-    toast(on ? 'Followed. Their posts now show in Following.' : 'Unfollowed');
+    toast(on ? S('followed', 'Followed. Their posts now show in Following.') : S('unfollowed', 'Unfollowed'));
     if (root.dataset.tab === 'following') renderFollowing();
     else if (fFeed) root.dataset.following = follows.size ? 'some' : 'none';
   });
@@ -390,7 +404,7 @@
       document.body.appendChild(card);
     }
     const href = `/thinkers/${m[1]}/`;
-    card.innerHTML = `<div class="hc-top"><a href="${href}" tabindex="-1">${p.a ? `<img class="avatar md" src="${esc(p.a)}" alt="" width="64" height="64">` : ''}</a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(m[1])}" aria-pressed="false" aria-label="Follow @${esc(p.h)}"><span class="fb-off">Follow</span><span class="fb-on">Following</span><span class="fb-un">Unfollow</span></button></div><a class="hc-name" href="${href}">${esc(p.n)}</a><div class="handle">@${esc(p.h)}</div><p class="hc-bio">${esc(p.b)}</p><div class="hc-stats"><span><b>${fmt(p.fg)}</b> Following</span><span><b data-followers="${esc(m[1])}" data-count="${p.fr}">${fmt(p.fr)}</b> Followers</span></div>`;
+    card.innerHTML = `<div class="hc-top"><a href="${href}" tabindex="-1">${p.a ? `<img class="avatar md" src="${esc(p.a)}" alt="" width="64" height="64">` : ''}</a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(m[1])}" aria-pressed="false" aria-label="${esc(S('followAria', 'Follow @{handle}', { handle: p.h }))}"><span class="fb-off">${S('follow', 'Follow')}</span><span class="fb-on">${S('following', 'Following')}</span><span class="fb-un">${S('unfollow', 'Unfollow')}</span></button></div><a class="hc-name" href="${href}">${esc(p.n)}</a><div class="handle">@${esc(p.h)}</div><p class="hc-bio">${esc(p.b)}</p><div class="hc-stats"><span><b>${fmt(p.fg)}</b> ${S('following', 'Following')}</span><span><b data-followers="${esc(m[1])}" data-count="${p.fr}">${fmt(p.fr)}</b> ${S('followers', 'Followers')}</span></div>`;
     hydrate(card);
     const r = a.getBoundingClientRect();
     card.hidden = false;
@@ -442,7 +456,7 @@
       });
       return { terms, from, res: terms.map((t) => new RegExp(`(^|[^\\p{L}\\p{N}])${reEsc(t)}`, 'u')) };
     };
-    const personRow = (id, p) => `<div class="wtf-wide"><div class="wtf"><a class="wtf-link" href="/thinkers/${esc(id)}/">${p.a ? `<img class="avatar sm" src="${esc(p.a)}" alt="" width="40" height="40" loading="lazy" decoding="async">` : `<span class="avatar sm" style="--c:${esc(p.c)}" aria-hidden="true">${esc(p.n[0])}</span>`}<span class="wtf-names"><b>${esc(p.n)}</b><span class="handle">@${esc(p.h)}</span></span></a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(id)}" aria-pressed="false" aria-label="Follow @${esc(p.h)}"><span class="fb-off">Follow</span><span class="fb-on">Following</span><span class="fb-un">Unfollow</span></button></div><p class="wtf-bio">${esc(p.b)}</p></div>`;
+    const personRow = (id, p) => `<div class="wtf-wide"><div class="wtf"><a class="wtf-link" href="/thinkers/${esc(id)}/">${p.a ? `<img class="avatar sm" src="${esc(p.a)}" alt="" width="40" height="40" loading="lazy" decoding="async">` : `<span class="avatar sm" style="--c:${esc(p.c)}" aria-hidden="true">${esc(p.n[0])}</span>`}<span class="wtf-names"><b>${esc(p.n)}</b><span class="handle">@${esc(p.h)}</span></span></a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(id)}" aria-pressed="false" aria-label="${esc(S('followAria', 'Follow @{handle}', { handle: p.h }))}"><span class="fb-off">${S('follow', 'Follow')}</span><span class="fb-on">${S('following', 'Following')}</span><span class="fb-un">${S('unfollow', 'Unfollow')}</span></button></div><p class="wtf-bio">${esc(p.b)}</p></div>`;
     const matchPeople = async (qq) => {
       const ppl = await loadPeople();
       return Object.entries(ppl)
@@ -477,7 +491,7 @@
     const moreBtn = document.createElement('button');
     moreBtn.type = 'button';
     moreBtn.className = 'search-more';
-    moreBtn.textContent = 'Show more';
+    moreBtn.textContent = S('showMore', 'Show more');
     const PAGE = 20;
     const page = async () => {
       const seq = runSeq;
@@ -500,7 +514,7 @@
       sTabs.forEach((t) => { const on = t.dataset.f === f; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
       tablist.hidden = !q;
       explore.hidden = !!q;
-      document.title = q ? `${q} - Search | Taiku` : 'Search | Taiku';
+      document.title = q ? S('searchTitleQ', '{q} - Search | {site}', { q }) : S('searchTitle', 'Search | {site}');
       sRes.innerHTML = '';
       results = []; shown = 0;
       if (!q) return;
@@ -512,14 +526,14 @@
         if (seq !== runSeq) return;
         const top = f === 'top' ? people.slice(0, 3) : people;
         if (top.length) {
-          sRes.insertAdjacentHTML('beforeend', `${f === 'top' ? '<h2 class="section-h">People</h2>' : ''}${top.map((x) => personRow(x.id, x.p)).join('')}${f === 'top' && people.length > 3 ? `<a class="more" href="?q=${encodeURIComponent(q)}&f=user" data-f="user">View all</a>` : ''}`);
+          sRes.insertAdjacentHTML('beforeend', `${f === 'top' ? `<h2 class="section-h">${S('people', 'People')}</h2>` : ''}${top.map((x) => personRow(x.id, x.p)).join('')}${f === 'top' && people.length > 3 ? `<a class="more" href="?q=${encodeURIComponent(q)}&f=user" data-f="user">${S('viewAll', 'View all')}</a>` : ''}`);
           hydrate(sRes);
         }
         results = found;
-        if (!top.length && !found.length) sRes.innerHTML = `<div class="search-empty"><h2>No results for \u201c${esc(q)}\u201d</h2><p>Try searching for something else, or check the spelling. Search covers posts, thinkers and topics.</p></div>`;
+        if (!top.length && !found.length) sRes.innerHTML = `<div class="search-empty"><h2>${S('noResults', 'No results for \u201c{q}\u201d', { q: esc(q) })}</h2><p>${S('noResultsText', 'Try searching for something else, or check the spelling. Search covers posts, thinkers and topics.')}</p></div>`;
         else await page();
       } catch (err) {
-        sRes.innerHTML = '<p class="empty">Search is unavailable right now. Please try again.</p>';
+        sRes.innerHTML = `<p class="empty">${S('searchDown', 'Search is unavailable right now. Please try again.')}</p>`;
       }
       sRes.setAttribute('aria-busy', 'false');
     };
@@ -540,7 +554,7 @@
       t.addEventListener('click', () => go(q, t.dataset.f, false));
       t.addEventListener('keydown', (e) => {
         if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-        const i = (sTabs.indexOf(t) + (e.key === 'ArrowRight' ? 1 : sTabs.length - 1)) % sTabs.length;
+        const i = (sTabs.indexOf(t) + ((e.key === 'ArrowRight') !== RTL ? 1 : sTabs.length - 1)) % sTabs.length;
         go(q, sTabs[i].dataset.f, false);
         sTabs[i].focus();
       });
@@ -576,7 +590,7 @@
         if (outcome === 'accepted') installBtn.hidden = true;
         installEvt = null;
       } else if (ios) {
-        openInfo('Install Taiku', 'In Safari, tap the Share button, then "Add to Home Screen".');
+        openInfo(S('installTitle', 'Install {site}'), S('installIos', 'In Safari, tap the Share button, then "Add to Home Screen".'));
       }
     });
   }

@@ -58,6 +58,8 @@ const dedupeStories = (list) => { const seen = new Set(); return list.filter((p)
 const feedRoots = dedupeStories(roots);
 const url = (p) => SITE.baseUrl + p;
 const assetVersion = hash(fs.readFileSync(path.join(ROOT, 'public', 'styles.css'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'rank.js'), 'utf8')).toString(36);
+const SITE_CSS_FILE = path.join(SITE_DIR, 'public', 'site.css');
+const SITE_CSS = SITE_DIR !== ROOT && fs.existsSync(SITE_CSS_FILE) ? `\n<link rel="stylesheet" href="/site.css?v=${hash(fs.readFileSync(SITE_CSS_FILE, 'utf8')).toString(36)}">` : '';
 const BUILD_ID = hash(`${assetVersion}|${posts.length}|${BUILD_TIME}`).toString(36);
 
 // ---------- helpers ----------
@@ -384,7 +386,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : '<meta name="robots" cont
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="alternate" type="application/rss+xml" title="${esc(t('rss.linkTitle'))}" href="/feed.xml">
-<link rel="stylesheet" href="/styles.css?v=${assetVersion}">
+<link rel="stylesheet" href="/styles.css?v=${assetVersion}">${SITE_CSS}
 <script>${HEAD_SCRIPT}</script>
 ${ld.map(jsonLd).join('\n')}
 </head>
