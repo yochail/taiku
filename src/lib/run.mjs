@@ -24,7 +24,7 @@ import { createGiphyClient } from './giphy.mjs';
 import { calibrate, cascade, createReactor } from './react.mjs';
 import { FEEDS, domainOf, fetchPool, fixtureFetch, sanitizeUntrusted } from './news.mjs';
 import { selectTopics, topicCount } from './topics.mjs';
-import { BudgetError, loadLlmConfig } from './llm.mjs';
+import { BudgetError, llmConfig, loadLlmConfig } from './llm.mjs';
 import { createMockClient } from './mock.mjs';
 import { createRotation, discoverModels, singleClientRotation } from './rotation.mjs';
 import { OPENERS_PER_BATCH, ORIGINALS_PER_BATCH, REPLIES_PER_BATCH, SHORTS_PER_BATCH, THREAD_PARTS, budgetFile, loadUsage, planBudget, saveUsage } from './budget.mjs';
@@ -320,6 +320,12 @@ export async function runDaily(opts = {}) {
   const usedToday = offline ? {} : loadUsage(usageFileLlm, usageDay);
   const discovery = offline || opts.client ? { available: null, skipped: [] } : await discoverModels({ config, env, fetchImpl: opts.fetchImpl, log });
   for (const s of discovery.skipped ?? []) log(`model ${s.name} (${s.model}) skipped: ${s.reason}`);
+  if (!offline && !opts.client) {
+    // Providers whose secret isn't set get no allowance, so the plan only counts usable models.
+    const keyed = config.providers.filter((p) => llmConfig(env, p).apiKey).map((p) => p.name);
+    for (const p of config.providers) if (!keyed.includes(p.name)) log(`model ${p.name} skipped: no ${p.keyEnv}`);
+    discovery.available = new Set(keyed.filter((n) => !discovery.available || discovery.available.has(n)));
+  }
   const budget = planBudget({ config, used: usedToday, available: discovery.available, maxCalls });
   const content = prev?.nonce === nonce && prev?.budgetPlan?.content ? prev.budgetPlan.content : budget.content;
   log(`budget: ${budget.models.map((m) => `${m.name} ${m.plan}+${m.reserve}`).join(', ')} → ~${budget.totals.neurons} Neurons; plan ${JSON.stringify(content)}`);

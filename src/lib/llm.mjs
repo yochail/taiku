@@ -1,4 +1,4 @@
-// OpenAI-compatible chat client (Cloudflare Workers AI /ai/v1/chat/completions) with ONE retry
+// OpenAI-compatible chat client (Gemini, OpenRouter, Groq, Cloudflare Workers AI) with ONE retry
 // layer, an rpm limiter and a shared request budget. GitHub Models is retired (it answers every
 // request with HTTP 200 "OK"), so it is not a provider any more; any non-JSON / empty body or a
 // message without content or tool calls is treated as a failure.
@@ -44,6 +44,14 @@ function hostOf(url) {
   }
 }
 
+/** Each provider key is only ever sent (over https) to its own API host. */
+export const KEY_HOSTS = {
+  CF_AI_TOKEN: 'api.cloudflare.com',
+  GEMINI_API_KEY: 'generativelanguage.googleapis.com',
+  GROQ_API_KEY: 'api.groq.com',
+  OPENROUTER_API_KEY: 'openrouter.ai',
+};
+
 /**
  * Single-provider config from env (tests, one-off runs): LLM_BASE_URL / LLM_API_KEY / LLM_MODEL,
  * defaulting to Cloudflare Workers AI with CF_ACCOUNT_ID + CF_AI_TOKEN. The CF token is only ever
@@ -53,8 +61,8 @@ export function llmConfig(env = process.env, provider = null) {
   const baseUrl = expandEnv(provider?.baseURL ?? env.LLM_BASE_URL ?? CF_BASE_URL, env).replace(/\/+$/, '');
   const { host, https, ok } = hostOf(baseUrl);
   const keyEnv = provider?.keyEnv ?? (env.LLM_API_KEY ? 'LLM_API_KEY' : 'CF_AI_TOKEN');
-  const cfHost = https && host === 'api.cloudflare.com';
-  const apiKey = ok && (keyEnv !== 'CF_AI_TOKEN' || cfHost) ? env[keyEnv] || '' : '';
+  const pinnedHost = KEY_HOSTS[keyEnv];
+  const apiKey = ok && (!pinnedHost || (https && host === pinnedHost)) ? env[keyEnv] || '' : '';
   return {
     name: provider?.name ?? 'env',
     baseUrl,
@@ -68,6 +76,9 @@ export function llmConfig(env = process.env, provider = null) {
     tools: String(env.LLM_TOOLS || provider?.tools || 'auto').toLowerCase(), // auto | on | off
     extra: provider?.extra ?? {},
     userPrefix: provider?.userPrefix ?? '',
+    headers: provider?.headers ?? {},
+    // Rotation providers move to the next model on any 429; a lone env client backs off once.
+    retry429: !provider,
     rpm: num(provider?.rpm ?? env.LLM_RPM, 12),
     maxRetryAfterMs: num(env.LLM_MAX_RETRY_AFTER_MS, 120000),
   };
@@ -133,7 +144,7 @@ export function createClient({ cfg = llmConfig(), fetchImpl = globalThis.fetch, 
       try {
         res = await fetchImpl(`${cfg.baseUrl}/chat/completions`, {
           method: 'POST',
-          headers: { 'content-type': 'application/json', accept: 'application/json', ...(cfg.apiKey ? { authorization: `Bearer ${cfg.apiKey}` } : {}) },
+          headers: { 'content-type': 'application/json', accept: 'application/json', ...(cfg.headers ?? {}), ...(cfg.apiKey ? { authorization: `Bearer ${cfg.apiKey}` } : {}) },
           body: JSON.stringify(body),
         });
       } catch (e) {
@@ -167,7 +178,7 @@ export function createClient({ cfg = llmConfig(), fetchImpl = globalThis.fetch, 
           if (st === 410 || st === 404 || quota) throw new LlmError(`HTTP ${st}: ${text.slice(0, 160)}`, { status: st, capped: true });
           if (st === 429) {
             // Back off once (bounded), then let the rotation switch models.
-            if (attempt === 0 && (wait ?? 0) <= Math.min(cfg.maxRetryAfterMs, 30000)) {
+            if (cfg.retry429 !== false && attempt === 0 && (wait ?? 0) <= Math.min(cfg.maxRetryAfterMs, 30000)) {
               stats.retries++;
               await sleep(wait ?? backoffMs(0, rand));
               lastErr = new LlmError(`HTTP 429: ${text.slice(0, 120)}`, { status: st, retryable: true });
@@ -242,7 +253,7 @@ const tryParse = (x) => {
     return null;
   }
 };
-const stripThink = (s) => s.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/^[\s\S]*?<\/think>/i, '');
+const stripThink = (s) => s.replace(/<(think|thought)>[\s\S]*?<\/\1>/gi, '').replace(/^[\s\S]*?<\/(think|thought)>/i, '');
 
 /** Lenient JSON extraction from a model message (fenced blocks, leading prose, <think> blocks). */
 export function parseJsonLoose(text) {

@@ -27,7 +27,7 @@ test('Neuron arithmetic per M tokens', () => {
 
 test('degrades gracefully as the quota runs out', () => {
   const full = planBudget({ config });
-  const used = Object.fromEntries(config.providers.map((p) => [p.name, { calls: 0, neurons: p.cap * 0.6 }]));
+  const used = Object.fromEntries(config.providers.map((p) => [p.name, p.capUnit === 'requests' ? { calls: Math.ceil(p.calls * 0.85), neurons: 0 } : { calls: 0, neurons: p.cap * 0.85 }]));
   const half = planBudget({ config, used });
   assert.ok(half.totals.calls < full.totals.calls && half.totals.calls > 0);
   assert.ok(half.content.llmItems < full.content.llmItems);
@@ -38,7 +38,7 @@ test('degrades gracefully as the quota runs out', () => {
   assert.equal(none.content.llmItems, 0);
   const capped = planBudget({ config, maxCalls: 12 });
   assert.ok(capped.totals.calls <= 12, 'GEN_MAX_CALLS caps the total');
-  assert.ok(capped.models.find((m) => m.role === 'voice').allowance > 0, 'voice is trimmed last');
+  assert.ok(capped.roles.voice.calls > 0 && capped.roles.voice.calls >= capped.roles.micro.calls, 'voice is trimmed last');
 });
 
 test('content plan scales with the role budgets', () => {

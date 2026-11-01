@@ -32,7 +32,7 @@ export function saveUsage(file, day, models) {
  * @param o.used     { [name]: { calls, neurons } } already spent today
  * @param o.available Set of usable provider names (discovery), or null for all
  * @param o.maxCalls hard cap on total HTTP calls (GEN_MAX_CALLS)
- * @returns { models: [...], totals, content }
+ * @returns { models: [...], roles: {voice|batch|micro|fallback: {calls, plan, reserve}}, totals, content }
  */
 export function planBudget({ config, used = {}, available = null, maxCalls = Infinity, maxTopics = 6 } = {}) {
   const planShare = config.planShare ?? 0.8;
@@ -45,29 +45,49 @@ export function planBudget({ config, used = {}, available = null, maxCalls = Inf
     if (available && !available.has(p.name)) allowance = 0;
     else if (p.capUnit === 'requests') allowance = Math.floor(p.cap * planShare) - (u.calls ?? 0);
     else allowance = Math.min(p.calls ?? Infinity, Math.floor((p.cap * planShare - (u.neurons ?? 0)) / Math.max(perCall, 1e-9)) - 0);
-    if (p.capUnit !== 'requests' && Number.isFinite(p.calls)) allowance = Math.min(allowance, p.calls - (u.calls ?? 0));
+    if (Number.isFinite(p.calls)) allowance = Math.min(allowance, p.calls - (u.calls ?? 0));
     return { name: p.name, model: p.model, role: p.role, capUnit: p.capUnit, cap: p.cap, perCall: Math.round(perCall * 10) / 10, usedToday: u, allowance: Math.max(0, allowance) };
   });
   // Global Neuron cap (shared pool) and the total-call target / GEN_MAX_CALLS.
   const neuronCap = (config.totalCap?.cap ?? Infinity) - models.reduce((s, m) => s + (m.usedToday.neurons ?? 0), 0);
   const maxTotal = Math.min(target.max ?? Infinity, maxCalls);
   const spend = () => models.reduce((s, m) => s + m.allowance * m.perCall, 0);
-  const total = () => models.reduce((s, m) => s + m.allowance, 0);
+  // 1) Neuron cap (Workers AI only): trim micro first, voice last.
   const order = ['micro', 'fallback', 'batch', 'voice'];
-  for (let guard = 0; guard < 1000 && (spend() > neuronCap || total() > maxTotal); guard++) {
-    const m = order.map((r) => models.filter((x) => x.role === r && x.allowance > 0).sort((a, b) => b.allowance - a.allowance)[0]).find(Boolean);
+  for (let guard = 0; guard < 5000 && spend() > neuronCap; guard++) {
+    const m = models.filter((x) => x.allowance > 0 && x.perCall > 0).sort((x, y) => order.indexOf(x.role) - order.indexOf(y.role) || y.allowance - x.allowance)[0];
     if (!m) break;
     m.allowance--;
   }
+  // Each model keeps its whole allowance as a ceiling, so a role can fall through its chain
+  // (config.chains) when a model 429s. Per-model plan/reserve split.
   for (const m of models) {
     m.reserve = m.allowance > 0 ? Math.max(1, Math.ceil(m.allowance * reserveShare)) : 0;
     m.plan = Math.max(0, m.allowance - m.reserve);
     m.neuronsPlanned = Math.round(m.allowance * m.perCall);
   }
-  const byRole = (r) => models.filter((m) => m.role === r).reduce((s, m) => s + m.plan, 0);
-  const totals = { calls: total(), plan: models.reduce((s, m) => s + m.plan, 0), reserve: models.reduce((s, m) => s + m.reserve, 0), neurons: Math.round(spend()), neuronCap: Math.round(neuronCap), targetMin: target.min, targetMax: target.max };
+  // 2) Day size: split the call target / GEN_MAX_CALLS across roles by config.roleShare (capped by
+  // each role's capacity; spare goes to voice, then batch, micro, fallback). The rotation enforces
+  // this total as a hard cap across all models.
+  const share = config.roleShare ?? { voice: 0.39, batch: 0.33, micro: 0.17, fallback: 0.11 };
+  const cap = Object.fromEntries(order.map((r) => [r, models.filter((m) => m.role === r).reduce((t, m) => t + m.allowance, 0)]));
+  const capTotal = order.reduce((t, r) => t + cap[r], 0);
+  const roles = Object.fromEntries(order.map((r) => [r, { calls: capTotal <= maxTotal ? cap[r] : Math.min(cap[r], Math.floor(maxTotal * (share[r] ?? 0))) }]));
+  let spare = Math.min(maxTotal, capTotal) - order.reduce((t, r) => t + roles[r].calls, 0);
+  for (const r of ['voice', 'batch', 'micro', 'fallback']) {
+    const add = Math.max(0, Math.min(spare, cap[r] - roles[r].calls));
+    roles[r].calls += add;
+    spare -= add;
+  }
+  for (const r of order) {
+    const c = roles[r].calls;
+    roles[r].reserve = c > 0 ? Math.max(1, Math.ceil(c * reserveShare)) : 0;
+    roles[r].plan = Math.max(0, c - roles[r].reserve);
+  }
+  const sum = (k) => order.reduce((t, r) => t + roles[r][k], 0);
+  const totals = { calls: sum('calls'), plan: sum('plan'), reserve: sum('reserve'), neurons: Math.round(spend()), neuronCap: Math.round(neuronCap), targetMin: target.min, targetMax: target.max };
   totals.degraded = totals.calls < (target.min ?? 0);
-  return { models, totals, content: contentPlan({ voice: byRole('voice') + Math.floor(byRole('fallback') / 2), batch: byRole('batch'), micro: byRole('micro'), maxTopics }) };
+  return { models, roles, totals, content: contentPlan({ voice: roles.voice.plan + Math.floor(roles.fallback.plan / 2), batch: roles.batch.plan, micro: roles.micro.plan, maxTopics }) };
 }
 
 /** Convert per-role call budgets into a content plan. */

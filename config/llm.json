@@ -1,11 +1,57 @@
 {
-  "_note": "Generic provider list for the daily generator (src/lib/rotation.mjs). Cloudflare Workers AI free tier: 10,000 Neurons/day per account, reset 00:00 UTC; Taiku budgets 8,000. cap is in capUnit per UTC day; the planner uses at most planShare of it and keeps reserveShare of that for regenerating rejected items. neuronRate = Neurons per 1M input/output tokens (developers.cloudflare.com/workers-ai/platform/pricing). est = typical tokens per call for planning. baseURL/keyEnv are resolved from env at run time; secrets: CF_ACCOUNT_ID, CF_AI_TOKEN.",
-  "totalCap": { "unit": "neurons", "cap": 8000 },
+  "_note": "Provider list for the daily fallback generator (src/lib/rotation.mjs). Each role walks config.chains in priority order (quality-tested: Gemini 3.5 Flash, OpenRouter Nemotron :free, Groq), with Cloudflare Workers AI as the last resort. Providers whose secret is missing are skipped; a 429 moves on to the next model. Not used: gemma via Gemini (leaks <thought>), gemini-2.5-flash (404), inkling (403). cap is per UTC day in capUnit (requests for Gemini/OpenRouter/Groq, Neurons for Workers AI: 10,000/day free, Taiku budgets 8,000 in totalCap); calls is Taiku's own daily ceiling. The planner uses at most planShare of each cap and keeps reserveShare for regenerating rejected items. neuronRate = Neurons per 1M input/output tokens. Secrets: GEMINI_API_KEY, OPENROUTER_API_KEY (free models share ~50 requests/day), GROQ_API_KEY, CF_ACCOUNT_ID, CF_AI_TOKEN.",
+  "totalCap": {
+    "unit": "neurons",
+    "cap": 8000
+  },
   "planShare": 0.8,
   "reserveShare": 0.1,
-  "targetCalls": { "min": 50, "max": 90 },
+  "targetCalls": {
+    "min": 50,
+    "max": 90
+  },
   "wallClockMinutes": 25,
   "discovery": "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/models/search?task=Text%20Generation",
+  "chains": {
+    "voice": [
+      "gemini-3.5-flash",
+      "or-nemotron-3-ultra",
+      "or-nemotron-3.5-super",
+      "cf-llama-3.3-70b"
+    ],
+    "batch": [
+      "gemini-3.5-flash",
+      "or-nemotron-3.5-super",
+      "groq-gpt-oss-120b",
+      "cf-gemma-4-26b"
+    ],
+    "micro": [
+      "groq-qwen3.8-27b",
+      "cf-qwen3-30b"
+    ],
+    "fallback": [
+      "cf-gpt-oss-120b"
+    ]
+  },
+  "spill": {
+    "voice": [
+      "voice",
+      "fallback"
+    ],
+    "batch": [
+      "batch",
+      "micro",
+      "fallback"
+    ],
+    "micro": [
+      "micro",
+      "batch",
+      "fallback"
+    ],
+    "fallback": [
+      "fallback"
+    ]
+  },
   "providers": [
     {
       "name": "cf-llama-3.3-70b",
@@ -22,8 +68,14 @@
       "max_tokens": 320,
       "temperature": 0.95,
       "extra": {},
-      "neuronRate": { "input": 26668, "output": 204805 },
-      "est": { "input": 2600, "output": 160 }
+      "neuronRate": {
+        "input": 26668,
+        "output": 204805
+      },
+      "est": {
+        "input": 2600,
+        "output": 160
+      }
     },
     {
       "name": "cf-gemma-4-26b",
@@ -41,8 +93,14 @@
       "temperature": 0.95,
       "extra": {},
       "_note": "Reasoning model: below ~1500 max_tokens the reasoning eats the budget and content comes back empty.",
-      "neuronRate": { "input": 9091, "output": 27273 },
-      "est": { "input": 2500, "output": 1000 }
+      "neuronRate": {
+        "input": 9091,
+        "output": 27273
+      },
+      "est": {
+        "input": 2500,
+        "output": 1000
+      }
     },
     {
       "name": "cf-qwen3-30b",
@@ -60,8 +118,14 @@
       "temperature": 0.9,
       "userPrefix": "/no_think",
       "extra": {},
-      "neuronRate": { "input": 4625, "output": 30475 },
-      "est": { "input": 1500, "output": 250 }
+      "neuronRate": {
+        "input": 4625,
+        "output": 30475
+      },
+      "est": {
+        "input": 1500,
+        "output": 250
+      }
     },
     {
       "name": "cf-gpt-oss-120b",
@@ -77,15 +141,112 @@
       "rpm": 12,
       "max_tokens": 900,
       "temperature": 0.9,
-      "extra": { "reasoning_effort": "low" },
-      "neuronRate": { "input": 31818, "output": 68182 },
-      "est": { "input": 2000, "output": 450 }
+      "extra": {
+        "reasoning_effort": "low"
+      },
+      "neuronRate": {
+        "input": 31818,
+        "output": 68182
+      },
+      "est": {
+        "input": 2000,
+        "output": 450
+      }
+    },
+    {
+      "name": "gemini-3.5-flash",
+      "baseURL": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "keyEnv": "GEMINI_API_KEY",
+      "model": "gemini-3.5-flash",
+      "role": "voice",
+      "voiceWeight": 0,
+      "tools": "on",
+      "capUnit": "requests",
+      "cap": 200,
+      "calls": 40,
+      "rpm": 8,
+      "max_tokens": 2000,
+      "temperature": 0.95,
+      "extra": {},
+      "_note": "Best all-rounder (voice + batch JSON). Uses em-dashes; the house-style lint strips them."
+    },
+    {
+      "name": "or-nemotron-3-ultra",
+      "baseURL": "https://openrouter.ai/api/v1",
+      "keyEnv": "OPENROUTER_API_KEY",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "role": "voice",
+      "voiceWeight": 0,
+      "tools": "off",
+      "capUnit": "requests",
+      "cap": 25,
+      "calls": 20,
+      "rpm": 6,
+      "max_tokens": 1200,
+      "temperature": 0.95,
+      "headers": {
+        "HTTP-Referer": "https://taiku.app",
+        "X-Title": "Taiku"
+      },
+      "extra": {},
+      "_note": "Top voice quality in the test, but slow (7-28s). Shares the OpenRouter free quota."
+    },
+    {
+      "name": "or-nemotron-3.5-super",
+      "baseURL": "https://openrouter.ai/api/v1",
+      "keyEnv": "OPENROUTER_API_KEY",
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "role": "batch",
+      "voiceWeight": 0,
+      "tools": "off",
+      "capUnit": "requests",
+      "cap": 20,
+      "calls": 16,
+      "rpm": 6,
+      "max_tokens": 1600,
+      "temperature": 0.95,
+      "headers": {
+        "HTTP-Referer": "https://taiku.app",
+        "X-Title": "Taiku"
+      },
+      "extra": {}
+    },
+    {
+      "name": "groq-gpt-oss-120b",
+      "baseURL": "https://api.groq.com/openai/v1",
+      "keyEnv": "GROQ_API_KEY",
+      "model": "openai/gpt-oss-120b",
+      "role": "batch",
+      "voiceWeight": 0,
+      "tools": "on",
+      "capUnit": "requests",
+      "cap": 1000,
+      "calls": 25,
+      "rpm": 20,
+      "max_tokens": 1600,
+      "temperature": 0.9,
+      "extra": {
+        "reasoning_effort": "low"
+      },
+      "_note": "Reliable JSON, blander voice; batch fallback only."
+    },
+    {
+      "name": "groq-qwen3.8-27b",
+      "baseURL": "https://api.groq.com/openai/v1",
+      "keyEnv": "GROQ_API_KEY",
+      "model": "qwen/qwen3.8-27b",
+      "role": "micro",
+      "voiceWeight": 0,
+      "tools": "off",
+      "capUnit": "requests",
+      "cap": 1000,
+      "calls": 50,
+      "rpm": 20,
+      "max_tokens": 700,
+      "temperature": 0.9,
+      "userPrefix": "/no_think",
+      "extra": {},
+      "_note": "Fast; adds hashtags and runs long, so the lint strips hashtags and the 280 check regenerates."
     }
-  ],
-  "spill": {
-    "voice": ["voice", "fallback"],
-    "batch": ["batch", "micro", "fallback"],
-    "micro": ["micro", "batch", "fallback"],
-    "fallback": ["fallback"]
-  }
+  ]
 }

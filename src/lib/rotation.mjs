@@ -1,7 +1,8 @@
-// Provider rotation over config/llm.json (Cloudflare Workers AI only). Each persona gets a primary
-// voice model by hash (weighted by voiceWeight) so voices differ; every role spills over to the
-// next model with quota left. 429 / quota errors / 410 mark a model capped and switch. Per-model
-// stats ({model, calls, cap, neurons_est, 429s, items}) go into the run manifest.
+// Provider rotation over config/llm.json. Each role (voice / batch / micro / fallback) walks its
+// priority chain (config.chains: Gemini → OpenRouter Nemotron → Groq → Cloudflare Workers AI) and
+// spills over to the next model with quota left. Providers without their key are skipped. 429 /
+// quota errors / 410 mark a model capped and switch. Per-model stats ({model, calls, cap,
+// neurons_est, 429s, items}) go into the run manifest.
 import { BudgetError, LlmError, createClient, expandEnv, llmConfig, probeTools, toolCapsKey } from './llm.mjs';
 import { neuronsFor } from './budget.mjs';
 import { sha256 } from './pipeline-util.mjs';
@@ -29,6 +30,10 @@ export async function discoverModels({ config, env = process.env, fetchImpl = gl
   const available = new Set();
   const skipped = [];
   for (const p of config.providers) {
+    if (!/api\.cloudflare\.com/.test(p.baseURL ?? '')) {
+      available.add(p.name); // only Workers AI has a model catalogue to check
+      continue;
+    }
     const m = byName.get(p.model);
     if (!m) {
       skipped.push({ name: p.name, model: p.model, reason: 'missing' });
@@ -84,18 +89,26 @@ export function createRotation({ config, plan, env = process.env, makeClient = n
       neurons: 0,
       r429: 0,
       items: 0,
-      capped: allowance <= 0 ? 'no allowance' : null,
+      capped: allowance <= 0 ? 'no allowance' : !makeClient && !cfg.apiKey ? `no ${p.keyEnv}` : null,
       tools: null,
     });
   }
   const byName = new Map(models.map((m) => [m.name, m]));
   const spill = config.spill ?? {};
-  const usable = (m, repair) => !m.capped && m.client.calls < (repair ? m.plan + m.reserve : m.plan) && m.neurons < m.neuronCap;
+  const usedAll = () => models.reduce((s, m) => s + m.client.calls, 0);
+  // Day-size cap across all models (budget roles); repairs may dip into the reserve.
+  const dayPlan = plan?.totals?.plan ?? Infinity;
+  const dayCap = plan?.totals?.calls ?? Infinity;
+  const usable = (m, repair) => !m.capped && m.client.calls < (repair ? m.plan + m.reserve : m.plan) && m.neurons < m.neuronCap && usedAll() < (repair ? dayCap : dayPlan);
 
   function order(role, personaId) {
     const roles = spill[role] ?? [role, 'fallback'];
     const out = [];
-    if (role === 'voice') {
+    const chain = config.chains?.[role];
+    if (chain) {
+      // Explicit priority chain (config.chains): best model first, cheaper/backup ones after.
+      for (const n of chain) if (byName.has(n) && !out.includes(byName.get(n))) out.push(byName.get(n));
+    } else if (role === 'voice') {
       const voices = models.filter((m) => (m.p.voiceWeight ?? 0) > 0);
       const primary = hashPick(`voice:${personaId ?? ''}`, voices.map((m) => [m.name, m.p.voiceWeight]));
       if (primary) out.push(byName.get(primary));
@@ -135,7 +148,8 @@ export function createRotation({ config, plan, env = process.env, makeClient = n
         return calls;
       },
       get remaining() {
-        return models.reduce((s, m) => s + (usable(m, true) ? m.plan + m.reserve - m.client.calls : 0), 0);
+        const perModel = models.reduce((s, m) => s + (usable(m, true) ? m.plan + m.reserve - m.client.calls : 0), 0);
+        return Math.max(0, Math.min(perModel, dayCap - usedAll()));
       },
       get nativeTools() {
         const m = pinned ?? pickModel(false) ?? pickModel(true);
