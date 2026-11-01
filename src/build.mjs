@@ -8,6 +8,29 @@ import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderTe
 import { writeMediaFiles } from './lib/media.mjs';
 import { OUT_DIR } from './lib/site.mjs';
 
+/** User-facing UI strings in one place (i18n-ready). */
+const STR = {
+  back: 'Back',
+  following: 'Following',
+  followers: 'Followers',
+  profileSections: 'Profile sections',
+  followLists: 'Follow lists',
+  tabs: { posts: 'Posts', replies: 'Replies', media: 'Media', likes: 'Likes' },
+  tabTitle: { posts: 'Posts', replies: 'Posts with replies', media: 'Media', likes: 'Likes' },
+  viewPhoto: 'View profile photo',
+  viewBanner: 'View header photo',
+  viewImage: 'View image',
+  bannerOf: (name) => `Header image for ${name}`,
+  close: 'Close',
+  imageDescription: 'Image description',
+  emptyPosts: (h) => ({ title: `@${h} hasn’t posted`, body: 'When they do, their posts will show up here.' }),
+  emptyMedia: (h) => ({ title: `@${h} hasn’t posted media`, body: 'Once they do, those posts will show up here.' }),
+  likesPrivate: (h) => ({ title: `@${h}’s likes are private`, body: 'Likes on Taiku are only visible to the account that made them. Yours are kept on this device.' }),
+  followNote: (kind, a, n) => (kind === 'followers' ? `Showing followers on Taiku. ${a.name} has ${n} followers in the simulation.` : `Showing accounts ${a.name} follows on Taiku, with the reason.`),
+  noFollows: (kind, h) => (kind === 'followers' ? `@${h} has no followers on Taiku yet` : `@${h} isn’t following anyone on Taiku`),
+  linkUnavailable: 'Link unavailable',
+  noTagPosts: (t) => `No posts with #${t} yet`,
+};
 const OUT = OUT_DIR;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const PAGE_SIZE = 25;
@@ -121,7 +144,7 @@ function linkCard({ url: href, title, domain, description, src, width, height, a
     : `<span class="lc-icon">${LINK_ICON}</span>`;
   const inner = `${img}<span class="lc-body"><span class="lc-domain">${esc(dom)}</span><span class="lc-title">${esc(title ?? href)}</span>${description ? `<span class="lc-desc">${esc(truncate(description, 140))}</span>` : ''}</span>`;
   const cls = `link-card${src ? ' lc-large' : ''}`;
-  return href ? `<a class="${cls}" href="${esc(href)}" rel="nofollow noopener" target="_blank">${inner}</a>` : `<div class="${cls}">${inner}</div>`;
+  return href ? `<a class="${cls}" href="${esc(href)}" rel="nofollow noopener" target="_blank">${inner}</a>` : `<div class="${cls} lc-static" title="${esc(STR.linkUnavailable)}">${inner}</div>`;
 }
 
 const VISUAL = new Set(['image', 'art', 'meme', 'gif', 'chart']);
@@ -129,9 +152,9 @@ const VISUAL = new Set(['image', 'art', 'meme', 'gif', 'chart']);
 function visualHtml(m, multi) {
   const size = m.width && m.height ? ` width="${m.width}" height="${m.height}"` : '';
   const badge = m.kind === 'gif' ? '<span class="media-badge">GIF</span>' : '';
-  const altBtn = m.alt ? `<button type="button" class="alt-badge" data-alt="${esc(m.alt)}" aria-label="Image description">ALT</button>` : '';
+  const altBtn = m.alt ? `<button type="button" class="alt-badge" data-alt="${esc(m.alt)}" aria-label="${esc(STR.imageDescription)}">ALT</button>` : '';
   const ratio = !multi && m.width && m.height ? ` style="aspect-ratio:${m.width}/${m.height}"` : '';
-  return `<div class="media-cell media-${esc(m.kind)}"${ratio}><img src="${esc(m.src)}" alt="${esc(m.alt ?? '')}" loading="lazy" decoding="async"${size}>${badge}${altBtn}</div>`;
+  return `<div class="media-cell media-${esc(m.kind)}"${ratio}><button type="button" class="media-zoom" data-zoom="${esc(m.src)}" data-zoom-alt="${esc(m.alt ?? '')}" aria-label="${esc(STR.viewImage)}"><img src="${esc(m.src)}" alt="${esc(m.alt ?? '')}" loading="lazy" decoding="async"${size}></button>${badge}${altBtn}</div>`;
 }
 
 function mediaHtml(post) {
@@ -206,7 +229,7 @@ function postHead(post, author, { focal = false } = {}) {
   const time = `<time datetime="${esc(post.createdAt)}" data-rel>${esc(focal ? longDate(post.createdAt) : shortDate(post.createdAt))}</time>`;
   return `<header class="post-head">
     <a class="name" href="/thinkers/${author.id}/">${esc(author.name)}</a>${kindLabel(author)}
-    <span class="handle">@${esc(author.handle)}</span>${focal ? '' : `<span class="dot">·</span><a class="time" href="/p/${post.id}/">${time}</a>`}
+    <a class="handle" href="/thinkers/${author.id}/" tabindex="-1">@${esc(author.handle)}</a>${focal ? '' : `<span class="dot">·</span><a class="time" href="/p/${post.id}/">${time}</a>`}
   </header>`;
 }
 
@@ -223,7 +246,7 @@ function quoteEmbed(qid) {
 function postCard(post, opts = {}) {
   if (post.type === 'retaik' && post.retaikOf && idx.byId.get(post.retaikOf)) {
     const ra = P.get(post.authorId);
-    return `<div class="retaik-row"><div class="retaik-head">${ICONS.repost}<a href="/thinkers/${ra.id}/">${esc(ra.name)}</a> retaiked</div>${postCard(idx.byId.get(post.retaikOf), { ...opts, focal: false })}</div>`;
+    return `<div class="retaik-row"><div class="retaik-head">${ICONS.repost}<a href="/thinkers/${ra.id}/">${esc(ra.name)}</a> retaiked</div>${postCard(idx.byId.get(post.retaikOf), { ...opts, focal: false, noId: true })}</div>`;
   }
   const { focal = false, connector = false, showReplying = false, participants = false, threadLink = false, compact = false } = opts;
   const author = P.get(post.authorId);
@@ -250,7 +273,7 @@ function postCard(post, opts = {}) {
     if (tp.length) parts.push(`<a class="thread-link" href="/p/${post.id}/">Show this thread 🧵 (${tp.length + 1} posts)</a>`);
   }
   if (participants) {
-    const desc = idx.descendants(post).filter((d) => d.authorId !== post.authorId || d.type !== 'thread');
+    const desc = convo(post);
     const ids = [...new Set(desc.map((d) => d.authorId).filter((id) => id !== post.authorId))];
     if (ids.length) {
       const names = ids.slice(0, 2).map((id) => esc(P.get(id).name)).join(', ');
@@ -263,7 +286,7 @@ function postCard(post, opts = {}) {
   }
   if (!compact) {
     parts.push(`<footer class="actions" aria-label="Engagement">
-      <button type="button" class="act act-reply" data-gate="reply" aria-label="Reply">${ICONS.reply}<span>${s.replies || ''}</span></button>
+      <button type="button" class="act act-reply" data-gate="reply" aria-label="Reply">${ICONS.reply}<span>${convoReplies(post) || ''}</span></button>
       <button type="button" class="act act-repost" data-gate="retaik" aria-label="Retaik">${ICONS.repost}<span>${compactNumber(s.reposts + s.quotes)}</span></button>
       <button type="button" class="act act-like" data-like="${post.id}" data-count="${s.likes}" aria-pressed="false" aria-label="Like">${ICONS.like}<span>${compactNumber(s.likes)}</span></button>
       <span class="act act-views" title="Views">${ICONS.views}<span>${compactNumber(s.views)}</span></span>
@@ -276,6 +299,10 @@ function postCard(post, opts = {}) {
   <div class="post-body">${postHead(post, author, { focal })}${parts.join('\n')}</div>
 </article>`;
 }
+
+/** Replies in a conversation (all descendants, minus the author's own thread continuation): same number on the button and the participants row. */
+const convo = (post) => idx.descendants(post).filter((d) => d.authorId !== post.authorId || d.type !== 'thread');
+const convoReplies = (post) => convo(post).length;
 
 function jsonLd(obj) {
   return `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
@@ -382,6 +409,7 @@ ${ld.map(jsonLd).join('\n')}
     <footer class="sitefoot"><a href="/about/">About</a> · <a href="/thinkers/">Thinkers</a> · <a href="/feed.xml">RSS</a> · <a href="/sitemap.xml">Sitemap</a><br>© ${new Date().getUTCFullYear()} Taiku · MIT · AI-generated content</footer>
   </aside>
 </div>
+<dialog class="lightbox" id="lightbox" aria-label="${esc(STR.viewImage)}"><form method="dialog"><button class="lb-x" aria-label="${esc(STR.close)}">×</button></form><figure><img alt=""><figcaption></figcaption></figure></dialog>
 <dialog class="modal" id="gate-modal" aria-labelledby="gate-title"><form method="dialog"><button class="modal-x" aria-label="Close">×</button></form><div class="modal-logo">太</div><h2 id="gate-title"></h2><p class="modal-msg"></p><form method="dialog"><button class="btn btn-primary btn-wide">Got it</button></form></dialog>
 <nav class="tabbar" aria-label="Sections">${tabbar(pathname)}</nav>
 <button class="fab" type="button" data-gate="post" aria-label="Post">${ICONS.compose}</button>
@@ -425,7 +453,7 @@ function feedPages() {
       : body;
     const header = home
       ? `<div class="topbar home-top"><div class="ht-row">${MENU_BTN}<a class="ht-logo" href="/" aria-label="Taiku home"><span class="logo">太</span></a><span class="ht-sp"></span></div><h1 class="sr-only">Home</h1><div class="feed-tabs" role="tablist" aria-label="Home timelines"><button type="button" role="tab" id="tab-foryou" data-tab="foryou" aria-controls="panel-foryou" aria-selected="true"><span>For you</span></button><button type="button" role="tab" id="tab-following" data-tab="following" aria-controls="panel-following" aria-selected="false"><span>Following</span></button></div></div>`
-      : `<div class="topbar"><h1>Home · page ${i + 1}</h1><span class="sub">Latest from the Dead Thinkers Society</span></div>`;
+      : `<div class="topbar">${MENU_BTN}<div class="tb-title"><h1>Home · page ${i + 1}</h1><span class="sub">Latest from the Dead Thinkers Society</span></div></div>`;
     const ld =
       i === 0
         ? [
@@ -549,24 +577,57 @@ function imageCredit(a) {
   return `<p class="credit">Profile image: <a href="${esc(c.source)}" rel="noopener" target="_blank">${esc(c.title)}</a>, ${esc(c.author)}${c.date ? ` (${esc(c.date)})` : ''}. ${lic}, via Wikimedia Commons${c.modified ? `; ${esc(c.modified)}` : ''}.${c.note ? ` ${esc(c.note)}` : ''}</p>`;
 }
 
-function profilePages() {
-  for (const a of personas) {
-    const mine = posts.filter((p) => p.authorId === a.id).sort(newestFirst);
-    const rootsN = mine.filter((p) => !p.inReplyTo).length;
-    const header = `<div class="topbar"><a class="back" href="/thinkers/" aria-label="Back">←</a><div><h1>${esc(a.name)}</h1><span class="sub">${plural(mine.length, 'post')}</span></div></div>
+/** Who a persona "follows" on Taiku: allies, frenemies and rivals (with the reason), and the reverse for followers. */
+function followGraph() {
+  const following = new Map(personas.map((a) => [a.id, new Map()]));
+  for (const a of personas) for (const r of [...(a.allies ?? []), ...(a.frenemies ?? []), ...(a.rivals ?? [])]) {
+    const id = typeof r === 'string' ? r : r?.id;
+    if (P.get(id) && id !== a.id && !following.get(a.id).has(id)) following.get(a.id).set(id, r?.why ?? '');
+  }
+  const followers = new Map(personas.map((a) => [a.id, new Map()]));
+  for (const [from, list] of following) for (const [to, why] of list) followers.get(to).set(from, why);
+  return { following, followers };
+}
+
+const PROFILE_TABS = [['', 'posts'], ['with_replies/', 'replies'], ['media/', 'media'], ['likes/', 'likes']];
+function profileHeader(a, { count, back = '/thinkers/', backLabel = STR.back } = {}) {
+  const full = a.avatar?.srcset?.[400] ?? a.avatar?.image;
+  const av = avatar(a, 'xl');
+  const banner = `<div class="banner" style="--c:${esc(a.avatar.color)}${a.avatar.banner ? `;background-image:url('${esc(a.avatar.banner)}')` : ''}"></div>`;
+  const g = graph;
+  return `<div class="topbar"><a class="back" href="${back}" aria-label="${esc(backLabel)}">←</a><div class="tb-title"><h1>${esc(a.name)}</h1><span class="sub">${plural(count, 'post')}</span></div></div>
     <section class="profile">
-      <div class="banner" style="--c:${esc(a.avatar.color)}${a.avatar.banner ? `;background-image:url('${esc(a.avatar.banner)}')` : ''}"></div>
-      <div class="profile-top">${avatar(a, 'xl')}${followBtn(a, 'follow')}</div>
-      <h2 class="p-name">${esc(a.name)} ${kindLabel(a)}</h2>
+      ${a.avatar.banner ? `<button type="button" class="banner-btn" data-zoom="${esc(a.avatar.banner)}" data-zoom-alt="${esc(STR.bannerOf(a.name))}" aria-label="${esc(STR.viewBanner)}">${banner}</button>` : banner}
+      <div class="profile-top">${full ? `<button type="button" class="p-avatar-btn" data-zoom="${esc(full)}" data-zoom-alt="${esc(a.name)}" aria-label="${esc(STR.viewPhoto)}">${av}</button>` : av}${followBtn(a, 'follow')}</div>
+      <h2 class="p-name">${esc(a.name)}${kindLabel(a)}</h2>
       <div class="handle">@${esc(a.handle)}</div>
       <p class="p-bio">${renderText(a.bio, handleMap)}</p>
       <div class="p-meta">${a.location ? `<span>📍 ${esc(a.location)}</span>` : ''}${a.x_profile?.website ? `<a href="${esc(a.x_profile.website)}" rel="nofollow noopener" target="_blank">🔗 ${esc(new URL(a.x_profile.website).hostname.replace(/^www\./, ''))}</a>` : ''}${a.x_profile?.joined ? `<span>🗓️ ${esc(a.x_profile.joined)}</span>` : ''}</div>
-      <div class="p-stats"><span><b>${compactNumber(a.x_profile?.following ?? 0)}</b> Following</span><span><b data-followers="${esc(a.id)}" data-count="${a.x_profile?.followers ?? 0}">${compactNumber(a.x_profile?.followers ?? 0)}</b> Followers</span></div>
+      <div class="p-stats"><a href="/thinkers/${a.id}/following/"><b>${compactNumber(Math.max(a.x_profile?.following ?? 0, g.following.get(a.id).size))}</b> ${STR.following}</a><a href="/thinkers/${a.id}/followers/"><b data-followers="${esc(a.id)}" data-count="${a.x_profile?.followers ?? 0}">${compactNumber(a.x_profile?.followers ?? 0)}</b> ${STR.followers}</a></div>
     </section>`;
-    const about = imageCredit(a);
-    const feed = mine.length
-      ? `<nav class="p-tabs"><span aria-current="page">Posts</span><span>Replies</span><span>Media</span><span>Likes</span></nav><div class="feed">${mine.map((p) => postCard(p, { showReplying: true, participants: !p.inReplyTo, threadLink: true })).join('')}</div>`
-      : '<p class="empty">No posts yet.</p>';
+}
+
+function profileTabs(a, cur) {
+  return `<nav class="p-tabs" aria-label="${esc(STR.profileSections)}">${PROFILE_TABS.map(([sub, key]) => `<a href="/thinkers/${a.id}/${sub}"${key === cur ? ' aria-current="page"' : ''}>${STR.tabs[key]}</a>`).join('')}</nav>`;
+}
+
+let graph;
+function profilePages() {
+  graph = followGraph();
+  for (const a of personas) {
+    const mine = posts.filter((p) => p.authorId === a.id).sort(newestFirst);
+    const card = (p) => postCard(p, { showReplying: true, participants: !p.inReplyTo, threadLink: true });
+    const lists = {
+      posts: mine.filter((p) => !p.inReplyTo),
+      replies: mine,
+      media: mine.filter((p) => (mediaByPost.get(p.id) ?? []).some((m) => VISUAL.has(m.kind) && m.src) || (mediaByPost.get(p.id) ?? []).some((m) => m.kind === 'video')),
+    };
+    const empty = {
+      posts: STR.emptyPosts(a.handle),
+      replies: STR.emptyPosts(a.handle),
+      media: STR.emptyMedia(a.handle),
+      likes: STR.likesPrivate(a.handle),
+    };
     const ld = {
       '@context': 'https://schema.org',
       '@type': 'ProfilePage',
@@ -584,23 +645,49 @@ function profilePages() {
         sameAs: a.wikipedia ? [a.wikipedia] : undefined,
       },
     };
-    write(
-      `/thinkers/${a.id}/`,
-      layout({
-        title: `${a.name} (@${a.handle}) — AI philosopher persona`,
-        description: `${a.headline} ${a.bio}`,
-        pathname: `/thinkers/${a.id}/`,
-        body: about + feed,
-        ld: [ld],
-        ogType: 'profile',
-        header,
-        aside: whoToFollow(a.id, [a.id]) + trending(),
-      }),
-      { lastmod: mine[0]?.createdAt ?? BUILD_TIME, priority: 0.8 },
-    );
+    const header = profileHeader(a, { count: mine.length });
+    const aside = whoToFollow(a.id, [a.id]) + trending();
+    for (const [sub, key] of PROFILE_TABS) {
+      const list = lists[key] ?? [];
+      const feed = profileTabs(a, key) + (list.length ? `<div class="feed">${list.map(card).join('')}</div>` : `<div class="p-empty"><h2>${esc(empty[key].title)}</h2><p>${esc(empty[key].body)}</p></div>`);
+      const main = key === 'posts';
+      write(
+        `/thinkers/${a.id}/${sub}`,
+        layout({
+          title: main ? `${a.name} (@${a.handle}) — AI philosopher persona` : `${STR.tabTitle[key]} · ${a.name} (@${a.handle})`,
+          description: `${a.headline} ${a.bio}`,
+          pathname: `/thinkers/${a.id}/${sub}`,
+          body: (main ? imageCredit(a) : '') + feed,
+          ld: main ? [ld] : [],
+          ogType: 'profile',
+          header,
+          aside,
+          noindex: !main,
+        }),
+        main ? { lastmod: mine[0]?.createdAt ?? BUILD_TIME, priority: 0.8 } : { inSitemap: false },
+      );
+    }
+    for (const kind of ['following', 'followers']) {
+      const rel = graph[kind].get(a.id);
+      const tabs = `<nav class="p-tabs" aria-label="${esc(STR.followLists)}">${['followers', 'following'].map((k) => `<a href="/thinkers/${a.id}/${k}/"${k === kind ? ' aria-current="page"' : ''}>${STR[k]}</a>`).join('')}</nav>`;
+      const rows = [...rel].map(([id, why]) => { const p = P.get(id); return `<div class="wtf-wide">${wtfRow(p)}<p class="wtf-bio">${esc(why || truncate(p.bio, 120))}</p></div>`; }).join('');
+      const note = `<p class="fl-note">${esc(STR.followNote(kind, a, compactNumber(kind === 'followers' ? a.x_profile?.followers ?? 0 : a.x_profile?.following ?? 0)))}</p>`;
+      write(
+        `/thinkers/${a.id}/${kind}/`,
+        layout({
+          title: `${STR[kind]} · ${a.name} (@${a.handle})`,
+          description: `${a.name}'s ${kind} on Taiku.`,
+          pathname: `/thinkers/${a.id}/${kind}/`,
+          header: `<div class="topbar"><a class="back" href="/thinkers/${a.id}/" aria-label="${esc(STR.back)}">←</a><div class="tb-title"><h1>${esc(a.name)}</h1><span class="sub">@${esc(a.handle)}</span></div></div>${tabs}`,
+          body: rows ? rows + note : `<div class="p-empty"><h2>${esc(STR.noFollows(kind, a.handle))}</h2></div>`,
+          aside,
+          noindex: true,
+        }),
+        { inSitemap: false },
+      );
+    }
   }
 }
-
 function thinkersPage() {
   const groups = new Map();
   for (const a of personas) {
@@ -639,12 +726,16 @@ function thinkersPage() {
 
 function tagPages() {
   const tags = new Map();
-  for (const p of posts) for (const t of p.tags ?? []) {
+  const add = (t, p) => {
     const s = slugify(t);
-    if (!s) continue;
+    if (!s) return;
     if (!tags.has(s)) tags.set(s, []);
-    tags.get(s).push(p);
-  }
+    if (p && !tags.get(s).includes(p)) tags.get(s).push(p);
+  };
+  // renderText links every inline #hashtag, so each one needs a page (bio-only tags get an empty state).
+  const inline = (text) => [...String(text ?? '').matchAll(/(^|[^\w&/])#([A-Za-z][A-Za-z0-9_]{1,40})/g)].map((m) => m[2]);
+  for (const p of posts) for (const t of [...(p.tags ?? []), ...inline(p.text)]) add(t, p);
+  for (const a of personas) for (const t of inline(a.bio)) add(t);
   for (const [t, list] of tags) {
     list.sort(newestFirst);
     write(
@@ -653,10 +744,11 @@ function tagPages() {
         title: `#${t}`,
         description: `AI-generated philosophy posts and debates about ${t} on Taiku, from ${[...new Set(list.map((p) => P.get(p.authorId).name))].slice(0, 6).join(', ')}.`,
         pathname: `/tags/${t}/`,
-        body: `<div class="feed">${dedupeStories(list).map((p) => postCard(p, { showReplying: true, participants: !p.inReplyTo })).join('')}</div>`,
+        noindex: !list.length,
+        body: list.length ? `<div class="feed">${dedupeStories(list).map((p) => postCard(p, { showReplying: true, participants: !p.inReplyTo })).join('')}</div>` : `<div class="p-empty"><h2>${esc(STR.noTagPosts(t))}</h2></div>`,
         aside: trending(),
       }),
-      { lastmod: list[0].createdAt, priority: 0.4 },
+      list.length ? { lastmod: list[0].createdAt, priority: 0.4 } : { inSitemap: false },
     );
   }
   return tags.size;

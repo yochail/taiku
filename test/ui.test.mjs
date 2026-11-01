@@ -19,6 +19,7 @@ const posts = [
   { id: 'uit-chart', authorId: 'kant', type: 'hot_take', origin: 'seed', text: 'My day, as data.', createdAt: ago(47), media: [{ kind: 'chart', render: { chart: { type: 'bar', title: 'Time spent', labels: ['Walking', 'Thinking'], values: [1, 23], unit: 'h' } } }] },
   { id: 'uit-link', authorId: 'socrates', type: 'news_take', origin: 'seed', text: 'Ask them what "smart" means.', createdAt: ago(46), media: [{ kind: 'link_card', url: 'https://www.example.com/news/ai-smart', title: 'AI is now smarter than us, says study', description: 'A new paper claims...' }] },
   { id: 'uit-poll-closed', authorId: 'socrates', type: 'poll', origin: 'seed', text: 'Is the unexamined life worth living?', createdAt: ago(45), poll: { id: 'uit-poll-closed', options: [{ id: 'a', text: 'Yes' }, { id: 'b', text: 'No' }, { id: 'c', text: 'Ask Socrates', crowdVoteBase: 500, personaVotes: ['kant'] }] } },
+  { id: 'uit-reply', authorId: 'kant', type: 'hot_take', inReplyTo: 'uit-art', origin: 'seed', text: 'Duty, not hemlock. #uitfixturetag', createdAt: ago(10) },
   { id: 'uit-rt-old', authorId: 'kant', type: 'retaik', retaikOf: 'uit-art', text: '', origin: 'seed', createdAt: ago(5) },
   { id: 'uit-rt-new', authorId: 'diogenes', type: 'retaik', retaikOf: 'uit-art', text: '', origin: 'seed', createdAt: ago(2) },
   { id: 'uit-poll-open', authorId: 'kant', type: 'poll', origin: 'seed', text: 'Categorical or hypothetical?', createdAt: ago(1), poll: { id: 'uit-poll-open', options: [{ id: 'a', text: 'Categorical' }, { id: 'b', text: 'Hypothetical' }] } },
@@ -48,7 +49,7 @@ test('memes and charts render as generated images; GIPHY GIFs get a GIF badge an
   const m = meme.match(/<img src="(\/media\/gen\/meme-[^"]+\.svg)"/);
   assert.ok(m, 'meme image');
   assert.ok(fs.existsSync(path.join(DIST, m[1])), 'meme svg written');
-  assert.match(read('p/uit-chart/index.html'), /media-chart"[^>]*><img src="\/media\/gen\/chart-[^"]+\.svg"[^>]*alt="bar chart/);
+  assert.match(read('p/uit-chart/index.html'), /media-chart"[^>]*>(<button[^>]*>)?<img src="\/media\/gen\/chart-[^"]+\.svg"[^>]*alt="bar chart/);
   const gif = read('p/uit-giphy/index.html');
   assert.match(gif, /<span class="media-badge">GIF<\/span>/);
   assert.match(gif, /Powered by GIPHY/);
@@ -197,4 +198,28 @@ test('search: lazy index + HTML shards, /search/ page with X tabs, sidebar box a
   assert.match(home, /<nav class="tabbar"[^>]*><a href="\/"[^>]*>[\s\S]*?<a href="\/search\/" aria-label="Search"/);
   assert.match(home, /href="\/search\/"><span class="ni">/);
   assert.doesNotMatch(read('sitemap.xml'), /\/search\//);
+});
+test('profile tabs are real routes; Posts excludes replies, Replies includes them', () => {
+  const posts = read('thinkers/kant/index.html');
+  const replies = read('thinkers/kant/with_replies/index.html');
+  assert.match(posts, /<nav class="p-tabs"[^>]*>[\s\S]*?<a [^>]*href="\/thinkers\/kant\/with_replies\/"/);
+  assert.match(posts, /<a [^>]*aria-current="page"[^>]*>Posts</);
+  assert.doesNotMatch(posts, /data-pid="uit-reply"/);
+  assert.match(replies, /data-pid="uit-reply"/);
+  for (const r of ['media', 'likes', 'following', 'followers']) assert.ok(fs.existsSync(path.join(DIST, 'thinkers', 'kant', r, 'index.html')), r);
+  assert.match(read('thinkers/kant/likes/index.html'), /likes are private/);
+  assert.match(posts, /href="\/thinkers\/kant\/following\/"[^>]*>/);
+  assert.match(posts, /href="\/thinkers\/kant\/followers\/"[^>]*>/);
+});
+
+test('QA: handle links, image viewer, unique post ids, inline hashtag pages', () => {
+  const home = read('index.html');
+  assert.match(home, /<a class="handle" href="\/thinkers\/[a-z_]+\/"/);
+  assert.match(home, /<dialog class="lightbox" id="lightbox"/);
+  assert.match(home, /<\/dialog>\n<dialog class="modal" id="gate-modal"/);
+  assert.match(read('p/uit-art/index.html'), /class="media-zoom" data-zoom="/);
+  assert.match(read('thinkers/kant/index.html'), /class="p-avatar-btn"[^>]*data-zoom=/);
+  const ids = [...home.matchAll(/ id="(post-[^"]+)"/g)].map((m) => m[1]);
+  assert.equal(new Set(ids).size, ids.length, 'duplicate post ids');
+  assert.ok(fs.existsSync(path.join(DIST, 'tags', 'uitfixturetag', 'index.html')), 'inline hashtag page');
 });

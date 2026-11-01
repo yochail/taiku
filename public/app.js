@@ -115,6 +115,22 @@
     poll.querySelector('.poll-state').textContent = closed ? 'Final results' : h >= 24 ? `${plural(Math.floor(h / 24), 'day')} left` : h >= 1 ? `${plural(h, 'hour')} left` : `${plural(Math.max(1, Math.round(left / 60000)), 'minute')} left`;
   };
 
+  // Image viewer: post photos, profile avatar and header open full size, like X.
+  const lightbox = document.getElementById('lightbox');
+  let lbFrom = null;
+  function openLightbox(src, alt, from) {
+    if (!lightbox || typeof lightbox.showModal !== 'function') { window.open(src, '_blank', 'noopener'); return; }
+    const img = lightbox.querySelector('img');
+    img.src = src;
+    img.alt = alt;
+    lightbox.querySelector('figcaption').textContent = alt;
+    lbFrom = from;
+    lightbox.showModal();
+  }
+  if (lightbox) {
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox || e.target.tagName === 'FIGURE') lightbox.close(); });
+    lightbox.addEventListener('close', () => { lightbox.querySelector('img').removeAttribute('src'); lbFrom?.focus(); });
+  }
   document.addEventListener('click', (e) => {
     const opt = e.target.closest('.poll-opt');
     if (opt) {
@@ -126,6 +142,8 @@
       }
       return;
     }
+    const zoom = e.target.closest('[data-zoom]');
+    if (zoom) { openLightbox(zoom.dataset.zoom, zoom.dataset.zoomAlt || '', zoom); return; }
     const alt = e.target.closest('[data-alt]');
     if (alt) { openInfo('Image description', alt.dataset.alt); return; }
     const like = e.target.closest('[data-like]');
