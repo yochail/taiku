@@ -32,43 +32,49 @@ test('news wire flow: wire posts carry headline + link_card, thinkers quote/repl
   const r = await run({ root, personas });
   assert.equal(r.status, 'complete', JSON.stringify(r.manifest?.completeness));
   const posts = [...r.published, ...r.staged];
-  const wires = posts.filter((p) => p.authorId === 'agora_wire');
+  const newsIds = new Set(personas.filter((p) => p.kind === 'news').map((p) => p.id));
+  const wires = posts.filter((p) => newsIds.has(p.authorId) && p.type !== 'retaik');
   const withUrl = r.topics.picks.filter((t) => t.url);
   assert.equal(wires.length, withUrl.length, 'one wire post per topic with a feed URL');
+  assert.equal(new Set(wires.map((w) => w.topic.id)).size, wires.length);
   for (const w of wires) {
     const topic = r.topics.picks.find((t) => t.id === w.topic.id);
-    assert.ok(['wire', 'news_take'].includes(w.type));
+    assert.equal(w.type, 'news_wire');
     assert.equal(w.media[0].kind, 'link_card');
     assert.equal(w.media[0].url, topic.url, 'link card URL is copied from the feed item');
     assert.ok(w.text.startsWith(topic.title.slice(0, 20)), 'real headline first');
     const reactions = posts.filter((p) => p.quoteOf === w.id || p.inReplyTo === w.id);
     assert.ok(reactions.length >= 1, `thinkers react to wire ${w.id}`);
-    assert.ok(reactions.every((p) => p.authorId !== 'agora_wire'));
+    assert.ok(reactions.every((p) => !newsIds.has(p.authorId)));
   }
   assert.ok(wires.some((w) => (w.personaReposts ?? []).length + (w.personaLikes ?? []).length > 0), 'retaiks/likes land on wire posts');
-  assert.ok(!posts.some((p) => p.type === 'news_take' && !p.inReplyTo && !p.quoteOf && p.authorId !== 'agora_wire' && p.topic), 'no hidden-topic roots when a wire exists');
+  assert.ok(!posts.some((p) => p.type === 'news_take' && !p.inReplyTo && !p.quoteOf && !newsIds.has(p.authorId) && p.topic), 'no hidden-topic roots when a wire exists');
   const parodyActs = r.manifest.reactions.filter((x) => x.personaId === 'zenos_arrow').length + r.manifest.tasks.filter((t) => t.personaId === 'zenos_arrow').length;
   assert.ok(parodyActs > 0, 'parody account takes part in the reaction graph');
-  assert.ok(!r.manifest.tasks.some((t) => t.personaId === 'agora_wire' && t.role !== 'wire'), 'wire accounts never reply/quote');
+  assert.ok(!r.manifest.tasks.some((t) => newsIds.has(t.personaId) && t.role !== 'wire'), 'wire accounts never reply/quote');
+  assert.ok(!posts.some((p) => newsIds.has(p.authorId) && (p.inReplyTo || p.quoteOf)), 'news accounts only post wires or plain retaiks');
   const errors = validate(personas, posts.map((p) => ({ ...p, _file: 'x' }))).filter(persErr);
   assert.deepEqual(errors, []);
 });
 
 test('fallback without news personas: 1–2 thinker roots per topic with topic{}', async () => {
   const root = freshRoot();
-  const r = await run({ root });
+  const r = await run({ root, personas: base.filter((p) => p.kind !== 'news') });
   assert.equal(r.status, 'complete');
   const posts = [...r.published, ...r.staged];
+  assert.ok(!posts.some((p) => p.type === 'news_wire'));
   for (const t of r.topics.picks) {
-    const roots = posts.filter((p) => p.topic?.id === t.id && !p.inReplyTo && !p.quoteOf);
+    const roots = posts.filter((p) => p.topic?.id === t.id && !p.inReplyTo && !p.quoteOf && p.type !== 'retaik');
     assert.ok(roots.length >= 1 && roots.length <= 2, `${t.id}: ${roots.length} roots`);
   }
   for (const p of posts) {
     for (const k of ['likedBy', 'repostedBy', 'engagement']) assert.equal(p[k], undefined, `old field ${k}`);
+    if (p.type === 'retaik') { assert.ok(p.retaikOf && p.text === ''); continue; }
     assert.ok(Array.isArray(p.personaLikes) && Number.isFinite(p.crowdLikeBase) && Number.isFinite(p.views));
+    assert.ok(['agree', 'disagree', 'mock', 'awe', 'confused', 'hype', 'neutral'].includes(p.stance), 'stance stored on every generated post');
     assert.equal(p.runId, r.manifest.runId);
     assert.ok(p.taskId && p.promptVersion && p.model && p.origin === 'mock');
-    for (const m of p.media ?? []) if (m.kind !== 'link_card') assert.match(m.src, /^\/media\/[A-Za-z0-9_-]+-\d+\.svg$/);
+    for (const m of p.media ?? []) if (m.kind !== 'link_card') assert.match(m.src, /^\/media\/((art|gen|reactions|memes)\/[A-Za-z0-9_.-]+|[A-Za-z0-9_-]+-\d+\.svg)$/, 'local media only');
   }
   const times = posts.map((p) => Date.parse(p.createdAt));
   assert.ok(Math.max(...times) - Math.min(...times) > 6 * 3.6e6, 'posts are spread through the day (drip)');
@@ -171,8 +177,10 @@ test('a policy failure fails the whole topic', async () => {
     get remaining() { return inner.remaining; },
     async chat(body) {
       const user = body.messages.find((m) => m.role === 'user')?.content ?? '';
-      if (/Football club/i.test(user)) return { message: { role: 'assistant', content: JSON.stringify({ text: 'details at evil-site.com' }) } };
-      return inner.chat(body);
+      const res = await inner.chat(body);
+      // singles and batches alike: every text in a response about the football headline carries a URL
+      if (!/Football club/i.test(user) || typeof res.message?.content !== 'string') return res;
+      return { ...res, message: { ...res.message, content: res.message.content.replace(/"text"\s*:\s*"(?:[^"\\]|\\.)*"/g, '"text":"details at evil-site.com"') } };
     },
   };
   const r = await run({ root, client });
@@ -181,4 +189,25 @@ test('a policy failure fails the whole topic', async () => {
   assert.equal(topic.status, 'blocked');
   assert.ok(![...r.published, ...r.staged].some((p) => p.topic?.id === topic.id || r.manifest.tasks.find((t) => t.postId === p.id)?.topicId === topic.id));
   assert.ok(r.manifest.tasks.some((t) => t.topicId === topic.id && t.status === 'blocked'));
+});
+
+test('pool reactions: picks store reactionId + stance and land in the usage state; exhausted pools fall back to the LLM', async () => {
+  const root = freshRoot();
+  const r = await run({ root });
+  assert.equal(r.status, 'complete');
+  const pooled = r.published.filter((p) => p.reactionId);
+  assert.ok(pooled.length > 0, 'some reactions come from the pools');
+  const state = read(path.join(root, 'content', 'state', 'reaction-usage-mock.json'));
+  for (const p of pooled) {
+    assert.ok(p.stance && p.replyForm, 'pool items carry stance + replyForm');
+    assert.equal(state.used[`${p.authorId}|${p.reactionId}`], DATE);
+  }
+  const empty = base.map((p) => ({ ...p, reaction_pool: [] }));
+  const r2 = await run({ root: freshRoot(), personas: empty });
+  assert.equal(r2.status, 'complete');
+  assert.ok(!r2.published.some((p) => p.reactionId), 'nothing to pick');
+  const fb = r2.manifest.tasks.filter((t) => /pool exhausted/.test(t.fallback ?? ''));
+  assert.ok(fb.length > 0, 'cheap forms fell back');
+  assert.ok(fb.some((t) => t.status === 'done'), 'some fallbacks were written by the LLM (batched short replies)');
+  assert.ok(fb.every((t) => ['done', 'liked', 'skipped', 'blocked', 'failed'].includes(t.status)));
 });

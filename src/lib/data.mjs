@@ -517,3 +517,10 @@ export function indexPosts(posts) {
   };
   return { byId, children, quotes, rootOf, ancestors, descendants, selfThread };
 }
+
+// pipeline helpers (appended by the generate pipeline; validates one reaction_pool entry with the same rules)
+export function reactionEntryProblems(entry, persona = {}) {
+  const errs = [];
+  validateReactions({ kind: personaKind(persona), reaction_pool: [entry] }, (m) => errs.push(m));
+  return errs.filter((m) => !/must have \d|needs ≥|needs at least/.test(m));
+}

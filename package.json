@@ -18,9 +18,13 @@
     "generate:dry": "node src/generate.mjs --dry-run",
     "generate:mock": "node src/generate.mjs --mock",
     "generate:topics": "node src/generate.mjs --topics-only",
+    "generate:force": "node src/generate.mjs --force",
     "promote": "node scripts/promote.mjs",
     "validate": "node scripts/validate.mjs",
     "docs:personas": "node scripts/persona-bible.mjs",
     "serve": "node scripts/serve.mjs"
+  },
+  "optionalDependencies": {
+    "@huggingface/transformers": "^4.3.2"
   }
 }

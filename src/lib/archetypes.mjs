@@ -64,8 +64,9 @@ export const POST_ARCHETYPES = {
   },
   news_wire: {
     label: 'News',
-    skeleton: '[marker] [real headline]\n[one neutral summary line]',
-    guidance: 'News-wire accounts only. Built from the real headline and source summary; no opinion, no added facts. The source link is attached as a news card.',
+    skeleton: '[Real headline]\n\n[One neutral sentence of context.]',
+    guidance: 'News-wire accounts only (kind=news): the real headline, then ONE neutral, factual summary line built only from the headline. No opinion, no jokes, no emoji, no invented facts. The source link is attached as a news card.',
+    vibe: 'calm',
   },
   quote_post: {
     label: 'Quote post',
@@ -120,12 +121,6 @@ export const POST_ARCHETYPES = {
     skeleton: '[terse mocking line] — e.g. imagine posting this / this you? / the [X] to [Y] pipeline is real / he\'s so close',
     guidance: 'Quote-dunk: a short public dunk on the IDEA in the quoted taik (never identity). Funny first, but the jab must carry a real philosophical point.',
     vibe: 'spicy',
-  },
-  wire: {
-    label: 'Wire',
-    skeleton: '[Real headline]\n\n[One neutral sentence of context.]',
-    guidance: 'News-wire account (kind=news): the real headline, then ONE neutral, factual summary line built only from the headline. No opinion, no jokes, no emoji, no invented facts. The link card carries the source.',
-    vibe: 'calm',
   },
 };
 

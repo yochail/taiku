@@ -3,14 +3,21 @@
 //
 //   node src/generate.mjs [--date YYYY-MM-DD] [--mock | --dry-run [--live] | --live]
 //        [--seed S] [--nonce N] [--topics N] [--max-calls N] [--topics-only] [--fresh]
-//        [--summary-only] [--quiet]
+//        [--force] [--summary-only] [--quiet]
 //
-// --mock     offline fixtures + mock LLM, writes `-mock` files (content/posts/<date>-daily-mock.json …)
+// --mock     offline fixtures + mock LLM, writes `-mock` files (content/posts/daily-<date>-mock.json …)
 // --dry-run  offline fixtures + mock LLM, writes nothing (add --live to dry-run against real feeds/LLM)
-// --live     real feeds + real LLM (default when neither --mock nor --dry-run is given)
+// --live     real feeds + Workers AI (default when neither --mock nor --dry-run is given)
+// --force    live only: run even if the local-first content/posts/daily-<date>.json exists. The cloud
+//            run then writes next to it as daily-<date>-cf.json (separate ids; never merges or overwrites).
+//
+// Local-first: a live run first checks content/posts/daily-<date>.json. If it exists and was not
+// written by a cloud run (origin "cloudflare"), it logs "local run present, skipping" and exits 0
+// without any LLM call.
 import { loadDistribution } from './lib/crowd.mjs';
+import { ROOT } from './lib/data.mjs';
 import { isoDate, localDate } from './lib/pipeline-util.mjs';
-import { runDaily } from './lib/run.mjs';
+import { localDailyFile, runDaily } from './lib/run.mjs';
 
 export function parseArgs(argv) {
   const o = {};
@@ -32,6 +39,7 @@ export function parseArgs(argv) {
       case '--refetch': o.refetch = true; break;
       case '--summary-only': o.summaryOnly = true; break;
       case '--quiet': o.quiet = true; break;
+      case '--force': o.force = true; break;
       case '--seed': o.seed = val(); break;
       case '--nonce': o.nonce = val(); break;
       case '--date': o.date = val(); break;
@@ -48,14 +56,21 @@ function summarize(r) {
   const m = r.manifest;
   if (!m) return { status: r.status, topics: r.topics?.picks?.map((t) => `${t.tier}: ${t.title}`) };
   const by = (k) => m.tasks.reduce((acc, t) => ({ ...acc, [t[k]]: (acc[t[k]] ?? 0) + 1 }), {});
-  const likes = [...r.published, ...r.staged].reduce((s, p) => s + p.personaLikes.length, 0);
-  const reposts = [...r.published, ...r.staged].reduce((s, p) => s + p.personaReposts.length, 0);
+  const likes = [...r.published, ...r.staged].reduce((s, p) => s + (p.personaLikes?.length ?? 0), 0);
+  const reposts = [...r.published, ...r.staged].reduce((s, p) => s + (p.personaReposts?.length ?? 0), 0);
   return {
     runId: m.runId,
     status: m.status,
     mode: m.mode,
     nonce: m.nonce,
-    model: m.model,
+    path: m.path,
+    degraded: m.degraded,
+    embeddings: m.embeddings.kind,
+    models: m.models.filter((x) => x.calls > 0 || x.plan > 0).map((x) => `${x.name}: ${x.calls}/${x.plan}+${x.reserve} calls, ~${x.neurons_est} N, ${x.items} items${x['429s'] ? `, ${x['429s']}x429` : ''}`),
+    plannedNeurons: m.budgetPlan.totals.neurons,
+    items: m.items,
+    pools: m.pools,
+    micro: { calls: m.micro.calls, replies: m.micro.replies, added: m.micro.added.length },
     topics: m.topics.map((t) => `${t.status} ${t.tier}: ${t.title}`),
     tasks: by('status'),
     roles: by('role'),
@@ -63,7 +78,8 @@ function summarize(r) {
     staged: m.outputs.staged,
     personaLikes: likes,
     personaReposts: reposts,
-    calls: `${m.budget.used}/${m.budget.maxCalls}`,
+    calls: `${m.budget.used}/${m.budget.maxCalls} (~${m.budget.neurons_est} Neurons)`,
+    wallClockSec: m.wallClockSec,
     calibration: { k: m.calibration.k, qTilt: m.calibration.qTilt, rTilt: m.calibration.rTilt },
     completeness: m.completeness,
     errors: m.outputs.errors,
@@ -77,6 +93,17 @@ async function main() {
   opts.date ??= process.env.GEN_DATE || localDate(Date.now(), tz);
   if (!isoDate(opts.date)) throw new Error(`bad --date ${opts.date}`);
   const offline = opts.mock || (opts.dryRun && !opts.live);
+  if (!offline && !opts.topicsOnly) {
+    const local = localDailyFile(ROOT, opts.date);
+    if (local && local.origin !== 'cloudflare') {
+      if (!opts.force) {
+        console.log(`local run present, skipping (${local.file}: origin ${local.origin ?? '?'}, ${local.posts} posts)`);
+        return;
+      }
+      opts.suffix = '-cf';
+      console.error(`--force: local run present; the cloud run writes daily-${opts.date}-cf.json`);
+    }
+  }
   const realFetch = globalThis.fetch;
   if (offline) {
     globalThis.fetch = async () => {

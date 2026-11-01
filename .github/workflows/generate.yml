@@ -1,28 +1,34 @@
 name: Daily feed
 
-# Security split (review A1): `generate` talks to the LLM + feeds with a read-only token and no persisted
-# git credentials; `publish` never sees the LLM key, only re-validates the generated JSON and pushes it.
+# Local-first: a local Copilot automation writes content/posts/daily-<UTC date>.json (origin "local",
+# provider "session-daily") and pushes it to main around 09:00 UTC. This workflow is the FALLBACK:
+# at 12:00 UTC it exits early when that file is already on main, otherwise it runs the Cloudflare
+# Workers AI pipeline and writes the same filename with origin "cloudflare".
+#
+# Security split: `generate` talks to Workers AI + feeds with a read-only token and no persisted git
+# credentials; `publish` never sees the AI token, only re-validates the generated JSON and pushes it.
 
 on:
   schedule:
-    # Once a day (UTC) for the editorial date: topics → wire/root taiks → reactions, spread over the
-    # day (future createdAt = drip release; the build hides future posts, release.yml rebuilds).
-    # 05:23 UTC = just after midnight in realism/spec.json reference_timezone (America/New_York, EST and EDT).
-    - cron: "23 5 * * *"
+    - cron: "0 12 * * *"
   workflow_dispatch:
     inputs:
       date:
-        description: "Editorial date YYYY-MM-DD (blank = today in the editorial timezone)"
+        description: "Date YYYY-MM-DD (blank = today, UTC)"
         default: ""
       nonce:
         description: "Replay a logged run nonce (blank = random)"
         default: ""
       topics:
-        description: "Topics this run (3-5, blank = GEN_TOPICS or 4)"
+        description: "Topics this run (3-5, blank = budget plan)"
         default: ""
       max_calls:
-        description: "LLM request budget incl. retries (blank = GEN_MAX_CALLS or 300)"
+        description: "LLM request ceiling incl. tool rounds and retries (blank = GEN_MAX_CALLS or 90)"
         default: ""
+      force:
+        description: "Run even if the local daily file exists (writes daily-<date>-cf.json next to it)"
+        type: boolean
+        default: false
       mock:
         description: "Mock provider + offline fixtures (writes -mock files, never published)"
         type: boolean
@@ -35,29 +41,55 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 40
     permissions:
       contents: read
-      models: read
+    outputs:
+      skipped: ${{ steps.local.outputs.skipped }}
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Local run present?
+        id: local
+        env:
+          GEN_DATE: ${{ inputs.date }}
+          FORCE: ${{ inputs.force && '1' || '' }}
+          MOCK: ${{ inputs.mock && '1' || '' }}
+        run: |
+          day="${GEN_DATE:-$(date -u +%Y-%m-%d)}"
+          echo "day=$day" >> "$GITHUB_OUTPUT"
+          if [ -z "$MOCK" ] && [ -z "$FORCE" ] && [ -f "content/posts/daily-$day.json" ]; then
+            echo "local run present, skipping (content/posts/daily-$day.json)"
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skipped=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.local.outputs.skipped != 'true'
         with:
           node-version: 22
-      # No `npm ci`: the project has zero dependencies.
 
-      - name: Generate the daily run
+      # The site build is zero-dependency. The generate step optionally uses MiniLM embeddings
+      # (@huggingface/transformers, optionalDependency); a failed install just degrades to tag overlap.
+      - name: Cache embedding model
+        if: steps.local.outputs.skipped != 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/taiku-hf
+          key: hf-minilm-l6-v2-${{ runner.os }}-v1
+      - name: Install optional embeddings
+        if: steps.local.outputs.skipped != 'true'
+        run: npm install --no-save --no-audit --no-fund @huggingface/transformers || echo "embeddings unavailable; the run falls back to tag overlap (degraded)"
+
+      - name: Generate the daily run (Workers AI fallback)
+        if: steps.local.outputs.skipped != 'true'
         env:
-          # Default provider: GitHub Models with the job token (models: read). The token is only sent
-          # when LLM_BASE_URL is https://models.github.ai/ (otherwise LLM_API_KEY is required).
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
-          LLM_MODEL: ${{ vars.LLM_MODEL }}
-          LLM_TOOLS: ${{ vars.LLM_TOOLS }}
-          GEN_DATE: ${{ inputs.date }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_AI_TOKEN: ${{ secrets.CF_AI_TOKEN }}
+          GEN_DATE: ${{ steps.local.outputs.day }}
           GEN_NONCE: ${{ inputs.nonce }}
           GEN_TOPICS: ${{ inputs.topics || vars.GEN_TOPICS }}
           GEN_MAX_CALLS: ${{ inputs.max_calls || vars.GEN_MAX_CALLS }}
@@ -68,21 +100,27 @@ jobs:
           NEWS_FEEDS: ${{ vars.NEWS_FEEDS }}
           POLICY_ALLOW_NAMES: ${{ vars.POLICY_ALLOW_NAMES }}
           PUBLISH_ENABLED: ${{ vars.PUBLISH_ENABLED }}
+          FORCE: ${{ inputs.force && '1' || '' }}
           MOCK: ${{ inputs.mock && '1' || '' }}
         run: |
-          args=()
+          export TRANSFORMERS_CACHE="$HOME/.cache/taiku-hf"
+          args=(--date "$GEN_DATE")
           [ -n "$GEN_NONCE" ] && args+=(--nonce "$GEN_NONCE")
+          [ -n "$FORCE" ] && args+=(--force)
           if [ -n "$MOCK" ]; then npm run generate:mock -- "${args[@]}"; else npm run generate -- "${args[@]}"; fi
 
       - name: Validate content
+        if: steps.local.outputs.skipped != 'true'
         run: npm run validate
       - name: Build, checks & unit tests
+        if: steps.local.outputs.skipped != 'true'
         run: npm test
       - name: Realism report (fails only on hard rules)
+        if: steps.local.outputs.skipped != 'true'
         run: npm run realism
 
       - name: Upload generated content
-        if: always()
+        if: always() && steps.local.outputs.skipped != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: daily-content
@@ -94,7 +132,7 @@ jobs:
 
   publish:
     needs: generate
-    if: vars.PUBLISH_ENABLED != 'false' && !inputs.mock
+    if: needs.generate.outputs.skipped != 'true' && vars.PUBLISH_ENABLED != 'false' && !inputs.mock
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -124,7 +162,7 @@ jobs:
           if git diff --cached --quiet; then echo "No new content."; exit 0; fi
           git config user.name "taiku-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "content: daily run $(date -u +%Y-%m-%d)"
+          git commit -m "content: daily run (cloudflare fallback) $(date -u +%Y-%m-%d)"
           auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_PUSH_TOKEN" | base64 -w0)"
           git -c http.extraheader="$auth" pull --rebase origin "${GITHUB_REF_NAME}"
           git -c http.extraheader="$auth" push origin "HEAD:${GITHUB_REF_NAME}"

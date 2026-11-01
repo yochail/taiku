@@ -2,7 +2,20 @@
 // can be written. Fails closed: the caller drops the whole topic if a topic post still fails after
 // one repair. Checks text plus original.text, poll options, note and media text.
 import { isGrave } from './themes.mjs';
-import { sha256 } from './pipeline-util.mjs';
+import { readJson, sha256 } from './pipeline-util.mjs';
+import { ROOT } from './data.mjs';
+import path from 'node:path';
+
+/** Names in the public-domain art library (dead painters, artwork titles) are historical, not living people. */
+function libraryCorpus() {
+  const lib = readJson(path.join(ROOT, 'media', 'library.json'), {}) ?? {};
+  const credits = readJson(path.join(ROOT, 'media', 'art-credits.json'), {}) ?? {};
+  const out = [];
+  for (const a of lib.art ?? []) out.push(a.title, a.artist, a.alt);
+  for (const c of Object.values(credits)) out.push(c?.author, c?.commons_artist);
+  for (const m of lib.memes ?? []) out.push(m.title, m.name);
+  return out.filter((x) => typeof x === 'string');
+}
 
 // Slurs are stored as sha256 prefixes so the list itself isn't a slur dump. Matched per token
 // (lowercased, letters only, with/without a trailing "s").
@@ -44,7 +57,7 @@ export function policyContext(personas, { allowNames = [] } = {}) {
       ...(p.quotables ?? []).map((q) => q.text), ...(p.quote_bank ?? []).map((q) => `${q.work ?? ''} ${q.section ?? ''} ${q.text ?? ''}`), ...(p.native_language?.phrases ?? []).map((x) => `${x.text} ${x.translation ?? ''}`));
   }
   const raw = corpus.filter(Boolean).join(' ');
-  const allow = lower(`${raw} ${allowNames.join(' ')}`);
+  const allow = lower(`${raw} ${libraryCorpus().join(' ')} ${allowNames.join(' ')}`);
   // Words that appear in lowercase somewhere in persona prose are ordinary English words
   // ("dear", "supposed", "right"), so a capitalised "Dear Emperor" is not a person's name.
   const commonWords = new Set((raw.match(/(?<![\p{L}])[a-z][a-z'’]+/gu) ?? []).filter((w) => w.length > 1));

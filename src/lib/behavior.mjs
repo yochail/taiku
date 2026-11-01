@@ -48,7 +48,7 @@ export function defaultBehaviorFor(persona) {
   const round2 = (x) => Math.round(Math.min(1, Math.max(0, x)) * 100) / 100;
   const g = GENERIC_X_BEHAVIOR;
   if (persona.kind === 'news') {
-    return { ...g, vibe: 'neutral news wire', activity: 0.6, reply_rate: 0, like_rate: 0, quote_rate: 0, repost_rate: 0, dunk_tendency: 0, meme_affinity: 0, thread_tendency: 0, shitpost_level: 0, clapback_rate: 0, emoji_use: 0, caps_use: 0, emoji: [], active_hours: [0, 24], likes_vibe: 'calm', formats: ['wire'] };
+    return { ...g, vibe: 'neutral news wire', activity: 0.6, reply_rate: 0, like_rate: 0, quote_rate: 0, repost_rate: 0, dunk_tendency: 0, meme_affinity: 0, thread_tendency: 0, shitpost_level: 0, clapback_rate: 0, emoji_use: 0, caps_use: 0, emoji: [], active_hours: [0, 24], likes_vibe: 'calm', formats: ['news_wire'] };
   }
   return {
     ...g,

@@ -18,6 +18,8 @@
 // likes/retaik ≈ 1 / sampling.engagement.reposts_per_like.median. Reply/quote need an LLM call and
 // are capped per day; when the cap is hit they downgrade to a like (logged as capped).
 // Every reaction logs its terms, score, p, draw and action — debug only, never in post objects.
+import fs from 'node:fs';
+import path from 'node:path';
 import { TOPIC_KEYS } from './data.mjs';
 import { behaviorOf } from './behavior.mjs';
 import { createSampler } from './realism.mjs';
@@ -74,7 +76,7 @@ export function mentionsIn(text, personas) {
  * Reactor: holds per-day state (fatigue, LLM cap, log). Deterministic for (seed, nonce).
  * @param {object} o { personas, spec, seed, nonce, calibration, llmCap }
  */
-export function createReactor({ personas, spec, seed, nonce = '', calibration = DEFAULT_CALIBRATION, llmCap = Infinity, log = true }) {
+export function createReactor({ personas, spec, seed, nonce = '', calibration = DEFAULT_CALIBRATION, llmCap = Infinity, log = true, formFn = null, affinityFn = null }) {
   const rand = seededRng('react', seed, nonce);
   const sampler = createSampler(spec, `react:${seed}:${nonce}`);
   const byId = new Map(personas.map((p) => [p.id, p]));
@@ -100,9 +102,13 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
     const eng = post.likes.length + post.reposts.length + (post.replies ?? 0) + (post.quotes ?? 0);
     const popularity = (0.5 + Math.log(1 + followersOf(author) / 1e4) / Math.log(101)) * (1 + 0.3 * Math.log(1 + eng));
     const mentioned = post.mentions?.has(persona.id);
+    // Embedding affinity arrives as a mean-1 multiplier (cosine of post and persona-interest
+    // embeddings, centred per persona) so the calibrated volume (k) stays valid; null → topic cosine only.
+    const base = Math.max(0.15, cosine(persona.topic_affinity, post.vector));
+    const emb = affinityFn ? affinityFn(persona, post) : null;
     return {
       reactivity: clamp(persona.reactivity ?? 3, 1, 5) / 3,
-      affinity: Math.max(0.15, cosine(persona.topic_affinity, post.vector)),
+      affinity: emb == null ? base : Math.max(0.15, base * emb),
       relation,
       popularity,
       recency: Math.exp(-delayMin / 60 / 12),
@@ -143,7 +149,12 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
       let action = chooseAction(persona, tm.rel, tm.mention > 1, post.depth ?? 0);
       let capped = false;
       const at = post.createdAt + delayMin * 60000 + Math.floor(rand() * 60000);
-      if ((action === 'reply' || action === 'quote') && (llmUsed >= llmCap || at > horizon || post.noReply)) {
+      // Reply form (emoji-only, few words, GIF-only, … short, full): cheap forms come from pools and
+      // don't count toward the LLM cap.
+      let form = null;
+      if ((action === 'reply' || action === 'quote') && formFn && !(at > horizon || post.noReply)) form = formFn(persona, action, post, tm.rel);
+      const cheap = Boolean(form?.cheap);
+      if ((action === 'reply' || action === 'quote') && ((!cheap && llmUsed >= llmCap) || at > horizon || post.noReply)) {
         capped = true;
         action = 'like';
       }
@@ -151,10 +162,10 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
       if (action === 'like') post.likes.push(persona.id);
       else if (action === 'repost') post.reposts.push(persona.id);
       else {
-        llmUsed++;
+        if (!cheap) llmUsed++;
         if (action === 'reply') post.replies = (post.replies ?? 0) + 1;
         else post.quotes = (post.quotes ?? 0) + 1;
-        out.push({ personaId: persona.id, action, at, rel: tm.rel });
+        out.push({ personaId: persona.id, action, at, rel: tm.rel, ...(form ? { form: form.form, cheap } : {}) });
       }
       if (log) {
         reactions.push({
@@ -162,12 +173,14 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
           personaId: persona.id,
           action,
           ...(capped ? { capped: true } : {}),
+          ...(form && action !== 'like' && action !== 'repost' ? { form: form.form } : {}),
           terms: Object.fromEntries(Object.entries(tm).filter(([key]) => key !== 'rel').map(([key, v]) => [key, round3(v)])),
           rel: tm.rel,
           delayMin,
           score: round3(score),
-          p: round3(p),
-          draw: round3(draw),
+          // Unrounded so the log always shows draw < p (rounding could make them equal).
+          p,
+          draw,
         });
       }
     }
@@ -217,6 +230,7 @@ export function cascade(reactor, originals, { horizon = Infinity, personas = [] 
         parent: ev.action === 'reply' ? post.id : null,
         quoteOf: ev.action === 'quote' ? post.id : null,
         rel: ev.rel,
+        ...(ev.form ? { form: ev.form, cheap: ev.cheap, noReply: Boolean(ev.cheap) } : {}),
         mentions: new Set([post.authorId].filter((id) => byId.size === 0 || byId.has(id))),
         likes: [],
         reposts: [],
@@ -302,9 +316,14 @@ const calCache = new Map();
  * by coordinate-wise bisection over simulated days with the real personas. Deterministic (fixed
  * seed); cached in memory per persona set and day size, and recorded in the run manifest.
  */
-export function calibrate({ personas, spec, originalsPerDay = 25, days = 8, rounds = 2 }) {
+export function calibrate({ personas, spec, originalsPerDay = 25, days = 8, rounds = 2, cacheFile = null, writeCache = true }) {
   const key = sha256(JSON.stringify([personas.map((p) => [p.id, p.reactivity, p.popularity, p.topic_affinity, p.x_behavior, p.kind, (p.rivals ?? []).length]), originalsPerDay, days, spec.sampling.activity, spec.sampling.engagement.reposts_per_like]));
   if (calCache.has(key)) return calCache.get(key);
+  const disk = cacheFile && fs.existsSync(cacheFile) ? (() => { try { return JSON.parse(fs.readFileSync(cacheFile, 'utf8')); } catch { return null; } })() : null;
+  if (disk?.entries?.[key]) {
+    calCache.set(key, disk.entries[key]);
+    return disk.entries[key];
+  }
   const t = calibrationTargets(spec);
   const cal = { ...DEFAULT_CALIBRATION };
   const run = (c) => simulate({ personas, spec, calibration: c, days, originalsPerDay, seed: 'calibration' });
@@ -336,5 +355,11 @@ export function calibrate({ personas, spec, originalsPerDay = 25, days = 8, roun
     achieved: { original: round3(last.shares.original), reply: round3(last.shares.reply), quote: round3(last.shares.quote), likesPerRepost: round3(last.likesPerRepost) },
   };
   calCache.set(key, out);
+  if (cacheFile && writeCache) {
+    // Keep only the latest few keys (persona set × day size) so the committed file stays small.
+    const entries = Object.fromEntries([...Object.entries(disk?.entries ?? {}), [key, out]].slice(-6));
+    fs.mkdirSync(path.dirname(cacheFile), { recursive: true });
+    fs.writeFileSync(cacheFile, `${JSON.stringify({ note: 'react.mjs calibration cache (keyed by persona set + spec)', entries }, null, 2)}\n`);
+  }
   return out;
 }
