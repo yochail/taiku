@@ -9,22 +9,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, safeUrl } from './data.mjs';
 import { hash8 } from './pipeline-util.mjs';
+import { sitePath } from './site.mjs';
 
 export const FIXTURE_DIR = path.join(ROOT, 'test', 'fixtures', 'feeds');
 
-/** Default feeds. `fixture` names the offline copy under test/fixtures/feeds/. */
-export const FEEDS = [
-  { id: 'bbc-world', tier: 'curated', kind: 'news', section: 'world', source: 'BBC News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', fixture: 'bbc-world.xml' },
-  { id: 'bbc-tech', tier: 'curated', kind: 'news', section: 'tech', source: 'BBC News', url: 'https://feeds.bbci.co.uk/news/technology/rss.xml', fixture: 'bbc-tech.xml' },
-  { id: 'bbc-science', tier: 'curated', kind: 'news', section: 'science', source: 'BBC News', url: 'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', fixture: 'bbc-science.xml' },
-  { id: 'bbc-culture', tier: 'curated', kind: 'news', section: 'culture', source: 'BBC News', url: 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml', fixture: 'bbc-culture.xml' },
-  { id: 'bbc-sport', tier: 'curated', kind: 'news', section: 'sports', source: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml', fixture: 'bbc-sport.xml' },
-  { id: 'ap', tier: 'curated', kind: 'news', section: 'world', source: 'AP News', url: 'https://news.google.com/rss/search?q=site:apnews.com+when:1d&hl=en-US&gl=US&ceid=US:en', fixture: 'ap.xml' },
-  { id: 'verge', tier: 'curated', kind: 'news', section: 'tech', source: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', fixture: 'verge.xml' },
-  { id: 'hn', tier: 'community', kind: 'news', section: 'tech', source: 'Hacker News', url: 'https://hnrss.org/frontpage', fixture: 'hn.xml' },
-  { id: 'google-trends', tier: 'community', kind: 'trend', section: 'trend', source: 'Google Trends', url: 'https://trends.google.com/trending/rss?geo=US', fixture: 'google-trends.xml' },
-  { id: 'reddit-popular', tier: 'community', kind: 'viral', section: 'memes', source: 'Reddit', url: 'https://www.reddit.com/r/popular.json?limit=50&raw_json=1', fixture: 'reddit-popular.json' },
-];
+/** Feeds come from the site pack (sites/<id>/config/feeds.json). `fixture` names the offline copy under test/fixtures/feeds/. */
+export const FEEDS = (() => {
+  const file = sitePath('config', 'feeds.json');
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')).feeds : [];
+})();
 
 // ---------------------------------------------------------------------------
 // Untrusted text handling.

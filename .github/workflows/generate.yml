@@ -1,6 +1,10 @@
 name: Daily feed
 
-# Local-first: a local Copilot automation writes sites/taiku/content/posts/daily-<UTC date>.json (origin "local",
+# Multi-site: one matrix leg per site pack with generation on (node scripts/sites.mjs --generate), run one
+# at a time because the sites share the LLM quota. Per-site call cap: repo variable GEN_MAX_CALLS_<SITE>
+# (e.g. GEN_MAX_CALLS_TARYA), else GEN_MAX_CALLS.
+#
+# Local-first: a local Copilot automation writes sites/<site>/content/posts/daily-<UTC date>.json (origin "local",
 # provider "session-daily") and pushes it to main around 09:00 UTC. This workflow is the FALLBACK:
 # at 12:00 UTC it exits early when that file is already on main, otherwise it runs the Cloudflare
 # Workers AI pipeline and writes the same filename with origin "cloudflare".
@@ -44,14 +48,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  sites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      list: ${{ steps.list.outputs.list }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: list
+        run: echo "list=$(node scripts/sites.mjs --generate --json)" >> "$GITHUB_OUTPUT"
+
   generate:
+    needs: sites
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
       contents: read
-    outputs:
-      skipped: ${{ steps.local.outputs.skipped }}
-      dayfile: ${{ steps.local.outputs.dayfile }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        site: ${{ fromJSON(needs.sites.outputs.list) }}
+    env:
+      SITE: ${{ matrix.site }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,10 +92,10 @@ jobs:
           # The file this run owns: -mock in mock mode, -cf when --force runs next to a local file.
           sfx=""
           if [ -n "$MOCK" ]; then sfx="-mock"
-          elif [ -n "$FORCE" ] && [ -f "sites/taiku/content/posts/daily-$day.json" ] && ! grep -q '"origin": *"cloudflare"' "sites/taiku/content/posts/daily-$day.json"; then sfx="-cf"; fi
-          echo "dayfile=sites/taiku/content/posts/daily-$day$sfx.json" >> "$GITHUB_OUTPUT"
-          if [ -z "$MOCK" ] && [ -z "$FORCE" ] && [ -f "sites/taiku/content/posts/daily-$day.json" ]; then
-            echo "local run present, skipping (sites/taiku/content/posts/daily-$day.json)"
+          elif [ -n "$FORCE" ] && [ -f "sites/$SITE/content/posts/daily-$day.json" ] && ! grep -q '"origin": *"cloudflare"' "sites/$SITE/content/posts/daily-$day.json"; then sfx="-cf"; fi
+          echo "dayfile=sites/$SITE/content/posts/daily-$day$sfx.json" >> "$GITHUB_OUTPUT"
+          if [ -z "$MOCK" ] && [ -z "$FORCE" ] && [ -f "sites/$SITE/content/posts/daily-$day.json" ]; then
+            echo "local run present, skipping (sites/$SITE/content/posts/daily-$day.json)"
             echo "skipped=true" >> "$GITHUB_OUTPUT"
           else
             echo "skipped=false" >> "$GITHUB_OUTPUT"
@@ -107,7 +130,7 @@ jobs:
           GEN_DATE: ${{ steps.local.outputs.day }}
           GEN_NONCE: ${{ inputs.nonce }}
           GEN_TOPICS: ${{ inputs.topics || vars.GEN_TOPICS }}
-          GEN_MAX_CALLS: ${{ inputs.max_calls || vars.GEN_MAX_CALLS }}
+          GEN_MAX_CALLS: ${{ inputs.max_calls || vars[format('GEN_MAX_CALLS_{0}', matrix.site)] || vars.GEN_MAX_CALLS }}
           GEN_MIN_COMPLETE: ${{ vars.GEN_MIN_COMPLETE }}
           # GIPHY beta key: server-side search only (rating=pg-13), capped per run.
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
@@ -140,7 +163,7 @@ jobs:
           GEN_DATE: ${{ steps.local.outputs.day }}
           GEN_NONCE: ${{ inputs.nonce }}
           GEN_TOPICS: ${{ inputs.topics || vars.GEN_TOPICS }}
-          GEN_MAX_CALLS: ${{ inputs.max_calls || vars.GEN_MAX_CALLS }}
+          GEN_MAX_CALLS: ${{ inputs.max_calls || vars[format('GEN_MAX_CALLS_{0}', matrix.site)] || vars.GEN_MAX_CALLS }}
           GEN_MIN_COMPLETE: ${{ vars.GEN_MIN_COMPLETE }}
           # GIPHY beta key: server-side search only (rating=pg-13), capped per run.
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
@@ -165,31 +188,42 @@ jobs:
         run: npm run validate
       - name: Build, checks & unit tests
         if: steps.local.outputs.skipped != 'true'
-        run: npm test
+        run: if [ "$SITE" = "taiku" ]; then SITE= npm test; else npm run build; fi
       - name: Realism report, whole corpus (non-blocking)
         if: steps.local.outputs.skipped != 'true'
         continue-on-error: true
         run: npm run realism
 
+      - name: Record the day file for publish
+        if: steps.local.outputs.skipped != 'true'
+        run: mkdir -p gen-meta && echo "${{ steps.local.outputs.dayfile }}" > gen-meta/dayfile.txt
       - name: Upload generated content
         if: always() && steps.local.outputs.skipped != 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: daily-content
+          name: daily-content-${{ matrix.site }}
           path: |
-            sites/taiku/content/
-            sites/taiku/staging/
+            gen-meta/
+            sites/${{ matrix.site }}/content/
+            sites/${{ matrix.site }}/staging/
             day-gate.json
           if-no-files-found: warn
           retention-days: 14
 
   publish:
-    needs: generate
-    if: needs.generate.outputs.skipped != 'true' && vars.PUBLISH_ENABLED != 'false' && !inputs.mock
+    needs: [sites, generate]
+    if: always() && needs.sites.result == 'success' && vars.PUBLISH_ENABLED != 'false' && !inputs.mock
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: write
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        site: ${{ fromJSON(needs.sites.outputs.list) }}
+    env:
+      SITE: ${{ matrix.site }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -197,29 +231,33 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # No artifact = this site skipped (local run present) or its generate leg failed: nothing to publish.
       - uses: actions/download-artifact@v4
+        id: dl
+        continue-on-error: true
         with:
-          name: daily-content
+          name: daily-content-${{ matrix.site }}
           path: .
 
       - name: Re-validate before publishing
-        env:
-          DAYFILE: ${{ needs.generate.outputs.dayfile }}
+        if: steps.dl.outcome == 'success'
         run: |
+          DAYFILE="$(cat gen-meta/dayfile.txt)"
           npm run validate
-          npm test
+          if [ "$SITE" = "taiku" ]; then SITE= npm test; else npm run build; fi
           npm run realism -- --file "$DAYFILE"
 
       - name: Commit & push
+        if: steps.dl.outcome == 'success'
         env:
           GH_PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          rm -f day-gate.json
-          git add sites/taiku/content sites/taiku/staging 2>/dev/null || git add sites/taiku/content
+          rm -rf day-gate.json gen-meta
+          git add sites/$SITE/content sites/$SITE/staging 2>/dev/null || git add sites/$SITE/content
           if git diff --cached --quiet; then echo "No new content."; exit 0; fi
           git config user.name "taiku-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "content: daily run (cloudflare fallback) $(date -u +%Y-%m-%d)"
+          git commit -m "content($SITE): daily run (cloudflare fallback) $(date -u +%Y-%m-%d)"
           auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_PUSH_TOKEN" | base64 -w0)"
           git -c http.extraheader="$auth" pull --rebase origin "${GITHUB_REF_NAME}"
           git -c http.extraheader="$auth" push origin "HEAD:${GITHUB_REF_NAME}"

@@ -22,6 +22,16 @@ jobs:
         run: npm run validate
       - name: Build, checks & unit tests
         run: npm test
+      # Every other site pack (sites/<id>/) must validate and build too; output goes to dist/<id>.
+      - name: Validate & build every other site pack
+        run: |
+          for s in $(node scripts/sites.mjs); do
+            [ "$s" = "taiku" ] && continue
+            echo "::group::site $s"
+            SITE="$s" npm run validate
+            SITE="$s" npm run build
+            echo "::endgroup::"
+          done
       # Blocking: every daily-*.json this push/PR adds or changes must pass the day gate.
       - name: Day gate on changed daily files
         env:
