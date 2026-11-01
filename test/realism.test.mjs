@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { loadPersonas, loadPosts } from '../src/lib/data.mjs';
 import {
   loadSpec, gini, burstiness, classify, mediaProblems, measure, evaluate, checkCorpus, createSampler, totalVariation,
+  replyFormOf, personaReplyStyle,
 } from '../src/lib/realism.mjs';
 
 const spec = loadSpec();
@@ -78,24 +79,42 @@ test('hard rules fail: >280 chars, reply before parent, unsafe media', () => {
 
 test('sampler output satisfies its own spec (sampling and metrics stay consistent)', () => {
   const s = createSampler(spec, 'test-seed');
+  const real = loadPersonas();
   const posts = [];
   const start = Date.parse('2026-10-01T00:00:00Z');
   const pick = (arr) => arr[Math.floor(s.rand() * arr.length)];
+  const between = ({ min, max }) => min + Math.floor(s.rand() * (max - min + 1));
+  const mk = (kind, i) => kind === 'poll' ? [{ kind, options: ['a', 'b'] }]
+    : kind === 'link_card' ? [{ kind, url: 'https://example.org/n' }]
+    : kind === 'gif' && s.gifSource() === 'giphy' ? [{ kind, origin: 'giphy', giphy_id: `g${i}`, src: `https://media1.giphy.com/media/g${i}/200w.gif`, alt: 'gif', rating: 'pg', credit: { author: 'a', license: 'GIPHY Terms of Service', url: 'https://giphy.com/gifs/x' }, attribution: 'Powered by GIPHY' }]
+    : [{ ...okImage, kind }];
+  const textFor = (form, chars) => {
+    if (form === 'emoji_only') return '😂'.repeat(1 + Math.floor(s.rand() * 3));
+    if (form === 'few_words') return ['based', 'this.', 'source?', 'ratio', 'so true'][Math.floor(s.rand() * 5)];
+    if (form === 'short') return Array(Math.max(4, Math.floor((between(chars) + 1) / 3))).fill('yy').join(' ');
+    return 'y'.repeat(between(chars));
+  };
   const dayOffsetEt = 4; // EDT hours behind UTC in October
   for (let i = 0; i < 1500; i++) {
     const role = s.activity();
-    const author = pick(personas);
+    const author = pick(real);
     const day = Math.floor(i / 50);
     const created = start + day * 86_400_000 + ((s.localHour() + dayOffsetEt) % 24) * 3_600_000 + s.minute() * 60_000;
-    const { min, max } = s.lengthRange();
-    const len = min + Math.floor(s.rand() * (max - min + 1));
-    const kind = s.mediaKind(role);
-    const media = kind === 'none' ? undefined
-      : kind === 'poll' ? [{ kind, options: ['a', 'b'] }]
-      : kind === 'link_card' ? [{ kind, url: 'https://example.org/n' }]
-      : kind === 'gif' && s.gifSource() === 'giphy' ? [{ kind, origin: 'giphy', giphy_id: `g${i}`, src: `https://media1.giphy.com/media/g${i}/200w.gif`, alt: 'gif', rating: 'pg', credit: { author: 'a', license: 'GIPHY Terms of Service', url: 'https://giphy.com/gifs/x' }, attribution: 'Powered by GIPHY' }]
-      : [{ ...okImage, kind }];
-    const post = { id: `t${i}`, authorId: author.id, type: 'x', text: 'y'.repeat(len), createdAt: new Date(created).toISOString(), media };
+    let text;
+    let media;
+    if (role === 'original' || !posts.length) {
+      text = 'y'.repeat(between(s.lengthRange()));
+    } else {
+      const rf = s.replyForm(role, author);
+      text = rf.media ? '' : textFor(rf.form, rf.chars);
+      if (rf.media) media = mk(rf.media, i);
+    }
+    if (text && text.length > 40 && s.wantsEmoji()) text = `${text.slice(0, -2)} 🙂`;
+    if (text) {
+      const kind = s.mediaKind(role);
+      if (kind !== 'none') media = mk(kind, i);
+    }
+    const post = { id: `t${i}`, authorId: author.id, type: 'x', text, createdAt: new Date(created).toISOString(), media };
     if (role !== 'original' && posts.length) {
       const parent = pick(posts);
       if (role === 'reply') post.inReplyTo = parent.id; else post.quoteOf = parent.id;
@@ -104,8 +123,15 @@ test('sampler output satisfies its own spec (sampling and metrics stay consisten
     post.stats = s.engagement({ popularity: author.popularity, isReply: role === 'reply' });
     posts.push(post);
   }
-  const { results } = checkCorpus(posts, personas, spec);
+  const authored = posts.length;
+  for (let i = 0, n = s.retaikCount(authored); i < n; i++) {
+    const parent = pick(posts.slice(0, authored));
+    posts.push({ id: `rt${i}`, authorId: pick(real).id, retaikOf: parent.id, text: '', createdAt: new Date(Date.parse(parent.createdAt) + s.replyDelayMinutes() * 60_000).toISOString() });
+  }
+  const { results } = checkCorpus(posts, real, spec);
   const must = [
+    'reply_form.reply.emoji_only_share', 'reply_form.reply.few_words_share', 'reply_form.reply.media_only_share',
+    'reply_form.reply.short_share', 'reply_form.reply.full_share', 'reply_form.quote.minimal_share', 'retaik.per_authored', 'text.emoji_share',
     'activity.original_share', 'activity.reply_share', 'activity.quote_share',
     'media.original.visual_share', 'media.original.link_card_share', 'media.original.poll_share', 'media.reply.visual_share',
     'media.gif_share_of_visual', 'media.gif.giphy_share', 'media.safety_violations',
@@ -123,4 +149,44 @@ test('real corpus has no hard-rule failures', () => {
   const { results } = checkCorpus(loadPosts(), loadPersonas(), spec);
   const failed = results.filter((r) => r.status === 'fail');
   assert.deepEqual(failed.map((r) => `${r.id}: ${JSON.stringify(r.detail ?? r.value)}`), []);
+});
+
+test('replyFormOf classifies X-style reply shapes', () => {
+  const f = (text, media) => replyFormOf({ text, media });
+  assert.equal(f('💀'), 'emoji_only');
+  assert.equal(f('😂😂 '), 'emoji_only');
+  assert.equal(f('👍🏽!'), 'emoji_only');
+  assert.equal(f('this.'), 'few_words');
+  assert.equal(f('based'), 'few_words');
+  assert.equal(f('source? 🤨'), 'few_words');
+  assert.equal(f('', [{ kind: 'gif' }]), 'gif_only');
+  assert.equal(f('', [{ kind: 'meme' }]), 'meme_only');
+  assert.equal(f('', [{ kind: 'image' }]), 'image_only');
+  assert.equal(f('ok but who asked you'), 'short');
+  assert.equal(f('Universalize it: if everyone lied, promising would cease to exist.'), 'full');
+});
+
+test('persona bias: Diogenes is terse, Kant is long-winded, reply_style overrides', () => {
+  assert.equal(personaReplyStyle(spec, 'diogenes'), 'terse');
+  assert.equal(personaReplyStyle(spec, { id: 'kant' }), 'discursive');
+  assert.equal(personaReplyStyle(spec, { id: 'kant', reply_style: 'terse' }), 'terse');
+  assert.equal(personaReplyStyle(spec, { id: 'kant', reply_style: 'nonsense' }), 'balanced');
+  assert.equal(personaReplyStyle(spec, 'unknown'), 'balanced');
+  const s = createSampler(spec, 'bias');
+  const n = 3000;
+  const minimal = (id) => {
+    let k = 0;
+    for (let i = 0; i < n; i++) if (s.replyForm('reply', id).form !== 'full') k++;
+    return k / n;
+  };
+  const dio = minimal('diogenes');
+  const kant = minimal('kant');
+  assert.ok(dio > 0.75, `diogenes non-full share ${dio}`);
+  assert.ok(kant < 0.35, `kant non-full share ${kant}`);
+  for (let i = 0; i < 200; i++) {
+    const r = s.replyForm('quote', 'hume');
+    assert.ok(!r.media, 'quote forms carry text');
+    assert.ok(r.chars.max <= 280 && r.chars.min <= r.chars.max);
+    if (r.form === 'full') assert.ok(r.chars.min > 40);
+  }
 });

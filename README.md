@@ -92,6 +92,13 @@ Generator flags: `--posts N` (default 3), `--replies N` (default 7), `--seed X`,
 
 [`realism/spec.json`](realism/spec.json) holds the target distributions taken from X/Twitter research, with sources and a confidence level for each: activity mix, media mix, length, thread depth, author skew, posting hours, burstiness, hashtags/emoji and engagement. The generator should draw from it with `createSampler()` in [`src/lib/realism.mjs`](src/lib/realism.mjs). `npm run realism` prints a drift report, which also appears in the CI job summary. It exits 1 only on hard-rule failures: more than 280 chars, a reply timestamped before its parent, or unsafe or unattributed media. Add `--strict` to fail on drift too.
 
+**Reply forms.** Real replies are often not sentences: an emoji ("💀"), a few words ("based", "source?"), a bare GIF or meme, or a plain retaik.
+- `sampling.reply_forms` sets the mix for replies and quotes.
+- `sampling.retaik` sets the plain-retaik rate.
+- `createSampler().replyForm(role, persona)` returns `{ form, chars: {min, max}, maxWords?, media? }`. Forms with `media` have empty text, which the validator now allows when media is present.
+- Personas are biased by style: `terse` (Diogenes), `punchy`, `balanced` or `discursive` (Kant…), via `persona_style` in the spec or an optional `reply_style` field on the persona.
+- `retaikCount(n)` gives how many plain retaiks (`{ retaikOf, text: '' }`) to emit per batch. The build doesn't render retaik rows yet.
+
 Optional post fields it reads: `media: [{ kind: image|gif|meme|chart|video|link_card|poll, src, alt, rating: g|pg|pg-13, origin: local-render|commons|giphy|…, render, giphy_id, attribution, ai_generated, credit: { author, license, url }, options, url }]` and `stats: { likes, reposts, quotes, views }`.
 
 ### Media (GIFs, memes, charts, pictures, polls)

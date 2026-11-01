@@ -74,7 +74,8 @@ export function validate(personas, posts) {
   for (const post of posts) {
     const where = `post ${post.id} (${post._file})`;
     if (!ids.has(post.authorId)) errors.push(`${where}: unknown author ${post.authorId}`);
-    if (!post.text || typeof post.text !== 'string') errors.push(`${where}: empty text`);
+    const mediaOnly = post.text === '' && Array.isArray(post.media) && post.media.length > 0;
+    if (typeof post.text !== 'string' || (!post.text && !mediaOnly)) errors.push(`${where}: empty text`);
     else if ([...post.text].length > 320) errors.push(`${where}: text too long (${[...post.text].length})`);
     if (!ALL_TYPES[post.type]) errors.push(`${where}: unknown type ${post.type}`);
     if (Number.isNaN(Date.parse(post.createdAt))) errors.push(`${where}: bad createdAt`);
