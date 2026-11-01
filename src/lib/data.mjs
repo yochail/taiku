@@ -342,6 +342,10 @@ export function validate(personas, posts) {
         for (const v of o.personaVotes ?? []) if (!ids.has(v)) errors.push(`${where}: poll vote by unknown persona ${v}`);
       }
     }
+    const pAuthor = byPersona.get(post.authorId);
+    if (post.type === 'news_wire' && !(personaKind(pAuthor) === 'news' && (post.topic?.url || post.media?.some?.((m) => m.kind === 'link_card' && m.url))))
+      errors.push(`${where}: news_wire posts need a news author and a topic.url or link_card`);
+    if (pAuthor && personaKind(pAuthor) === 'news' && !['news_wire', 'retaik'].includes(post.type)) errors.push(`${where}: news accounts only post news_wire (or plain retaiks)`);
     if (post.citation) errors.push(`${where}: legacy "citation" is not allowed; use quoteRefs (verbatim) or a Community Note`);
 
     // Persona engagement refs.
