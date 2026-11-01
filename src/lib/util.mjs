@@ -114,7 +114,7 @@ export function renderText(text, handleMap) {
     const p = handleMap.get(h.toLowerCase());
     return p ? `${pre}<a class="mention" href="/thinkers/${p.id}/">@${h}</a>` : m;
   });
-  html = html.replace(/(^|[^\w&/])#([A-Za-z][A-Za-z0-9_]{1,40})/g, (m, pre, t) => `${pre}<a class="hashtag" href="/tags/${slugify(t)}/">#${t}</a>`);
+  html = html.replace(/(^|[^\p{L}\p{M}\p{N}_&/])#(\p{L}[\p{L}\p{M}\p{N}_]{1,40})/gu, (m, pre, t) => `${pre}<a class="hashtag" href="/tags/${slugify(t)}/">#${t}</a>`);
   return html
     .split(/\n{2,}/)
     .map((para) => para.replace(/\n/g, '<br>'))

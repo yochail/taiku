@@ -6,7 +6,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const SITES_DIR = path.join(ROOT, 'sites');
+// SITES_DIR env: tests point the platform at fixture packs.
+export const SITES_DIR = process.env.SITES_DIR ? path.resolve(ROOT, process.env.SITES_DIR) : path.join(ROOT, 'sites');
 export const DEFAULT_SITE = 'taiku';
 export const SITE = process.env.SITE || DEFAULT_SITE;
 if (!/^[a-z0-9][a-z0-9-]*$/.test(SITE)) throw new Error(`invalid SITE "${SITE}"`);

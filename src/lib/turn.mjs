@@ -180,7 +180,7 @@ export async function assembleFields({ out, text, refs, task, persona, passages,
     if (note) fields.note = note;
   }
   // Text #hashtags come first so every rendered #tag link has a tag page.
-  const textTags = [...String(fields.text ?? text).matchAll(/(^|[^\w&/])#([A-Za-z][A-Za-z0-9_]{1,40})/g)].map((m) => m[2]);
+  const textTags = [...String(fields.text ?? text).matchAll(/(^|[^\p{L}\p{M}\p{N}_&/])#(\p{L}[\p{L}\p{M}\p{N}_]{1,40})/gu)].map((m) => m[2]);
   const tags = tagsOf([...textTags, ...(Array.isArray(out.tags) ? out.tags : [])]);
   if (tags.length) fields.tags = tags;
   return fields;

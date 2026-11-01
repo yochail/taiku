@@ -736,7 +736,7 @@ function tagPages() {
     if (p && !tags.get(s).includes(p)) tags.get(s).push(p);
   };
   // renderText links every inline #hashtag, so each one needs a page (bio-only tags get an empty state).
-  const inline = (text) => [...String(text ?? '').matchAll(/(^|[^\w&/])#([A-Za-z][A-Za-z0-9_]{1,40})/g)].map((m) => m[2]);
+  const inline = (text) => [...String(text ?? '').matchAll(/(^|[^\p{L}\p{M}\p{N}_&/])#(\p{L}[\p{L}\p{M}\p{N}_]{1,40})/gu)].map((m) => m[2]);
   for (const p of posts) for (const tag of [...(p.tags ?? []), ...inline(p.text)]) add(tag, p);
   for (const a of personas) for (const tag of inline(a.bio)) add(tag);
   for (const [tag, list] of tags) {
