@@ -9,7 +9,7 @@ import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderTe
 import { writeMediaFiles } from './lib/media.mjs';
 import { PostPack } from './lib/postpack.mjs';
 import { OUT_DIR, SITE_CONFIG } from './lib/site.mjs';
-import { t, fmtNumber, clientStrings, DIR, CA, HTML_CA, cw, CONTENT_LOCALE } from './lib/i18n.mjs';
+import { t, fmtNumber, clientStrings, DIR, CA, HTML_CA, cw, CONTENT_LOCALE, STRINGS } from './lib/i18n.mjs';
 
 /** User-facing UI strings in one place (i18n-ready). */
 const STR = {
@@ -249,7 +249,7 @@ function tabbar(pathname) {
     `<a href="/" aria-label="${t('nav.home')}"${cur(pathname === '/' || /^\/page\//.test(pathname))} data-home>${ICONS.home}</a>`,
     `<a href="/search/" aria-label="${t('nav.search')}"${cur(pathname === '/search/')}>${ICONS.search}</a>`,
     `<button type="button" data-gate="notifications" aria-label="${t('nav.notifications')}">${ICONS.bell}</button>`,
-    `<button type="button" data-gate="messages" aria-label="${t('nav.messages')}">${ICONS.mail}</button>`,
+    `<a href="/me/" aria-label="${t('me.title')}"${cur(pathname === '/me/')}>${ICONS.user}</a>`,
   ].join('');
 }
 
@@ -359,13 +359,76 @@ function whoToFollow(seed, exclude = []) {
   const pool = thinkers.filter((p) => !exclude.includes(p.id));
   const start = hash(String(seed)) % pool.length;
   const list = Array.from({ length: Math.min(4, pool.length) }, (_, i) => pool[(start + i * 7) % pool.length]);
-  return `<section class="panel"><h2>${t('wtf.title')}</h2>${[...new Map(list.map((p) => [p.id, p])).values()].map(wtfRow).join('')}<a class="more" href="/thinkers/">${t('wtf.showAll')}</a></section>`;
+  return `<section class="panel wtf-panel"><h2>${t('wtf.title')}</h2><div class="wtf-rows">${[...new Map(list.map((p) => [p.id, p])).values()].map(wtfRow).join('')}</div><a class="more" href="/connect/">${t('wtf.showAll')}</a></section>`;
+}
+
+// ---------- topics & trends: a followable taxonomy derived from post tags and news topics ----------
+const META_TAGS = new Set(['news', 'recap', 'press', 'breaking', 'update', 'thread']);
+const postsN = (n) => t('count.posts', { n });
+const topicLabel = (k) => STRINGS[`topic.label.${k}`] ?? k.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase());
+const rootOf = (p) => { let r = p; for (let i = 0; i < 60 && r.inReplyTo && idx.byId.has(r.inReplyTo); i++) r = idx.byId.get(r.inReplyTo); return r; };
+const newsKey = (p) => (p.topic?.id ? `n_${slugify(p.topic.id).slice(0, 60)}` : null);
+/** Topic keys of a post: its own tags and news topic plus its thread root's (replies are rarely tagged). */
+function topicKeysOf(p) {
+  const src = p.type === 'retaik' && idx.byId.has(p.retaikOf) ? idx.byId.get(p.retaikOf) : p;
+  const r = rootOf(src);
+  const keys = new Set();
+  for (const q of r === src ? [src] : [src, r]) {
+    for (const tag of q.tags ?? []) { const s = slugify(tag); if (s && !META_TAGS.has(s)) keys.add(s); }
+    const n = newsKey(q);
+    if (n) keys.add(n);
+  }
+  return [...keys];
+}
+let TOPICS = null;
+function topicIndex() {
+  if (TOPICS) return TOPICS;
+  const all = new Map();
+  const newest = posts.reduce((m, p) => (p.createdAt > m ? p.createdAt : m), '');
+  const since = new Date(Date.parse(newest || BUILD_TIME) - 48 * 3600000).toISOString();
+  const recent = new Map();
+  const keysOf = new Map();
+  for (const p of posts) {
+    const keys = topicKeysOf(p);
+    keysOf.set(p.id, keys);
+    if (p.type === 'retaik') continue;
+    for (const k of keys) {
+      if (!all.has(k)) {
+        const n = k.startsWith('n_') ? (p.topic?.id && newsKey(p) === k ? p.topic : rootOf(p).topic) : null;
+        all.set(k, { k, label: n ? n.title : topicLabel(k), news: !!n, source: n?.source ?? '', posts: [] });
+      }
+      all.get(k).posts.push(p);
+      if (p.createdAt >= since) recent.set(k, (recent.get(k) ?? 0) + 1);
+    }
+  }
+  for (const e of all.values()) e.posts.sort(newestFirst);
+  const topics = [...all.values()].filter((e) => !e.news && e.posts.length >= 6).sort((a, b) => b.posts.length - a.posts.length || a.k.localeCompare(b.k)).slice(0, 40);
+  const trends = [...recent.entries()].filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8).map(([k, n]) => ({ ...all.get(k), recent: n }));
+  TOPICS = { all, topics, trends, keysOf };
+  return TOPICS;
+}
+const topicHref = (e) => (e.news ? `/p/${e.posts.slice().sort((a, b) => convoReplies(b) - convoReplies(a))[0].id}/` : `/tags/${e.k}/`);
+function topicBtn(e) {
+  return `<button type="button" class="btn follow-btn btn-sm" data-topic="${esc(e.k)}" aria-pressed="false" aria-label="${esc(t('topic.follow', { label: e.label }))}"><span class="fb-off">${t('follow.follow')}</span><span class="fb-on">${t('follow.following')}</span><span class="fb-un">${t('follow.unfollow')}</span></button>`;
+}
+function topicChip(e) {
+  return `<button type="button" class="tchip" data-topic="${esc(e.k)}" aria-pressed="false"><span>${esc(e.label)}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path class="tc-plus" d="M12 6v12M6 12h12"/><path class="tc-tick" d="m6 12.5 4 4 8-9"/></svg></button>`;
+}
+function topicChips(list) {
+  return `<div class="topic-chips">${list.map(topicChip).join('')}</div>`;
+}
+const trendMeta = (e, i) => (e.news ? (e.source ? t('topic.newsFrom', { source: e.source }) : t('topic.news')) : t('topic.trendRank', { rank: i + 1 }));
+function trendRow(e, i) {
+  const meta = trendMeta(e, i);
+  return `<div class="trend trend-f"><a class="trend-link" href="${esc(topicHref(e))}"><span class="t-meta">${esc(meta)}</span><span class="t-title">${e.news ? '' : '#'}${esc(e.news ? truncate(e.label, 80) : e.k)}</span><span class="t-meta">${esc(postsN(e.recent ?? e.posts.length))}</span></a>${topicBtn(e)}</div>`;
+}
+function whatsHappening(n = 5) {
+  const { trends } = topicIndex();
+  if (!trends.length) return '';
+  return `<section class="panel trends-panel"><h2>${esc(t('topic.whatsHappening'))}</h2>${trends.slice(0, n).map(trendRow).join('')}<a class="more" href="/connect/#trending">${esc(t('topic.showMore'))}</a></section>`;
 }
 
 function trending() {
-  const counts = new Map();
-  for (const p of posts) for (const tag of p.tags ?? []) counts.set(slugify(tag), (counts.get(slugify(tag)) ?? 0) + 1);
-  const top = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 6);
   const debates = roots
     .map((r) => [r, idx.descendants(r).length])
     .filter(([, n]) => n >= 2)
@@ -374,9 +437,8 @@ function trending() {
   return `<section class="panel"><h2>${t('trend.debates')}</h2>${debates
     .map(([r, n]) => `<a class="trend" href="/p/${r.id}/"><span class="t-meta">${cw(esc(P.get(r.authorId).name))} · ${t('trend.replies', { n })}</span><span class="t-title"${CA}>${esc(truncate(shownText(r), 80))}</span></a>`)
     .join('')}</section>
-  <section class="panel"><h2>${t('trend.topics')}</h2>${top
-    .map(([tag, n]) => `<a class="trend" href="/tags/${tag}/"><span class="t-title"${CA}>#${esc(tag)}</span><span class="t-meta">${t('count.posts', { n })}</span></a>`)
-    .join('')}</section>`;
+
+  ${whatsHappening()}`;
 }
 
 export const HEAD_SCRIPT = "try{var d=document.documentElement;d.dataset.theme=localStorage.getItem('theme')||'dark';if(localStorage.getItem('welcomed'))d.dataset.welcomed='1';d.dataset.tab=localStorage.getItem('feedTab')==='following'?'following':'foryou'}catch(e){}";
@@ -387,6 +449,7 @@ function layout({ title, description, pathname, body, ld = [], ogType = 'website
   const nav = [
     ['/search/', t('nav.explore'), '🔍'],
     ['/thinkers/', t('nav.thinkers'), '🏛️'],
+    ['/me/', t('me.title'), '🙂'],
     ['/about/', t('nav.about'), 'ℹ️'],
   ];
   const navHtml = nav
@@ -447,7 +510,7 @@ ${ld.map(jsonLd).join('\n')}
     <footer class="sitefoot"><a href="/about/">${t('nav.about')}</a> · <a href="/thinkers/">${t('nav.thinkers')}</a> · <a href="/feed.xml">${t('footer.rss')}</a> · <a href="/sitemap.xml">${t('footer.sitemap')}</a><br>${t('footer.copy', { year: new Date().getUTCFullYear() })}</footer>
   </aside>
 </div>
-<dialog class="lightbox" id="lightbox" aria-label="${esc(STR.viewImage)}"><form method="dialog"><button class="lb-x" aria-label="${esc(STR.close)}">×</button></form><figure><img alt=""><figcaption></figcaption></figure></dialog>
+<dialog class="lightbox" id="lightbox" aria-label="${esc(STR.viewImage)}"><form method="dialog"><button class="lb-x" aria-label="${esc(t('nav.close'))}">×</button></form><figure><img alt=""><figcaption></figcaption></figure></dialog>
 <dialog class="modal" id="gate-modal" aria-labelledby="gate-title"><form method="dialog"><button class="modal-x" aria-label="${t('nav.close')}">×</button></form><div class="modal-logo">${LOGO}</div><h2 id="gate-title"></h2><p class="modal-msg"></p><form method="dialog"><button class="btn btn-primary btn-wide">${t('gotIt')}</button></form></dialog>
 <nav class="tabbar" aria-label="${t('nav.sectionsAria')}">${tabbar(pathname)}</nav>
 <button class="fab" type="button" data-gate="post" aria-label="${t('nav.post')}">${ICONS.compose}</button>
@@ -475,6 +538,43 @@ function write(pathname, html, { lastmod = BUILD_TIME, priority = 0.5, inSitemap
 
 // ---------- pages ----------
 
+function onboardDialog() {
+  const people = thinkers.filter((p) => (p.popularity ?? 5) >= 4).sort((a, b) => (b.popularity ?? 5) - (a.popularity ?? 5) || a.name.localeCompare(b.name)).slice(0, 12);
+  return `<dialog class="modal onboard" id="onboard" aria-labelledby="ob-title"><form method="dialog"><button class="modal-x" aria-label="${esc(t('nav.close'))}">×</button></form><div class="modal-logo">${LOGO}</div><h2 id="ob-title">${esc(t('onboard.title'))}</h2><p class="modal-msg">${esc(t('onboard.body'))}</p>
+<h3 class="ob-h">${esc(t('onboard.people'))}</h3><div class="ob-people">${people.map((p) => `<button type="button" class="ob-person" data-follow="${esc(p.id)}" aria-pressed="false">${avatar(p, 'md')}<span>${esc(p.name)}</span></button>`).join('')}</div>
+<h3 class="ob-h">${esc(t('topic.topics'))}</h3>${topicChips(topicIndex().topics.slice(0, 18))}
+<div class="ob-foot"><span class="ob-count" aria-live="polite"></span><button type="button" class="btn ob-skip">${esc(t('onboard.skip'))}</button><button type="button" class="btn btn-primary ob-done" disabled>${esc(t('onboard.done'))}</button></div></dialog>`;
+}
+
+/** /connect/: people, topics and trends to follow (X's "Connect" + Explore topics); the client re-ranks people by similarity. */
+function connectPage() {
+  const { topics, trends } = topicIndex();
+  const people = personas.filter((p) => p.kind === 'thinker' || p.kind === 'parody' || p.kind === 'fictional').sort((a, b) => (b.popularity ?? 5) - (a.popularity ?? 5) || a.name.localeCompare(b.name));
+  const tabs = Object.entries({ people: t('connect.tabPeople'), topics: t('connect.tabTopics'), trending: t('connect.tabTrending') }).map(([k, l], i) => `<button type="button" role="tab" id="ctab-${k}" data-ctab="${k}" aria-controls="cpanel-${k}" aria-selected="${i === 0}"${i ? ' tabindex="-1"' : ''}><span>${esc(l)}</span></button>`).join('');
+  const header = `<div class="topbar connect-top"><div class="tb-row">${MENU_BTN}<div class="tb-title"><h1>${esc(t('connect.title'))}</h1><span class="sub">${esc(t('connect.sub'))}</span></div></div><div class="feed-tabs connect-tabs" role="tablist" aria-label="${esc(t('connect.title'))}">${tabs}</div></div>`;
+  const body = `<section class="ctab-panel" id="cpanel-people" role="tabpanel" aria-labelledby="ctab-people"><h2 class="section-h">${esc(t('connect.suggested'))}</h2><div class="connect-people">${people.map((p) => `<div class="wtf-wide" data-pid="${esc(p.id)}">${wtfRow(p)}<p class="wtf-bio">${esc(truncate(p.bio ?? '', 140))}</p></div>`).join('')}</div><p class="fl-note">${esc(t('connect.note'))}</p></section>
+<section class="ctab-panel" id="cpanel-topics" role="tabpanel" aria-labelledby="ctab-topics" hidden><h2 class="section-h">${esc(t('topic.toFollow'))}</h2>${topics.map((e) => `<div class="trend trend-f"><a class="trend-link" href="/tags/${esc(e.k)}/"><span class="t-title">${esc(e.label)}</span><span class="t-meta">${esc(postsN(e.posts.length))}</span></a>${topicBtn(e)}</div>`).join('')}</section>
+<section class="ctab-panel" id="cpanel-trending" role="tabpanel" aria-labelledby="ctab-trending" hidden><h2 class="section-h">${esc(t('topic.whatsHappening'))}</h2>${trends.map(trendRow).join('')}</section>`;
+  write('/connect/', layout({ title: t('connect.title'), description: t('connect.desc'), pathname: '/connect/', noindex: true, header, body, aside: whatsHappening() }), { inSitemap: false });
+}
+
+/** /me/: the visitor's local profile (likes, bookmarks, follows) rendered client-side from cookie/localStorage. */
+function mePage() {
+  const tabs = Object.entries({ likes: t('me.tabLikes'), bookmarks: t('me.tabBookmarks'), following: t('me.tabFollowing'), topics: t('me.tabTopics'), viewed: t('me.tabViewed') }).map(([k, l], i) => `<button type="button" role="tab" id="mtab-${k}" data-mtab="${k}" aria-controls="me-panel" aria-selected="${i === 0}"${i ? ' tabindex="-1"' : ''}><span>${esc(l)}</span></button>`).join('');
+  const header = `<div class="topbar">${MENU_BTN}<div class="tb-title"><h1>${esc(t('me.title'))}</h1><span class="sub">${esc(t('me.sub'))}</span></div></div>`;
+  const body = `<section class="profile me">
+  <div class="banner me-banner"></div>
+  <div class="profile-top"><span class="avatar xl me-avatar" aria-hidden="true">${ICONS.user}</span></div>
+  <h2 class="p-name">${esc(t('me.title'))}</h2><div class="handle">${esc(t('me.handle'))}</div>
+  <p class="me-note">${esc(t('me.note'))}</p>
+  <div class="p-stats"><a href="#following" data-mtab-link="following"><b data-me-n="follows">0</b> ${esc(STR.following)}</a><a href="#topics" data-mtab-link="topics"><b data-me-n="topics">0</b> ${esc(t('topic.topics'))}</a></div>
+</section>
+<div class="feed-tabs me-tabs" role="tablist" aria-label="${esc(t('me.title'))}">${tabs}</div>
+<div class="me-panel feed" id="me-panel" role="tabpanel" aria-live="polite" aria-busy="false"></div>
+<p class="fe-cta"><a class="more" href="/connect/">${esc(t('me.findMore'))}</a></p>`;
+  write('/me/', layout({ title: t('me.title'), description: t('me.desc'), pathname: '/me/', noindex: true, header, body, aside: whoToFollow('me') + whatsHappening() }), { inSitemap: false });
+}
+
 function feedPages() {
   const pages = Math.max(1, Math.ceil(feedRoots.length / PAGE_SIZE));
   for (let i = 0; i < pages; i++) {
@@ -492,8 +592,9 @@ function feedPages() {
       ? `<div class="tab-panel tab-foryou" id="panel-foryou" role="tabpanel" aria-labelledby="tab-foryou">${body}</div>
 <div class="tab-panel tab-following" id="panel-following" role="tabpanel" aria-labelledby="tab-following">
   <div class="following-feed feed" aria-live="polite" aria-busy="false"></div>
-  <section class="following-empty"><h2>${t('following.emptyTitle')}</h2><p>${t('following.emptyText')}</p><h3 class="section-h">${t('wtf.title')}</h3>${suggestions.map((p) => `<div class="wtf-wide">${wtfRow(p)}<p class="wtf-bio"${CA}>${esc(truncate(p.bio, 120))}</p></div>`).join('')}<a class="more" href="/thinkers/">${t('following.showAll')}</a></section>
-</div>`
+  <section class="following-empty"><h2>${t('following.emptyTitle')}</h2><p>${t('following.emptyText')}</p><h3 class="section-h">${t('wtf.title')}</h3>${suggestions.map((p) => `<div class="wtf-wide">${wtfRow(p)}<p class="wtf-bio"${CA}>${esc(truncate(p.bio, 120))}</p></div>`).join('')}<a class="more" href="/connect/">${t('wtf.showAll')}</a><h3 class="section-h">${t('topic.toFollow')}</h3>${topicChips(topicIndex().topics.slice(0, 16))}<p class="fe-cta"><button type="button" class="btn btn-primary" data-onboard>${esc(t('onboard.cta'))}</button></p></section>
+</div>
+${onboardDialog()}`
       : body;
     const header = home
       ? `<div class="topbar home-top"><div class="ht-row">${MENU_BTN}<a class="ht-logo" href="/" aria-label="${esc(t('home.logoAria'))}" data-home><span class="logo">${LOGO}</span></a><span class="ht-sp"></span></div><h1 class="sr-only">${t('home.title')}</h1><div class="feed-tabs" role="tablist" aria-label="${t('home.tabsAria')}"><button type="button" role="tab" id="tab-foryou" data-tab="foryou" aria-controls="panel-foryou" aria-selected="true"><span>${t('home.forYou')}</span></button><button type="button" role="tab" id="tab-following" data-tab="following" aria-controls="panel-following" aria-selected="false"><span>${t('home.following')}</span></button></div></div>`
@@ -862,23 +963,48 @@ function pwa() {
 }
 
 /** Client-side Following timeline + hovercards: per-author pre-rendered cards and a compact persona index under /data/. */
+function followItem(p) {
+  const parent = p.inReplyTo ? idx.byId.get(p.inReplyTo) : null;
+  const h = parent
+    ? `<div class="conv">${postCard(parent, { connector: true, noId: true })}${postCard(p, { noId: true })}</div>`
+    : postCard(p, { participants: true, threadLink: true, noId: true });
+  return { id: p.id, k: storyKey(p), a: p.authorId, t: p.createdAt, h };
+}
 function followData() {
   const dir = path.join(OUT, 'data', 'u');
   fs.mkdirSync(dir, { recursive: true });
   const byAuthor = new Map(personas.map((a) => [a.id, []]));
   for (const p of posts) if (!(p.type === 'thread' && p.inReplyTo)) byAuthor.get(p.authorId)?.push(p);
   for (const [id, list] of byAuthor) {
-    const items = list.sort(newestFirst).slice(0, 25).map((p) => {
-      const parent = p.inReplyTo ? idx.byId.get(p.inReplyTo) : null;
-      const h = parent
-        ? `<div class="conv">${postCard(parent, { connector: true, noId: true })}${postCard(p, { noId: true })}</div>`
-        : postCard(p, { participants: true, threadLink: true, noId: true });
-      return { id: p.id, k: storyKey(p), t: p.createdAt, h };
-    });
+    const items = list.sort(newestFirst).slice(0, 25).map(followItem);
     fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify({ v: BUILD_ID, posts: items }));
   }
+  // followed topics: same shape as /data/u, keyed by topic key
+  const { all, topics, trends, keysOf } = topicIndex();
+  const tdir = path.join(OUT, 'data', 't');
+  fs.mkdirSync(tdir, { recursive: true });
+  const followable = new Set([...topics, ...trends].map((e) => e.k));
+  for (const e of all.values()) {
+    if (e.posts.length < 2 && !followable.has(e.k)) continue;
+    fs.writeFileSync(path.join(tdir, `${e.k}.json`), JSON.stringify({ v: BUILD_ID, posts: e.posts.slice(0, 25).map(followItem) }));
+  }
+  fs.writeFileSync(
+    path.join(OUT, 'data', 'topics.json'),
+    JSON.stringify({ v: BUILD_ID, topics: topics.map((e) => [e.k, e.label, e.posts.length]), trends: trends.map((e, i) => [e.k, e.label, trendMeta(e, i), e.recent, topicHref(e)]), labels: Object.fromEntries([...all.values()].filter((e) => followable.has(e.k) || e.posts.length >= 2).map((e) => [e.k, e.label])) }),
+  );
+  // similarity signals for "Who to follow": topics each persona posts about and who they talk to
+  const tp = new Map(personas.map((a) => [a.id, new Map()]));
+  const co = new Map(personas.map((a) => [a.id, new Map()]));
+  const bump = (m, k, n = 1) => m?.set(k, (m.get(k) ?? 0) + n);
+  for (const p of posts) {
+    for (const k of keysOf.get(p.id) ?? []) if (!k.startsWith('n_')) bump(tp.get(p.authorId), k);
+    const other = p.inReplyTo ? idx.byId.get(p.inReplyTo)?.authorId : p.quoteOf ? idx.byId.get(p.quoteOf)?.authorId : null;
+    if (other && other !== p.authorId) { bump(co.get(p.authorId), other); bump(co.get(other), p.authorId, 0.5); }
+  }
+  const top6 = (m) => [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 6).map(([k]) => k);
+  const rel = (a) => [...new Set(['allies', 'rivals', 'frenemies'].flatMap((r) => (a.relationships?.[r] ?? a[r] ?? []).map((x) => (typeof x === 'string' ? x : x?.id))).filter((id) => id && P.has(id) && id !== a.id))];
   const index = Object.fromEntries(
-    personas.map((a) => [a.id, { n: displayName(a), h: a.handle, b: truncate(a.bio ?? '', 160), a: a.avatar?.srcset?.[96] ?? a.avatar?.image ?? '', c: a.avatar?.color ?? '#64748b', fr: a.x_profile?.followers ?? 0, fg: a.x_profile?.following ?? 0 }]),
+    personas.map((a) => [a.id, { n: displayName(a), h: a.handle, b: truncate(a.bio ?? '', 160), a: a.avatar?.srcset?.[96] ?? a.avatar?.image ?? '', c: a.avatar?.color ?? '#64748b', fr: a.x_profile?.followers ?? 0, fg: a.x_profile?.following ?? 0, k: a.kind, tp: top6(tp.get(a.id)), co: top6(co.get(a.id)), rel: rel(a) }]),
   );
   fs.writeFileSync(path.join(OUT, 'data', 'personas.json'), JSON.stringify({ v: BUILD_ID, personas: index }));
 }
@@ -895,7 +1021,7 @@ function forYouData() {
       const src = storyKey(p) !== p.id ? idx.byId.get(p.retaikOf) : p;
       const s = stats(src);
       const visual = (mediaByPost.get(src.id) ?? []).length > 0 || !!src.poll || !!textPoll(src);
-      items.push({ id: p.id, a: p.authorId, t: Date.parse(p.createdAt), l: s.likes, r: s.replies, rt: s.reposts + s.quotes, m: visual ? 1 : 0, s: i / FY_SHARD, ...(src !== p ? { k: src.id } : {}) });
+      items.push({ id: p.id, a: p.authorId, t: Date.parse(p.createdAt), l: s.likes, r: s.replies, rt: s.reposts + s.quotes, m: visual ? 1 : 0, s: i / FY_SHARD, g: topicIndex().keysOf.get(p.id) ?? [], ...(src !== p ? { k: src.id } : {}) });
       const kids = (idx.children.get(p.id) ?? []).filter((k) => k.authorId !== p.authorId || k.type !== 'thread');
       const top = kids.slice().sort((a, b) => stats(b).likes - stats(a).likes)[0];
       if (top) {
@@ -948,6 +1074,8 @@ const tagCount = tagPages();
 aboutPage();
 notFound();
 searchPage();
+connectPage();
+mePage();
 pwa();
 followData();
 forYouData();

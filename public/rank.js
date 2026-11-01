@@ -26,7 +26,38 @@
   function affinity(it, ctx) {
     const followed = ctx.follows && ctx.follows.has(it.a) ? 1 : 0;
     const a = (ctx.affinity && ctx.affinity[it.a]) || 0;
-    return 1 + followed + Math.min(1, a * 0.25);
+    const topical = ctx.topics && ctx.topics.size && it.g && it.g.some((k) => ctx.topics.has(k)) ? 0.6 : 0;
+    return 1 + followed + topical + Math.min(1, a * 0.25);
+  }
+  // "Who to follow": score unfollowed people by closeness to the ones the user follows/likes
+  // (declared allies/rivals, who they reply to, shared topics, followed topics), popularity as tie-break.
+  function suggestPeople(people, ctx = {}) {
+    const follows = ctx.follows || new Set();
+    const topics = ctx.topics || new Set();
+    const aff = ctx.affinity || {};
+    const seeds = new Map();
+    for (const id of follows) seeds.set(id, 3);
+    for (const id in aff) if (aff[id] > 0) seeds.set(id, (seeds.get(id) || 0) + Math.min(3, aff[id]));
+    const scores = [];
+    for (const id in people) {
+      if (follows.has(id)) continue;
+      const p = people[id];
+      let s = 0;
+      for (const [sid, w] of seeds) {
+        if (sid === id) continue;
+        const q = people[sid];
+        if (!q) continue;
+        if ((q.rel || []).includes(id)) s += 2 * w;
+        if ((q.co || []).includes(id)) s += 1.5 * w;
+        if ((p.rel || []).includes(sid) || (p.co || []).includes(sid)) s += w;
+        const shared = (p.tp || []).filter((k) => (q.tp || []).includes(k)).length;
+        s += 0.3 * shared * w;
+      }
+      s += 0.6 * (p.tp || []).filter((k) => topics.has(k)).length;
+      if (p.k && p.k !== 'thinker') s *= 0.5;
+      scores.push([id, s + Math.log10(1 + (p.fr || 0)) * 0.01 + rand01(ctx.seed || 0, id) * 0.001]);
+    }
+    return scores.sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).map(([id, s]) => ({ id, score: s }));
   }
   function seenCount(it, ctx) {
     const s = ctx.seen && ctx.seen[it.id];
@@ -95,5 +126,5 @@
     return out;
   }
 
-  globalThis.TaikuRank = { hashStr, rand01, engagement, recency, affinity, score, diversify, rankFeed, markSeen, pruneSeen, SEEN_CAP };
+  globalThis.TaikuRank = { hashStr, rand01, engagement, recency, affinity, score, diversify, rankFeed, suggestPeople, markSeen, pruneSeen, SEEN_CAP };
 })();

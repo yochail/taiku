@@ -231,3 +231,21 @@ test('the logo is the way home: no separate Home item in the side menu', () => {
   assert.doesNotMatch(nav, /class="nl">Home</);
   assert.match(home, /class="ht-logo" href="\/" aria-label="Taiku home" data-home/);
 });
+test('discovery: topics/trends data, /connect and /me pages, onboarding outside the hidden panel', () => {
+  const topics = JSON.parse(read('data/topics.json'));
+  assert.ok(Array.isArray(topics.topics) && Array.isArray(topics.trends));
+  for (const [k] of topics.topics.slice(0, 3)) assert.ok(fs.existsSync(path.join(DIST, 'data', 't', `${k}.json`)));
+  for (const rel of ['connect/index.html', 'me/index.html']) assert.match(read(rel), /<meta name="robots" content="noindex/);
+  assert.match(read('connect/index.html'), /data-ctab="people"[\s\S]*data-ctab="topics"/);
+  assert.match(read('me/index.html'), /data-mtab="likes"[\s\S]*data-mtab="bookmarks"[\s\S]*data-mtab="following"/);
+  const home = read('index.html');
+  assert.match(home, /class="tabbar"[\s\S]*?href="\/me\/"/);
+  const onboard = home.indexOf('id="onboard"');
+  assert.ok(onboard > 0);
+  const panel = home.slice(home.indexOf('id="panel-following"'), onboard);
+  assert.equal((panel.match(/<div\b/g) ?? []).length + 1, (panel.match(/<\/div>/g) ?? []).length, 'panel closes before the dialog');
+  const { items } = JSON.parse(read('data/foryou.json'));
+  assert.ok(items.every((x) => Array.isArray(x.g)));
+  const people = JSON.parse(read('data/personas.json')).personas;
+  assert.ok(Object.values(people).some((p) => Array.isArray(p.tp) && Array.isArray(p.co) && Array.isArray(p.rel)));
+});

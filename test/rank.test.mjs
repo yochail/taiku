@@ -67,3 +67,25 @@ test('a retaik and its original appear once', () => {
   const out = R.rankFeed(items, ctx()).fresh.map((x) => x.id);
   assert.equal(out.length, 1);
 });
+
+test('followed topics boost matching posts', () => {
+  const a = item('a', 'x', 1, { g: ['ethics'] });
+  const b = item('b', 'y', 1, { g: ['sports'] });
+  const c = ctx({ topics: new Set(['ethics']) });
+  assert.ok(R.affinity(a, c) > R.affinity(b, c));
+  assert.equal(R.affinity(b, c), 1);
+});
+
+test('suggestPeople ranks allies, reply partners and shared topics of follows; skips followed', () => {
+  const people = {
+    hume: { rel: ['smith'], co: ['kant'], tp: ['ethics', 'economics'], k: 'thinker', fr: 10 },
+    smith: { rel: ['hume'], co: [], tp: ['economics'], k: 'thinker', fr: 5 },
+    kant: { rel: [], co: ['hume'], tp: ['ethics'], k: 'thinker', fr: 5 },
+    messi: { rel: [], co: [], tp: ['sports'], k: 'thinker', fr: 1000 },
+  };
+  const out = R.suggestPeople(people, { follows: new Set(['hume']), seed: 1 });
+  assert.deepEqual(out.map((x) => x.id), ['smith', 'kant', 'messi']);
+  const byTopic = R.suggestPeople(people, { topics: new Set(['sports']), seed: 1 });
+  assert.equal(byTopic[0].id, 'messi');
+  assert.deepEqual(R.suggestPeople(people, { follows: new Set(['hume']), seed: 1 }), out);
+});

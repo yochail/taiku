@@ -13,6 +13,7 @@
   const RTL = root.dir === 'rtl';
   // Content language attrs when posts/names/bios differ from the UI language (build sets data-clang/data-cdir on <html>).
   const CA = root.dataset.clang ? ` lang="${root.dataset.clang}" dir="${root.dataset.cdir === 'rtl' ? 'rtl' : 'ltr'}"` : '';
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
   const store = {
     get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -266,13 +267,38 @@
     store.set('follows', [...follows]);
   };
   if (follows.size) saveFollows();
+  // Followed topics/trends: same format in taiku_topics.
+  const readTopics = () => {
+    const m = document.cookie.match(/(?:^|;\s*)taiku_topics=([^;]*)/);
+    const list = m ? decodeURIComponent(m[1]).split('.').filter(Boolean) : store.get('topics', []);
+    return new Set(list.filter((k) => /^[a-z0-9_-]+$/.test(k)));
+  };
+  const topics = readTopics();
+  const saveTopics = () => {
+    document.cookie = `taiku_topics=${encodeURIComponent([...topics].join('.'))}; Max-Age=31536000; Path=/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+    store.set('topics', [...topics]);
+  };
+  if (topics.size) saveTopics();
+  const relabel = (b, on) => {
+    const l = b.getAttribute('aria-label');
+    if (!l) return;
+    b.dataset.n ??= (l.match(/@\w+/) || [l.replace(/^\S+\s+/, '')])[0];
+    b.setAttribute('aria-label', on ? S('unfollowName', 'Unfollow {name}', { name: b.dataset.n }) : S('followName', 'Follow {name}', { name: b.dataset.n }));
+  };
   const paintFollow = (b) => {
     const on = follows.has(b.dataset.follow);
     b.classList.toggle('on', on);
     b.setAttribute('aria-pressed', String(on));
-    b.dataset.h ??= (b.getAttribute('aria-label').match(/@([\w]+)/) || ['', ''])[1];
-    b.setAttribute('aria-label', on ? S('unfollowAria', 'Unfollow @{handle}', { handle: b.dataset.h }) : S('followAria', 'Follow @{handle}', { handle: b.dataset.h }));
+    relabel(b, on);
   };
+  const paintTopic = (b) => {
+    const on = topics.has(b.dataset.topic);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+    relabel(b, on);
+  };
+  let topicData = null;
+  const loadTopics = () => (topicData ??= fetch(`/data/topics.json?v=${document.body.dataset.build || ''}`).then((r) => r.json()).catch(() => ({ topics: [], trends: [], labels: {} })));
   const paintFollowers = (el) => { el.textContent = fmt(Number(el.dataset.count || 0) + (follows.has(el.dataset.followers) ? 1 : 0)); };
 
   function hydrate(scope) {
@@ -280,6 +306,7 @@
     scope.querySelectorAll('[data-bookmark]').forEach(paintMark);
     scope.querySelectorAll('.poll[data-poll]').forEach(paintPoll);
     scope.querySelectorAll('[data-follow]').forEach(paintFollow);
+    scope.querySelectorAll('[data-topic]').forEach(paintTopic);
     scope.querySelectorAll('[data-followers]').forEach(paintFollowers);
     relTimes(scope);
   }
@@ -290,21 +317,26 @@
   const fFeed = document.querySelector('.following-feed');
   const authorCache = new Map();
   const loadAuthor = (id) => {
-    if (!authorCache.has(id)) authorCache.set(id, fetch(`/data/u/${encodeURIComponent(id)}.json?v=${build}`).then((r) => (r.ok ? r.json() : { posts: [] })).catch(() => ({ posts: [] })));
+    if (!authorCache.has(id)) authorCache.set(id, fetch(`/data/${id.startsWith('../t/') ? `t/${encodeURIComponent(id.slice(5))}` : `u/${encodeURIComponent(id)}`}.json?v=${build}`).then((r) => (r.ok ? r.json() : { posts: [] })).catch(() => ({ posts: [] })));
     return authorCache.get(id);
   };
   let renderSeq = 0;
   async function renderFollowing() {
     if (!fFeed) return;
     const seq = ++renderSeq;
-    root.dataset.following = follows.size ? 'some' : 'none';
-    if (!follows.size) { fFeed.innerHTML = ''; return; }
+    root.dataset.following = follows.size || topics.size ? 'some' : 'none';
+    if (!follows.size && !topics.size) { fFeed.innerHTML = ''; return; }
     fFeed.setAttribute('aria-busy', 'true');
-    const lists = await Promise.all([...follows].map(loadAuthor));
+    const [lists, tlists, td] = await Promise.all([
+      Promise.all([...follows].map(loadAuthor)),
+      Promise.all([...topics].map((k) => loadAuthor(`../t/${k}`).then((l) => (l.posts || []).map((p) => ({ ...p, topic: k }))))),
+      topics.size ? loadTopics() : null,
+    ]);
     if (seq !== renderSeq) return;
     const seen = new Set();
-    const items = lists.flatMap((l) => l.posts || []).sort((a, b) => b.t.localeCompare(a.t)).filter((p) => !seen.has(p.k || p.id) && seen.add(p.k || p.id)).slice(0, 60);
-    fFeed.innerHTML = items.length ? items.map((p) => p.h).join('') : `<p class="empty">${S('followingEmpty', 'The accounts you follow haven\u2019t posted yet.')}</p>`;
+    const items = [...lists.flatMap((l) => l.posts || []), ...tlists.flat()].sort((a, b) => b.t.localeCompare(a.t) || (a.topic ? 1 : -1)).filter((p) => !seen.has(p.k || p.id) && seen.add(p.k || p.id)).slice(0, 60);
+    const ctx = (p) => (p.topic && !follows.has(p.a) ? `<div class="topic-ctx"><a href="/connect/#topics">${esc(td?.labels?.[p.topic] || p.topic)}</a></div>` : '');
+    fFeed.innerHTML = items.length ? items.map((p) => ctx(p) + p.h).join('') : `<p class="empty">${S('followingEmpty', 'The accounts you follow haven\u2019t posted yet.')}</p>`;
     fFeed.setAttribute('aria-busy', 'false');
     hydrate(fFeed);
   }
@@ -348,8 +380,10 @@
       return shards.get(n);
     };
     fetch(`/data/foryou.json?v=${build}`).then((r) => (r.ok ? r.json() : Promise.reject())).then(async (data) => {
-      const { fresh, seen } = R.rankFeed(data.items, { now: Date.now(), seed, seen: store.get('taiku_seen', {}), follows, affinity: store.get('taiku_aff', {}) });
+      const { fresh, seen } = R.rankFeed(data.items, { now: Date.now(), seed, seen: store.get('taiku_seen', {}), follows, topics, affinity: store.get('taiku_aff', {}) });
       const queue = [...fresh, ...(seen.length ? [{ divider: true }] : []), ...seen];
+      if (queue.length > 6) queue.splice(5, 0, { strip: 'people' });
+      if (queue.length > 18) queue.splice(17, 0, { strip: 'topics' });
       const BATCH = 15;
       let pos = 0;
       let busy = false;
@@ -360,7 +394,7 @@
         busy = true;
         const batch = queue.slice(pos, pos + BATCH);
         pos += batch.length;
-        const html = await Promise.all(batch.map(async (it) => (it.divider
+        const html = await Promise.all(batch.map(async (it) => (it.strip ? feedStrip(it.strip) : it.divider
           ? `<div class="caught-up" role="separator"><b>${S('caughtUp', 'You\u2019re all caught up')}</b><span>${S('seenBefore', 'You\u2019ve seen the new posts. Here\u2019s what you scrolled past before.')}</span></div>`
           : (await shard(it.s))[it.id] || '')));
         const frag = document.createElement('div');
@@ -384,7 +418,7 @@
     }).catch(() => watchSeen(fyFeed));
   }
 
-  const tabs = [...document.querySelectorAll('.feed-tabs:not(.search-tabs) [role="tab"]')];
+  const tabs = [...document.querySelectorAll('.home-top .feed-tabs [role="tab"]')];
   const selectTab = (name, focus) => {
     root.dataset.tab = name;
     try { localStorage.setItem('feedTab', name); } catch (e) {}
@@ -418,16 +452,33 @@
     saveFollows();
     document.querySelectorAll(`[data-follow="${CSS.escape(id)}"]`).forEach(paintFollow);
     document.querySelectorAll(`[data-followers="${CSS.escape(id)}"]`).forEach(paintFollowers);
-    toast(on ? S('followed', 'Followed. Their posts now show in Following.') : S('unfollowed', 'Unfollowed'));
-    if (root.dataset.tab === 'following') renderFollowing();
-    else if (fFeed) root.dataset.following = follows.size ? 'some' : 'none';
+    if (on) bumpAffinity(id, 1);
+    followChanged(fb, on ? S('followed', 'Followed. Their posts now show in Following.') : S('unfollowed', 'Unfollowed'));
   });
+  document.addEventListener('click', (e) => {
+    const tb = e.target.closest('[data-topic]');
+    if (!tb) return;
+    e.preventDefault();
+    const k = tb.dataset.topic;
+    const on = !topics.has(k);
+    on ? topics.add(k) : topics.delete(k);
+    saveTopics();
+    document.querySelectorAll(`[data-topic="${CSS.escape(k)}"]`).forEach(paintTopic);
+    followChanged(tb, on ? S('topicFollowed', 'Topic followed. Posts about it now show in Following.') : S('topicUnfollowed', 'Topic unfollowed'));
+  });
+  function followChanged(from, msg) {
+    if (msg && !from.closest('.onboard')) toast(msg);
+    else paintOnboard();
+    if (root.dataset.tab === 'following' && !from.closest('.onboard')) renderFollowing();
+    else if (fFeed) root.dataset.following = follows.size || topics.size ? 'some' : 'none';
+    document.querySelectorAll('[data-me-n="follows"]').forEach((el) => { el.textContent = follows.size; });
+    document.querySelectorAll('[data-me-n="topics"]').forEach((el) => { el.textContent = topics.size; });
+  }
 
   // Hovercards on avatars and names (mouse only; profiles have the same info for keyboard/touch users).
   let people = null;
   const loadPeople = () => (people ??= fetch(`/data/personas.json?v=${build}`).then((r) => r.json()).then((d) => d.personas).catch(() => ({})));
   let card = null, showT = 0, hideT = 0, anchor = null;
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
   const hideCard = () => { clearTimeout(showT); hideT = setTimeout(() => { if (card) card.hidden = true; anchor = null; }, 250); };
   const showCard = async (a) => {
     const m = a.getAttribute('href').match(/^\/thinkers\/([^/]+)\/$/);
@@ -465,6 +516,134 @@
     });
   }
 
+  // Discovery: Who to follow, topics, onboarding, /connect/ and the local "You" profile (/me/).
+  const TX = {
+    whoToFollow: S('whoToFollow', 'Who to follow'), showMore: S('showMore', 'Show more'), topicsToFollow: S('topicsToFollow', 'Topics to follow'),
+    follow: S('follow', 'Follow'), following: S('following', 'Following'), unfollow: S('unfollow', 'Unfollow'),
+    meEmpty: { likes: S('meEmptyLikes', 'No likes yet. Tap the heart on a post and it shows up here.'), bookmarks: S('meEmptyBookmarks', 'No bookmarks yet. Save posts with the bookmark button to find them later.'), following: S('meEmptyFollowing', 'You aren\u2019t following anyone yet.'), topics: S('meEmptyTopics', 'You aren\u2019t following any topics yet.'), viewed: S('meEmptyViewed', 'Posts you open show up here.') },
+    loading: S('loading', 'Loading\u2026'), picked: (n) => S('picked', '{n} picked', { n }),
+  };
+  const L = (k) => TX[k];
+  const seeds = () => follows.size || topics.size || Object.keys(store.get('taiku_aff', {})).length;
+  const avatarHtml = (p, size) => (p.a ? `<img class="avatar ${size}" src="${esc(p.a)}" alt="" width="${size === 'md' ? 64 : 40}" height="${size === 'md' ? 64 : 40}" loading="lazy" decoding="async">` : `<span class="avatar ${size}" style="--c:${esc(p.c)}" aria-hidden="true">${esc(p.n[0])}</span>`);
+  const followBtnHtml = (id, p) => `<button type="button" class="btn follow-btn btn-sm" data-follow="${esc(id)}" aria-pressed="false" aria-label="${esc(S('followAria', 'Follow @{handle}', { handle: p.h }))}"><span class="fb-off">${esc(L('follow'))}</span><span class="fb-on">${esc(L('following'))}</span><span class="fb-un">${esc(L('unfollow'))}</span></button>`;
+  function personRow(id, p, bio = true) {
+    return `<div class="wtf-wide"><div class="wtf"><a class="wtf-link" href="/thinkers/${esc(id)}/">${avatarHtml(p, 'sm')}<span class="wtf-names"><b>${esc(p.n)}</b><span class="handle">@${esc(p.h)}</span></span></a>${followBtnHtml(id, p)}</div>${bio ? `<p class="wtf-bio">${esc(p.b)}</p>` : ''}</div>`;
+  }
+  const chipHtml = (k, label) => `<button type="button" class="tchip" data-topic="${esc(k)}" aria-pressed="false"><span>${esc(label)}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path class="tc-plus" d="M12 6v12M6 12h12"/><path class="tc-tick" d="m6 12.5 4 4 8-9"/></svg></button>`;
+  const suggest = async () => {
+    const ppl = await loadPeople();
+    return { ppl, list: R ? R.suggestPeople(ppl, { follows, topics, affinity: store.get('taiku_aff', {}), seed: Number(sessionStorage.getItem('taiku_seed')) || 1 }) : [] };
+  };
+  // In-feed strips (X shows a "Who to follow" carousel and topic chips between posts).
+  async function feedStrip(kind) {
+    if (kind === 'people') {
+      const { ppl, list } = await suggest();
+      const cards = list.filter((x) => ppl[x.id].k === 'thinker').slice(0, 10).map(({ id }) => {
+        const p = ppl[id];
+        return `<div class="ws-card"><a class="ws-link" href="/thinkers/${esc(id)}/">${avatarHtml(p, 'md')}<b>${esc(p.n)}</b><span class="handle">@${esc(p.h)}</span></a>${followBtnHtml(id, p)}</div>`;
+      }).join('');
+      return cards ? `<section class="wtf-strip" aria-label="${esc(L('whoToFollow'))}"><h2>${esc(L('whoToFollow'))}</h2><div class="ws-cards">${cards}</div><a class="more" href="/connect/">${esc(L('showMore'))}</a></section>` : '';
+    }
+    const td = await loadTopics();
+    const chips = td.topics.filter(([k]) => !topics.has(k)).slice(0, 12).map(([k, l]) => chipHtml(k, l)).join('');
+    return chips ? `<section class="topic-strip" aria-label="${esc(L('topicsToFollow'))}"><h2>${esc(L('topicsToFollow'))}</h2><div class="topic-chips">${chips}</div><a class="more" href="/connect/#topics">${esc(L('showMore'))}</a></section>` : '';
+  }
+  // Sidebar "Who to follow": personalised once there's something to go on.
+  const wtfRows = document.querySelector('.wtf-panel .wtf-rows');
+  if (wtfRows && seeds()) suggest().then(({ ppl, list }) => {
+    const top = list.filter((x) => ppl[x.id].k === 'thinker').slice(0, 3);
+    if (top.length) { wtfRows.innerHTML = top.map(({ id }) => personRow(id, ppl[id], false).replace(/^<div class="wtf-wide">|<\/div>$/g, '')).join(''); hydrate(wtfRows); }
+  });
+  // Simple tab sets driven by the URL hash (/connect/ and /me/).
+  function hashTabs(sel, attr, onSelect) {
+    const tbs = [...document.querySelectorAll(sel)];
+    if (!tbs.length) return;
+    const names = tbs.map((b) => b.dataset[attr]);
+    const pick = (name, focus) => {
+      tbs.forEach((b) => { const on = b.dataset[attr] === name; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); });
+      onSelect(name);
+    };
+    const fromHash = () => pick(names.includes(location.hash.slice(1)) ? location.hash.slice(1) : names[0]);
+    tbs.forEach((b, i) => {
+      b.addEventListener('click', () => { history.replaceState(null, '', `#${b.dataset[attr]}`); pick(b.dataset[attr]); });
+      b.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        const n = tbs[(i + (e.key === 'ArrowRight' ? 1 : tbs.length - 1)) % tbs.length];
+        history.replaceState(null, '', `#${n.dataset[attr]}`);
+        pick(n.dataset[attr], true);
+      });
+    });
+    addEventListener('hashchange', fromHash);
+    fromHash();
+  }
+  // /connect/: re-rank the people list by similarity to what this browser follows and likes.
+  const cPeople = document.querySelector('.connect-people');
+  if (cPeople) {
+    hashTabs('.connect-tabs [role="tab"]', 'ctab', (name) => document.querySelectorAll('.ctab-panel').forEach((p) => { p.hidden = p.id !== `cpanel-${name}`; }));
+    if (seeds()) suggest().then(({ list }) => {
+      const rows = new Map([...cPeople.children].map((el) => [el.dataset.pid, el]));
+      const order = [...list.map((x) => x.id), ...[...follows]].filter((id) => rows.has(id));
+      cPeople.append(...order.map((id) => rows.get(id)));
+    });
+  }
+  // Onboarding picker: optional; opens once on a first visit to the home timeline, or from "Pick thinkers and topics".
+  const onboard = document.getElementById('onboard');
+  const obDone = onboard?.querySelector('.ob-done');
+  function paintOnboard() {
+    if (!obDone) return;
+    const n = follows.size + topics.size;
+    obDone.disabled = n < 3;
+    const c = onboard.querySelector('.ob-count');
+    if (c) c.textContent = L('picked')(n);
+  }
+  if (onboard) {
+    const open = () => { paintOnboard(); hydrate(onboard); onboard.showModal(); };
+    document.addEventListener('click', (e) => { if (e.target.closest('[data-onboard]')) { e.preventDefault(); open(); } });
+    onboard.addEventListener('close', () => store.set('taiku_onboarded', 1));
+    onboard.addEventListener('click', (e) => { if (e.target === onboard) onboard.close(); });
+    onboard.querySelector('.ob-skip').addEventListener('click', () => onboard.close());
+    obDone.addEventListener('click', () => { onboard.close(); const tb = document.getElementById('tab-following'); if (tb) tb.click(); else location.href = '/'; });
+    if (!store.get('taiku_onboarded', 0) && !follows.size && !topics.size && !navigator.webdriver && !matchMedia('(display-mode: standalone)').matches) setTimeout(() => { if (!document.querySelector('dialog[open]')) open(); }, 2500);
+  }
+  // Posts opened on this device, for the "Viewed" tab of /me/.
+  const focalPost = document.querySelector('.post.focal[data-pid]');
+  if (focalPost) store.set('taiku_opened', [focalPost.dataset.pid, ...store.get('taiku_opened', []).filter((id) => id !== focalPost.dataset.pid)].slice(0, 50));
+  // /me/: likes, bookmarks, follows and viewed posts from this browser's storage, rendered with the search shards.
+  const mePanel = document.getElementById('me-panel');
+  if (mePanel) {
+    followChanged(mePanel, '');
+    let sIdx = null;
+    const postIndex = () => (sIdx ??= fetch(`/data/search.json?v=${build}`).then((r) => r.json()).then((d) => new Map(d.posts.map((row) => [row[0], { t: row[3], s: row[6] }]))).catch(() => new Map()));
+    const meShards = new Map();
+    const meShard = (n) => { if (!meShards.has(n)) meShards.set(n, fetch(`/data/s/${n}.json?v=${build}`).then((r) => r.json()).catch(() => ({}))); return meShards.get(n); };
+    const empty = (k) => `<p class="empty">${esc(L('meEmpty')[k])}</p>`;
+    let seq = 0;
+    const show = async (name) => {
+      const my = ++seq;
+      mePanel.setAttribute('aria-busy', 'true');
+      let html = '';
+      if (name === 'following') {
+        const ppl = await loadPeople();
+        html = [...follows].filter((id) => ppl[id]).map((id) => personRow(id, ppl[id])).join('') || empty(name);
+      } else if (name === 'topics') {
+        const td = await loadTopics();
+        html = topics.size ? `<div class="topic-chips me-chips">${[...topics].map((k) => chipHtml(k, td.labels[k] || k)).join('')}</div>` : empty(name);
+      } else {
+        const ids = name === 'likes' ? [...likes].reverse() : name === 'bookmarks' ? [...marks].reverse() : store.get('taiku_opened', []);
+        const pi = await postIndex();
+        const rows = ids.filter((id) => pi.has(id)).slice(0, 50);
+        const cards = await Promise.all(rows.map(async (id) => (await meShard(pi.get(id).s))[id] || ''));
+        html = cards.join('') || empty(name);
+      }
+      if (my !== seq) return;
+      mePanel.innerHTML = html;
+      mePanel.setAttribute('aria-busy', 'false');
+      hydrate(mePanel);
+    };
+    hashTabs('.me-tabs [role="tab"]', 'mtab', show);
+  }
+
   // Search (static): a lazily loaded index and HTML shards from /data; the query lives in the URL (?q=&f=).
   const sRes = document.getElementById('search-results');
   if (sRes) {
@@ -494,7 +673,6 @@
       });
       return { terms, from, res: terms.map((t) => new RegExp(`(^|[^\\p{L}\\p{N}])${reEsc(t)}`, 'u')) };
     };
-    const personRow = (id, p) => `<div class="wtf-wide"><div class="wtf"><a class="wtf-link" href="/thinkers/${esc(id)}/">${p.a ? `<img class="avatar sm" src="${esc(p.a)}" alt="" width="40" height="40" loading="lazy" decoding="async">` : `<span class="avatar sm" style="--c:${esc(p.c)}" aria-hidden="true">${esc(p.n[0])}</span>`}<span class="wtf-names"><b${CA}>${esc(p.n)}</b><span class="handle">@${esc(p.h)}</span></span></a><button type="button" class="btn follow-btn btn-sm" data-follow="${esc(id)}" aria-pressed="false" aria-label="${esc(S('followAria', 'Follow @{handle}', { handle: p.h }))}"><span class="fb-off">${S('follow', 'Follow')}</span><span class="fb-on">${S('following', 'Following')}</span><span class="fb-un">${S('unfollow', 'Unfollow')}</span></button></div><p class="wtf-bio"${CA}>${esc(p.b)}</p></div>`;
     const matchPeople = async (qq) => {
       const ppl = await loadPeople();
       return Object.entries(ppl)
