@@ -11,11 +11,10 @@ export const DEFAULT_SITE = 'taiku';
 export const SITE = process.env.SITE || DEFAULT_SITE;
 if (!/^[a-z0-9][a-z0-9-]*$/.test(SITE)) throw new Error(`invalid SITE "${SITE}"`);
 
-/** Root of a site pack. The default site falls back to the repo root while content still lives there. */
+/** Root of a site pack (sites/<id>). */
 export function siteDir(id = SITE) {
   const dir = path.join(SITES_DIR, id);
   if (fs.existsSync(dir)) return dir;
-  if (id === DEFAULT_SITE) return ROOT;
   throw new Error(`unknown site "${id}" (no ${path.relative(ROOT, dir)})`);
 }
 

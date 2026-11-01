@@ -1,6 +1,6 @@
 name: Daily feed
 
-# Local-first: a local Copilot automation writes content/posts/daily-<UTC date>.json (origin "local",
+# Local-first: a local Copilot automation writes sites/taiku/content/posts/daily-<UTC date>.json (origin "local",
 # provider "session-daily") and pushes it to main around 09:00 UTC. This workflow is the FALLBACK:
 # at 12:00 UTC it exits early when that file is already on main, otherwise it runs the Cloudflare
 # Workers AI pipeline and writes the same filename with origin "cloudflare".
@@ -69,10 +69,10 @@ jobs:
           # The file this run owns: -mock in mock mode, -cf when --force runs next to a local file.
           sfx=""
           if [ -n "$MOCK" ]; then sfx="-mock"
-          elif [ -n "$FORCE" ] && [ -f "content/posts/daily-$day.json" ] && ! grep -q '"origin": *"cloudflare"' "content/posts/daily-$day.json"; then sfx="-cf"; fi
-          echo "dayfile=content/posts/daily-$day$sfx.json" >> "$GITHUB_OUTPUT"
-          if [ -z "$MOCK" ] && [ -z "$FORCE" ] && [ -f "content/posts/daily-$day.json" ]; then
-            echo "local run present, skipping (content/posts/daily-$day.json)"
+          elif [ -n "$FORCE" ] && [ -f "sites/taiku/content/posts/daily-$day.json" ] && ! grep -q '"origin": *"cloudflare"' "sites/taiku/content/posts/daily-$day.json"; then sfx="-cf"; fi
+          echo "dayfile=sites/taiku/content/posts/daily-$day$sfx.json" >> "$GITHUB_OUTPUT"
+          if [ -z "$MOCK" ] && [ -z "$FORCE" ] && [ -f "sites/taiku/content/posts/daily-$day.json" ]; then
+            echo "local run present, skipping (sites/taiku/content/posts/daily-$day.json)"
             echo "skipped=true" >> "$GITHUB_OUTPUT"
           else
             echo "skipped=false" >> "$GITHUB_OUTPUT"
@@ -177,8 +177,8 @@ jobs:
         with:
           name: daily-content
           path: |
-            content/
-            staging/
+            sites/taiku/content/
+            sites/taiku/staging/
             day-gate.json
           if-no-files-found: warn
           retention-days: 14
@@ -215,7 +215,7 @@ jobs:
           GH_PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           rm -f day-gate.json
-          git add content staging 2>/dev/null || git add content
+          git add sites/taiku/content sites/taiku/staging 2>/dev/null || git add sites/taiku/content
           if git diff --cached --quiet; then echo "No new content."; exit 0; fi
           git config user.name "taiku-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
