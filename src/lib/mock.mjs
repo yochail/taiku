@@ -111,11 +111,16 @@ function sentences(ctx, rand) {
   return list;
 }
 
+const RAMBLE = ['and yes, i checked.', 'nobody asked, i know.', 'the scroll agrees with me.', 'twice, in fact.', 'i will not be taking questions.', 'this is the hill.', 'ok one more thing.', 'fine.'];
+
 /** Fit sentences into [min,max] by greedy assembly; never exceeds MAX_TAIK_CHARS. */
 function assemble(list, min, max, rand) {
   if (max <= 40) {
-    const short = list.filter((x) => taikLength(x) <= max);
-    return short.length && rand() < 0.4 ? short[0] : pick(SHORT.filter((x) => taikLength(x) <= max).concat('no.'), rand);
+    // The "short" reply form (min >= 10) means 4+ words; tinier asks may be a word or two.
+    const fits = (x) => taikLength(x) <= max && (min < 10 || x.trim().split(/\s+/).length >= 4);
+    const short = list.filter(fits);
+    const pool = SHORT.filter(fits);
+    return short.length && rand() < 0.4 ? short[0] : pick(pool.length ? pool : ['no. absolutely not.'], rand);
   }
   let text = '';
   for (const s of list) {
@@ -123,6 +128,12 @@ function assemble(list, min, max, rand) {
     if (taikLength(next) > max) continue;
     text = next;
     if (taikLength(text) >= min) break;
+  }
+  // Ran out of material below the target: pad with rambles, like a real poster on a roll.
+  for (const s of RAMBLE) {
+    if (!text || taikLength(text) >= min) break;
+    const next = `${text} ${s}`;
+    if (taikLength(next) <= max) text = next;
   }
   return text || SHORT[0];
 }
@@ -172,8 +183,9 @@ function compose(ctx, passages, rand, { repairing }) {
     if (p.translated && rand() < 0.35) qtext = fuzzVariant(p.text, rand) ?? p.text;
     const lead = pick(['', 'me, years ago: ', 'said it then, saying it now: ', 'anyway. ', 'once again for the back row: '], rand);
     text = `${lead}"${qtext}"`;
-    const tail = assemble(sentences(ctx, rand), 1, max - taikLength(text) - 1, rand);
-    if (taikLength(`${text}\n\n${tail}`) <= max && rand() < 0.7) text = `${text}\n\n${tail}`;
+    const need = min - taikLength(text) - 2;
+    const tail = assemble(sentences(ctx, rand), Math.max(1, need), max - taikLength(text) - 2, rand);
+    if (taikLength(`${text}\n\n${tail}`) <= max && (need > 0 || rand() < 0.7)) text = `${text}\n\n${tail}`;
     quoteRefs = [{ passageId: p.passageId, text: qtext }];
     if (rand() < 0.5) out.note = { passageId: p.passageId };
     min = 1;

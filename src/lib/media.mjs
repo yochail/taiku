@@ -317,12 +317,13 @@ function sample(rand, arr, k) {
  * Decide whether a post gets media and what the LLM must supply. Uses sampler.mediaKind(role)
  * so the corpus follows realism/spec.json. Returns null (no media) or a plan:
  *   { kind, options?, prompt }  -> put `plan.prompt` into the LLM turn, then call materializeMedia(plan, llmJson.media)
- * ctx: { mood?: string, news?: object, giphy?: client from createGiphyClient() }
+ * ctx: { mood?: string, news?: object, giphy?: client from createGiphyClient(), persona?: object (scales
+ *   visual kinds by x_behavior.meme_affinity), kind?: force a kind (e.g. the day's guaranteed poll) }
  *   link cards need ctx.news; 'video' is never produced; gifs use GIPHY per spec.sampling.gif_sources
  *   when ctx.giphy is enabled, else the local public-domain reactions.
  */
 export function planMedia(sampler, role = 'original', ctx = {}) {
-  const kind = sampler.mediaKind(role);
+  const kind = ctx.kind ?? sampler.mediaKind(role, ctx.persona ?? null);
   const rand = sampler.rand;
   const lib = loadLibrary();
   if (kind === 'none' || kind === 'video') return null;

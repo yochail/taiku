@@ -5,6 +5,11 @@ name: Daily feed
 # at 12:00 UTC it exits early when that file is already on main, otherwise it runs the Cloudflare
 # Workers AI pipeline and writes the same filename with origin "cloudflare".
 #
+# Distribution gate: the day's file must pass `npm run realism -- --file <day file>` (realism/spec.json,
+# bands widened for one day's sample, hard checks, per-persona plausibility). On failure the flagged
+# items are regenerated once (`generate --repair`), then the gate runs again and blocks: a failing
+# day fails the job, so `publish` never runs and nothing is committed.
+#
 # Security split: `generate` talks to Workers AI + feeds with a read-only token and no persisted git
 # credentials; `publish` never sees the AI token, only re-validates the generated JSON and pushes it.
 
@@ -46,6 +51,7 @@ jobs:
       contents: read
     outputs:
       skipped: ${{ steps.local.outputs.skipped }}
+      dayfile: ${{ steps.local.outputs.dayfile }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,6 +66,11 @@ jobs:
         run: |
           day="${GEN_DATE:-$(date -u +%Y-%m-%d)}"
           echo "day=$day" >> "$GITHUB_OUTPUT"
+          # The file this run owns: -mock in mock mode, -cf when --force runs next to a local file.
+          sfx=""
+          if [ -n "$MOCK" ]; then sfx="-mock"
+          elif [ -n "$FORCE" ] && [ -f "content/posts/daily-$day.json" ] && ! grep -q '"origin": *"cloudflare"' "content/posts/daily-$day.json"; then sfx="-cf"; fi
+          echo "dayfile=content/posts/daily-$day$sfx.json" >> "$GITHUB_OUTPUT"
           if [ -z "$MOCK" ] && [ -z "$FORCE" ] && [ -f "content/posts/daily-$day.json" ]; then
             echo "local run present, skipping (content/posts/daily-$day.json)"
             echo "skipped=true" >> "$GITHUB_OUTPUT"
@@ -85,6 +96,7 @@ jobs:
         run: npm install --no-save --no-audit --no-fund @huggingface/transformers || echo "embeddings unavailable; the run falls back to tag overlap (degraded)"
 
       - name: Generate the daily run (Workers AI fallback)
+        id: gen
         if: steps.local.outputs.skipped != 'true'
         env:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -112,14 +124,51 @@ jobs:
           [ -n "$FORCE" ] && args+=(--force)
           if [ -n "$MOCK" ]; then npm run generate:mock -- "${args[@]}"; else npm run generate -- "${args[@]}"; fi
 
+      - name: Day gate (distribution)
+        id: gate
+        if: steps.local.outputs.skipped != 'true'
+        continue-on-error: true
+        run: npm run realism -- --file "${{ steps.local.outputs.dayfile }}" --json day-gate.json
+      - name: Repair once (regenerate the flagged items)
+        if: steps.local.outputs.skipped != 'true' && steps.gate.outcome == 'failure'
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_AI_TOKEN: ${{ secrets.CF_AI_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEN_DATE: ${{ steps.local.outputs.day }}
+          GEN_NONCE: ${{ inputs.nonce }}
+          GEN_TOPICS: ${{ inputs.topics || vars.GEN_TOPICS }}
+          GEN_MAX_CALLS: ${{ inputs.max_calls || vars.GEN_MAX_CALLS }}
+          GEN_MIN_COMPLETE: ${{ vars.GEN_MIN_COMPLETE }}
+          # GIPHY beta key: server-side search only (rating=pg-13), capped per run.
+          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+          GIPHY_MAX_CALLS: ${{ vars.GIPHY_MAX_CALLS || '10' }}
+          NEWS_FEEDS: ${{ vars.NEWS_FEEDS }}
+          POLICY_ALLOW_NAMES: ${{ vars.POLICY_ALLOW_NAMES }}
+          PUBLISH_ENABLED: ${{ vars.PUBLISH_ENABLED }}
+          FORCE: ${{ inputs.force && '1' || '' }}
+          MOCK: ${{ inputs.mock && '1' || '' }}
+        run: |
+          export TRANSFORMERS_CACHE="$HOME/.cache/taiku-hf"
+          args=(--date "$GEN_DATE" --repair)
+          [ -n "$GEN_NONCE" ] && args+=(--nonce "$GEN_NONCE")
+          [ -n "$FORCE" ] && args+=(--force)
+          if [ -n "$MOCK" ]; then npm run generate:mock -- "${args[@]}"; else npm run generate -- "${args[@]}"; fi
+      - name: Day gate after repair (blocking; a failure means nothing is committed)
+        if: steps.local.outputs.skipped != 'true' && steps.gate.outcome == 'failure'
+        run: npm run realism -- --file "${{ steps.local.outputs.dayfile }}" --json day-gate.json
+
       - name: Validate content
         if: steps.local.outputs.skipped != 'true'
         run: npm run validate
       - name: Build, checks & unit tests
         if: steps.local.outputs.skipped != 'true'
         run: npm test
-      - name: Realism report (fails only on hard rules)
+      - name: Realism report, whole corpus (non-blocking)
         if: steps.local.outputs.skipped != 'true'
+        continue-on-error: true
         run: npm run realism
 
       - name: Upload generated content
@@ -130,6 +179,7 @@ jobs:
           path: |
             content/
             staging/
+            day-gate.json
           if-no-files-found: warn
           retention-days: 14
 
@@ -153,14 +203,18 @@ jobs:
           path: .
 
       - name: Re-validate before publishing
+        env:
+          DAYFILE: ${{ needs.generate.outputs.dayfile }}
         run: |
           npm run validate
           npm test
+          npm run realism -- --file "$DAYFILE"
 
       - name: Commit & push
         env:
           GH_PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          rm -f day-gate.json
           git add content staging 2>/dev/null || git add content
           if git diff --cached --quiet; then echo "No new content."; exit 0; fi
           git config user.name "taiku-bot"

@@ -110,6 +110,10 @@ export function userMessage(task, ctx) {
 }
 
 export const shortenRepair = (len, min, max) => `Too long: ${len} characters, the limit is ${MAX_TAIK_CHARS}. Rewrite it shorter (aim ${min}-${max}); keep any verified quote verbatim or drop it. Return the JSON object only.`;
+/** Over the item's sampled target (with slack): real X posts are short; rewrite to the target, never truncate. */
+export const targetRepair = (len, min, max) => `Too long: ${len} characters for this item; the target is ${min}-${max}. Rewrite it to fit (cut, don't summarize; one point, said fast). Return the JSON object only.`;
+/** Hard ceiling for an item with a sampled target: 1.5x the bucket top or +40 chars, whichever is larger. */
+export const targetCeiling = (length) => Math.min(MAX_TAIK_CHARS, Math.max(Math.round((length?.max ?? MAX_TAIK_CHARS) * 1.5), (length?.max ?? MAX_TAIK_CHARS) + 40));
 export const quoteRepair = (spans) => `These double-quoted spans are not verbatim passages from your tool results in this conversation: ${spans.map((s) => `‘${String(s).slice(0, 60)}’`).join('; ')}. Remove the double quotes (paraphrase, or use single curly quotes), or quote a returned passage exactly with its passageId in quoteRefs. Return the JSON object only.`;
 export const formatRepair = () => 'That was not a valid JSON object with a non-empty "text". Return ONLY the JSON object.';
 

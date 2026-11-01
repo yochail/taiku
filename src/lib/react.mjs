@@ -7,10 +7,13 @@
 //     relation   = rival 3 · frenemy 2.5 · ally 2 · follows-author 1.5 · else 1
 //     popularity = (0.5 + ln(1 + followers/1e4)/ln 101) × (1 + 0.3·ln(1 + engagement so far))  (rich get richer)
 //     recency    = exp(−hours between post and would-be reaction / 12)
-//     depth      = 0.6^depth (reply depth in the thread)
+//     depth      = 0.6^depth (reply depth in the thread); 0.85^depth for the persona being replied to (arguments run on)
 //     fatigue    = max(0, 1 − actions used today / daily budget), budget = round(4 + 36·x_behavior.activity)
-//     mention    = 5 if the post @mentions the persona (id/handle), quotes them, or replies to them
-//   p = 1 − exp(−k·score), Bernoulli draw with a RNG seeded by (date, nonce).
+//     mention    = clapback if the post @mentions the persona (id/handle), quotes them, or replies to them:
+//                  (2 + 8·x_behavior.clapback_rate) × heat, heat = 0.7 + 0.15·temperament.heat (1-5)
+//   p = 1 − exp(−k·score), Bernoulli draw with a RNG seeded by (date, nonce). A persona who was
+//   replied to or quoted gets a notification: p ≥ clapback_rate × (0.4 + 0.12·heat) × 0.85^depth × fatigue,
+//   so hot-headed posters keep arguments going (deep threads, reciprocal reply edges).
 // If it fires, the action is sampled from the persona's propensities (x_behavior like/repost/
 // reply/quote rates × global multipliers LIKE_BOOST / rTilt / 1 / qTilt) tilted by the relation
 // (beef → reply/quote, allies → like/retaik). k, qTilt and rTilt are CALIBRATED by bisection on
@@ -83,6 +86,8 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
   const used = new Map(personas.map((p) => [p.id, 0]));
   const budget = new Map(personas.map((p) => [p.id, dailyBudget(p)]));
   const beh = new Map(personas.map((p) => [p.id, behaviorOf(p)]));
+  const heat = (p) => 0.7 + 0.15 * clamp(p.temperament?.heat ?? 3, 1, 5);
+  const clap = (p) => clamp(beh.get(p.id)?.clapback_rate ?? 0.4, 0, 1);
   const followMemo = new Map();
   const reactors = personas.filter((p) => !isNews(p));
   const reactions = [];
@@ -112,9 +117,9 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
       relation,
       popularity,
       recency: Math.exp(-delayMin / 60 / 12),
-      depth: 0.6 ** (post.depth ?? 0),
+      depth: (mentioned ? 0.85 : 0.6) ** (post.depth ?? 0),
       fatigue: Math.max(0, 1 - used.get(persona.id) / budget.get(persona.id)),
-      mention: mentioned ? 5 : 1,
+      mention: mentioned ? (2 + 8 * clap(persona)) * heat(persona) : 1,
       rel: rel ?? (relation > 1 ? 'follows' : null),
     };
   }
@@ -125,7 +130,7 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
     const w = {
       like: (b.like_rate ?? 0.3) * LIKE_BOOST * t.like,
       repost: (b.repost_rate ?? 0.15) * rTilt * t.repost,
-      reply: (b.reply_rate ?? 0.3) * t.reply * (mentioned && rel !== 'ally' ? 2 : 1) * (depth >= MAX_DEPTH ? 0 : 1),
+      reply: (b.reply_rate ?? 0.3) * t.reply * (mentioned ? (1 + 4 * clap(persona)) * heat(persona) * (rel === 'ally' ? 0.6 : 1) : 1) * (depth >= MAX_DEPTH ? 0 : 1),
       quote: (b.quote_rate ?? 0.15) * qTilt * t.quote,
     };
     return weightedPick(rand, ACTIONS.map((a) => [a, w[a]])) ?? 'like';
@@ -143,7 +148,8 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
       const delayMin = sampler.replyDelayMinutes();
       const tm = terms(persona, post, delayMin);
       const score = tm.reactivity * tm.affinity * tm.relation * tm.popularity * tm.recency * tm.depth * tm.fatigue * tm.mention;
-      const p = 1 - Math.exp(-k * score);
+      const notified = tm.mention > 1 ? clap(persona) * (0.4 + 0.12 * clamp(persona.temperament?.heat ?? 3, 1, 5)) * 0.85 ** (post.depth ?? 0) * tm.fatigue : 0;
+      const p = Math.max(1 - Math.exp(-k * score), notified);
       const draw = rand();
       if (!(draw < p)) continue;
       let action = chooseAction(persona, tm.rel, tm.mention > 1, post.depth ?? 0);
@@ -230,7 +236,8 @@ export function cascade(reactor, originals, { horizon = Infinity, personas = [] 
         parent: ev.action === 'reply' ? post.id : null,
         quoteOf: ev.action === 'quote' ? post.id : null,
         rel: ev.rel,
-        ...(ev.form ? { form: ev.form, cheap: ev.cheap, noReply: Boolean(ev.cheap) } : {}),
+        // Cheap (pool) replies can draw clapbacks too; they are executed a level before their children.
+        ...(ev.form ? { form: ev.form, cheap: ev.cheap } : {}),
         mentions: new Set([post.authorId].filter((id) => byId.size === 0 || byId.has(id))),
         likes: [],
         reposts: [],

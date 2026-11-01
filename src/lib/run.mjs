@@ -148,6 +148,13 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
     const h = Math.max(minHour, sampler.localHour());
     return day.start + h * 3.6e6 + sampler.minute() * 6e4 + Math.floor(rand() * 6e4);
   };
+  // People post in sessions: each author gets 1-2 sittings a day and their originals cluster there (bursty, B > 0).
+  const sittings = new Map();
+  const sessionAt = (pid, minHour = 0) => {
+    if (!sittings.has(pid)) sittings.set(pid, Array.from({ length: rand() < 0.5 ? 1 : 2 }, () => at(minHour)));
+    const c = sittings.get(pid);
+    return c[Math.floor(rand() * c.length)] + Math.floor(rand() * 25 * 6e4);
+  };
   const delay = (maxMin = 180) => Math.min(maxMin, sampler.replyDelayMinutes()) * 6e4 + Math.floor(rand() * 6e4);
   const node = (o) => ({ depth: 0, mentions: new Set(), likes: [], reposts: [], rel: null, parent: null, quoteOf: null, topicId: null, ...o });
   const nodes = [];
@@ -179,7 +186,7 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
         const pid = pickFan(used);
         if (!pid) break;
         used.add(pid);
-        nodes.push(node({ id: `${t.id}-root${j}`, authorId: pid, createdAt: j === 1 ? T : T + delay(240), vector: t.keys, role: 'original', kind: 'topic-root', exec: 'single', topicId: t.id }));
+        nodes.push(node({ id: `${t.id}-root${j}`, authorId: pid, createdAt: j === 1 ? T : Math.max(T + 6e4, sessionAt(pid, 6)), vector: t.keys, role: 'original', kind: 'topic-root', exec: 'single', topicId: t.id }));
       }
     }
   }
@@ -192,7 +199,7 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
     const p = personas.find((x) => x.id === pid);
     const key = weightedPick(rand, Object.entries(p.topic_affinity ?? { philosophy: 1 }).map(([k, v]) => [k, Number(v) || 0.01]));
     const exec = i <= singles ? 'single' : i === threadAt ? 'thread' : 'originals';
-    nodes.push(node({ id: `s${i}`, authorId: pid, createdAt: at(), vector: { [key]: 1 }, role: 'original', kind: exec === 'thread' ? 'thread' : 'standalone', exec, theme: key }));
+    nodes.push(node({ id: `s${i}`, authorId: pid, createdAt: sessionAt(pid), vector: { [key]: 1 }, role: 'original', kind: exec === 'thread' ? 'thread' : 'standalone', exec, theme: key }));
   }
   const authoredOriginals = nodes.filter((n) => n.role === 'original' && n.kind !== 'wire').length;
   const cal = calibrate({ personas, spec, originalsPerDay: authoredOriginals, cacheFile: calibrationFile, writeCache: writeCalibration });
@@ -227,9 +234,9 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
   let mediaPlan = null;
   if (role !== 'wire' && !cheap && !short) {
     const news = safeUrl(topic?.url ?? '') ? { url: topic.url, title: topic.title } : null;
-    mediaPlan = planFor(sampler, role === 'original' ? 'original' : role, { news, giphy });
+    mediaPlan = planFor(sampler, role === 'original' ? 'original' : role, { news, giphy, persona });
     // Topic roots re-draw so link cards keep their spec share despite URL-less standalones.
-    if (role === 'original' && !mediaPlan && news) for (let i = 0; i < 2 && mediaPlan?.kind !== 'link_card'; i++) mediaPlan = planFor(sampler, 'original', { news, giphy }) ?? mediaPlan;
+    if (role === 'original' && !mediaPlan && news) for (let i = 0; i < 2 && mediaPlan?.kind !== 'link_card'; i++) mediaPlan = planFor(sampler, 'original', { news, giphy, persona }) ?? mediaPlan;
     if (mediaPlan?.kind === 'poll' && (role !== 'original' || node.kind === 'thread' || node.kind === 'thread-part')) mediaPlan = null;
     if (mediaPlan?.kind === 'link_card' && !news) mediaPlan = null;
   }
@@ -238,7 +245,10 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
   if (role === 'wire') length = { min: 60, max: 240 };
   else if (short) length = { min: 10, max: 40 };
   else {
-    length = sampler.lengthRange();
+    length = sampler.lengthRange(persona);
+    // A full-form reply/quote is > 40 chars by definition: draw from the persona's buckets above 40
+    // (conditional distribution), not a fixed fallback, so long replies keep their spec share.
+    for (let i = 0; i < 12 && role !== 'original' && form === 'full' && length.max <= 40; i++) length = sampler.lengthRange(persona);
     if (role !== 'original' && form === 'full' && length.max <= 40) length = { min: 41, max: 120 };
   }
   if (media === 'gif') length = { min: 1, max: Math.min(length.max, 80) };
@@ -425,6 +435,26 @@ export async function runDaily(opts = {}) {
     t.sig = sig(t);
     return t;
   });
+  // The day's guaranteed polls (spec.sampling.media.polls_per_day_min): a poll is ~1% of originals,
+  // so a ~60-original day often samples none. Convert a plain standalone original.
+  const pollMin = spec.sampling.media?.polls_per_day_min ?? 0;
+  const pollable = tasks.filter((t) => t.role === 'original' && !t.media && (t.exec === 'originals' || t.exec === 'single') && t.kind !== 'thread' && t.kind !== 'thread-part');
+  for (let have = tasks.filter((t) => t.media === 'poll').length; have < pollMin && pollable.length; have++) {
+    const t = pollable.splice(Math.floor(plan.rand() * pollable.length), 1)[0];
+    const mp = planFor(plan.sampler, 'original', { persona: byId.get(t.personaId), kind: 'poll' });
+    Object.assign(t.spec, { media: 'poll', mediaPlan: mp, length: { min: Math.max(20, t.spec.length.min), max: Math.max(60, Math.min(t.spec.length.max, 140)) }, archetype: pickType(plan.rand, byId.get(t.personaId), nodeById.get(t.taskId), 'poll') });
+    Object.assign(t, { media: 'poll', archetype: t.spec.archetype });
+    t.sig = sig(t);
+  }
+  // Gate repair (generate --repair): regenerate the items the distribution gate flagged, once, with
+  // the fix applied to their spec (shorter length bucket / persona-typical length). Everything else resumes.
+  const repair = new Map((opts.repair ?? []).map((r) => [r.taskId, r]));
+  for (const t of tasks) {
+    const r = repair.get(t.taskId);
+    if (!r || t.exec === 'pool' || t.exec === 'wire') continue;
+    if (r.length) t.spec.length = { ...r.length };
+    t.repair = r.reason ?? 'gate';
+  }
 
   // 6) Execute by depth level (a parent's text exists before its children), resuming finished work.
   const workDoc = opts.fresh ? null : readJson(paths.work);
@@ -534,7 +564,7 @@ export async function runDaily(opts = {}) {
       t.error = 'topic blocked';
       return false;
     }
-    const cached = work[t.taskId];
+    const cached = t.repair ? null : work[t.taskId];
     if (cached && cached.sig === t.sig) {
       t.resumed = true;
       t.calls = 0;

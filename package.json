@@ -14,6 +14,8 @@
     "test": "node src/build.mjs && node scripts/check.mjs && node --test \"test/*.test.mjs\"",
     "media:fetch": "node scripts/fetch-art.mjs",
     "realism": "node scripts/realism.mjs",
+    "gate": "node scripts/realism.mjs --date",
+    "gate:today": "node scripts/realism.mjs --date today",
     "generate": "node src/generate.mjs",
     "generate:dry": "node src/generate.mjs --dry-run",
     "generate:mock": "node src/generate.mjs --mock",

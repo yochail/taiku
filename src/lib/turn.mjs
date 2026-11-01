@@ -7,7 +7,7 @@ import { materializeFor } from './gen-media.mjs';
 import { houseStyleRepair, lintTaik } from './house-style.mjs';
 import { BudgetError, parseJsonLoose } from './llm.mjs';
 import { checkPost, repairHint } from './policy.mjs';
-import { formatRepair, quoteRepair, shortenRepair, systemMessage, userMessage } from './prompts.mjs';
+import { formatRepair, quoteRepair, shortenRepair, systemMessage, targetCeiling, targetRepair, userMessage } from './prompts.mjs';
 import { createToolbox } from './tools.mjs';
 
 export const MAX_TOOL_ROUNDS = 2;
@@ -86,6 +86,7 @@ export async function validateItem(out, { task, persona, passages, policyCtx, ct
   const text = out.text.replace(/\r\n?/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
   const len = taikLength(text);
   if (len > MAX_TAIK_CHARS) return { problem: shortenRepair(len, task.length.min, Math.min(task.length.max, MAX_TAIK_CHARS)), kind: 'length' };
+  if (task.length && task.role !== 'wire' && len > targetCeiling(task.length)) return { problem: targetRepair(len, task.length.min, task.length.max), kind: 'length' };
   const style = [...lintTaik(text, persona), ...(tracker ? tracker.check(text) : [])];
   if (style.length) return { problem: houseStyleRepair(style), kind: 'style', style };
   const { refs, bad } = resolveQuotes(text, out.quoteRefs, passages);

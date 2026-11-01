@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -20,13 +22,31 @@ jobs:
         run: npm run validate
       - name: Build, checks & unit tests
         run: npm test
-      - name: Realism report (fails on hard rules; drift is a warning in the job summary)
+      # Blocking: every daily-*.json this push/PR adds or changes must pass the day gate.
+      - name: Day gate on changed daily files
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then range="origin/$BASE_REF...HEAD"
+          elif [ -n "$BEFORE" ] && ! echo "$BEFORE" | grep -qE '^0+$' && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then range="$BEFORE..HEAD"
+          else range="HEAD~1..HEAD"; fi
+          files=$(git diff --name-only --diff-filter=AM "$range" -- 'content/posts/daily-*.json' || true)
+          if [ -z "$files" ]; then echo "No daily files changed ($range)."; exit 0; fi
+          args=()
+          for f in $files; do args+=(--file "$f"); done
+          npm run realism -- "${args[@]}" --json day-gate.json
+      - name: Realism report, whole corpus (non-blocking; drift shows in the job summary)
+        continue-on-error: true
         run: npm run realism -- --json realism-report.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: realism-report
-          path: realism-report.json
+          path: |
+            realism-report.json
+            day-gate.json
           if-no-files-found: ignore
       - name: Generator dry-run (offline fixtures + mock provider, network blocked, writes nothing)
         run: npm run generate:dry -- --seed ci --summary-only

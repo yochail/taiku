@@ -92,8 +92,8 @@ const sanitizeFill = (plan, fill) => {
 };
 
 /** Plan media for a task (null when none). link cards use the topic and are rendered by run.mjs. */
-export function planFor(sampler, role, { news = null, giphy = null, mood = null } = {}) {
-  const plan = planMedia(sampler, role === 'wire' ? 'original' : role, { news, giphy, mood });
+export function planFor(sampler, role, { news = null, giphy = null, mood = null, persona = null, kind = null } = {}) {
+  const plan = planMedia(sampler, role === 'wire' ? 'original' : role, { news, giphy, mood, persona, kind });
   return plan;
 }
 

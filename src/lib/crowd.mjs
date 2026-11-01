@@ -28,19 +28,30 @@ export function crowdFor(post, author, spec = loadDistribution()) {
 }
 
 /**
- * Counts shown in the UI. replies/quotes = real graph counts (children, quote-taiks).
+ * Counts shown in the UI. replies = real graph count; quotes = quote-taiks + the crowd's quotes
+ * (sampling.engagement.quotes_per_repost), which also count as reposts.
  * `visitorLikes` is the hook for real viewer likes from the D1 API later (0 for now).
  */
 export function displayStats(post, author, { replies = 0, quotes = 0, visitorLikes = 0 } = {}) {
   const c = crowdFor(post, author);
   const likeBase = post.crowdLikeBase ?? c.likes;
   const repostBase = post.crowdRepostBase ?? c.reposts;
+  const allQuotes = quotes + (post.crowdQuoteBase ?? c.quotes);
   return {
     replies,
-    quotes,
+    quotes: allQuotes,
     likes: (post.personaLikes?.length ?? 0) + likeBase + visitorLikes,
-    reposts: (post.personaReposts?.length ?? 0) + repostBase + quotes,
+    reposts: (post.personaReposts?.length ?? 0) + repostBase + allQuotes,
     views: post.views ?? c.views,
     bookmarks: post.bookmarks ?? c.bookmarks,
   };
+}
+
+/** Fill `post.stats` (where missing) the way visitors see it: persona engagement + seeded crowd + quote counts. */
+export function withDisplayStats(posts, personas) {
+  const byP = new Map(personas.map((p) => [p.id, p]));
+  const quoteN = new Map();
+  for (const p of posts) if (p.quoteOf) quoteN.set(p.quoteOf, (quoteN.get(p.quoteOf) ?? 0) + 1);
+  for (const p of posts) p.stats ??= displayStats(p, byP.get(p.authorId), { quotes: quoteN.get(p.id) ?? 0 });
+  return posts;
 }

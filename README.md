@@ -86,7 +86,8 @@ npm run serve          # preview dist/ at http://localhost:8080
 npm run generate:dry   # mock generation, prints JSON, writes nothing (no key needed)
 npm run generate:mock  # mock generation, writes a batch file (for testing; delete it afterwards)
 npm run generate       # real generation with an LLM (needs a key, see below)
-npm run realism        # measure the corpus against realism/spec.json (X-like distributions)
+npm run realism        # measure the corpus against realism/spec.json (X-like distributions; report)
+npm run gate -- 2026-11-02   # blocking day gate for daily-2026-11-02.json (+ -cf); npm run gate:today = today UTC
 npm run media:fetch    # (re)download the verified public-domain art in media/library.json
 ```
 
@@ -95,6 +96,14 @@ Generator flags: `--posts N` (default 3), `--replies N` (default 7), `--seed X`,
 ### Network realism
 
 [`realism/spec.json`](realism/spec.json) holds the target distributions taken from X/Twitter research, with sources and a confidence level for each: activity mix, media mix, length, thread depth, author skew, posting hours, burstiness, hashtags/emoji and engagement. The generator should draw from it with `createSampler()` in [`src/lib/realism.mjs`](src/lib/realism.mjs). `npm run realism` prints a drift report, which also appears in the CI job summary. It exits 1 only on hard-rule failures: more than 280 chars, a reply timestamped before its parent, or unsafe or unattributed media. Add `--strict` to fail on drift too.
+
+**Day gate (blocking).** Each day's generated file must also pass `npm run realism -- --file content/posts/daily-D.json` (or `npm run gate -- D`, which gates `daily-D.json` and `daily-D-cf.json`). It is [`src/lib/daygate.mjs`](src/lib/daygate.mjs), tuned by the `gate` section of the spec:
+- Only that day is scored. Share metrics get a binomial 95% interval around the spec band at the day's sample size; other metrics get ±15%. The role mix, median length, short share and visual share on originals block; the rest are reported.
+- Hard fails: no media at all, no poll on a day with 20+ originals, more than 20% of items over 140 chars, more than 40% of timestamps on a round 5 minutes, anything before its parent, and every spec hard rule.
+- Per persona (5+ items that day): the share of items of 40 chars or less, and over 140, must be plausible for that persona's style (from `x_behavior`, `temperament` and the spec's `persona_styles`). Diogenes writing essays fails; so does Kant answering in two words all day.
+- It prints a markdown scorecard (also written to the GitHub job summary) and lists the offending items.
+
+It runs in three places: in `generate.yml` before anything is committed (on failure the flagged items are regenerated once with `generate --repair`, then the gate runs again and a failure ends the job); in CI for every push or PR that adds or changes a `daily-*.json`; and in the local daily automation, which must run `npm run gate:today` and fix the day before pushing.
 
 **Reply forms.** Real replies are often not sentences: an emoji ("💀"), a few words ("based", "source?"), a bare GIF or meme, or a plain retaik.
 - `sampling.reply_forms` sets the mix for replies and quotes.

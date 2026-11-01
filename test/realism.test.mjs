@@ -16,8 +16,8 @@ test('spec is well-formed', () => {
     assert.ok(['warn', 'fail'].includes(t.severity), `${id} severity`);
     for (const s of t.sources) assert.ok(spec.sources[s], `${id} cites unknown source ${s}`);
   }
-  for (const [role, w] of Object.entries(spec.sampling.media)) {
-    if (role.startsWith('_')) continue;
+  for (const role of ['original', 'reply', 'quote']) {
+    const w = spec.sampling.media[role];
     const sum = Object.values(w).reduce((s, v) => s + v, 0);
     assert.ok(Math.abs(sum - 1) < 1e-6, `media.${role} sums to 1 (${sum})`);
   }

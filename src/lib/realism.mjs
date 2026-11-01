@@ -4,6 +4,7 @@ import path from 'node:path';
 import { ROOT } from './data.mjs';
 import { rng as makeRng } from './util.mjs';
 import { renderProblems } from './media.mjs';
+import { behaviorOf } from './behavior.mjs';
 
 export const SPEC_PATH = path.join(ROOT, 'realism', 'spec.json');
 export const VISUAL_KINDS = new Set(['image', 'gif', 'meme', 'chart', 'video']);
@@ -332,13 +333,58 @@ function weighted(rand, entries) {
   return list[list.length - 1][0];
 }
 
-/** terse | punchy | balanced | discursive. persona.reply_style wins, then the spec map, then balanced. */
+/**
+ * Style score from the persona's X behaviour and temperament: shitposters, meme lovers and
+ * hot-heads write short; thread-writers write long. Roughly -0.4 (scholar) .. 1 (Diogenes).
+ */
+export function styleScore(persona) {
+  if (!persona || typeof persona !== 'object') return 0.2;
+  const b = behaviorOf(persona);
+  const heat = (Math.min(5, Math.max(1, persona.temperament?.heat ?? 3)) - 1) / 4;
+  return 0.5 * (b.shitpost_level ?? 0.2) + 0.3 * (b.meme_affinity ?? 0.3) + 0.2 * heat - 0.4 * (b.thread_tendency ?? 0.2);
+}
+
+/**
+ * terse | punchy | balanced | discursive. persona.reply_style wins, then the spec map, then the
+ * persona's x_behavior/temperament (sampling.reply_forms.style_thresholds), then balanced.
+ */
 export function personaReplyStyle(spec, persona) {
   const rf = spec.sampling.reply_forms;
   const id = typeof persona === 'string' ? persona : persona?.id;
   const own = typeof persona === 'object' ? persona?.reply_style : undefined;
-  const style = own ?? rf.persona_style[id] ?? 'balanced';
-  return rf.persona_styles[style] ? style : 'balanced';
+  let style = own ?? rf.persona_style[id];
+  if (!style && typeof persona === 'object' && persona) {
+    const th = rf.style_thresholds ?? { terse: 0.55, punchy: 0.3, discursive: 0 };
+    const sc = styleScore(persona);
+    style = sc >= th.terse ? 'terse' : sc >= th.punchy ? 'punchy' : sc <= th.discursive ? 'discursive' : 'balanced';
+  }
+  return rf.persona_styles[style ?? 'balanced'] ? style ?? 'balanced' : 'balanced';
+}
+
+/** Length bucket weights for a persona: spec buckets × sampling.length_chars.persona_styles[style]. */
+export function lengthWeights(spec, persona = null) {
+  const lc = spec.sampling.length_chars;
+  const mult = persona ? lc.persona_styles?.[personaReplyStyle(spec, persona)] ?? [] : [];
+  return lc.buckets.map((b, i) => b[2] * (mult[i] ?? 1));
+}
+
+/** Expected reply/quote form mix for a persona (normalized base × persona style multipliers). */
+export function expectedReplyForms(spec, role = 'reply', persona = null) {
+  const rf = spec.sampling.reply_forms;
+  const base = rf[role] ?? rf.reply;
+  const mult = rf.persona_styles[personaReplyStyle(spec, persona)] ?? {};
+  const w = Object.entries(base).filter(([k, v]) => !k.startsWith('_') && typeof v === 'number').map(([k, v]) => [k, v * (mult[k] ?? 1)]);
+  const total = w.reduce((a, [, v]) => a + v, 0);
+  return Object.fromEntries(w.map(([k, v]) => [k, v / total]));
+}
+
+/** Visual-media multiplier from x_behavior.meme_affinity, centred on sampling.media.persona.meme_affinity_mean. */
+export function mediaFactor(spec, persona = null) {
+  if (!persona || typeof persona !== 'object') return 1;
+  const cfg = spec.sampling.media?.persona ?? {};
+  const mean = cfg.meme_affinity_mean ?? 0.3;
+  const f = (0.5 + (behaviorOf(persona).meme_affinity ?? mean)) / (0.5 + mean);
+  return Math.min(cfg.max ?? 1.6, Math.max(cfg.min ?? 0.5, f));
 }
 
 /** Deterministic sampler over spec.sampling. */
@@ -354,11 +400,15 @@ export function createSampler(spec = loadSpec(), seed = 'taiku') {
     rand,
     /** 'original' | 'reply' | 'quote' */
     activity: () => weighted(rand, Object.entries(s.activity)),
-    /** media kind for a role, or 'none' */
-    mediaKind: (role = 'original') => weighted(rand, Object.entries(s.media[role] ?? s.media.original)),
-    /** { min, max } character range to ask the LLM for (never truncate to fit) */
-    lengthRange: () => {
-      const i = Number(weighted(rand, s.length_chars.buckets.map((b, idx) => [String(idx), b[2]])));
+    /** media kind for a role, or 'none'; visual kinds scale with the persona's meme affinity */
+    mediaKind: (role = 'original', persona = null) => {
+      const f = mediaFactor(spec, persona);
+      return weighted(rand, Object.entries(s.media[role] ?? s.media.original).map(([k, w]) => [k, VISUAL_KINDS.has(k) && typeof w === 'number' ? w * f : w]));
+    },
+    /** { min, max } character range to ask the LLM for (never truncate to fit); persona-tilted buckets */
+    lengthRange: (persona = null) => {
+      const ws = lengthWeights(spec, persona);
+      const i = Number(weighted(rand, s.length_chars.buckets.map((b, idx) => [String(idx), ws[idx]])));
       const [min, max] = s.length_chars.buckets[i];
       return { min, max };
     },
@@ -392,9 +442,10 @@ export function createSampler(spec = loadSpec(), seed = 'taiku') {
       const def = rf.forms[form];
       let [min, max] = def.chars;
       if (form === 'full') {
-        const buckets = s.length_chars.buckets.filter(([lo]) => lo > 40);
-        const i = Number(weighted(rand, buckets.map((b, idx) => [String(idx), b[2]])));
-        [min, max] = buckets[i];
+        const ws = lengthWeights(spec, persona);
+        const idx = s.length_chars.buckets.map((b, j) => j).filter((j) => s.length_chars.buckets[j][0] > 40);
+        const i = Number(weighted(rand, idx.map((j) => [String(j), ws[j]])));
+        [min, max] = s.length_chars.buckets[i];
       }
       return { form, style, chars: { min, max }, ...(def.max_words ? { maxWords: def.max_words } : {}), ...(def.media ? { media: def.media } : {}) };
     },

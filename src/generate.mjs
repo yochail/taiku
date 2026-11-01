@@ -3,7 +3,7 @@
 //
 //   node src/generate.mjs [--date YYYY-MM-DD] [--mock | --dry-run [--live] | --live]
 //        [--seed S] [--nonce N] [--topics N] [--max-calls N] [--topics-only] [--fresh]
-//        [--force] [--summary-only] [--quiet]
+//        [--force] [--repair] [--summary-only] [--quiet]
 //
 // --mock     offline fixtures + mock LLM, writes `-mock` files (content/posts/daily-<date>-mock.json …)
 // --dry-run  offline fixtures + mock LLM, writes nothing (add --live to dry-run against real feeds/LLM)
@@ -11,13 +11,20 @@
 // --force    live only: run even if the local-first content/posts/daily-<date>.json exists. The cloud
 //            run then writes next to it as daily-<date>-cf.json (separate ids; never merges or overwrites).
 //
+// --repair   re-run the day's distribution gate (src/lib/daygate.mjs) on the file this run owns and
+//            regenerate the flagged items once (cache skipped for them, their length target fixed);
+//            everything else resumes from the work cache. The workflow gates again afterwards.
+//
 // Local-first: a live run first checks content/posts/daily-<date>.json. If it exists and was not
 // written by a cloud run (origin "cloudflare"), it logs "local run present, skipping" and exits 0
 // without any LLM call.
 import { loadDistribution } from './lib/crowd.mjs';
 import { ROOT } from './lib/data.mjs';
 import { isoDate, localDate } from './lib/pipeline-util.mjs';
-import { localDailyFile, runDaily } from './lib/run.mjs';
+import { gateDay } from './lib/daygate.mjs';
+import { loadPersonas } from './lib/data.mjs';
+import { loadOtherPosts, localDailyFile, outputPaths, runDaily } from './lib/run.mjs';
+import fs from 'node:fs';
 
 export function parseArgs(argv) {
   const o = {};
@@ -40,6 +47,7 @@ export function parseArgs(argv) {
       case '--summary-only': o.summaryOnly = true; break;
       case '--quiet': o.quiet = true; break;
       case '--force': o.force = true; break;
+      case '--repair': o.repair = true; break;
       case '--seed': o.seed = val(); break;
       case '--nonce': o.nonce = val(); break;
       case '--date': o.date = val(); break;
@@ -49,6 +57,7 @@ export function parseArgs(argv) {
     }
   }
   if (o.mock && o.live) throw new Error('--mock and --live are exclusive');
+  if (o.repair && o.dryRun) throw new Error('--repair needs a written day file (not --dry-run)');
   return o;
 }
 
@@ -104,6 +113,19 @@ async function main() {
       console.error(`--force: local run present; the cloud run writes daily-${opts.date}-cf.json`);
     }
   }
+  if (opts.repair) {
+    const paths = outputPaths(ROOT, opts.date, { mock: opts.mock, suffix: opts.suffix ?? null });
+    if (!fs.existsSync(paths.posts)) throw new Error(`--repair: ${paths.posts} does not exist; run the day first`);
+    const posts = JSON.parse(fs.readFileSync(paths.posts, 'utf8')).posts ?? [];
+    const g = gateDay({ posts, context: loadOtherPosts(paths.postsDir, [paths.posts]), personas: loadPersonas(), spec, label: paths.posts });
+    const fixable = g.offenders.filter((o) => o.taskId);
+    if (g.ok || !fixable.length) {
+      console.log(g.ok ? 'day gate passes; nothing to repair' : `day gate fails but no item is regenerable (${g.failures.map((c) => c.id).join(', ')}); not repairing`);
+      return;
+    }
+    console.error(`--repair: regenerating ${fixable.length} item(s): ${fixable.map((o) => `${o.taskId} ${o.reason}`).join(', ')}`);
+    opts.repair = fixable;
+  } else delete opts.repair;
   const realFetch = globalThis.fetch;
   if (offline) {
     globalThis.fetch = async () => {
