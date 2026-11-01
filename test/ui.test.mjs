@@ -46,9 +46,9 @@ test('images render as lazy, sized, rounded media cards with alt text and a cred
 
 test('memes and charts render as generated images; GIPHY GIFs get a GIF badge and attribution', () => {
   const meme = read('p/uit-meme/index.html');
-  const m = meme.match(/<img src="(\/media\/gen\/meme-[^"]+\.svg)"/);
+  const m = meme.match(/<img src="(\/media\/gen\/meme-[^"]+\.(?:svg|jpg))"/);
   assert.ok(m, 'meme image');
-  assert.ok(fs.existsSync(path.join(DIST, m[1])), 'meme svg written');
+  assert.ok(fs.existsSync(path.join(DIST, m[1])), 'meme image written');
   assert.match(read('p/uit-chart/index.html'), /media-chart"[^>]*>(<button[^>]*>)?<img src="\/media\/gen\/chart-[^"]+\.svg"[^>]*alt="bar chart/);
   const gif = read('p/uit-giphy/index.html');
   assert.match(gif, /<span class="media-badge">GIF<\/span>/);

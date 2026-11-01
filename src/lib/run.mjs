@@ -249,7 +249,7 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
   let mediaPlan = null;
   if (role !== 'wire' && !cheap && !short) {
     const news = safeUrl(topic?.url ?? '') ? { url: topic.url, title: topic.title } : null;
-    mediaPlan = planFor(sampler, role === 'original' ? 'original' : role, { news, giphy, persona });
+    mediaPlan = planFor(sampler, role === 'original' ? 'original' : role, { news, giphy, persona, topic });
     // Topic roots re-draw so link cards keep their spec share despite URL-less standalones.
     if (role === 'original' && !mediaPlan && news) for (let i = 0; i < 2 && mediaPlan?.kind !== 'link_card'; i++) mediaPlan = planFor(sampler, 'original', { news, giphy, persona }) ?? mediaPlan;
     if (mediaPlan?.kind === 'poll' && (role !== 'original' || node.kind === 'thread' || node.kind === 'thread-part')) mediaPlan = null;

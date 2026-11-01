@@ -6,6 +6,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hash } from './util.mjs';
+import { loadTemplates, renderMeme, memeAlt, canRaster, rasterizeSvg } from './meme-render.mjs';
+import { shortlistTemplates, pickReaction } from './meme-select.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -16,7 +18,8 @@ export function loadLibrary() {
   const lib = readJson(path.join(ROOT, 'media', 'library.json'));
   const credits = readJson(path.join(ROOT, 'media', 'art-credits.json'));
   const art = new Map(lib.art.filter((a) => credits[a.id]).map((a) => [a.id, { ...a, ...credits[a.id] }]));
-  const memes = new Map(lib.memes.filter((m) => art.has(m.art)).map((m) => [m.id, m]));
+  // Meme templates live in assets/memes/templates.json (real meme library + PD-art templates).
+  const memes = loadTemplates().templates;
   const reactions = new Map(lib.reactions.filter((r) => art.has(r.art)).map((r) => [r.id, r]));
   cache = { art, memes, reactions };
   return cache;
@@ -71,42 +74,9 @@ const SANS = `font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helveti
 
 // ---------- memes ----------
 
-export function renderMemeSvg(template, captions) {
-  const a = loadLibrary().art.get(template.art);
-  const W = a.width, H = a.height, img = artDataUri(a);
-  if (template.layout === 'caption-bar') {
-    const pad = 16, em = 0.55;
-    const { size, lines } = fit(captions.caption, W - pad * 2, { max: 26, min: 15, maxLines: 4, em });
-    const bar = Math.round(pad * 2 + lines.length * size * 1.25);
-    return svg(W, H + bar, `<rect width="${W}" height="${bar}" fill="#fff"/>`
-      + textLines({ lines, size, x: pad, y: pad + size * 0.9, anchor: 'start', em, lineHeight: 1.25, maxWidth: W - pad * 2, attrs: `${SANS} font-weight="500" fill="#0f1419"` })
-      + `<image href="${img}" x="0" y="${bar}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/>`);
-  }
-  let body = `<image href="${img}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/>`;
-  if (template.layout === 'top-bottom') {
-    const em = IMPACT_EM, opts = { max: 40, min: 20, maxLines: 2, em };
-    for (const slot of template.slots) {
-      const text = String(captions[slot.name] ?? '').toUpperCase();
-      if (!text) continue;
-      const { size, lines } = fit(text, W - 24, opts);
-      const y = slot.name === 'bottom' ? H - 14 - (lines.length - 1) * size * 1.1 : 12 + size;
-      body += textLines({ lines, size, x: W / 2, y, em, lineHeight: 1.1, maxWidth: W - 24, attrs: IMPACT });
-    }
-  } else if (template.layout === 'labels') {
-    const em = 0.58;
-    for (const slot of template.slots) {
-      const text = captions[slot.name];
-      if (!text) continue;
-      const { size, lines } = fit(text, W * 0.46, { max: 22, min: 13, maxLines: 2, em });
-      const w = Math.max(...lines.map((l) => chars(l) * size * em)) + 20;
-      const h = lines.length * size * 1.2 + 12;
-      const cx = Math.min(W - w / 2 - 6, Math.max(w / 2 + 6, slot.x * W));
-      const cy = Math.min(H - h / 2 - 6, Math.max(h / 2 + 6, slot.y * H));
-      body += `<rect x="${(cx - w / 2).toFixed(1)}" y="${(cy - h / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="8" fill="#000" fill-opacity=".72"/>`
-        + textLines({ lines, size, x: cx, y: cy - h / 2 + 6 + size * 0.95, em, lineHeight: 1.2, maxWidth: w - 16, attrs: `${SANS} font-weight="700" fill="#fff"` });
-    }
-  } else throw new Error(`unknown meme layout ${template.layout}`);
-  return svg(W, H, body);
+// Real-meme layouts, fonts and rasterising live in meme-render.mjs.
+export function renderMemeSvg(template, captions, opts = {}) {
+  return renderMeme(template, captions, opts).svg;
 }
 
 // ---------- reaction "GIFs" (animated SVG, loops, respects reduced motion) ----------
@@ -220,7 +190,11 @@ export function renderProblems(item) {
   if (item.kind === 'meme') {
     const t = lib.memes.get(r.template);
     if (!t) return [`unknown meme template "${r.template}"`];
-    for (const s of t.slots) textOk(r.captions?.[s.name], s.max, `caption "${s.name}"`);
+    for (const s of t.slots) if (!s.optional || r.captions?.[s.name]) textOk(r.captions?.[s.name], s.max, `caption "${s.name}"`);
+    if (t.layout === 'tweet') {
+      if (!r.quote?.text) out.push('tweet-dunk needs render.quote {name, handle, text}');
+      if (r.reaction && !lib.memes.get(r.reaction)?.reaction) out.push(`unknown reaction template "${r.reaction}"`);
+    }
   } else if (item.kind === 'gif') {
     if (!lib.reactions.has(r.reaction)) return [`unknown reaction "${r.reaction}"`];
     if (r.caption) textOk(r.caption, 40, 'gif caption');
@@ -260,10 +234,12 @@ export function resolveMedia(item) {
     return { ...base, src: a.src, width: a.width, height: a.height, alt: item.alt || a.alt, origin: 'commons', credit: creditOf(a) };
   }
   if (item.kind === 'meme') {
-    const t = lib.memes.get(r.template), a = lib.art.get(t.art);
-    const svgText = renderMemeSvg(t, r.captions);
-    const said = t.slots.map((s) => `"${r.captions[s.name]}"`).join(' / ');
-    return { ...base, src: genSrc(svgText), ...svgSize(svgText), alt: item.alt || `Meme on ${a.title} (${a.artist}). Text: ${said}`, origin: 'local-render', credit: creditOf(a), svg: svgText };
+    const t = lib.memes.get(r.template);
+    const { svg: svgText, width, height } = renderMeme(t, r.captions, { quote: r.quote, reaction: r.reaction });
+    const raster = canRaster();
+    const src = genSrc(svgText).replace(/\.svg$/, raster ? '.jpg' : '.svg');
+    const credit = t.credit ?? (r.reaction ? lib.memes.get(r.reaction)?.credit : undefined);
+    return { ...base, src, width, height, alt: item.alt || memeAlt(t, r.captions, r), origin: 'local-render', ...(credit ? { credit } : {}), svg: svgText, ...(raster ? { raster } : {}) };
   }
   if (item.kind === 'gif') {
     const rx = lib.reactions.get(r.reaction), a = lib.art.get(rx.art);
@@ -294,10 +270,11 @@ export function writeMediaFiles(posts, outDir) {
       if (r.svg) {
         const dest = path.join(outDir, r.src.replace(/^\//, ''));
         fs.mkdirSync(path.dirname(dest), { recursive: true });
-        fs.writeFileSync(dest, r.svg);
+        fs.writeFileSync(dest, r.raster ? rasterizeSvg(r.svg) : r.svg);
         written++;
       }
       delete r.svg;
+      delete r.raster;
       return r;
     });
     byPost.set(p.id, resolved);
@@ -332,8 +309,11 @@ export function planMedia(sampler, role = 'original', ctx = {}) {
     return { kind, prompt: 'Make this post a poll. Add "media": {"options": ["...", "..."]} with 2-4 short options (max 25 chars each). The post text is the question.' };
   }
   if (kind === 'meme') {
-    const options = sample(rand, [...lib.memes.values()], 3).map((m) => ({ id: m.id, description: m.description, slots: m.slots.map(({ name, hint, max }) => ({ name, hint, max })) }));
-    return { kind, options, prompt: `Attach a meme. Choose ONE template that fits and write its captions in your voice (witty, PG, no URLs; respect each max length, never truncate). Return "media": {"template": id, "captions": {slot: text}}. Templates: ${JSON.stringify(options)}` };
+    // Shortlist by fit (usage notes / keywords / tone vs. news, mood, persona, dunk target), then the LLM picks.
+    const picks = shortlistTemplates({ ...ctx, text: ctx.text ?? ctx.topic?.title }, { n: 5, rand, exclude: ctx.excludeMemes ?? [] });
+    const options = picks.map((m) => ({ id: m.id, name: m.name, description: m.usage, slots: m.slots.map(({ name, hint, max }) => ({ name, hint, max })) }));
+    const dunk = picks.some((m) => m.layout === 'tweet') ? { quote: ctx.quote, reaction: pickReaction(ctx, rand) } : {};
+    return { kind, options, ...dunk, prompt: `Attach a meme. Choose ONE template whose "description" (when to use it) fits your point, and write its captions in your voice (witty, PG, no URLs; follow each slot hint, respect each max length, never truncate). Return "media": {"template": id, "captions": {slot: text}}. Templates: ${JSON.stringify(options)}` };
   }
   if (kind === 'gif') {
     const all = [...lib.reactions.values()];
@@ -375,10 +355,10 @@ export async function materializeMedia(plan, fill = {}, { giphy = null, rand = M
   const allowed = new Set((plan.options ?? []).map((o) => o.id));
   const pickId = fill.template ?? fill.reaction ?? fill.art;
   if (plan.options && !allowed.has(pickId)) throw new Error(`"${pickId}" is not one of the offered options`);
-  const render = plan.kind === 'meme' ? { template: fill.template, captions: fill.captions ?? {} }
+  const render = plan.kind === 'meme' ? { template: fill.template, captions: fill.captions ?? {}, ...(fill.template === 'tweet-dunk' ? { quote: plan.quote, reaction: fill.reaction ?? plan.reaction } : {}) }
     : plan.kind === 'gif' ? { reaction: fill.reaction, ...(fill.caption ? { caption: String(fill.caption) } : {}) }
       : plan.kind === 'image' ? { art: fill.art }
         : { chart: { type: fill.type, title: fill.title, labels: fill.labels, values: fill.values, ...(fill.unit ? { unit: fill.unit } : {}), ...(fill.source ? { source: fill.source } : {}) } };
-  const { svg: _svg, ...item } = resolveMedia({ kind: plan.kind, render });
+  const { svg: _svg, raster: _raster, ...item } = resolveMedia({ kind: plan.kind, render });
   return item;
 }

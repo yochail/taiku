@@ -24,9 +24,16 @@
     "promote": "node scripts/promote.mjs",
     "validate": "node scripts/validate.mjs",
     "docs:personas": "node scripts/persona-bible.mjs",
-    "serve": "node scripts/serve.mjs"
+    "serve": "node scripts/serve.mjs",
+    "memes:fetch": "node scripts/fetch-memes.mjs",
+    "memes:render": "node scripts/render-memes.mjs"
   },
   "optionalDependencies": {
-    "@huggingface/transformers": "^4.3.2"
+    "@huggingface/transformers": "^4.3.2",
+    "@resvg/resvg-js": "^2.6.2",
+    "jpeg-js": "^0.4.4"
+  },
+  "devDependencies": {
+    "opentype.js": "^2.0.0"
   }
 }

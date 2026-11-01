@@ -20,21 +20,24 @@ test('library: every art piece is fetched, public domain/CC0 and credited; templ
     assert.match(a.url, /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
     assert.ok(a.alt && a.width > 0 && a.height > 0);
   }
-  assert.equal(lib.memes.size, raw.memes.length);
+  const memeLib = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets', 'memes', 'templates.json'), 'utf8'));
+  assert.equal(lib.memes.size, memeLib.templates.length, 'every meme template is loadable');
+  for (const m of raw.memes) assert.ok(lib.memes.has(m.id), `legacy meme id ${m.id} still resolves`);
   assert.equal(lib.reactions.size, raw.reactions.length);
   const ids = [...raw.art, ...raw.memes, ...raw.reactions].map((x) => x.id);
   assert.equal(new Set(raw.art.map((x) => x.id)).size, raw.art.length);
   assert.ok(ids.length >= 40, 'starter set: art + memes + reactions');
 });
 
-test('every meme template renders safe, escaped SVG at max caption length', () => {
+test('every meme template renders a safe image at max caption length with the caption as alt text', () => {
   for (const t of lib.memes.values()) {
     const captions = Object.fromEntries(t.slots.map((s) => [s.name, ('Tom & "Jerry" ' + 'word '.repeat(40)).slice(0, s.max).trim()]));
-    const m = resolveMedia({ kind: 'meme', render: { template: t.id, captions } });
+    const extra = t.layout === 'tweet' ? { quote: { name: 'Plato', handle: 'plato', text: 'The unexamined feed is not worth scrolling.' }, reaction: 'democritus-laughs' } : {};
+    const m = resolveMedia({ kind: 'meme', render: { template: t.id, captions, ...extra } });
     assert.match(m.svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
     assert.doesNotMatch(m.svg, /<script|on\w+=|href="http/i);
-    assert.match(m.svg, /Tom &amp; &quot;Jerry&quot;|TOM &amp; &quot;JERRY&quot;/);
-    assert.match(m.src, /^\/media\/gen\/meme-[a-z0-9]+-[a-z0-9]+\.svg$/);
+    assert.doesNotMatch(m.svg, /Jerry/i, 'captions are drawn as glyph outlines, not live text');
+    assert.match(m.src, /^\/media\/gen\/meme-[a-z0-9]+-[a-z0-9]+\.(svg|jpg)$/);
     assert.deepEqual(mediaProblems(m, pol), [], t.id);
     assert.ok(m.credit.license && m.alt.includes('Tom'));
   }
@@ -83,7 +86,7 @@ test('planMedia/materializeMedia: sampler-driven plans produce valid post.media 
   assert.equal(planMedia(stubSampler('link_card'), 'original', { news: { url: 'https://bbc.co.uk' } }).kind, 'link_card');
 
   const meme = planMedia(stubSampler('meme'));
-  assert.equal(meme.options.length, 3);
+  assert.ok(meme.options.length >= 3 && meme.options.length <= 6);
   assert.match(meme.prompt, /never truncate/);
   const tpl = lib.memes.get(meme.options[0].id);
   const item = await materializeMedia(meme, { template: tpl.id, captions: Object.fromEntries(tpl.slots.map((s) => [s.name, 'ok'])) });

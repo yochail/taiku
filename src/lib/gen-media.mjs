@@ -92,8 +92,9 @@ const sanitizeFill = (plan, fill) => {
 };
 
 /** Plan media for a task (null when none). link cards use the topic and are rendered by run.mjs. */
-export function planFor(sampler, role, { news = null, giphy = null, mood = null, persona = null, kind = null } = {}) {
-  const plan = planMedia(sampler, role === 'wire' ? 'original' : role, { news, giphy, mood, persona, kind });
+export function planFor(sampler, role, { news = null, giphy = null, mood = null, persona = null, kind = null, ...memeCtx } = {}) {
+  // memeCtx: { topic?, text?, quote?, excludeMemes? } steers the meme template shortlist (meme-select.mjs).
+  const plan = planMedia(sampler, role === 'wire' ? 'original' : role, { news, giphy, mood, persona, kind, ...memeCtx });
   return plan;
 }
 

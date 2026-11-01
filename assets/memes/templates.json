@@ -1,0 +1,5607 @@
+{
+  "version": 1,
+  "_note": "Taiku meme template library. Geometry (slot x/y/w/h) is fractions of the image (or of the extended canvas when extend_right is set). Sources: memegen (github.com/jacebrowning/memegen, MIT code; images are the well-known meme templates, cached here with source_url) and public-domain art from Wikimedia Commons. Non-commercial hobby use. Excluded on purpose: templates depicting minors, templates with active licensing disputes (e.g. Grumpy Cat, Pepe, Nyan Cat, Trollface, Socially Awkward Penguin), and living politicians.",
+  "templates": [
+    {
+      "id": "distracted-boyfriend",
+      "name": "Distracted Boyfriend",
+      "source": "memegen",
+      "source_id": "db",
+      "source_url": "https://api.memegen.link/images/db.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/distracted-boyfriend",
+      "image": "assets/memes/img/distracted-boyfriend.jpg",
+      "width": 640,
+      "height": 427,
+      "public_domain": false,
+      "license_note": "Stock photo by Antonio Guillem (2015); photographer objected to some uses but no legal action; widely shared meme, non-commercial commentary.",
+      "credit": {
+        "author": "Distracted Boyfriend meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/distracted-boyfriend",
+        "title": "Distracted Boyfriend"
+      },
+      "layout": "boxes",
+      "usage": "Choosing a shiny new idea over the old one you are committed to; temptation, fickle loyalty, switching schools of thought.",
+      "tone": [
+        "ironic",
+        "relatable"
+      ],
+      "keywords": [
+        "new",
+        "old",
+        "tempt",
+        "loyal",
+        "switch",
+        "trend",
+        "fad",
+        "abandon",
+        "fashion",
+        "novel"
+      ],
+      "slots": [
+        {
+          "name": "new_thing",
+          "hint": "the tempting new idea",
+          "x": 0.12,
+          "y": 0.7,
+          "w": 0.325,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 55
+        },
+        {
+          "name": "me",
+          "hint": "who is tempted",
+          "x": 0.55,
+          "y": 0.45,
+          "w": 0.175,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        },
+        {
+          "name": "old_thing",
+          "hint": "the loyal old idea being ignored",
+          "x": 0.74,
+          "y": 0.66,
+          "w": 0.2,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 35
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "drake",
+      "name": "Drakeposting",
+      "source": "memegen",
+      "source_id": "drake",
+      "source_url": "https://api.memegen.link/images/drake.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/drakeposting",
+      "image": "assets/memes/img/drake.jpg",
+      "width": 600,
+      "height": 939,
+      "public_domain": false,
+      "license_note": "Still from the \"Hotline Bling\" music video (2015); copyrighted, used as a widely circulated reaction meme (non-commercial parody).",
+      "credit": {
+        "author": "Drakeposting meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/drakeposting",
+        "title": "Drakeposting"
+      },
+      "layout": "boxes",
+      "usage": "Rejecting one option and approving another; preferences, \"this not that\", choosing between two framings.",
+      "tone": [
+        "smug",
+        "playful"
+      ],
+      "keywords": [
+        "prefer",
+        "instead",
+        "rather",
+        "versus",
+        "vs",
+        "better",
+        "reject",
+        "choose",
+        "not",
+        "approve"
+      ],
+      "extend_right": 1,
+      "slots": [
+        {
+          "name": "no",
+          "hint": "the thing rejected",
+          "x": 0.52,
+          "y": 0.02,
+          "w": 0.46,
+          "h": 0.46,
+          "style": "plain",
+          "align": "left",
+          "max": 70
+        },
+        {
+          "name": "yes",
+          "hint": "the thing preferred",
+          "x": 0.52,
+          "y": 0.52,
+          "w": 0.46,
+          "h": 0.46,
+          "style": "plain",
+          "align": "left",
+          "max": 70
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "expanding-brain",
+      "name": "Galaxy Brain",
+      "source": "memegen",
+      "source_id": "gb",
+      "source_url": "https://api.memegen.link/images/gb.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/galaxy-brain",
+      "image": "assets/memes/img/expanding-brain.jpg",
+      "width": 600,
+      "height": 848,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Galaxy Brain meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/galaxy-brain",
+        "title": "Galaxy Brain"
+      },
+      "layout": "boxes",
+      "usage": "Escalating \"enlightenment\" tiers where each step is (ironically) more galaxy-brained than the last.",
+      "tone": [
+        "ironic",
+        "absurd"
+      ],
+      "keywords": [
+        "level",
+        "tier",
+        "enlighten",
+        "evolve",
+        "progress",
+        "smart",
+        "galaxy",
+        "brain",
+        "higher",
+        "transcend",
+        "dialectic"
+      ],
+      "slots": [
+        {
+          "name": "tier1",
+          "hint": "the basic take",
+          "x": 0,
+          "y": 0,
+          "w": 0.49,
+          "h": 0.245,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "tier2",
+          "hint": "the smarter take",
+          "x": 0,
+          "y": 0.255,
+          "w": 0.49,
+          "h": 0.246,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "tier3",
+          "hint": "the galaxy-brain take",
+          "x": 0,
+          "y": 0.51,
+          "w": 0.489,
+          "h": 0.224,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "tier4",
+          "hint": "the transcendent (absurd) take",
+          "x": 0,
+          "y": 0.746,
+          "w": 0.49,
+          "h": 0.254,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        }
+      ],
+      "captions": 4
+    },
+    {
+      "id": "grus-plan",
+      "name": "Gru's Plan",
+      "source": "memegen",
+      "source_id": "gru",
+      "source_url": "https://api.memegen.link/images/gru.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/grus-plan",
+      "image": "assets/memes/img/grus-plan.jpg",
+      "width": 640,
+      "height": 411,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Gru's Plan meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/grus-plan",
+        "title": "Gru's Plan"
+      },
+      "layout": "boxes",
+      "usage": "A plan that goes wrong at step 3 and the character realises it at step 4; self-defeating arguments.",
+      "tone": [
+        "ironic",
+        "self-own"
+      ],
+      "keywords": [
+        "plan",
+        "step",
+        "scheme",
+        "backfire",
+        "realize",
+        "oops",
+        "strategy"
+      ],
+      "slots": [
+        {
+          "name": "step1",
+          "hint": "first step of the plan",
+          "x": 0.275,
+          "y": 0.2,
+          "w": 0.208,
+          "h": 0.2,
+          "style": "plain",
+          "align": "center",
+          "max": 30
+        },
+        {
+          "name": "step2",
+          "hint": "second step",
+          "x": 0.78,
+          "y": 0.2,
+          "w": 0.205,
+          "h": 0.2,
+          "style": "plain",
+          "align": "center",
+          "max": 30
+        },
+        {
+          "name": "step3",
+          "hint": "the step where it goes wrong",
+          "x": 0.28,
+          "y": 0.7,
+          "w": 0.205,
+          "h": 0.2,
+          "style": "plain",
+          "align": "center",
+          "max": 30
+        },
+        {
+          "name": "step4",
+          "hint": "same as step 3, realised",
+          "x": 0.78,
+          "y": 0.7,
+          "w": 0.205,
+          "h": 0.2,
+          "style": "plain",
+          "align": "center",
+          "max": 30
+        }
+      ],
+      "captions": 4
+    },
+    {
+      "id": "american-chopper",
+      "name": "American Chopper Argument",
+      "source": "memegen",
+      "source_id": "chair",
+      "source_url": "https://api.memegen.link/images/chair.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/american-chopper-argument",
+      "image": "assets/memes/img/american-chopper.jpg",
+      "width": 640,
+      "height": 533,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "American Chopper Argument meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/american-chopper-argument",
+        "title": "American Chopper Argument"
+      },
+      "layout": "boxes",
+      "usage": "A heated back-and-forth argument; two positions escalating over six beats.",
+      "tone": [
+        "heated",
+        "debate"
+      ],
+      "keywords": [
+        "argue",
+        "argument",
+        "debate",
+        "fight",
+        "disagree",
+        "rebut",
+        "dialogue",
+        "objection"
+      ],
+      "slots": [
+        {
+          "name": "a1",
+          "hint": "first claim",
+          "x": 0,
+          "y": 0.2,
+          "w": 0.495,
+          "h": 0.13,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "b1",
+          "hint": "angry reply",
+          "x": 0.495,
+          "y": 0.2,
+          "w": 0.505,
+          "h": 0.13,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "a2",
+          "hint": "counter",
+          "x": 0,
+          "y": 0.535,
+          "w": 0.495,
+          "h": 0.13,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "b2",
+          "hint": "louder reply",
+          "x": 0.495,
+          "y": 0.525,
+          "w": 0.505,
+          "h": 0.14,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "a3",
+          "hint": "final point",
+          "x": 0,
+          "y": 0.87,
+          "w": 0.5,
+          "h": 0.13,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "b3",
+          "hint": "final outburst",
+          "x": 0.5,
+          "y": 0.87,
+          "w": 0.5,
+          "h": 0.13,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 6
+    },
+    {
+      "id": "epic-handshake",
+      "name": "Epic Handshake",
+      "source": "memegen",
+      "source_id": "handshake",
+      "source_url": "https://api.memegen.link/images/handshake.jpg",
+      "origin_url": "https://www.deviantart.com/miloslavvonranda/art/EPIC-handshake-by-Dillon-and-Dutch-325709082",
+      "image": "assets/memes/img/epic-handshake.jpg",
+      "width": 640,
+      "height": 459,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Epic Handshake meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://www.deviantart.com/miloslavvonranda/art/EPIC-handshake-by-Dillon-and-Dutch-325709082",
+        "title": "Epic Handshake"
+      },
+      "layout": "boxes",
+      "usage": "Two unlikely groups agreeing on one thing; rivals finding common ground.",
+      "tone": [
+        "wholesome",
+        "ironic"
+      ],
+      "keywords": [
+        "agree",
+        "both",
+        "common",
+        "unite",
+        "together",
+        "alliance",
+        "consensus",
+        "rivals"
+      ],
+      "slots": [
+        {
+          "name": "left",
+          "hint": "first group",
+          "x": 0.016,
+          "y": 0.439,
+          "w": 0.4,
+          "h": 0.4,
+          "angle": -45,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "right",
+          "hint": "second group",
+          "x": 0.444,
+          "y": 0.457,
+          "w": 0.4,
+          "h": 0.4,
+          "angle": 27.5,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "shared",
+          "hint": "the thing they both agree on",
+          "x": 0.15,
+          "y": 0.1,
+          "w": 0.5,
+          "h": 0.2,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "always-has-been",
+      "name": "Always Has Been",
+      "source": "memegen",
+      "source_id": "astronaut",
+      "source_url": "https://api.memegen.link/images/astronaut.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/wait-its-all-ohio-always-has-been",
+      "image": "assets/memes/img/always-has-been.jpg",
+      "width": 640,
+      "height": 360,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Always Has Been meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/wait-its-all-ohio-always-has-been",
+        "title": "Always Has Been"
+      },
+      "layout": "boxes",
+      "usage": "A shocking realisation that something was always true; revealing the hidden nature of a thing.",
+      "tone": [
+        "dark",
+        "deadpan"
+      ],
+      "keywords": [
+        "always",
+        "realize",
+        "truth",
+        "reveal",
+        "secretly",
+        "all along",
+        "was it",
+        "wait"
+      ],
+      "slots": [
+        {
+          "name": "realization",
+          "hint": "\"wait, it's all X?\"",
+          "x": 0.45,
+          "y": 0.35,
+          "w": 0.25,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 25
+        },
+        {
+          "name": "reply",
+          "hint": "\"always has been\"",
+          "x": 0.75,
+          "y": 0,
+          "w": 0.25,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 25
+        },
+        {
+          "name": "astronaut1",
+          "hint": "who realises (label)",
+          "x": 0.375,
+          "y": 0.8,
+          "w": 0.25,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 25
+        },
+        {
+          "name": "astronaut2",
+          "hint": "who knew all along (label)",
+          "x": 0.75,
+          "y": 0.7,
+          "w": 0.25,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 25
+        }
+      ],
+      "captions": 4
+    },
+    {
+      "id": "is-this-a-pigeon",
+      "name": "Is This a Pigeon?",
+      "source": "memegen",
+      "source_id": "pigeon",
+      "source_url": "https://api.memegen.link/images/pigeon.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/is-this-a-pigeon",
+      "image": "assets/memes/img/is-this-a-pigeon.jpg",
+      "width": 640,
+      "height": 384,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Is This a Pigeon? meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/is-this-a-pigeon",
+        "title": "Is This a Pigeon?"
+      },
+      "layout": "boxes",
+      "usage": "Confidently misidentifying something; category errors and mislabelled concepts.",
+      "tone": [
+        "absurd",
+        "mocking"
+      ],
+      "keywords": [
+        "mistake",
+        "misidentify",
+        "confuse",
+        "wrong",
+        "category",
+        "is this",
+        "mislabel",
+        "actually"
+      ],
+      "slots": [
+        {
+          "name": "who",
+          "hint": "the confused one",
+          "x": 0.15,
+          "y": 0,
+          "w": 0.35,
+          "h": 0.2,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "thing",
+          "hint": "the thing being misidentified",
+          "x": 0.71,
+          "y": 0.3,
+          "w": 0.175,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        },
+        {
+          "name": "question",
+          "hint": "\"is this X?\"",
+          "x": 0,
+          "y": 0.8,
+          "w": 1,
+          "h": 0.2,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "left-exit",
+      "name": "Left Exit 12 Off Ramp",
+      "source": "memegen",
+      "source_id": "exit",
+      "source_url": "https://api.memegen.link/images/exit.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/left-exit-12-off-ramp",
+      "image": "assets/memes/img/left-exit.jpg",
+      "width": 640,
+      "height": 574,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Left Exit 12 Off Ramp meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/left-exit-12-off-ramp",
+        "title": "Left Exit 12 Off Ramp"
+      },
+      "layout": "boxes",
+      "usage": "Swerving away from the sensible option toward the tempting one at the last second.",
+      "tone": [
+        "ironic",
+        "relatable"
+      ],
+      "keywords": [
+        "swerve",
+        "choice",
+        "tempt",
+        "avoid",
+        "instead",
+        "detour",
+        "procrastinate",
+        "distraction"
+      ],
+      "slots": [
+        {
+          "name": "straight",
+          "hint": "the sensible option",
+          "x": 0.24,
+          "y": 0.15,
+          "w": 0.15,
+          "h": 0.22,
+          "style": "impact",
+          "align": "center",
+          "max": 40
+        },
+        {
+          "name": "exit",
+          "hint": "the tempting detour",
+          "x": 0.53,
+          "y": 0.15,
+          "w": 0.22,
+          "h": 0.22,
+          "style": "impact",
+          "align": "center",
+          "max": 60
+        },
+        {
+          "name": "car",
+          "hint": "who swerves",
+          "x": 0.466,
+          "y": 0.879,
+          "w": 0.32,
+          "h": 0.1,
+          "angle": 9,
+          "style": "impact",
+          "align": "center",
+          "max": 40
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "spiderman-pointing",
+      "name": "Spider-Man Pointing at Spider-Man",
+      "source": "memegen",
+      "source_id": "spiderman",
+      "source_url": "https://api.memegen.link/images/spiderman.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/spider-man-pointing-at-spider-man",
+      "image": "assets/memes/img/spiderman-pointing.jpg",
+      "width": 640,
+      "height": 459,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Spider-Man Pointing at Spider-Man meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/spider-man-pointing-at-spider-man",
+        "title": "Spider-Man Pointing at Spider-Man"
+      },
+      "layout": "boxes",
+      "usage": "Two parties accusing each other of the same thing; mirror-image hypocrisy.",
+      "tone": [
+        "mocking",
+        "ironic"
+      ],
+      "keywords": [
+        "same",
+        "both",
+        "hypocrite",
+        "accuse",
+        "mirror",
+        "each other",
+        "identical",
+        "pot",
+        "kettle"
+      ],
+      "slots": [
+        {
+          "name": "left",
+          "hint": "first accuser",
+          "x": 0.05,
+          "y": 0,
+          "w": 0.45,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "right",
+          "hint": "second accuser",
+          "x": 0.5,
+          "y": 0.85,
+          "w": 0.45,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "same-picture",
+      "name": "They're The Same Picture",
+      "source": "memegen",
+      "source_id": "same",
+      "source_url": "https://api.memegen.link/images/same.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/theyre-the-same-picture",
+      "image": "assets/memes/img/same-picture.jpg",
+      "width": 600,
+      "height": 672,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "They're The Same Picture meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/theyre-the-same-picture",
+        "title": "They're The Same Picture"
+      },
+      "layout": "boxes",
+      "usage": "Two things people insist are different that are actually the same.",
+      "tone": [
+        "deadpan",
+        "mocking"
+      ],
+      "keywords": [
+        "same",
+        "difference",
+        "identical",
+        "equivalent",
+        "distinction",
+        "rebrand"
+      ],
+      "slots": [
+        {
+          "name": "picture1",
+          "hint": "first thing",
+          "x": 0.092,
+          "y": 0.045,
+          "w": 0.35,
+          "h": 0.3,
+          "angle": -12,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "picture2",
+          "hint": "second thing",
+          "x": 0.555,
+          "y": 0.099,
+          "w": 0.445,
+          "h": 0.3,
+          "angle": -12,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "verdict",
+          "hint": "optional caption (e.g. \"they're the same picture\")",
+          "x": 0.45,
+          "y": 0.775,
+          "w": 0.4,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 75
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "panik-kalm-panik",
+      "name": "Panik Kalm Panik",
+      "source": "memegen",
+      "source_id": "panik-kalm-panik",
+      "source_url": "https://api.memegen.link/images/panik-kalm-panik.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/panik-kalm",
+      "image": "assets/memes/img/panik-kalm-panik.jpg",
+      "width": 600,
+      "height": 839,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Panik Kalm Panik meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/panik-kalm",
+        "title": "Panik Kalm Panik"
+      },
+      "layout": "boxes",
+      "usage": "A worry, a relief, then a worse worry; three-beat emotional rollercoaster.",
+      "tone": [
+        "anxious",
+        "relatable"
+      ],
+      "keywords": [
+        "panic",
+        "calm",
+        "worry",
+        "relief",
+        "anxiety",
+        "but then",
+        "fear",
+        "twist"
+      ],
+      "slots": [
+        {
+          "name": "panik1",
+          "hint": "the scary thing",
+          "x": 0.01,
+          "y": 0.01,
+          "w": 0.45,
+          "h": 0.32,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "kalm",
+          "hint": "the reassuring thought",
+          "x": 0.01,
+          "y": 0.35,
+          "w": 0.45,
+          "h": 0.32,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "panik2",
+          "hint": "the twist that makes it worse",
+          "x": 0.01,
+          "y": 0.69,
+          "w": 0.45,
+          "h": 0.305,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "midwit",
+      "name": "Midwit",
+      "source": "memegen",
+      "source_id": "midwit",
+      "source_url": "https://api.memegen.link/images/midwit.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/iq-bell-curve-midwit",
+      "image": "assets/memes/img/midwit.jpg",
+      "width": 640,
+      "height": 498,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Midwit meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/iq-bell-curve-midwit",
+        "title": "Midwit"
+      },
+      "layout": "boxes",
+      "usage": "The bell curve: simple people and sages agree, the middle overthinks it.",
+      "tone": [
+        "smug",
+        "ironic"
+      ],
+      "keywords": [
+        "simple",
+        "overthink",
+        "wise",
+        "bell curve",
+        "iq",
+        "naive",
+        "complicated",
+        "sage"
+      ],
+      "slots": [
+        {
+          "name": "low",
+          "hint": "the simple take",
+          "x": 0.02,
+          "y": 0.46,
+          "w": 0.283,
+          "h": 0.1,
+          "style": "plain",
+          "align": "center",
+          "max": 20
+        },
+        {
+          "name": "mid",
+          "hint": "the anxious overthought take",
+          "x": 0.13,
+          "y": 0.02,
+          "w": 0.7,
+          "h": 0.1,
+          "style": "plain",
+          "align": "left",
+          "max": 50
+        },
+        {
+          "name": "high",
+          "hint": "the same simple take, from wisdom",
+          "x": 0.687,
+          "y": 0.386,
+          "w": 0.283,
+          "h": 0.1,
+          "style": "plain",
+          "align": "center",
+          "max": 20
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "scooby-doo-reveal",
+      "name": "Scooby Doo Reveal",
+      "source": "memegen",
+      "source_id": "reveal",
+      "source_url": "https://api.memegen.link/images/reveal.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/lets-see-who-this-really-is",
+      "image": "assets/memes/img/scooby-doo-reveal.jpg",
+      "width": 600,
+      "height": 800,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Scooby Doo Reveal meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/lets-see-who-this-really-is",
+        "title": "Scooby Doo Reveal"
+      },
+      "layout": "boxes",
+      "usage": "Unmasking something to reveal what it really was all along.",
+      "tone": [
+        "mocking",
+        "reveal"
+      ],
+      "keywords": [
+        "unmask",
+        "reveal",
+        "really",
+        "disguise",
+        "actually",
+        "hidden",
+        "all along",
+        "secretly"
+      ],
+      "slots": [
+        {
+          "name": "mask",
+          "hint": "the disguise",
+          "x": 0.04,
+          "y": 0.26,
+          "w": 0.3,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 45
+        },
+        {
+          "name": "unmasker",
+          "hint": "who unmasks",
+          "x": 0,
+          "y": 0.36,
+          "w": 1,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "face",
+          "hint": "what it really is",
+          "x": 0.04,
+          "y": 0.8,
+          "w": 0.3,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 45
+        },
+        {
+          "name": "verdict",
+          "hint": "the gotcha line",
+          "x": 0,
+          "y": 0.9,
+          "w": 1,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 4
+    },
+    {
+      "id": "anakin-padme",
+      "name": "Anakin and Padme Change the World For the Better",
+      "source": "memegen",
+      "source_id": "right",
+      "source_url": "https://api.memegen.link/images/right.jpg",
+      "origin_url": "https://www.reddit.com/r/MemeTemplatesOfficial/comments/nia6wu/im_going_to_change_the_world_for_the_better_right/",
+      "image": "assets/memes/img/anakin-padme.jpg",
+      "width": 600,
+      "height": 600,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Anakin and Padme Change the World For the Better meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://www.reddit.com/r/MemeTemplatesOfficial/comments/nia6wu/im_going_to_change_the_world_for_the_better_right/",
+        "title": "Anakin and Padme Change the World For the Better"
+      },
+      "layout": "boxes",
+      "usage": "Someone hoping the obvious good outcome follows, and the silence says it will not.",
+      "tone": [
+        "ironic",
+        "dark"
+      ],
+      "keywords": [
+        "right",
+        "surely",
+        "hope",
+        "naive",
+        "assume",
+        "plan",
+        "consequence"
+      ],
+      "slots": [
+        {
+          "name": "anakin_line",
+          "hint": "the plan stated flatly",
+          "x": 0.09,
+          "y": 0.01,
+          "w": 0.25,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 25
+        },
+        {
+          "name": "padme_line",
+          "hint": "hopeful follow-up \"...right?\"",
+          "x": 0.65,
+          "y": 0.01,
+          "w": 0.25,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 25
+        },
+        {
+          "name": "anakin_silence",
+          "hint": "(optional) blank stare caption",
+          "x": 0,
+          "y": 0.399,
+          "w": 0.499,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 55
+        },
+        {
+          "name": "padme_line2",
+          "hint": "repeated worried \"...right?\"",
+          "x": 0.502,
+          "y": 0.399,
+          "w": 0.498,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 55
+        },
+        {
+          "name": "extra",
+          "hint": "optional",
+          "x": 0.502,
+          "y": 0.9,
+          "w": 0.498,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 55
+        }
+      ],
+      "captions": 5
+    },
+    {
+      "id": "woman-yelling-at-cat",
+      "name": "Woman Yelling at a Cat",
+      "source": "memegen",
+      "source_id": "woman-cat",
+      "source_url": "https://api.memegen.link/images/woman-cat.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/woman-yelling-at-a-cat",
+      "image": "assets/memes/img/woman-yelling-at-cat.jpg",
+      "width": 640,
+      "height": 412,
+      "public_domain": false,
+      "license_note": "Screenshot from \"The Real Housewives of Beverly Hills\" (Bravo) + photo of Smudge the cat; widely shared meme, non-commercial parody.",
+      "credit": {
+        "author": "Woman Yelling at a Cat meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/woman-yelling-at-a-cat",
+        "title": "Woman Yelling at a Cat"
+      },
+      "layout": "boxes",
+      "usage": "An angry accusation met with a calm, smug or confused reply.",
+      "tone": [
+        "heated",
+        "absurd"
+      ],
+      "keywords": [
+        "yell",
+        "accuse",
+        "angry",
+        "confused",
+        "blame",
+        "reply",
+        "calm"
+      ],
+      "slots": [
+        {
+          "name": "woman",
+          "hint": "the angry accusation",
+          "x": 0,
+          "y": 0,
+          "w": 0.5,
+          "h": 0.22,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "cat",
+          "hint": "the unbothered reply",
+          "x": 0.5,
+          "y": 0,
+          "w": 0.5,
+          "h": 0.22,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "x-everywhere",
+      "name": "X, X Everywhere",
+      "source": "memegen",
+      "source_id": "buzz",
+      "source_url": "https://api.memegen.link/images/buzz.jpg",
+      "origin_url": "https://imgflip.com/memetemplate/X-Everywhere",
+      "image": "assets/memes/img/x-everywhere.jpg",
+      "width": 640,
+      "height": 487,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "X, X Everywhere meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://imgflip.com/memetemplate/X-Everywhere",
+        "title": "X, X Everywhere"
+      },
+      "layout": "top-bottom",
+      "usage": "Pointing out that something is suddenly everywhere.",
+      "tone": [
+        "playful"
+      ],
+      "keywords": [
+        "everywhere",
+        "all",
+        "every",
+        "ubiquitous",
+        "trend",
+        "flood"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"X\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"X everywhere\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "change-my-mind",
+      "name": "Change My Mind",
+      "source": "memegen",
+      "source_id": "cmm",
+      "source_url": "https://api.memegen.link/images/cmm.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/steven-crowders-change-my-mind-campus-sign",
+      "image": "assets/memes/img/change-my-mind.jpg",
+      "width": 640,
+      "height": 509,
+      "public_domain": false,
+      "license_note": "Photo of commentator Steven Crowder (2018); widely circulated meme template, non-commercial parody.",
+      "credit": {
+        "author": "Change My Mind meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/steven-crowders-change-my-mind-campus-sign",
+        "title": "Change My Mind"
+      },
+      "layout": "boxes",
+      "usage": "Stating a provocative claim and daring people to refute it.",
+      "tone": [
+        "smug",
+        "provocative"
+      ],
+      "keywords": [
+        "change my mind",
+        "claim",
+        "prove",
+        "debate",
+        "hot take",
+        "dare",
+        "refute",
+        "opinion"
+      ],
+      "slots": [
+        {
+          "name": "claim",
+          "hint": "the provocative claim on the sign",
+          "x": 0.351,
+          "y": 0.434,
+          "w": 0.46,
+          "h": 0.25,
+          "angle": 23,
+          "style": "plain",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "this-is-fine",
+      "name": "This is Fine",
+      "source": "memegen",
+      "source_id": "fine",
+      "source_url": "https://api.memegen.link/images/fine.jpg",
+      "origin_url": "https://gunshowcomic.com/648",
+      "image": "assets/memes/img/this-is-fine.jpg",
+      "width": 617,
+      "height": 600,
+      "public_domain": false,
+      "license_note": "Panel from KC Green's webcomic \"Gunshow\" (2013); the artist welcomes non-commercial sharing.",
+      "credit": {
+        "author": "This is Fine meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://gunshowcomic.com/648",
+        "title": "This is Fine"
+      },
+      "layout": "top-bottom",
+      "usage": "Pretending everything is fine while everything burns.",
+      "tone": [
+        "dark",
+        "deadpan"
+      ],
+      "keywords": [
+        "fine",
+        "burn",
+        "denial",
+        "crisis",
+        "chaos",
+        "collapse",
+        "calm",
+        "disaster"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the situation",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"this is fine\" (or your variant)",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "hide-the-pain-harold",
+      "name": "Hide the Pain Harold",
+      "source": "memegen",
+      "source_id": "harold",
+      "source_url": "https://api.memegen.link/images/harold.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/hide-the-pain-harold",
+      "image": "assets/memes/img/hide-the-pain-harold.jpg",
+      "width": 640,
+      "height": 427,
+      "public_domain": false,
+      "license_note": "Stock photo of András Arató, who has embraced the meme.",
+      "credit": {
+        "author": "Hide the Pain Harold meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/hide-the-pain-harold",
+        "title": "Hide the Pain Harold"
+      },
+      "layout": "top-bottom",
+      "usage": "Smiling through pain; enduring something awful politely.",
+      "tone": [
+        "dark",
+        "relatable"
+      ],
+      "keywords": [
+        "pain",
+        "smile",
+        "endure",
+        "cope",
+        "suffer",
+        "polite",
+        "awkward",
+        "pretend"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the situation",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the painful twist",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "roll-safe",
+      "name": "Roll Safe",
+      "source": "memegen",
+      "source_id": "rollsafe",
+      "source_url": "https://api.memegen.link/images/rollsafe.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/roll-safe",
+      "image": "assets/memes/img/roll-safe.jpg",
+      "width": 640,
+      "height": 358,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Roll Safe meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/roll-safe",
+        "title": "Roll Safe"
+      },
+      "layout": "top-bottom",
+      "usage": "Fake-clever logic: avoiding a problem by sidestepping it absurdly.",
+      "tone": [
+        "smug",
+        "absurd"
+      ],
+      "keywords": [
+        "logic",
+        "clever",
+        "cant",
+        "if you",
+        "loophole",
+        "smart",
+        "trick",
+        "think about it"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"can't X...\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"...if you don't Y\"",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "one-does-not-simply",
+      "name": "One Does Not Simply Walk into Mordor",
+      "source": "memegen",
+      "source_id": "mordor",
+      "source_url": "https://api.memegen.link/images/mordor.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/one-does-not-simply-walk-into-mordor",
+      "image": "assets/memes/img/one-does-not-simply.jpg",
+      "width": 640,
+      "height": 378,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "One Does Not Simply Walk into Mordor meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/one-does-not-simply-walk-into-mordor",
+        "title": "One Does Not Simply Walk into Mordor"
+      },
+      "layout": "top-bottom",
+      "usage": "Something that is much harder than people think.",
+      "tone": [
+        "grave",
+        "playful"
+      ],
+      "keywords": [
+        "simply",
+        "hard",
+        "difficult",
+        "impossible",
+        "just",
+        "easy"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"one does not simply\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the hard thing",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "condescending-wonka",
+      "name": "Condescending Wonka",
+      "source": "memegen",
+      "source_id": "wonka",
+      "source_url": "https://api.memegen.link/images/wonka.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/condescending-wonka-creepy-wonka",
+      "image": "assets/memes/img/condescending-wonka.jpg",
+      "width": 640,
+      "height": 460,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Condescending Wonka meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/condescending-wonka-creepy-wonka",
+        "title": "Condescending Wonka"
+      },
+      "layout": "top-bottom",
+      "usage": "Condescending sarcasm at someone overconfident.",
+      "tone": [
+        "mocking",
+        "sarcastic"
+      ],
+      "keywords": [
+        "oh you",
+        "tell me",
+        "sarcasm",
+        "condescend",
+        "must know",
+        "expert",
+        "genius"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"oh, you X?\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the sarcastic jab",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "not-sure-if",
+      "name": "Futurama Fry",
+      "source": "memegen",
+      "source_id": "fry",
+      "source_url": "https://api.memegen.link/images/fry.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/futurama-fry-not-sure-if",
+      "image": "assets/memes/img/not-sure-if.jpg",
+      "width": 640,
+      "height": 480,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Futurama Fry meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/futurama-fry-not-sure-if",
+        "title": "Futurama Fry"
+      },
+      "layout": "top-bottom",
+      "usage": "Being unable to tell between two interpretations.",
+      "tone": [
+        "skeptical"
+      ],
+      "keywords": [
+        "not sure",
+        "or",
+        "unsure",
+        "suspicious",
+        "doubt",
+        "ambiguous",
+        "skeptic"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"not sure if X\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"or Y\"",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "what-if-i-told-you",
+      "name": "Matrix Morpheus",
+      "source": "memegen",
+      "source_id": "morpheus",
+      "source_url": "https://api.memegen.link/images/morpheus.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/matrix-morpheus",
+      "image": "assets/memes/img/what-if-i-told-you.jpg",
+      "width": 640,
+      "height": 388,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Matrix Morpheus meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/matrix-morpheus",
+        "title": "Matrix Morpheus"
+      },
+      "layout": "top-bottom",
+      "usage": "Revealing a mind-bending truth that undercuts an assumption.",
+      "tone": [
+        "grave",
+        "smug"
+      ],
+      "keywords": [
+        "what if",
+        "told you",
+        "truth",
+        "illusion",
+        "reality",
+        "actually",
+        "reveal"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"what if I told you\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the mind-bending truth",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "philosoraptor",
+      "name": "Philosoraptor",
+      "source": "memegen",
+      "source_id": "philosoraptor",
+      "source_url": "https://api.memegen.link/images/philosoraptor.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/philosoraptor",
+      "image": "assets/memes/img/philosoraptor.jpg",
+      "width": 600,
+      "height": 600,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Philosoraptor meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/philosoraptor",
+        "title": "Philosoraptor"
+      },
+      "layout": "top-bottom",
+      "usage": "A pseudo-deep shower thought posed as a question.",
+      "tone": [
+        "absurd",
+        "curious"
+      ],
+      "keywords": [
+        "if",
+        "then",
+        "question",
+        "shower thought",
+        "paradox",
+        "deep",
+        "why"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the premise",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the pseudo-profound conclusion",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "joseph-ducreux",
+      "name": "Joseph Ducreux",
+      "source": "memegen",
+      "source_id": "jd",
+      "source_url": "https://api.memegen.link/images/jd.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/joseph-ducreux-archaic-rap",
+      "image": "assets/memes/img/joseph-ducreux.jpg",
+      "width": 600,
+      "height": 788,
+      "public_domain": true,
+      "license_note": "Self-portrait \"Le Discret\" by Joseph Ducreux (c. 1790), public-domain painting.",
+      "credit": {
+        "author": "Joseph Ducreux (c. 1783)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Joseph_Ducreux_-_Self-Portrait,_Yawning.jpg",
+        "title": "Joseph Ducreux"
+      },
+      "layout": "top-bottom",
+      "usage": "Archaic, overly formal phrasing of a modern idea (an 18th-century portrait).",
+      "tone": [
+        "playful",
+        "archaic"
+      ],
+      "keywords": [
+        "archaic",
+        "formal",
+        "old",
+        "olde",
+        "thou",
+        "ye",
+        "disregard",
+        "acquire"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "archaic-phrased setup",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "archaic-phrased punchline",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "ancient-aliens",
+      "name": "Ancient Aliens Guy",
+      "source": "memegen",
+      "source_id": "aag",
+      "source_url": "https://api.memegen.link/images/aag.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/ancient-aliens",
+      "image": "assets/memes/img/ancient-aliens.jpg",
+      "width": 640,
+      "height": 537,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Ancient Aliens Guy meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/ancient-aliens",
+        "title": "Ancient Aliens Guy"
+      },
+      "layout": "top-bottom",
+      "usage": "Attributing everything to one absurd explanation.",
+      "tone": [
+        "absurd"
+      ],
+      "keywords": [
+        "explain",
+        "cause",
+        "because",
+        "aliens",
+        "conspiracy",
+        "theory",
+        "everything"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the question",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the one absurd answer",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "its-a-trap",
+      "name": "It's A Trap!",
+      "source": "memegen",
+      "source_id": "ackbar",
+      "source_url": "https://api.memegen.link/images/ackbar.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/its-a-trap",
+      "image": "assets/memes/img/its-a-trap.jpg",
+      "width": 600,
+      "height": 777,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "It's A Trap! meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/its-a-trap",
+        "title": "It's A Trap!"
+      },
+      "layout": "top-bottom",
+      "usage": "Spotting a trap or a bad-faith offer.",
+      "tone": [
+        "alarmed"
+      ],
+      "keywords": [
+        "trap",
+        "offer",
+        "suspicious",
+        "free",
+        "deal",
+        "beware",
+        "gift"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the bait",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"it's a trap!\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "expectation-vs-reality",
+      "name": "Expectation vs. Reality",
+      "source": "memegen",
+      "source_id": "dbg",
+      "source_url": "https://api.memegen.link/images/dbg.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/disappointed-black-guy",
+      "image": "assets/memes/img/expectation-vs-reality.jpg",
+      "width": 640,
+      "height": 549,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Expectation vs. Reality meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/disappointed-black-guy",
+        "title": "Expectation vs. Reality"
+      },
+      "layout": "boxes",
+      "usage": "What you expected versus what actually happened.",
+      "tone": [
+        "relatable",
+        "ironic"
+      ],
+      "keywords": [
+        "expect",
+        "reality",
+        "actually",
+        "vs",
+        "thought",
+        "turned out",
+        "plan"
+      ],
+      "slots": [
+        {
+          "name": "expectation",
+          "hint": "what you expected",
+          "x": 0,
+          "y": 0,
+          "w": 0.48,
+          "h": 0.5,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "reality",
+          "hint": "what happened",
+          "x": 0,
+          "y": 0.5,
+          "w": 0.48,
+          "h": 0.5,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "drowning-high-five",
+      "name": "Drowning High Five",
+      "source": "memegen",
+      "source_id": "drowning",
+      "source_url": "https://api.memegen.link/images/drowning.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/drowning-high-five",
+      "image": "assets/memes/img/drowning-high-five.jpg",
+      "width": 640,
+      "height": 482,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Drowning High Five meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/drowning-high-five",
+        "title": "Drowning High Five"
+      },
+      "layout": "boxes",
+      "usage": "Someone ignoring a person in trouble to bond with another over something trivial.",
+      "tone": [
+        "dark",
+        "ironic"
+      ],
+      "keywords": [
+        "ignore",
+        "help",
+        "drown",
+        "distracted",
+        "bond",
+        "trivial",
+        "neglect"
+      ],
+      "slots": [
+        {
+          "name": "drowning",
+          "hint": "who needs help",
+          "x": 0.03,
+          "y": 0.33,
+          "w": 0.46,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "ignorer",
+          "hint": "who ignores them",
+          "x": 0.51,
+          "y": 0.14,
+          "w": 0.2,
+          "h": 0.2,
+          "style": "impact",
+          "align": "center",
+          "max": 60
+        },
+        {
+          "name": "distraction",
+          "hint": "the trivial bonding thing",
+          "x": 0.03,
+          "y": 0.82,
+          "w": 0.46,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "two-buttons",
+      "name": "Daily Struggle",
+      "source": "memegen",
+      "source_id": "ds",
+      "source_url": "https://api.memegen.link/images/ds.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/daily-struggle-two-buttons",
+      "image": "assets/memes/img/two-buttons.jpg",
+      "width": 600,
+      "height": 896,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Daily Struggle meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/daily-struggle-two-buttons",
+        "title": "Daily Struggle"
+      },
+      "layout": "boxes",
+      "usage": "Sweating over two buttons you can't choose between; dilemmas.",
+      "tone": [
+        "anxious",
+        "relatable"
+      ],
+      "keywords": [
+        "choose",
+        "dilemma",
+        "either",
+        "or",
+        "decide",
+        "torn",
+        "paradox",
+        "both"
+      ],
+      "slots": [
+        {
+          "name": "button1",
+          "hint": "first option",
+          "x": 0.097,
+          "y": 0.108,
+          "w": 0.32,
+          "h": 0.095,
+          "angle": 12.5,
+          "style": "plain",
+          "align": "left",
+          "max": 50
+        },
+        {
+          "name": "button2",
+          "hint": "second option",
+          "x": 0.467,
+          "y": 0.069,
+          "w": 0.23,
+          "h": 0.09,
+          "angle": 10.5,
+          "style": "plain",
+          "align": "center",
+          "max": 35
+        },
+        {
+          "name": "sweating",
+          "hint": "who must choose",
+          "x": 0.04,
+          "y": 0.82,
+          "w": 0.92,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "facepalm",
+      "name": "Facepalm",
+      "source": "memegen",
+      "source_id": "facepalm",
+      "source_url": "https://api.memegen.link/images/facepalm.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/facepalm",
+      "image": "assets/memes/img/facepalm.jpg",
+      "width": 640,
+      "height": 566,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Facepalm meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/facepalm",
+        "title": "Facepalm"
+      },
+      "layout": "top-bottom",
+      "usage": "Exasperation at something dumb.",
+      "tone": [
+        "exasperated"
+      ],
+      "keywords": [
+        "facepalm",
+        "dumb",
+        "stupid",
+        "why",
+        "sigh",
+        "cringe",
+        "embarrass"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the dumb thing",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the reaction",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "confused-gandalf",
+      "name": "Confused Gandalf",
+      "source": "memegen",
+      "source_id": "gandalf",
+      "source_url": "https://api.memegen.link/images/gandalf.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/confused-gandalf",
+      "image": "assets/memes/img/confused-gandalf.jpg",
+      "width": 600,
+      "height": 728,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Confused Gandalf meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/confused-gandalf",
+        "title": "Confused Gandalf"
+      },
+      "layout": "top-bottom",
+      "usage": "Not remembering or recognising something you supposedly knew.",
+      "tone": [
+        "confused"
+      ],
+      "keywords": [
+        "remember",
+        "forgot",
+        "memory",
+        "recognize",
+        "confused",
+        "old"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the situation",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"I have no memory of this place\"",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "food-at-home",
+      "name": "We Have Food at Home",
+      "source": "memegen",
+      "source_id": "home",
+      "source_url": "https://api.memegen.link/images/home.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/we-have-food-at-home",
+      "image": "assets/memes/img/food-at-home.jpg",
+      "width": 600,
+      "height": 600,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "We Have Food at Home meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/we-have-food-at-home",
+        "title": "We Have Food at Home"
+      },
+      "layout": "boxes",
+      "usage": "The disappointing knock-off version of the thing you wanted.",
+      "tone": [
+        "ironic",
+        "relatable"
+      ],
+      "keywords": [
+        "knockoff",
+        "disappoint",
+        "version",
+        "imitation",
+        "cheap",
+        "we have",
+        "at home"
+      ],
+      "slots": [
+        {
+          "name": "me",
+          "hint": "\"can we have X?\"",
+          "x": 0.002,
+          "y": 0.002,
+          "w": 0.998,
+          "h": 0.1,
+          "angle": 0.001,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "mom",
+          "hint": "\"we have X at home\"",
+          "x": 0,
+          "y": 0.1,
+          "w": 1,
+          "h": 0.1,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "at_home",
+          "hint": "\"X at home:\" (the sad version)",
+          "x": 0,
+          "y": 0.2,
+          "w": 1,
+          "h": 0.1,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "most-interesting-man",
+      "name": "The Most Interesting Man in the World",
+      "source": "memegen",
+      "source_id": "interesting",
+      "source_url": "https://api.memegen.link/images/interesting.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/the-most-interesting-man-in-the-world",
+      "image": "assets/memes/img/most-interesting-man.jpg",
+      "width": 600,
+      "height": 759,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "The Most Interesting Man in the World meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/the-most-interesting-man-in-the-world",
+        "title": "The Most Interesting Man in the World"
+      },
+      "layout": "top-bottom",
+      "usage": "Conditional bragging: \"I don't always X, but when I do, Y\".",
+      "tone": [
+        "smug"
+      ],
+      "keywords": [
+        "always",
+        "when i do",
+        "rarely",
+        "but when",
+        "brag"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"I don't always X\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"but when I do, Y\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "jim-whiteboard",
+      "name": "Jim Halpert Pointing to Whiteboard",
+      "source": "memegen",
+      "source_id": "jim",
+      "source_url": "https://api.memegen.link/images/jim.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/jim-halpert-pointing-to-whiteboard",
+      "image": "assets/memes/img/jim-whiteboard.jpg",
+      "width": 600,
+      "height": 675,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Jim Halpert Pointing to Whiteboard meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/jim-halpert-pointing-to-whiteboard",
+        "title": "Jim Halpert Pointing to Whiteboard"
+      },
+      "layout": "boxes",
+      "usage": "Presenting an obvious-in-hindsight truth on a whiteboard.",
+      "tone": [
+        "earnest",
+        "smug"
+      ],
+      "keywords": [
+        "explain",
+        "teach",
+        "lesson",
+        "present",
+        "obvious",
+        "truth",
+        "whiteboard"
+      ],
+      "slots": [
+        {
+          "name": "board1",
+          "hint": "the claim",
+          "x": 0.029,
+          "y": 0.051,
+          "w": 0.61,
+          "h": 0.22,
+          "angle": 1,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "board2",
+          "hint": "the follow-up",
+          "x": 0.02,
+          "y": 0.56,
+          "w": 0.55,
+          "h": 0.35,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "none-of-my-business",
+      "name": "But That's None of My Business",
+      "source": "memegen",
+      "source_id": "kermit",
+      "source_url": "https://api.memegen.link/images/kermit.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/kermit-sipping-tea-but-thats-none-of-my-business",
+      "image": "assets/memes/img/none-of-my-business.jpg",
+      "width": 640,
+      "height": 450,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "But That's None of My Business meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/kermit-sipping-tea-but-thats-none-of-my-business",
+        "title": "But That's None of My Business"
+      },
+      "layout": "top-bottom",
+      "usage": "Passive-aggressive observation followed by sipping tea.",
+      "tone": [
+        "petty",
+        "sarcastic"
+      ],
+      "keywords": [
+        "tea",
+        "business",
+        "just saying",
+        "passive",
+        "shade",
+        "observe",
+        "notice"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the shady observation",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"but that's none of my business\"",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "i-made-this",
+      "name": "I Made This",
+      "source": "memegen",
+      "source_id": "made",
+      "source_url": "https://api.memegen.link/images/made.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/i-made-this",
+      "image": "assets/memes/img/i-made-this.jpg",
+      "width": 600,
+      "height": 801,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "I Made This meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/i-made-this",
+        "title": "I Made This"
+      },
+      "layout": "boxes",
+      "usage": "Taking credit for someone else's idea.",
+      "tone": [
+        "mocking",
+        "petty"
+      ],
+      "keywords": [
+        "credit",
+        "steal",
+        "plagiar",
+        "original",
+        "copy",
+        "idea",
+        "invent"
+      ],
+      "slots": [
+        {
+          "name": "creator",
+          "hint": "the original creator",
+          "x": 0.01,
+          "y": 0.28,
+          "w": 0.25,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 35
+        },
+        {
+          "name": "taker",
+          "hint": "who takes it",
+          "x": 0.74,
+          "y": 0.28,
+          "w": 0.25,
+          "h": 0.1,
+          "style": "impact",
+          "align": "center",
+          "max": 35
+        },
+        {
+          "name": "line1",
+          "hint": "\"I made this.\"",
+          "x": 0.27,
+          "y": 0.04,
+          "w": 0.15,
+          "h": 0.1,
+          "style": "plain",
+          "align": "center",
+          "max": 20
+        },
+        {
+          "name": "line2",
+          "hint": "\"You made this?\"",
+          "x": 0.525,
+          "y": 0.03,
+          "w": 0.15,
+          "h": 0.1,
+          "style": "plain",
+          "align": "center",
+          "max": 20
+        },
+        {
+          "name": "line3",
+          "hint": "\"I made this.\"",
+          "x": 0.345,
+          "y": 0.725,
+          "w": 0.15,
+          "h": 0.1,
+          "style": "plain",
+          "align": "center",
+          "max": 20
+        }
+      ],
+      "captions": 5
+    },
+    {
+      "id": "no-idea-dog",
+      "name": "I Have No Idea What I'm Doing",
+      "source": "memegen",
+      "source_id": "noidea",
+      "source_url": "https://api.memegen.link/images/noidea.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/i-have-no-idea-what-im-doing",
+      "image": "assets/memes/img/no-idea-dog.jpg",
+      "width": 640,
+      "height": 408,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "I Have No Idea What I'm Doing meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/i-have-no-idea-what-im-doing",
+        "title": "I Have No Idea What I'm Doing"
+      },
+      "layout": "top-bottom",
+      "usage": "Confidently doing something you don't understand.",
+      "tone": [
+        "self-deprecating"
+      ],
+      "keywords": [
+        "no idea",
+        "clueless",
+        "confused",
+        "pretend",
+        "winging",
+        "expert",
+        "understand"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"I have no idea\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"what I'm doing\"",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "hammering-nails-in-sand",
+      "name": "Guy Hammering Nails Into Sand",
+      "source": "memegen",
+      "source_id": "nails",
+      "source_url": "https://api.memegen.link/images/nails.jpg",
+      "origin_url": "https://www.meme-arsenal.com/en/create/template/11689406",
+      "image": "assets/memes/img/hammering-nails-in-sand.jpg",
+      "width": 613,
+      "height": 600,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Guy Hammering Nails Into Sand meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://www.meme-arsenal.com/en/create/template/11689406",
+        "title": "Guy Hammering Nails Into Sand"
+      },
+      "layout": "boxes",
+      "usage": "Trying to pin down something that cannot be pinned down; futile effort.",
+      "tone": [
+        "absurd",
+        "grave"
+      ],
+      "keywords": [
+        "futile",
+        "impossible",
+        "ineffable",
+        "language",
+        "define",
+        "pin down",
+        "meaning"
+      ],
+      "slots": [
+        {
+          "name": "man",
+          "hint": "who tries",
+          "x": 0.039,
+          "y": 0.297,
+          "w": 0.35,
+          "h": 0.1,
+          "angle": 42,
+          "style": "impact",
+          "align": "center",
+          "max": 40
+        },
+        {
+          "name": "nail",
+          "hint": "the tool used",
+          "x": 0.407,
+          "y": 0.839,
+          "w": 0.35,
+          "h": 0.1,
+          "angle": -20,
+          "style": "impact",
+          "align": "center",
+          "max": 40
+        },
+        {
+          "name": "sand",
+          "hint": "the thing that cannot be pinned down",
+          "x": 0.525,
+          "y": 0.279,
+          "w": 0.45,
+          "h": 0.2,
+          "angle": -10,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "that-would-be-great",
+      "name": "That Would Be Great",
+      "source": "memegen",
+      "source_id": "officespace",
+      "source_url": "https://api.memegen.link/images/officespace.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/that-would-be-great",
+      "image": "assets/memes/img/that-would-be-great.jpg",
+      "width": 640,
+      "height": 536,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "That Would Be Great meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/that-would-be-great",
+        "title": "That Would Be Great"
+      },
+      "layout": "top-bottom",
+      "usage": "A passive-aggressive boss-style request.",
+      "tone": [
+        "passive-aggressive"
+      ],
+      "keywords": [
+        "yeah",
+        "would be great",
+        "request",
+        "boss",
+        "please",
+        "mmkay",
+        "work"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"yeah...\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"...that'd be great\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "perfection",
+      "name": "Perfection",
+      "source": "memegen",
+      "source_id": "perfection",
+      "source_url": "https://api.memegen.link/images/perfection.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/magnetos-perfection",
+      "image": "assets/memes/img/perfection.jpg",
+      "width": 639,
+      "height": 600,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Perfection meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/magnetos-perfection",
+        "title": "Perfection"
+      },
+      "layout": "boxes",
+      "usage": "Ranking three versions of something and declaring the last perfect.",
+      "tone": [
+        "smug",
+        "playful"
+      ],
+      "keywords": [
+        "rank",
+        "best",
+        "perfect",
+        "version",
+        "prefer",
+        "real",
+        "original"
+      ],
+      "slots": [
+        {
+          "name": "option1",
+          "hint": "the first version",
+          "x": 0,
+          "y": 0,
+          "w": 0.5,
+          "h": 0.333,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "reaction1",
+          "hint": "disapproving line",
+          "x": 0.5,
+          "y": 0.225,
+          "w": 0.5,
+          "h": 0.1,
+          "style": "plain",
+          "align": "left",
+          "max": 60
+        },
+        {
+          "name": "option2",
+          "hint": "the second version",
+          "x": 0,
+          "y": 0.333,
+          "w": 0.5,
+          "h": 0.333,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "reaction2",
+          "hint": "still disapproving",
+          "x": 0.5,
+          "y": 0.56,
+          "w": 0.5,
+          "h": 0.1,
+          "style": "plain",
+          "align": "left",
+          "max": 60
+        },
+        {
+          "name": "option3",
+          "hint": "the best version",
+          "x": 0,
+          "y": 0.666,
+          "w": 0.5,
+          "h": 0.333,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "reaction3",
+          "hint": "\"Perfection.\"",
+          "x": 0.5,
+          "y": 0.895,
+          "w": 0.5,
+          "h": 0.1,
+          "style": "plain",
+          "align": "left",
+          "max": 60
+        }
+      ],
+      "captions": 6
+    },
+    {
+      "id": "pepperidge-farm-remembers",
+      "name": "Pepperidge Farm Remembers",
+      "source": "memegen",
+      "source_id": "remembers",
+      "source_url": "https://api.memegen.link/images/remembers.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/pepperidge-farm-remembers",
+      "image": "assets/memes/img/pepperidge-farm-remembers.jpg",
+      "width": 640,
+      "height": 490,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Pepperidge Farm Remembers meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/pepperidge-farm-remembers",
+        "title": "Pepperidge Farm Remembers"
+      },
+      "layout": "top-bottom",
+      "usage": "Nostalgia for something forgotten by everyone else.",
+      "tone": [
+        "nostalgic"
+      ],
+      "keywords": [
+        "remember",
+        "nostalgia",
+        "used to",
+        "old days",
+        "back then",
+        "history"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"remember when X?\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"Pepperidge Farm remembers\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "say-the-line",
+      "name": "Say the Line, Bart!",
+      "source": "memegen",
+      "source_id": "say",
+      "source_url": "https://api.memegen.link/images/say.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/say-the-line-bart",
+      "image": "assets/memes/img/say-the-line.jpg",
+      "width": 600,
+      "height": 909,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Say the Line, Bart! meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/say-the-line-bart",
+        "title": "Say the Line, Bart!"
+      },
+      "layout": "boxes",
+      "usage": "Everyone waiting for the predictable catchphrase from someone.",
+      "tone": [
+        "playful"
+      ],
+      "keywords": [
+        "predictable",
+        "catchphrase",
+        "always say",
+        "line",
+        "expected",
+        "crowd"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"say the line, X!\"",
+          "x": 0,
+          "y": 0.33,
+          "w": 1,
+          "h": 0.17,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "bottom",
+          "hint": "the predictable line",
+          "x": 0,
+          "y": 0.85,
+          "w": 1,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "sudden-clarity",
+      "name": "Sudden Clarity Clarence",
+      "source": "memegen",
+      "source_id": "scc",
+      "source_url": "https://api.memegen.link/images/scc.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/sudden-clarity-clarence",
+      "image": "assets/memes/img/sudden-clarity.jpg",
+      "width": 640,
+      "height": 348,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Sudden Clarity Clarence meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/sudden-clarity-clarence",
+        "title": "Sudden Clarity Clarence"
+      },
+      "layout": "top-bottom",
+      "usage": "A sudden realisation in the middle of chaos.",
+      "tone": [
+        "epiphany"
+      ],
+      "keywords": [
+        "realize",
+        "epiphany",
+        "sudden",
+        "clarity",
+        "wait",
+        "just realized"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the setup",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the realisation",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "mocking-spongebob",
+      "name": "Mocking Spongebob",
+      "source": "memegen",
+      "source_id": "spongebob",
+      "source_url": "https://api.memegen.link/images/spongebob.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/mocking-spongebob",
+      "image": "assets/memes/img/mocking-spongebob.jpg",
+      "width": 640,
+      "height": 450,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Mocking Spongebob meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/mocking-spongebob",
+        "title": "Mocking Spongebob"
+      },
+      "layout": "top-bottom",
+      "usage": "Mocking someone by repeating their words in alternating caps.",
+      "tone": [
+        "mocking"
+      ],
+      "keywords": [
+        "mock",
+        "repeat",
+        "quote",
+        "sarcasm",
+        "said",
+        "mimic"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "what they said",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the mocking repeat in aLtErNaTiNg CaPs",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "stonks",
+      "name": "Stonks",
+      "source": "memegen",
+      "source_id": "stonks",
+      "source_url": "https://api.memegen.link/images/stonks.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/stonks",
+      "image": "assets/memes/img/stonks.jpg",
+      "width": 640,
+      "height": 450,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Stonks meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/stonks",
+        "title": "Stonks"
+      },
+      "layout": "top-bottom",
+      "usage": "Celebrating a dumb decision as a financial win.",
+      "tone": [
+        "absurd",
+        "ironic"
+      ],
+      "keywords": [
+        "money",
+        "profit",
+        "market",
+        "invest",
+        "stock",
+        "economy",
+        "gain",
+        "growth"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the dumb move",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"stonks\"",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "stop-it-get-help",
+      "name": "Stop It, Get Some Help",
+      "source": "memegen",
+      "source_id": "stop-it",
+      "source_url": "https://api.memegen.link/images/stop-it.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/stop-it-get-some-help",
+      "image": "assets/memes/img/stop-it-get-help.jpg",
+      "width": 640,
+      "height": 360,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Stop It, Get Some Help meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/stop-it-get-some-help",
+        "title": "Stop It, Get Some Help"
+      },
+      "layout": "top-bottom",
+      "usage": "Telling someone their behaviour is a problem.",
+      "tone": [
+        "exasperated"
+      ],
+      "keywords": [
+        "stop",
+        "help",
+        "addict",
+        "obsess",
+        "again",
+        "enough"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"stop it.\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"get some help.\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "out-of-touch",
+      "name": "Principal Skinner",
+      "source": "memegen",
+      "source_id": "touch",
+      "source_url": "https://api.memegen.link/images/touch.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/am-i-so-out-of-touch",
+      "image": "assets/memes/img/out-of-touch.jpg",
+      "width": 600,
+      "height": 843,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Principal Skinner meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/am-i-so-out-of-touch",
+        "title": "Principal Skinner"
+      },
+      "layout": "boxes",
+      "usage": "Doubting yourself for a second, then deciding everyone else is wrong.",
+      "tone": [
+        "ironic",
+        "self-own"
+      ],
+      "keywords": [
+        "wrong",
+        "out of touch",
+        "everyone else",
+        "young",
+        "children",
+        "stubborn",
+        "deny"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"am I so out of touch?\"",
+          "x": 0,
+          "y": 0.3,
+          "w": 1,
+          "h": 0.2,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "bottom",
+          "hint": "\"no, it's X who are wrong\"",
+          "x": 0,
+          "y": 0.8,
+          "w": 1,
+          "h": 0.2,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "at-least-you-tried",
+      "name": "At Least You Tried",
+      "source": "memegen",
+      "source_id": "tried",
+      "source_url": "https://api.memegen.link/images/tried.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/you-tried",
+      "image": "assets/memes/img/at-least-you-tried.jpg",
+      "width": 600,
+      "height": 600,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "At Least You Tried meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/you-tried",
+        "title": "At Least You Tried"
+      },
+      "layout": "top-bottom",
+      "usage": "Patronising consolation for a failed effort.",
+      "tone": [
+        "patronising"
+      ],
+      "keywords": [
+        "tried",
+        "fail",
+        "effort",
+        "attempt",
+        "consolation",
+        "nice try"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"at least\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"you tried\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "we-dont-do-that-here",
+      "name": "We Don't Do That Here",
+      "source": "memegen",
+      "source_id": "wddth",
+      "source_url": "https://api.memegen.link/images/wddth.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/we-dont-do-that-here",
+      "image": "assets/memes/img/we-dont-do-that-here.jpg",
+      "width": 640,
+      "height": 543,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "We Don't Do That Here meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/we-dont-do-that-here",
+        "title": "We Don't Do That Here"
+      },
+      "layout": "boxes",
+      "usage": "Politely shutting down a behaviour that is not acceptable.",
+      "tone": [
+        "stern"
+      ],
+      "keywords": [
+        "not here",
+        "forbidden",
+        "rule",
+        "norm",
+        "unacceptable",
+        "etiquette"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the behaviour",
+          "x": 0,
+          "y": 0,
+          "w": 1,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        },
+        {
+          "name": "bottom",
+          "hint": "\"we don't do that here\"",
+          "x": 0.1,
+          "y": 0.85,
+          "w": 0.8,
+          "h": 0.15,
+          "style": "impact",
+          "align": "center",
+          "max": 90
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "x-all-the-y",
+      "name": "X all the Y",
+      "source": "memegen",
+      "source_id": "xy",
+      "source_url": "https://api.memegen.link/images/xy.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/all-the-things",
+      "image": "assets/memes/img/x-all-the-y.jpg",
+      "width": 640,
+      "height": 486,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "X all the Y meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/all-the-things",
+        "title": "X all the Y"
+      },
+      "layout": "top-bottom",
+      "usage": "Overly enthusiastic intention to do something to everything.",
+      "tone": [
+        "manic"
+      ],
+      "keywords": [
+        "all",
+        "everything",
+        "every",
+        "enthusiasm",
+        "all the things"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the verb",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"ALL THE THINGS!\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "yo-dawg",
+      "name": "Xzibit Yo Dawg",
+      "source": "memegen",
+      "source_id": "yodawg",
+      "source_url": "https://api.memegen.link/images/yodawg.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/xzibit-yo-dawg",
+      "image": "assets/memes/img/yo-dawg.jpg",
+      "width": 640,
+      "height": 427,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Xzibit Yo Dawg meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/xzibit-yo-dawg",
+        "title": "Xzibit Yo Dawg"
+      },
+      "layout": "top-bottom",
+      "usage": "Recursive or self-referential situations.",
+      "tone": [
+        "playful"
+      ],
+      "keywords": [
+        "recursive",
+        "meta",
+        "inside",
+        "self-referential",
+        "about",
+        "nested",
+        "loop"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"yo dawg, I heard you like X\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"so I put X in your X\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "y-u-no",
+      "name": "Y U NO Guy",
+      "source": "memegen",
+      "source_id": "yuno",
+      "source_url": "https://api.memegen.link/images/yuno.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/y-u-no-guy",
+      "image": "assets/memes/img/y-u-no.jpg",
+      "width": 640,
+      "height": 481,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Y U NO Guy meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/y-u-no-guy",
+        "title": "Y U NO Guy"
+      },
+      "layout": "top-bottom",
+      "usage": "Frustrated demand at someone who won't do the obvious thing.",
+      "tone": [
+        "frustrated"
+      ],
+      "keywords": [
+        "why",
+        "won't",
+        "refuse",
+        "demand",
+        "frustrat",
+        "just"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"X,\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"Y U NO Z?\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "three-headed-dragon",
+      "name": "Three-Headed Dragon",
+      "source": "memegen",
+      "source_id": "3hd",
+      "source_url": "https://api.memegen.link/images/3hd.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/three-headed-dragon",
+      "image": "assets/memes/img/three-headed-dragon.jpg",
+      "width": 640,
+      "height": 512,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Three-Headed Dragon meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/three-headed-dragon",
+        "title": "Three-Headed Dragon"
+      },
+      "layout": "boxes",
+      "usage": "Three versions of something where the third is the silly one.",
+      "tone": [
+        "absurd"
+      ],
+      "keywords": [
+        "three",
+        "versions",
+        "odd one",
+        "trio",
+        "group",
+        "weird"
+      ],
+      "slots": [
+        {
+          "name": "head1",
+          "hint": "serious head",
+          "x": 0,
+          "y": 0.65,
+          "w": 0.27,
+          "h": 0.13,
+          "style": "impact",
+          "align": "center",
+          "max": 50
+        },
+        {
+          "name": "head2",
+          "hint": "serious head",
+          "x": 0.365,
+          "y": 0.55,
+          "w": 0.27,
+          "h": 0.13,
+          "style": "impact",
+          "align": "center",
+          "max": 50
+        },
+        {
+          "name": "head3",
+          "hint": "the derpy head",
+          "x": 0.73,
+          "y": 0.6,
+          "w": 0.27,
+          "h": 0.13,
+          "style": "impact",
+          "align": "center",
+          "max": 50
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "running-away-balloon",
+      "name": "Running Away Balloon",
+      "source": "memegen",
+      "source_id": "balloon",
+      "source_url": "https://api.memegen.link/images/balloon.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/running-away-balloon",
+      "image": "assets/memes/img/running-away-balloon.jpg",
+      "width": 600,
+      "height": 805,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Running Away Balloon meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/running-away-balloon",
+        "title": "Running Away Balloon"
+      },
+      "layout": "boxes",
+      "usage": "Being held back by something just as the opportunity floats away.",
+      "tone": [
+        "relatable",
+        "sad"
+      ],
+      "keywords": [
+        "opportunity",
+        "held back",
+        "miss",
+        "lose",
+        "chance",
+        "fear"
+      ],
+      "slots": [
+        {
+          "name": "balloon",
+          "hint": "the opportunity",
+          "x": 0.61,
+          "y": 0.1,
+          "w": 0.39,
+          "h": 0.2,
+          "style": "plain",
+          "align": "left",
+          "max": 90
+        },
+        {
+          "name": "balloon_again",
+          "hint": "the same opportunity",
+          "x": 0.8,
+          "y": 0.57,
+          "w": 0.2,
+          "h": 0.2,
+          "style": "plain",
+          "align": "left",
+          "max": 80
+        },
+        {
+          "name": "holder",
+          "hint": "what holds you back",
+          "x": 0,
+          "y": 0.7,
+          "w": 0.27,
+          "h": 0.2,
+          "style": "plain",
+          "align": "center",
+          "max": 85
+        }
+      ],
+      "captions": 3
+    },
+    {
+      "id": "honest-work",
+      "name": "But It's Honest Work",
+      "source": "memegen",
+      "source_id": "bihw",
+      "source_url": "https://api.memegen.link/images/bihw.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/but-its-honest-work",
+      "image": "assets/memes/img/honest-work.jpg",
+      "width": 640,
+      "height": 427,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "But It's Honest Work meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/but-its-honest-work",
+        "title": "But It's Honest Work"
+      },
+      "layout": "top-bottom",
+      "usage": "A modest but sincere accomplishment.",
+      "tone": [
+        "wholesome"
+      ],
+      "keywords": [
+        "modest",
+        "small",
+        "honest",
+        "work",
+        "humble",
+        "not much"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"it ain't much\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"but it's honest work\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "life-finds-a-way",
+      "name": "Life... Finds a Way",
+      "source": "memegen",
+      "source_id": "away",
+      "source_url": "https://api.memegen.link/images/away.jpg",
+      "origin_url": "https://www.youtube.com/watch?v=dMjQ3hA9mEA",
+      "image": "assets/memes/img/life-finds-a-way.jpg",
+      "width": 640,
+      "height": 360,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Life... Finds a Way meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://www.youtube.com/watch?v=dMjQ3hA9mEA",
+        "title": "Life... Finds a Way"
+      },
+      "layout": "top-bottom",
+      "usage": "Something persistently finding a way to happen anyway.",
+      "tone": [
+        "wry"
+      ],
+      "keywords": [
+        "persist",
+        "anyway",
+        "despite",
+        "always",
+        "finds a way",
+        "inevitable"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the thing",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"...finds a way\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "take-my-money",
+      "name": "Shut Up and Take My Money!",
+      "source": "memegen",
+      "source_id": "money",
+      "source_url": "https://api.memegen.link/images/money.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/shut-up-and-take-my-money",
+      "image": "assets/memes/img/take-my-money.jpg",
+      "width": 640,
+      "height": 360,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Shut Up and Take My Money! meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/shut-up-and-take-my-money",
+        "title": "Shut Up and Take My Money!"
+      },
+      "layout": "top-bottom",
+      "usage": "Overeager enthusiasm to buy into something.",
+      "tone": [
+        "manic"
+      ],
+      "keywords": [
+        "buy",
+        "want",
+        "take my money",
+        "shut up",
+        "need",
+        "eager"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"shut up and\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"take my money!\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "everything-the-light-touches",
+      "name": "Everything the Light Touches is Our Kingdom",
+      "source": "memegen",
+      "source_id": "light",
+      "source_url": "https://api.memegen.link/images/light.jpg",
+      "origin_url": "https://www.youtube.com/watch?v=JawCb15MWLc",
+      "image": "assets/memes/img/everything-the-light-touches.jpg",
+      "width": 640,
+      "height": 387,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Everything the Light Touches is Our Kingdom meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://www.youtube.com/watch?v=JawCb15MWLc",
+        "title": "Everything the Light Touches is Our Kingdom"
+      },
+      "layout": "top-bottom",
+      "usage": "A grand promise of an inheritance, with a forbidden zone.",
+      "tone": [
+        "grandiose"
+      ],
+      "keywords": [
+        "kingdom",
+        "inherit",
+        "empire",
+        "everything",
+        "forbidden",
+        "domain"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the grand claim",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the forbidden exception",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "older-code",
+      "name": "An Older Code Sir, But It Checks Out",
+      "source": "memegen",
+      "source_id": "older",
+      "source_url": "https://api.memegen.link/images/older.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/its-an-older-meme-but-it-checks-out",
+      "image": "assets/memes/img/older-code.jpg",
+      "width": 640,
+      "height": 345,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "An Older Code Sir, But It Checks Out meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/its-an-older-meme-but-it-checks-out",
+        "title": "An Older Code Sir, But It Checks Out"
+      },
+      "layout": "top-bottom",
+      "usage": "A dated reference that still checks out.",
+      "tone": [
+        "dry"
+      ],
+      "keywords": [
+        "old",
+        "dated",
+        "still",
+        "checks out",
+        "ancient",
+        "classic"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"it's an older X, sir\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"but it checks out\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "no-god-please-no",
+      "name": "Michael Scott No God No",
+      "source": "memegen",
+      "source_id": "michael-scott",
+      "source_url": "https://api.memegen.link/images/michael-scott.jpg",
+      "origin_url": "https://www.youtube.com/watch?v=31g0YE61PLQ",
+      "image": "assets/memes/img/no-god-please-no.jpg",
+      "width": 640,
+      "height": 360,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Michael Scott No God No meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://www.youtube.com/watch?v=31g0YE61PLQ",
+        "title": "Michael Scott No God No"
+      },
+      "layout": "top-bottom",
+      "usage": "Overdramatic despair at bad news.",
+      "tone": [
+        "dramatic"
+      ],
+      "keywords": [
+        "no",
+        "despair",
+        "horror",
+        "bad news",
+        "disaster",
+        "please"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the bad news",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"NO, GOD, PLEASE NO\"",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "too-damn-high",
+      "name": "The Rent Is Too Damn High",
+      "source": "memegen",
+      "source_id": "toohigh",
+      "source_url": "https://api.memegen.link/images/toohigh.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/the-rent-is-too-damn-high-jimmy-mcmillan",
+      "image": "assets/memes/img/too-damn-high.jpg",
+      "width": 640,
+      "height": 436,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "The Rent Is Too Damn High meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/the-rent-is-too-damn-high-jimmy-mcmillan",
+        "title": "The Rent Is Too Damn High"
+      },
+      "layout": "top-bottom",
+      "usage": "Complaining that something is excessive.",
+      "tone": [
+        "frustrated"
+      ],
+      "keywords": [
+        "too",
+        "expensive",
+        "rent",
+        "price",
+        "cost",
+        "high",
+        "excess"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"the X is\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"too damn high\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "and-its-gone",
+      "name": "And It's Gone",
+      "source": "memegen",
+      "source_id": "gone",
+      "source_url": "https://api.memegen.link/images/gone.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/and-its-gone",
+      "image": "assets/memes/img/and-its-gone.jpg",
+      "width": 640,
+      "height": 502,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "And It's Gone meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/and-its-gone",
+        "title": "And It's Gone"
+      },
+      "layout": "top-bottom",
+      "usage": "Something lost instantly after being acquired.",
+      "tone": [
+        "dark",
+        "wry"
+      ],
+      "keywords": [
+        "gone",
+        "lost",
+        "vanish",
+        "spend",
+        "waste",
+        "instantly"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the setup",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"...and it's gone\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "you-get-a",
+      "name": "Oprah You Get a Car",
+      "source": "memegen",
+      "source_id": "oprah",
+      "source_url": "https://api.memegen.link/images/oprah.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/oprahs-you-get-a-car",
+      "image": "assets/memes/img/you-get-a.jpg",
+      "width": 640,
+      "height": 480,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Oprah You Get a Car meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/oprahs-you-get-a-car",
+        "title": "Oprah You Get a Car"
+      },
+      "layout": "top-bottom",
+      "usage": "Handing out something to everyone indiscriminately.",
+      "tone": [
+        "manic"
+      ],
+      "keywords": [
+        "everyone",
+        "you get",
+        "free",
+        "give",
+        "all of you",
+        "generous"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"you get an X!\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"everyone gets an X!\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "immediately-regret",
+      "name": "I Immediately Regret This Decision!",
+      "source": "memegen",
+      "source_id": "regret",
+      "source_url": "https://api.memegen.link/images/regret.jpg",
+      "origin_url": "https://www.youtube.com/watch?v=gd9ltJGykYc",
+      "image": "assets/memes/img/immediately-regret.jpg",
+      "width": 640,
+      "height": 572,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "I Immediately Regret This Decision! meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://www.youtube.com/watch?v=gd9ltJGykYc",
+        "title": "I Immediately Regret This Decision!"
+      },
+      "layout": "top-bottom",
+      "usage": "Instant regret after a decision.",
+      "tone": [
+        "self-deprecating"
+      ],
+      "keywords": [
+        "regret",
+        "mistake",
+        "decision",
+        "immediately",
+        "oops"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the decision",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"I immediately regret this decision\"",
+          "max": 60
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "what-year-is-it",
+      "name": "What Year Is It?",
+      "source": "memegen",
+      "source_id": "whatyear",
+      "source_url": "https://api.memegen.link/images/whatyear.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/what-year-is-it",
+      "image": "assets/memes/img/what-year-is-it.jpg",
+      "width": 640,
+      "height": 477,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "What Year Is It? meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/what-year-is-it",
+        "title": "What Year Is It?"
+      },
+      "layout": "top-bottom",
+      "usage": "Emerging from isolation, out of touch with the present.",
+      "tone": [
+        "confused"
+      ],
+      "keywords": [
+        "year",
+        "time",
+        "out of date",
+        "asleep",
+        "return",
+        "jungle",
+        "catch up"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the situation",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"what year is it?\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "this-is-sparta",
+      "name": "This is Sparta!",
+      "source": "memegen",
+      "source_id": "sparta",
+      "source_url": "https://api.memegen.link/images/sparta.jpg",
+      "origin_url": "https://www.youtube.com/watch?v=QkWS9PiXekE",
+      "image": "assets/memes/img/this-is-sparta.jpg",
+      "width": 640,
+      "height": 338,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "This is Sparta! meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://www.youtube.com/watch?v=QkWS9PiXekE",
+        "title": "This is Sparta!"
+      },
+      "layout": "top-bottom",
+      "usage": "An emphatic, shouted declaration.",
+      "tone": [
+        "heated"
+      ],
+      "keywords": [
+        "this is",
+        "shout",
+        "declare",
+        "madness",
+        "emphatic",
+        "sparta"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"this. is.\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "the shouted thing",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "brace-yourselves",
+      "name": "Winter is coming",
+      "source": "memegen",
+      "source_id": "winter",
+      "source_url": "https://api.memegen.link/images/winter.jpg",
+      "origin_url": "https://knowyourmeme.com/memes/brace-yourselves-winter-is-coming",
+      "image": "assets/memes/img/brace-yourselves.jpg",
+      "width": 640,
+      "height": 491,
+      "public_domain": false,
+      "license_note": "Copyrighted film/TV/web still, used as a widely circulated meme template for non-commercial commentary/parody (fair use / quotation).",
+      "credit": {
+        "author": "Winter is coming meme template via memegen",
+        "license": "Meme template (fair use, non-commercial)",
+        "url": "https://knowyourmeme.com/memes/brace-yourselves-winter-is-coming",
+        "title": "Winter is coming"
+      },
+      "layout": "top-bottom",
+      "usage": "Warning that something predictable is coming.",
+      "tone": [
+        "grave"
+      ],
+      "keywords": [
+        "coming",
+        "brace",
+        "prepare",
+        "warn",
+        "incoming",
+        "soon"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "\"brace yourselves\"",
+          "max": 60
+        },
+        {
+          "name": "bottom",
+          "hint": "\"X is coming\"",
+          "max": 60
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "plato-vs-aristotle",
+      "name": "Plato vs Aristotle (pointing up / down)",
+      "source": "taiku-art",
+      "art": "plato-aristotle",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Sanzio_01_Plato_Aristotle_(cropped).jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Sanzio_01_Plato_Aristotle_(cropped).jpg",
+      "width": 500,
+      "height": 287,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The School of Athens (detail: Plato and Aristotle), Raphael (1509–1511) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Raphael (1509–1511)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Sanzio_01_Plato_Aristotle_(cropped).jpg",
+        "title": "The School of Athens (detail: Plato and Aristotle)"
+      },
+      "layout": "boxes",
+      "usage": "Two people disagreeing about where truth lives: one points up (abstract/ideal), one points down (concrete/practical).",
+      "tone": [
+        "debate",
+        "nerdy"
+      ],
+      "keywords": [
+        "ideal",
+        "abstract",
+        "concrete",
+        "practical",
+        "theory",
+        "practice",
+        "forms",
+        "up",
+        "down",
+        "plato",
+        "aristotle",
+        "vs"
+      ],
+      "slots": [
+        {
+          "name": "up",
+          "hint": "the lofty/abstract position (Plato pointing up)",
+          "x": 0.03,
+          "y": 0.03,
+          "w": 0.44,
+          "h": 0.26,
+          "style": "impact",
+          "align": "center",
+          "max": 32
+        },
+        {
+          "name": "down",
+          "hint": "the grounded/practical position (Aristotle's hand to earth)",
+          "x": 0.53,
+          "y": 0.72,
+          "w": 0.44,
+          "h": 0.26,
+          "style": "impact",
+          "align": "center",
+          "max": 32
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "athens-everyone",
+      "name": "School of Athens: everyone talking",
+      "source": "taiku-art",
+      "art": "school-of-athens",
+      "source_url": "https://commons.wikimedia.org/wiki/File:%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg",
+      "width": 500,
+      "height": 388,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The School of Athens, Raphael (1509–1511) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Raphael (1509–1511)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg",
+        "title": "The School of Athens"
+      },
+      "layout": "caption-bar",
+      "usage": "A crowded scene of everyone talking at once. Use for a group chat or seminar that went off the rails.",
+      "tone": [
+        "chaotic",
+        "relatable"
+      ],
+      "keywords": [
+        "everyone",
+        "group",
+        "chat",
+        "seminar",
+        "crowd",
+        "talking",
+        "conference",
+        "academy"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "modern-style caption, e.g. 'the group chat after one (1) question about free will'",
+          "max": 110
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "socrates-one-more",
+      "name": "Death of Socrates: one more point",
+      "source": "taiku-art",
+      "art": "death-of-socrates",
+      "source_url": "https://commons.wikimedia.org/wiki/File:David_-_The_Death_of_Socrates.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:David_-_The_Death_of_Socrates.jpg",
+      "width": 500,
+      "height": 328,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Death of Socrates, Jacques-Louis David (1787) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Jacques-Louis David (1787)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:David_-_The_Death_of_Socrates.jpg",
+        "title": "The Death of Socrates"
+      },
+      "layout": "caption-bar",
+      "usage": "A man about to die still raising a finger to make one more point.",
+      "tone": [
+        "relatable",
+        "stubborn"
+      ],
+      "keywords": [
+        "one more",
+        "argue",
+        "point",
+        "actually",
+        "stubborn",
+        "last word",
+        "death",
+        "socrates"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "caption about refusing to stop arguing, e.g. 'me with 1% battery: actually, define justice'",
+          "max": 110
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "diogenes-searching",
+      "name": "Diogenes searching with a lantern",
+      "source": "taiku-art",
+      "art": "diogenes-jar",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Jean-L%C3%A9on_G%C3%A9r%C3%B4me_-_Diogenes_-_Walters_37131.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Jean-L%C3%A9on_G%C3%A9r%C3%B4me_-_Diogenes_-_Walters_37131.jpg",
+      "width": 500,
+      "height": 367,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Diogenes, Jean-Léon Gérôme (1860) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Jean-Léon Gérôme (1860)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Jean-L%C3%A9on_G%C3%A9r%C3%B4me_-_Diogenes_-_Walters_37131.jpg",
+        "title": "Diogenes"
+      },
+      "layout": "top-bottom",
+      "usage": "Searching in daylight with a lantern for something impossible to find.",
+      "tone": [
+        "cynical"
+      ],
+      "keywords": [
+        "search",
+        "find",
+        "looking",
+        "honest",
+        "impossible",
+        "rare",
+        "lantern"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "setup, short",
+          "max": 40
+        },
+        {
+          "name": "bottom",
+          "hint": "punchline: the thing that can't be found",
+          "max": 40
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "wanderer-above",
+      "name": "Wanderer above the sea of fog",
+      "source": "taiku-art",
+      "art": "wanderer",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
+      "width": 500,
+      "height": 640,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Wanderer above the Sea of Fog, Caspar David Friedrich (c. 1818) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Caspar David Friedrich (c. 1818)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
+        "title": "Wanderer above the Sea of Fog"
+      },
+      "layout": "boxes",
+      "usage": "One person calmly overlooking a sea of chaos below.",
+      "tone": [
+        "smug",
+        "calm"
+      ],
+      "keywords": [
+        "above",
+        "calm",
+        "chaos",
+        "aloof",
+        "detached",
+        "overlook",
+        "drama",
+        "discourse"
+      ],
+      "slots": [
+        {
+          "name": "me",
+          "hint": "the calm observer",
+          "x": 0.2,
+          "y": 0.03,
+          "w": 0.6,
+          "h": 0.17,
+          "style": "impact",
+          "align": "center",
+          "max": 28
+        },
+        {
+          "name": "fog",
+          "hint": "the chaos below",
+          "x": 0.05,
+          "y": 0.8,
+          "w": 0.9,
+          "h": 0.17,
+          "style": "impact",
+          "align": "center",
+          "max": 32
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "scream-when",
+      "name": "The Scream",
+      "source": "taiku-art",
+      "art": "the-scream",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg",
+      "width": 500,
+      "height": 621,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Scream, Edvard Munch (1893) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Edvard Munch (1893)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg",
+        "title": "The Scream"
+      },
+      "layout": "caption-bar",
+      "usage": "Pure existential panic.",
+      "tone": [
+        "anxious",
+        "dark"
+      ],
+      "keywords": [
+        "panic",
+        "scream",
+        "anxiety",
+        "dread",
+        "horror",
+        "existential",
+        "when",
+        "realizing"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "'when ...' / 'me realizing ...' caption",
+          "max": 110
+        }
+      ],
+      "captions": 1,
+      "reaction": true
+    },
+    {
+      "id": "pollice-verso-verdict",
+      "name": "Pollice Verso: crowd thumbs down",
+      "source": "taiku-art",
+      "art": "pollice-verso",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Jean-Leon_Gerome_Pollice_Verso.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Jean-Leon_Gerome_Pollice_Verso.jpg",
+      "width": 500,
+      "height": 336,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Pollice Verso, Jean-Léon Gérôme (1872) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Jean-Léon Gérôme (1872)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Jean-Leon_Gerome_Pollice_Verso.jpg",
+        "title": "Pollice Verso"
+      },
+      "layout": "boxes",
+      "usage": "A crowd gives thumbs down to a lone figure in the arena; public verdicts, getting ratioed.",
+      "tone": [
+        "heated",
+        "mocking"
+      ],
+      "keywords": [
+        "verdict",
+        "crowd",
+        "judge",
+        "thumbs down",
+        "ratio",
+        "cancel",
+        "public",
+        "arena"
+      ],
+      "slots": [
+        {
+          "name": "crowd",
+          "hint": "who is judging",
+          "x": 0.1,
+          "y": 0.03,
+          "w": 0.8,
+          "h": 0.2,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        },
+        {
+          "name": "gladiator",
+          "hint": "who/what is being judged",
+          "x": 0.1,
+          "y": 0.78,
+          "w": 0.65,
+          "h": 0.19,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "babel-project",
+      "name": "Tower of Babel: grand project",
+      "source": "taiku-art",
+      "art": "tower-of-babel",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_(Vienna)_-_Google_Art_Project_-_edited.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_(Vienna)_-_Google_Art_Project_-_edited.jpg",
+      "width": 500,
+      "height": 366,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Tower of Babel, Pieter Bruegel the Elder (1563) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Pieter Bruegel the Elder (1563)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_(Vienna)_-_Google_Art_Project_-_edited.jpg",
+        "title": "The Tower of Babel"
+      },
+      "layout": "top-bottom",
+      "usage": "A gigantic unfinished project collapsing under its own ambition.",
+      "tone": [
+        "wry"
+      ],
+      "keywords": [
+        "project",
+        "ambition",
+        "plan",
+        "build",
+        "unfinished",
+        "grand",
+        "system",
+        "collapse"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the grand plan",
+          "max": 40
+        },
+        {
+          "name": "bottom",
+          "hint": "the reality",
+          "max": 40
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "aristotle-respect",
+      "name": "Aristotle with a bust of Homer",
+      "source": "taiku-art",
+      "art": "aristotle-homer",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Aristotle_with_a_Bust_of_Homer_MET_DP319026.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Aristotle_with_a_Bust_of_Homer_MET_DP319026.jpg",
+      "width": 500,
+      "height": 526,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Aristotle with a Bust of Homer, Rembrandt (1653) (CC0, Wikimedia Commons).",
+      "credit": {
+        "author": "Rembrandt (1653)",
+        "license": "CC0",
+        "url": "https://commons.wikimedia.org/wiki/File:Aristotle_with_a_Bust_of_Homer_MET_DP319026.jpg",
+        "title": "Aristotle with a Bust of Homer"
+      },
+      "layout": "caption-bar",
+      "usage": "Respectfully resting a hand on the bust of a predecessor; citing, respecting, or name-dropping a source.",
+      "tone": [
+        "smug",
+        "nerdy"
+      ],
+      "keywords": [
+        "cite",
+        "source",
+        "respect",
+        "predecessor",
+        "homage",
+        "tradition",
+        "reference"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "caption about citing / respecting the source, e.g. 'me citing the one guy who agrees with me'",
+          "max": 110
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "democritus-laughs",
+      "name": "Democritus, the laughing philosopher",
+      "source": "taiku-art",
+      "art": "democritus",
+      "source_url": "https://commons.wikimedia.org/wiki/File:%27Democritus%27_by_Luca_Giordano,_called_Fa_Presto.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:%27Democritus%27_by_Luca_Giordano,_called_Fa_Presto.jpg",
+      "width": 500,
+      "height": 642,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Democritus, the Laughing Philosopher, Luca Giordano (c. 1650s) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Luca Giordano (c. 1650s)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:%27Democritus%27_by_Luca_Giordano,_called_Fa_Presto.jpg",
+        "title": "Democritus, the Laughing Philosopher"
+      },
+      "layout": "top-bottom",
+      "usage": "The laughing philosopher, amused by the world.",
+      "tone": [
+        "mocking",
+        "playful"
+      ],
+      "keywords": [
+        "laugh",
+        "lol",
+        "absurd",
+        "funny",
+        "amused",
+        "ridiculous"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the absurd thing",
+          "max": 40
+        },
+        {
+          "name": "bottom",
+          "hint": "the laughing reaction",
+          "max": 40
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "heraclitus-weeps",
+      "name": "Heraclitus, the weeping philosopher",
+      "source": "taiku-art",
+      "art": "heraclitus",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Hendrik_ter_Brugghen_-_Heraclitus.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Hendrik_ter_Brugghen_-_Heraclitus.jpg",
+      "width": 500,
+      "height": 614,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Heraclitus, the Weeping Philosopher, Hendrick ter Brugghen (1628) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Hendrick ter Brugghen (1628)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Hendrik_ter_Brugghen_-_Heraclitus.jpg",
+        "title": "Heraclitus, the Weeping Philosopher"
+      },
+      "layout": "top-bottom",
+      "usage": "Weeping at the state of the world (pairs with Democritus laughing).",
+      "tone": [
+        "sad",
+        "dramatic"
+      ],
+      "keywords": [
+        "cry",
+        "weep",
+        "sad",
+        "tears",
+        "grief",
+        "state of the world",
+        "everything changes"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "what is sad",
+          "max": 40
+        },
+        {
+          "name": "bottom",
+          "hint": "the weeping reaction",
+          "max": 40
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "eternitys-gate",
+      "name": "At Eternity's Gate (head in hands)",
+      "source": "taiku-art",
+      "art": "eternitys-gate",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_At_Eternity%27s_Gate.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_At_Eternity%27s_Gate.jpg",
+      "width": 500,
+      "height": 631,
+      "public_domain": true,
+      "license_note": "Public-domain painting: At Eternity's Gate, Vincent van Gogh (1890) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Vincent van Gogh (1890)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_At_Eternity%27s_Gate.jpg",
+        "title": "At Eternity's Gate"
+      },
+      "layout": "caption-bar",
+      "usage": "Head in hands, overwhelmed; quiet despair after reading something.",
+      "tone": [
+        "sad",
+        "relatable"
+      ],
+      "keywords": [
+        "despair",
+        "overwhelmed",
+        "tired",
+        "exhausted",
+        "head in hands",
+        "cannot",
+        "reading"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"me after reading ...\" style caption",
+          "max": 110
+        }
+      ],
+      "captions": 1,
+      "reaction": true
+    },
+    {
+      "id": "desperate-man",
+      "name": "The Desperate Man",
+      "source": "taiku-art",
+      "art": "desperate-man",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_Le_D%C3%A9sesp%C3%A9r%C3%A9_(1843).jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_Le_D%C3%A9sesp%C3%A9r%C3%A9_(1843).jpg",
+      "width": 500,
+      "height": 409,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Desperate Man (self-portrait), Gustave Courbet (1843–1845) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Gustave Courbet (1843–1845)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_Le_D%C3%A9sesp%C3%A9r%C3%A9_(1843).jpg",
+        "title": "The Desperate Man (self-portrait)"
+      },
+      "layout": "caption-bar",
+      "usage": "Wide-eyed, hair-pulling shock at a revelation.",
+      "tone": [
+        "shocked",
+        "dramatic"
+      ],
+      "keywords": [
+        "shock",
+        "desperate",
+        "what",
+        "horror",
+        "disbelief",
+        "realize",
+        "wtf"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"me when ...\" caption",
+          "max": 110
+        }
+      ],
+      "captions": 1,
+      "reaction": true
+    },
+    {
+      "id": "open-mouthed",
+      "name": "Rembrandt open-mouthed",
+      "source": "taiku-art",
+      "art": "rembrandt-open-mouth",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rembrandt_Self-portrait_with_Open_Mouth.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Rembrandt_Self-portrait_with_Open_Mouth.jpg",
+      "width": 500,
+      "height": 653,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Self-Portrait, Open-Mouthed, Rembrandt (1630) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Rembrandt (1630)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Rembrandt_Self-portrait_with_Open_Mouth.jpg",
+        "title": "Self-Portrait, Open-Mouthed"
+      },
+      "layout": "top-bottom",
+      "usage": "Gasping in shock or outrage.",
+      "tone": [
+        "shocked"
+      ],
+      "keywords": [
+        "gasp",
+        "shock",
+        "what",
+        "outrage",
+        "surprised",
+        "excuse me"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "what happened",
+          "max": 40
+        },
+        {
+          "name": "bottom",
+          "hint": "the gasp",
+          "max": 40
+        }
+      ],
+      "captions": 2,
+      "reaction": true
+    },
+    {
+      "id": "cossacks-reply",
+      "name": "Cossacks writing a reply",
+      "source": "taiku-art",
+      "art": "cossacks",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Repin_Cossacks.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Repin_Cossacks.jpg",
+      "width": 500,
+      "height": 295,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Reply of the Zaporozhian Cossacks, Ilya Repin (1880–1891) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Ilya Repin (1880–1891)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Repin_Cossacks.jpg",
+        "title": "Reply of the Zaporozhian Cossacks"
+      },
+      "layout": "caption-bar",
+      "usage": "A group gleefully drafting a savage reply together.",
+      "tone": [
+        "mocking",
+        "gleeful"
+      ],
+      "keywords": [
+        "reply",
+        "draft",
+        "roast",
+        "clapback",
+        "group",
+        "writing",
+        "response",
+        "letter"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"the group chat drafting a reply to ...\" caption",
+          "max": 110
+        }
+      ],
+      "captions": 1,
+      "reaction": true
+    },
+    {
+      "id": "oath-horatii",
+      "name": "Oath of the Horatii",
+      "source": "taiku-art",
+      "art": "oath-horatii",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_Oath_of_the_Horatii_-_Google_Art_Project.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_Oath_of_the_Horatii_-_Google_Art_Project.jpg",
+      "width": 500,
+      "height": 390,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Oath of the Horatii, Jacques-Louis David (1784) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Jacques-Louis David (1784)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_Oath_of_the_Horatii_-_Google_Art_Project.jpg",
+        "title": "Oath of the Horatii"
+      },
+      "layout": "boxes",
+      "usage": "Several people swearing allegiance to one thing; solemn pledges.",
+      "tone": [
+        "grave",
+        "ironic"
+      ],
+      "keywords": [
+        "oath",
+        "swear",
+        "pledge",
+        "loyal",
+        "allegiance",
+        "promise",
+        "vow",
+        "team"
+      ],
+      "slots": [
+        {
+          "name": "oath_takers",
+          "hint": "who is swearing",
+          "x": 0.03,
+          "y": 0.04,
+          "w": 0.5,
+          "h": 0.2,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        },
+        {
+          "name": "cause",
+          "hint": "what they swear to",
+          "x": 0.35,
+          "y": 0.78,
+          "w": 0.6,
+          "h": 0.19,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "sleeping-spinner",
+      "name": "The Sleeping Spinner",
+      "source": "taiku-art",
+      "art": "sleeping-spinner",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_The_Sleeping_Spinner_-_WGA05461.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_The_Sleeping_Spinner_-_WGA05461.jpg",
+      "width": 500,
+      "height": 386,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Sleeping Spinner, Gustave Courbet (1853) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Gustave Courbet (1853)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_The_Sleeping_Spinner_-_WGA05461.jpg",
+        "title": "The Sleeping Spinner"
+      },
+      "layout": "caption-bar",
+      "usage": "Fallen asleep mid-task; boredom.",
+      "tone": [
+        "relatable",
+        "tired"
+      ],
+      "keywords": [
+        "sleep",
+        "bored",
+        "tired",
+        "nap",
+        "lecture",
+        "boring",
+        "asleep"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"me during ...\" caption",
+          "max": 110
+        }
+      ],
+      "captions": 1,
+      "reaction": true
+    },
+    {
+      "id": "astronomer-gaze",
+      "name": "The Astronomer",
+      "source": "taiku-art",
+      "art": "astronomer",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer_-_The_Astronomer_-_WGA24685FXD.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer_-_The_Astronomer_-_WGA24685FXD.jpg",
+      "width": 500,
+      "height": 571,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Astronomer, Johannes Vermeer (c. 1668) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Johannes Vermeer (c. 1668)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer_-_The_Astronomer_-_WGA24685FXD.jpg",
+        "title": "The Astronomer"
+      },
+      "layout": "caption-bar",
+      "usage": "Intently studying something; nerdy curiosity.",
+      "tone": [
+        "nerdy",
+        "curious"
+      ],
+      "keywords": [
+        "study",
+        "research",
+        "curious",
+        "stars",
+        "science",
+        "nerd",
+        "look into"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"me researching ...\" caption",
+          "max": 110
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "starry-night",
+      "name": "The Starry Night",
+      "source": "taiku-art",
+      "art": "starry-night",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+      "width": 500,
+      "height": 386,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Starry Night, Vincent van Gogh (1889) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Vincent van Gogh (1889)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+        "title": "The Starry Night"
+      },
+      "layout": "top-bottom",
+      "usage": "Swirling, overwhelming thoughts at night.",
+      "tone": [
+        "dreamy",
+        "anxious"
+      ],
+      "keywords": [
+        "night",
+        "3am",
+        "thoughts",
+        "insomnia",
+        "swirling",
+        "cosmos",
+        "stars"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the situation",
+          "max": 40
+        },
+        {
+          "name": "bottom",
+          "hint": "the swirling thought",
+          "max": 40
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "philosopher-meditation",
+      "name": "Philosopher in Meditation",
+      "source": "taiku-art",
+      "art": "philosopher-meditation",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Philosopher_in_Meditation_(cleaned).jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Philosopher_in_Meditation_(cleaned).jpg",
+      "width": 500,
+      "height": 415,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Philosopher in Meditation, Rembrandt (attributed) (1632) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Rembrandt (attributed) (1632)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Philosopher_in_Meditation_(cleaned).jpg",
+        "title": "Philosopher in Meditation"
+      },
+      "layout": "caption-bar",
+      "usage": "Sitting quietly in a dark corner thinking too long.",
+      "tone": [
+        "calm",
+        "wry"
+      ],
+      "keywords": [
+        "think",
+        "meditate",
+        "quiet",
+        "alone",
+        "ponder",
+        "contemplate",
+        "overthink"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"me after ...\" caption",
+          "max": 110
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "nobody-me",
+      "name": "nobody: / me:",
+      "source": "taiku-art",
+      "art": "desperate-man",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_Le_D%C3%A9sesp%C3%A9r%C3%A9_(1843).jpg",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_Le_D%C3%A9sesp%C3%A9r%C3%A9_(1843).jpg",
+      "width": 500,
+      "height": 409,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Desperate Man (self-portrait), Gustave Courbet (1843–1845) (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Gustave Courbet (1843–1845)",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_Le_D%C3%A9sesp%C3%A9r%C3%A9_(1843).jpg",
+        "title": "The Desperate Man (self-portrait)"
+      },
+      "layout": "caption-bar",
+      "prefix": "nobody:\n\n",
+      "usage": "The \"nobody: / me:\" format: doing something unprompted that nobody asked for.",
+      "tone": [
+        "self-deprecating",
+        "absurd"
+      ],
+      "keywords": [
+        "nobody",
+        "unprompted",
+        "random",
+        "no one asked",
+        "me",
+        "unsolicited"
+      ],
+      "slots": [
+        {
+          "name": "me",
+          "hint": "starts with \"me:\" then what you do unprompted, e.g. 'me: actually, Kant would say'",
+          "max": 100
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "creation-of-adam",
+      "name": "Creation of Adam (hands)",
+      "source": "commons",
+      "commons_file": "File:Michelangelo - Creation of Adam (cropped).jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Michelangelo_-_Creation_of_Adam_%28cropped%29.jpg/960px-Michelangelo_-_Creation_of_Adam_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Michelangelo_-_Creation_of_Adam_(cropped).jpg",
+      "image": "assets/memes/img/creation-of-adam.jpg",
+      "width": 640,
+      "height": 291,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Creation of Adam, Michelangelo (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Michelangelo",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Michelangelo_-_Creation_of_Adam_(cropped).jpg",
+        "title": "The Creation of Adam"
+      },
+      "layout": "boxes",
+      "usage": "Two things almost touching; a connection that is just out of reach, or handing an idea from one to another.",
+      "tone": [
+        "grand",
+        "ironic"
+      ],
+      "keywords": [
+        "almost",
+        "connect",
+        "reach",
+        "touch",
+        "spark",
+        "create",
+        "god",
+        "give"
+      ],
+      "slots": [
+        {
+          "name": "left",
+          "hint": "one side (Adam)",
+          "x": 0.02,
+          "y": 0.04,
+          "w": 0.42,
+          "h": 0.25,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        },
+        {
+          "name": "right",
+          "hint": "the other side (God)",
+          "x": 0.56,
+          "y": 0.04,
+          "w": 0.42,
+          "h": 0.25,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "fall-of-icarus",
+      "name": "Landscape with the Fall of Icarus",
+      "source": "commons",
+      "commons_file": "File:Pieter Bruegel de Oude - De val van Icarus.jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Pieter_Bruegel_de_Oude_-_De_val_van_Icarus.jpg/960px-Pieter_Bruegel_de_Oude_-_De_val_van_Icarus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_de_Oude_-_De_val_van_Icarus.jpg",
+      "image": "assets/memes/img/fall-of-icarus.jpg",
+      "width": 640,
+      "height": 409,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Landscape with the Fall of Icarus label QS:Lde,\"Landschaft mit dem Sturz des Ikarus\" label QS:Lnl,\"L, After Pieter Brueghel the Elder (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "After Pieter Brueghel the Elder",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_de_Oude_-_De_val_van_Icarus.jpg",
+        "title": "Landscape with the Fall of Icarus label QS:Lde,\"Landschaft mit dem Sturz des Ikarus\" label QS:Lnl,\"L"
+      },
+      "layout": "boxes",
+      "usage": "Something dramatic happening while everyone ignores it.",
+      "tone": [
+        "dark",
+        "wry"
+      ],
+      "keywords": [
+        "ignore",
+        "nobody cares",
+        "unnoticed",
+        "fall",
+        "disaster",
+        "meanwhile",
+        "busy"
+      ],
+      "slots": [
+        {
+          "name": "everyone",
+          "hint": "who carries on unbothered (the ploughman)",
+          "x": 0.03,
+          "y": 0.03,
+          "w": 0.55,
+          "h": 0.22,
+          "style": "impact",
+          "align": "center",
+          "max": 34
+        },
+        {
+          "name": "icarus",
+          "hint": "what nobody notices (Icarus, bottom right)",
+          "x": 0.52,
+          "y": 0.76,
+          "w": 0.46,
+          "h": 0.21,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "anatomy-lesson",
+      "name": "The Anatomy Lesson of Dr Tulp",
+      "source": "commons",
+      "commons_file": "File:Rembrandt - The Anatomy Lesson of Dr Nicolaes Tulp.jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg/960px-Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
+      "image": "assets/memes/img/anatomy-lesson.jpg",
+      "width": 640,
+      "height": 482,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Anatomy Lesson of Dr Nicolaes Tulp title QS:P1476,en:\"The Anatomy Lesson of Dr Nicolaes Tulp \" l, Rembrandt (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Rembrandt",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
+        "title": "The Anatomy Lesson of Dr Nicolaes Tulp title QS:P1476,en:\"The Anatomy Lesson of Dr Nicolaes Tulp \" l"
+      },
+      "layout": "caption-bar",
+      "usage": "A crowd intensely over-analysing one small thing.",
+      "tone": [
+        "nerdy",
+        "mocking"
+      ],
+      "keywords": [
+        "analyze",
+        "dissect",
+        "study",
+        "overanalyze",
+        "close reading",
+        "experts",
+        "seminar"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"grad students dissecting ...\" caption",
+          "max": 110
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "raft-of-medusa",
+      "name": "The Raft of the Medusa",
+      "source": "commons",
+      "commons_file": "File:JEAN LOUIS THÉODORE GÉRICAULT - La Balsa de la Medusa (Museo del Louvre, 1818-19).jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg/960px-JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_(Museo_del_Louvre,_1818-19).jpg",
+      "image": "assets/memes/img/raft-of-medusa.jpg",
+      "width": 640,
+      "height": 436,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Raft of the Medusa title QS:P1476,en:\"The Raft of the Medusa \" label QS:Len,\"The Raft of the Med, Théodore Géricault (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Théodore Géricault",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_(Museo_del_Louvre,_1818-19).jpg",
+        "title": "The Raft of the Medusa title QS:P1476,en:\"The Raft of the Medusa \" label QS:Len,\"The Raft of the Med"
+      },
+      "layout": "top-bottom",
+      "usage": "Desperate survivors waving at a faint hope on the horizon.",
+      "tone": [
+        "dramatic",
+        "dark"
+      ],
+      "keywords": [
+        "hope",
+        "desperate",
+        "rescue",
+        "survive",
+        "stranded",
+        "help",
+        "sinking"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the desperate situation",
+          "max": 44
+        },
+        {
+          "name": "bottom",
+          "hint": "the faint hope",
+          "max": 44
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "fighting-temeraire",
+      "name": "The Fighting Temeraire",
+      "source": "commons",
+      "commons_file": "File:The Fighting Temeraire, JMW Turner, National Gallery.jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/The_Fighting_Temeraire%2C_JMW_Turner%2C_National_Gallery.jpg/960px-The_Fighting_Temeraire%2C_JMW_Turner%2C_National_Gallery.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:The_Fighting_Temeraire,_JMW_Turner,_National_Gallery.jpg",
+      "image": "assets/memes/img/fighting-temeraire.jpg",
+      "width": 640,
+      "height": 476,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Fighting Temeraire tugged to her last berth to be broken up, 1838 title QS:P1476,en:\"The Fightin, J. M. W. Turner (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "J. M. W. Turner",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:The_Fighting_Temeraire,_JMW_Turner,_National_Gallery.jpg",
+        "title": "The Fighting Temeraire tugged to her last berth to be broken up, 1838 title QS:P1476,en:\"The Fightin"
+      },
+      "layout": "caption-bar",
+      "usage": "The end of an era: a grand old thing towed away by a new one.",
+      "tone": [
+        "nostalgic",
+        "sad"
+      ],
+      "keywords": [
+        "end of an era",
+        "obsolete",
+        "replace",
+        "old",
+        "new",
+        "progress",
+        "nostalgia",
+        "retire"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "caption about something old being replaced",
+          "max": 110
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "napoleon-alps",
+      "name": "Napoleon Crossing the Alps",
+      "source": "commons",
+      "commons_file": "File:David - Napoleon crossing the Alps - Malmaison1.jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/David_-_Napoleon_crossing_the_Alps_-_Malmaison1.jpg/960px-David_-_Napoleon_crossing_the_Alps_-_Malmaison1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:David_-_Napoleon_crossing_the_Alps_-_Malmaison1.jpg",
+      "image": "assets/memes/img/napoleon-alps.jpg",
+      "width": 640,
+      "height": 751,
+      "public_domain": true,
+      "license_note": "Public-domain painting: French: Bonaparte franchissant les Alpes au Grand-Saint-Bernard Napoleon Crossing the Alps title QS:, Jacques-Louis David (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Jacques-Louis David",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:David_-_Napoleon_crossing_the_Alps_-_Malmaison1.jpg",
+        "title": "French: Bonaparte franchissant les Alpes au Grand-Saint-Bernard Napoleon Crossing the Alps title QS:"
+      },
+      "layout": "top-bottom",
+      "usage": "Heroically overdramatic self-presentation of something mundane.",
+      "tone": [
+        "grandiose",
+        "ironic"
+      ],
+      "keywords": [
+        "heroic",
+        "epic",
+        "dramatic",
+        "brave",
+        "conquer",
+        "ambition",
+        "mundane"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the mundane thing",
+          "max": 44
+        },
+        {
+          "name": "bottom",
+          "hint": "presented heroically",
+          "max": 44
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "washington-delaware",
+      "name": "Washington Crossing the Delaware",
+      "source": "commons",
+      "commons_file": "File:Washington Crossing the Delaware by Emanuel Leutze, MMA-NYC, 1851.jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Washington_Crossing_the_Delaware_by_Emanuel_Leutze%2C_MMA-NYC%2C_1851.jpg/960px-Washington_Crossing_the_Delaware_by_Emanuel_Leutze%2C_MMA-NYC%2C_1851.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Washington_Crossing_the_Delaware_by_Emanuel_Leutze,_MMA-NYC,_1851.jpg",
+      "image": "assets/memes/img/washington-delaware.jpg",
+      "width": 640,
+      "height": 410,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Washington Crossing the Delaware ., Emanuel Leutze (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Emanuel Leutze",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Washington_Crossing_the_Delaware_by_Emanuel_Leutze,_MMA-NYC,_1851.jpg",
+        "title": "Washington Crossing the Delaware ."
+      },
+      "layout": "caption-bar",
+      "usage": "Standing heroically while everyone else does the actual work.",
+      "tone": [
+        "ironic"
+      ],
+      "keywords": [
+        "lead",
+        "leader",
+        "work",
+        "credit",
+        "team",
+        "pose",
+        "heroic"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"me in the group project\" style caption",
+          "max": 110
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "the-nightmare",
+      "name": "The Nightmare",
+      "source": "commons",
+      "commons_file": "File:John Henry Fuseli - The Nightmare.JPG",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/John_Henry_Fuseli_-_The_Nightmare.JPG/960px-John_Henry_Fuseli_-_The_Nightmare.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:John_Henry_Fuseli_-_The_Nightmare.JPG",
+      "image": "assets/memes/img/the-nightmare.jpg",
+      "width": 640,
+      "height": 519,
+      "public_domain": true,
+      "license_note": "Public-domain painting: The Nightmare, Henry Fuseli (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Henry Fuseli",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:John_Henry_Fuseli_-_The_Nightmare.JPG",
+        "title": "The Nightmare"
+      },
+      "layout": "caption-bar",
+      "usage": "A thought sitting on your chest at 3am.",
+      "tone": [
+        "dark",
+        "anxious"
+      ],
+      "keywords": [
+        "3am",
+        "nightmare",
+        "sleep",
+        "insomnia",
+        "haunt",
+        "intrusive",
+        "thought",
+        "anxiety"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"my brain at 3am: ...\" caption",
+          "max": 110
+        }
+      ],
+      "captions": 1
+    },
+    {
+      "id": "sisyphus",
+      "name": "Sisyphus (Titian)",
+      "source": "commons",
+      "commons_file": "File:Punishment sisyph.jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Punishment_sisyph.jpg/960px-Punishment_sisyph.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Punishment_sisyph.jpg",
+      "image": "assets/memes/img/sisyphus.jpg",
+      "width": 640,
+      "height": 727,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Spanish: Sísifo Sisyphus label QS:Les,\" Sísifo \" label QS:Len,\" Sisyphus \", Titian (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Titian",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Punishment_sisyph.jpg",
+        "title": "Spanish: Sísifo Sisyphus label QS:Les,\" Sísifo \" label QS:Len,\" Sisyphus \""
+      },
+      "layout": "top-bottom",
+      "usage": "Endless, pointless repetition of the same task.",
+      "tone": [
+        "dark",
+        "wry"
+      ],
+      "keywords": [
+        "again",
+        "repeat",
+        "endless",
+        "pointless",
+        "absurd",
+        "every day",
+        "routine",
+        "camus"
+      ],
+      "slots": [
+        {
+          "name": "top",
+          "hint": "the task",
+          "max": 44
+        },
+        {
+          "name": "bottom",
+          "hint": "doing it again",
+          "max": 44
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "mona-lisa",
+      "name": "Mona Lisa's smirk",
+      "source": "commons",
+      "commons_file": "File:Mona Lisa, by Leonardo da Vinci, from C2RMF retouched.jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/960px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+      "image": "assets/memes/img/mona-lisa.jpg",
+      "width": 640,
+      "height": 954,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Polish: Mona Lisa Mona Lisa title QS:P1476,pl:\"Mona Lisa \" label QS:Lpl,\"Mona Lisa \" label QS:Lrsk,\", Leonardo da Vinci (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Leonardo da Vinci",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+        "title": "Polish: Mona Lisa Mona Lisa title QS:P1476,pl:\"Mona Lisa \" label QS:Lpl,\"Mona Lisa \" label QS:Lrsk,\""
+      },
+      "layout": "caption-bar",
+      "usage": "A knowing, smug little smile.",
+      "tone": [
+        "smug"
+      ],
+      "keywords": [
+        "smirk",
+        "smug",
+        "knowing",
+        "secret",
+        "mysterious",
+        "told you"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"me when ...\" caption",
+          "max": 110
+        }
+      ],
+      "captions": 1,
+      "reaction": true
+    },
+    {
+      "id": "van-gogh-ear",
+      "name": "Self-portrait with bandaged ear",
+      "source": "commons",
+      "commons_file": "File:Vincent van Gogh - Self-portrait with bandaged ear (1889, Courtauld Institute).jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Vincent_van_Gogh_-_Self-portrait_with_bandaged_ear_%281889%2C_Courtauld_Institute%29.jpg/960px-Vincent_van_Gogh_-_Self-portrait_with_bandaged_ear_%281889%2C_Courtauld_Institute%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Self-portrait_with_bandaged_ear_(1889,_Courtauld_Institute).jpg",
+      "image": "assets/memes/img/van-gogh-ear.jpg",
+      "width": 640,
+      "height": 778,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Self-Portrait with Bandaged Ear, Vincent van Gogh (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Vincent van Gogh",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Self-portrait_with_bandaged_ear_(1889,_Courtauld_Institute).jpg",
+        "title": "Self-Portrait with Bandaged Ear"
+      },
+      "layout": "caption-bar",
+      "usage": "Recovering from a self-inflicted disaster, pretending to be fine.",
+      "tone": [
+        "dark",
+        "self-deprecating"
+      ],
+      "keywords": [
+        "self-inflicted",
+        "recover",
+        "regret",
+        "damage",
+        "after",
+        "consequences"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "\"me the day after ...\" caption",
+          "max": 110
+        }
+      ],
+      "captions": 1,
+      "reaction": true
+    },
+    {
+      "id": "liberty-gaze",
+      "name": "Two Men Contemplating the Moon",
+      "source": "commons",
+      "commons_file": "File:Caspar David Friedrich - Zwei Männer in Betrachtung des Mondes.jpg",
+      "source_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Caspar_David_Friedrich_-_Zwei_M%C3%A4nner_in_Betrachtung_des_Mondes.jpg/960px-Caspar_David_Friedrich_-_Zwei_M%C3%A4nner_in_Betrachtung_des_Mondes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "origin_url": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Zwei_M%C3%A4nner_in_Betrachtung_des_Mondes.jpg",
+      "image": "assets/memes/img/liberty-gaze.jpg",
+      "width": 640,
+      "height": 500,
+      "public_domain": true,
+      "license_note": "Public-domain painting: Two men contemplating the Moon label QS:Lru,\"Двое мужчин созерцая Луну\" label QS:Lde,\"Zwei Männer in, Caspar David Friedrich (Public domain, Wikimedia Commons).",
+      "credit": {
+        "author": "Caspar David Friedrich",
+        "license": "Public domain",
+        "url": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Zwei_M%C3%A4nner_in_Betrachtung_des_Mondes.jpg",
+        "title": "Two men contemplating the Moon label QS:Lru,\"Двое мужчин созерцая Луну\" label QS:Lde,\"Zwei Männer in"
+      },
+      "layout": "boxes",
+      "usage": "Two friends staring at the same thing with very different thoughts.",
+      "tone": [
+        "wholesome",
+        "wry"
+      ],
+      "keywords": [
+        "friends",
+        "contemplate",
+        "moon",
+        "together",
+        "stare",
+        "both",
+        "wonder"
+      ],
+      "slots": [
+        {
+          "name": "friend1",
+          "hint": "what the first one thinks",
+          "x": 0.03,
+          "y": 0.03,
+          "w": 0.45,
+          "h": 0.22,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        },
+        {
+          "name": "friend2",
+          "hint": "what the second one thinks",
+          "x": 0.52,
+          "y": 0.03,
+          "w": 0.45,
+          "h": 0.22,
+          "style": "impact",
+          "align": "center",
+          "max": 30
+        }
+      ],
+      "captions": 2
+    },
+    {
+      "id": "tweet-dunk",
+      "name": "Tweet screenshot dunk",
+      "source": "taiku",
+      "public_domain": true,
+      "license_note": "Taiku-rendered screenshot of a Taiku post (our own content) above a reaction image from this library.",
+      "credit": null,
+      "layout": "tweet",
+      "usage": "Dunking on another taik: screenshot of the quoted/replied-to post, then a reaction image with a short caption (\"me reading this:\").",
+      "tone": [
+        "mocking",
+        "dunk"
+      ],
+      "keywords": [
+        "dunk",
+        "ratio",
+        "this you",
+        "reading this",
+        "quote",
+        "reply",
+        "clown",
+        "imagine"
+      ],
+      "slots": [
+        {
+          "name": "caption",
+          "hint": "short reaction caption above the reaction image, e.g. \"me reading this:\" (optional)",
+          "max": 80,
+          "optional": true
+        }
+      ],
+      "captions": 1
+    }
+  ]
+}
