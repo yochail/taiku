@@ -111,15 +111,50 @@
     b.setAttribute('aria-pressed', String(on));
   };
 
-  // Polls: one local vote per poll, results revealed after voting or once the poll has closed.
+  // Polls: one vote per poll, results revealed after voting or once the poll has closed.
+  // Real votes come from the Worker (/api, a Durable Object per poll) and are added to the simulated counts in
+  // the HTML. If the API is unavailable (local preview, outage), the vote stays local and polls work as before.
   const votes = store.get('pollVotes', {});
+  const sent = store.get('pollSent', {}); // poll id -> server time the vote was counted
+  const real = {}; // poll id -> { c: {opt: n}, at } (null while loading)
+  const API = /^https?:$/.test(location.protocol);
+  const queued = new Set();
+  let pollTimer = 0;
+  const repaintPoll = (id) => document.querySelectorAll(`.poll[data-poll="${CSS.escape(id)}"]`).forEach(paintPoll);
+  const loadReal = () => {
+    const ids = [...queued].slice(0, 20);
+    ids.forEach((id) => { queued.delete(id); real[id] = null; });
+    if (queued.size) pollTimer = setTimeout(loadReal, 50);
+    fetch(`/api/polls?ids=${ids.map(encodeURIComponent).join(',')}`)
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((d) => ids.forEach((id) => { if (d[id]?.c) { real[id] = d[id]; repaintPoll(id); } }))
+      .catch(() => {});
+  };
+  const wantReal = (id) => {
+    if (!API || id in real || queued.has(id)) return;
+    queued.add(id);
+    clearTimeout(pollTimer);
+    pollTimer = setTimeout(loadReal, 50);
+  };
+  const sendVote = (id, opt) => {
+    if (!API) return;
+    fetch(`/api/poll/${encodeURIComponent(id)}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ opt }) })
+      .then((r) => r.json().then((d) => {
+        // 409: this browser/network already voted (e.g. storage was cleared), so the totals include that vote.
+        if ((r.ok || r.status === 409) && d?.c) { real[id] = { c: d.c, at: d.at }; sent[id] = d.at; store.set('pollSent', sent); repaintPoll(id); }
+      }))
+      .catch(() => {});
+  };
   const paintPoll = (poll) => {
     const id = poll.dataset.poll;
+    wantReal(id);
     const mine = votes[id];
+    const live = real[id];
+    const counted = live && sent[id] && live.at >= sent[id];
     const left = Date.parse(poll.dataset.ends) - Date.now();
     const closed = !(left > 0);
     const opts = [...poll.querySelectorAll('.poll-opt')];
-    const counts = opts.map((o) => Number(o.dataset.votes) + (o.dataset.opt === mine ? 1 : 0));
+    const counts = opts.map((o) => Number(o.dataset.votes) + (live?.c?.[o.dataset.opt] ?? 0) + (o.dataset.opt === mine && !counted ? 1 : 0));
     const total = counts.reduce((a, b) => a + b, 0);
     const max = Math.max(...counts);
     opts.forEach((o, i) => {
@@ -162,7 +197,8 @@
       if (!opt.disabled && votes[poll.dataset.poll] == null) {
         votes[poll.dataset.poll] = opt.dataset.opt;
         store.set('pollVotes', votes);
-        document.querySelectorAll(`.poll[data-poll="${CSS.escape(poll.dataset.poll)}"]`).forEach(paintPoll);
+        repaintPoll(poll.dataset.poll);
+        sendVote(poll.dataset.poll, opt.dataset.opt);
       }
       return;
     }

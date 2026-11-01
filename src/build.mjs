@@ -114,6 +114,9 @@ const pollTime = (ms) => {
   return t('poll.minutes', { n: Math.max(1, Math.round(ms / 60000)) });
 };
 
+/** Every rendered poll: id -> [option ids, ends ms]. Written to _p/polls.json for the Worker's vote API. */
+const POLL_INDEX = {};
+
 /** X-style poll. Accepts the top-level `post.poll` ({id, options:[{id,text,personaVotes?,crowdVoteBase?}]}) or a media poll ({kind:'poll', options:[string]}). */
 function pollHtml(post, poll) {
   const h = hash(`${post.id}:poll`);
@@ -129,6 +132,7 @@ function pollHtml(post, poll) {
   const ends = Date.parse(poll.endsAt ?? '') || Date.parse(post.createdAt) + (poll.durationHours ?? POLL_HOURS) * 3600000;
   const left = ends - Date.parse(BUILD_TIME);
   const closed = left <= 0;
+  POLL_INDEX[poll.id ?? post.id] = [opts.map((o) => o.id), ends];
   const pct = (v) => (total ? Math.round((v / total) * 100) : 0);
   const rows = opts
     .map((o) => `<li><button type="button" class="poll-opt${o.votes === max ? ' lead' : ''}" data-opt="${esc(o.id)}" data-votes="${o.votes}"${closed ? ' disabled' : ''}><span class="po-bar" style="width:${pct(o.votes)}%"></span><span class="po-label">${esc(o.text)}</span><span class="po-pct">${pct(o.votes)}%</span></button></li>`)
@@ -921,5 +925,7 @@ searchData();
 rss();
 seoFiles();
 const packed = postPack?.finish();
+fs.mkdirSync(path.join(OUT, '_p'), { recursive: true });
+fs.writeFileSync(path.join(OUT, '_p', 'polls.json'), JSON.stringify(POLL_INDEX));
 if (packed && packed.count < posts.length) console.warn(`post pack: ${posts.length - packed.count} page(s) didn't fit the template; written as static files`);
 console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags, ${mediaOut.written} rendered media${packed ? `, ${packed.count} post pages in ${packed.files} pack files` : ''})`);

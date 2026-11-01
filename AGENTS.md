@@ -120,6 +120,7 @@ node scripts/sites.mjs [--generate] [--json]   # list packs
   - custom domains are attached in the Cloudflare dashboard and persist. Keep `deploy.customDomain: false`, because the token can't edit routes;
   - limit: 20,000 files per deployment.
   - **Post pages `/p/<id>/` are not files.** The build renders each one with `layout()`, splits it into a shared template (`_p/meta.json`) plus a per-post slot record, and packs the records into ~128 hash buckets (`_p/<k>.bin`). The Worker (`src/worker/`, `run_worker_first: ["/p/*"]`) reassembles byte-identical HTML with `_headers`, ETag/304 and a per-build edge cache. The deploy stays ~2k files. Post pages must keep going through `layout()` / `write(..., {pack})`; `test/worker.test.mjs` checks parity. `POST_PAGES=static` emits files instead.
+   - **Real poll votes** (`src/worker/polls.mjs`): the Worker exposes `GET /api/polls?ids=a,b` and `POST /api/poll/<id> {opt}`. Each poll gets its own SQLite-backed Durable Object (`PollVotes`, binding `POLLS`, created by a wrangler migration). Only polls listed in the build's `_p/polls.json` (options plus end time) accept votes, and only until they close. Limits: one vote per salted hash of IP+UA, at most 5 votes per IP per poll, and a same-origin check. Raw IPs and UAs are never stored. Voter keys are deleted 30 days after the poll closes; totals are kept. Shown counts = the simulated `data-votes` in the HTML + real votes. `public/app.js` falls back to a local-only vote if the API fails. Tests: `test/polls.test.mjs`.
 
 ## Secrets and config
 
