@@ -20,5 +20,13 @@ jobs:
         run: npm run validate
       - name: Build & check
         run: npm test
+      - name: Realism report (fails on hard rules; drift is a warning in the job summary)
+        run: npm run realism -- --json realism-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: realism-report
+          path: realism-report.json
+          if-no-files-found: ignore
       - name: Generator dry-run (mock, no key, writes nothing)
         run: npm run generate:dry -- --posts 2 --replies 3

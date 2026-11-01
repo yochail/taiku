@@ -11,7 +11,8 @@
   "scripts": {
     "build": "node src/build.mjs",
     "check": "node scripts/check.mjs",
-    "test": "node src/build.mjs && node scripts/check.mjs",
+    "test": "node src/build.mjs && node scripts/check.mjs && node --test test/realism.test.mjs",
+    "realism": "node scripts/realism.mjs",
     "generate": "node src/generate.mjs",
     "generate:dry": "node src/generate.mjs --dry-run",
     "generate:mock": "node src/generate.mjs --mock",

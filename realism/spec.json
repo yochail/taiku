@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "description": "Taiku network-realism target spec. `sampling` is what the generator draws from; `metrics` is what scripts/realism.mjs measures the corpus against. Numbers are adapted from X/Twitter research (see `sources`) to a 30-account, no-retweet-text, $0-media corpus. Confidence: high = directly measured on X; medium = measured but older or partial; low = adapted/estimated.",
+  "reference_timezone": "America/New_York",
+  "sources": {
+    "pfeffer2023": "Pfeffer et al., 'Just Another Day on Twitter: A Complete 24 Hours of Twitter Data', ICWSM 2023, https://arxiv.org/abs/2301.11429 (375M tweets, 21 Sep 2022: 20.8% original, 50.7% retweets, 24.2% replies, 4.3% quotes; media attachments 76.9% photo / 20.7% video / 2.4% GIF; 0.44% of accounts make 50% of tweets; follower median 99)",
+    "pew2019": "Pew Research Center, 'Sizing Up Twitter Users', 2019, https://www.pewresearch.org/internet/2019/04/24/sizing-up-twitter-users/ (top 10% of US adult users create 80% of tweets; median user 2 tweets/month)",
+    "pew2021": "McClain, Pew Research Center, 'The Behaviors and Attitudes of U.S. Adults on Twitter', 2021, https://www.pewresearch.org/internet/2021/11/15/the-behaviors-and-attitudes-of-u-s-adults-on-twitter/ (top 25% of users produce 97% of tweets)",
+    "twitter2018len": "Twitter data reported by TechCrunch, 30 Oct 2018, https://techcrunch.com/2018/10/30/twitters-doubling-of-character-count-from-140-to-280-had-little-impact-on-length-of-tweets/ (most common length 33 chars; 12% > 140; 5% > 190; 1% hit 280)",
+    "kwak2010": "Kwak, Lee, Park, Moon, 'What is Twitter, a Social Network or a News Media?', WWW 2010, doi:10.1145/1772690.1772751 (22.1% reciprocal follow pairs; heavy-tailed, non-power-law follower distribution)",
+    "nishi2016": "Nishi, Takaguchi et al., 'Reply trees in Twitter: data analysis and branching process models', Social Network Analysis and Mining 6, 2016, https://link.springer.com/article/10.1007/s13278-016-0334-0 (reply trees mostly small and shallow; heavy-tailed size/depth)",
+    "goel2016": "Goel, Anderson, Hofman, Watts, 'The Structural Virality of Online Diffusion', Management Science 62(1), 2016 (vast majority of cascades are size 1 or broadcast depth 1)",
+    "goh2008": "Goh & Barabasi, 'Burstiness and memory in complex systems', EPL 81, 2008 (burstiness B=(sigma-mu)/(sigma+mu); human online activity has B>0)",
+    "golder2011": "Golder & Macy, 'Diurnal and Seasonal Mood Vary with Work, Sleep, and Daylength Across Diverse Cultures', Science 333, 2011 (strong circadian rhythm in tweeting)",
+    "kehoe2018": "Kehoe & Gee, 'Analysing emojis in context in a corpus of Twitter data', 2018 (about 16% of English tweets contain an emoji)"
+  },
+  "sampling": {
+    "activity": {
+      "_note": "Share of authored items (retweets/retaiks are counters, not posts). pfeffer2023 non-retweet split: 20.8/49.3 original, 24.2/49.3 reply, 4.3/49.3 quote.",
+      "original": 0.42,
+      "reply": 0.49,
+      "quote": 0.09
+    },
+    "media": {
+      "_note": "Weights per role. Video folded into image/gif because there is no $0 video source. Kinds: none, image, gif, meme, chart, video, link_card, poll.",
+      "original": { "none": 0.62, "image": 0.14, "meme": 0.07, "link_card": 0.08, "gif": 0.04, "chart": 0.04, "poll": 0.01, "video": 0.0 },
+      "reply": { "none": 0.875, "gif": 0.06, "image": 0.02, "meme": 0.02, "link_card": 0.015, "chart": 0.01, "poll": 0.0, "video": 0.0 },
+      "quote": { "none": 0.8, "image": 0.06, "meme": 0.05, "gif": 0.03, "chart": 0.03, "link_card": 0.03, "poll": 0.0, "video": 0.0 }
+    },
+    "length_chars": {
+      "_note": "Target length buckets [min, max, weight]. Real X skews shorter (mode 33 chars); Taiku is educational so it is shifted up but keeps a real short tail. Never exceed 280; never truncate.",
+      "buckets": [[1, 40, 0.18], [41, 80, 0.24], [81, 140, 0.3], [141, 200, 0.16], [201, 260, 0.09], [261, 280, 0.03]]
+    },
+    "diurnal_local": {
+      "_note": "Relative posting weight per local hour 0-23 in reference_timezone (circadian shape per golder2011 and pfeffer2023 Fig. 1).",
+      "weights": [0.035, 0.025, 0.017, 0.012, 0.01, 0.012, 0.02, 0.032, 0.043, 0.05, 0.053, 0.055, 0.056, 0.055, 0.053, 0.052, 0.052, 0.053, 0.054, 0.056, 0.058, 0.057, 0.052, 0.044]
+    },
+    "reply_delay_minutes": {
+      "_note": "Lognormal delay between parent and reply: median about 25 min, 90th percentile about 2.5 h.",
+      "lognormal": { "median": 25, "sigma": 1.4 },
+      "max": 2880
+    },
+    "engagement": {
+      "_note": "Simulated counters. Likes are lognormal (heavy tail), scaled by persona popularity/5; replies get reply_factor. Ratios carry lognormal noise.",
+      "likes_lognormal": { "median": 60, "sigma": 1.5 },
+      "reply_factor": 0.3,
+      "reposts_per_like": { "median": 0.14, "sigma": 0.5 },
+      "quotes_per_repost": { "median": 0.2, "sigma": 0.5 },
+      "views_per_like": { "median": 45, "sigma": 0.4 }
+    },
+    "hashtag_probability": 0.05,
+    "emoji_probability": 0.15
+  },
+  "metrics": {
+    "activity.original_share": { "min": 0.3, "max": 0.55, "target": 0.42, "min_n": 30, "severity": "warn", "confidence": "high (adapted: retweets excluded)", "sources": ["pfeffer2023"] },
+    "activity.reply_share": { "min": 0.35, "max": 0.62, "target": 0.49, "min_n": 30, "severity": "warn", "confidence": "high (adapted)", "sources": ["pfeffer2023"] },
+    "activity.quote_share": { "min": 0.04, "max": 0.16, "target": 0.09, "min_n": 30, "severity": "warn", "confidence": "high (adapted)", "sources": ["pfeffer2023"] },
+
+    "media.original.visual_share": { "_def": "share of originals with image/gif/meme/chart/video", "min": 0.18, "max": 0.42, "target": 0.29, "min_n": 30, "severity": "warn", "confidence": "low (X publishes no per-post media share; pfeffer2023 has ~0.3 attachments per tweet incl. retweets)", "sources": ["pfeffer2023"] },
+    "media.original.link_card_share": { "min": 0.02, "max": 0.15, "target": 0.08, "min_n": 30, "severity": "warn", "confidence": "low", "sources": [] },
+    "media.original.poll_share": { "min": 0.0, "max": 0.04, "target": 0.01, "min_n": 30, "severity": "warn", "confidence": "low", "sources": [] },
+    "media.reply.visual_share": { "min": 0.03, "max": 0.2, "target": 0.11, "min_n": 30, "severity": "warn", "confidence": "low", "sources": [] },
+    "media.gif_share_of_visual": { "min": 0.05, "max": 0.4, "target": 0.2, "min_n": 15, "severity": "warn", "confidence": "low (2.4% of X attachments are GIFs; reaction GIFs dominate replies, so raised)", "sources": ["pfeffer2023"] },
+    "media.safety_violations": { "_def": "media items with unknown kind, missing alt, third-party without credit+license, AI image without ai_generated flag, non-allowlisted or non-https remote src, or rating above max_rating", "min": 0, "max": 0, "severity": "fail", "confidence": "hard rule", "sources": [] },
+
+    "length.max_chars": { "min": 1, "max": 280, "severity": "fail", "confidence": "hard rule", "sources": [] },
+    "length.median_chars": { "min": 55, "max": 140, "target": 100, "min_n": 30, "severity": "warn", "confidence": "medium (X mode is 33; shifted up for teaching)", "sources": ["twitter2018len"] },
+    "length.short_share": { "_def": "share <= 40 chars", "min": 0.08, "max": 0.35, "target": 0.18, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["twitter2018len"] },
+    "length.over_140_share": { "min": 0.12, "max": 0.4, "target": 0.28, "min_n": 30, "severity": "warn", "confidence": "medium (X: 12%)", "sources": ["twitter2018len"] },
+    "length.near_limit_share": { "_def": "share >= 261 chars", "min": 0.0, "max": 0.06, "target": 0.03, "min_n": 30, "severity": "warn", "confidence": "medium (X: 1% hit 280)", "sources": ["twitter2018len"] },
+
+    "threads.zero_reply_root_share": { "min": 0.3, "max": 0.7, "target": 0.5, "min_n": 20, "severity": "warn", "confidence": "medium (most X posts get no reply; Taiku wants debate so capped at 70%)", "sources": ["nishi2016", "goel2016"] },
+    "threads.depth1_share_of_conversations": { "_def": "share of roots with replies whose max reply depth is 1", "min": 0.35, "max": 0.8, "target": 0.55, "min_n": 15, "severity": "warn", "confidence": "medium", "sources": ["nishi2016"] },
+    "threads.deep_share_of_conversations": { "_def": "share of roots with replies whose max reply depth is >= 4", "min": 0.02, "max": 0.25, "target": 0.1, "min_n": 15, "severity": "warn", "confidence": "medium", "sources": ["nishi2016"] },
+    "threads.replies_per_root_gini": { "min": 0.45, "max": 0.95, "target": 0.65, "min_n": 20, "severity": "warn", "confidence": "medium (heavy-tailed)", "sources": ["nishi2016", "goel2016"] },
+
+    "authors.posts_gini": { "min": 0.2, "max": 0.6, "target": 0.4, "min_n": 60, "severity": "warn", "confidence": "low (X-wide is far more skewed; 30 curated active accounts are moderated)", "sources": ["pew2019", "pew2021", "pfeffer2023"] },
+    "authors.top20_share": { "min": 0.33, "max": 0.65, "target": 0.45, "min_n": 60, "severity": "warn", "confidence": "low (adapted)", "sources": ["pew2019"] },
+    "authors.reply_in_degree_gini": { "min": 0.15, "max": 0.65, "target": 0.4, "min_n": 30, "severity": "warn", "confidence": "low", "sources": [] },
+    "graph.reply_reciprocity": { "_def": "share of directed author->author reply edges that are reciprocated", "min": 0.2, "max": 0.8, "target": 0.45, "min_n": 15, "severity": "warn", "confidence": "low (follow graph is 22%; reply graphs are more reciprocal)", "sources": ["kwak2010"] },
+
+    "time.diurnal_tvd": { "_def": "total-variation distance between local-hour histogram and sampling.diurnal_local", "min": 0.0, "max": 0.3, "target": 0.1, "min_n": 200, "severity": "warn", "confidence": "medium", "sources": ["golder2011", "pfeffer2023"] },
+    "time.round_minute_share": { "_def": "share of timestamps with minute % 5 == 0 (uniform = 0.2; LLM-picked times cluster on :00/:05)", "min": 0.0, "max": 0.35, "target": 0.2, "min_n": 30, "severity": "warn", "confidence": "high (statistical)", "sources": [] },
+    "time.burstiness_median": { "_def": "median per-author B over authors with >= 8 posts", "min": 0.0, "max": 0.65, "target": 0.25, "min_n": 3, "severity": "warn", "confidence": "medium", "sources": ["goh2008"] },
+    "time.reply_delay_median_min": { "min": 3, "max": 180, "target": 25, "min_n": 20, "severity": "warn", "confidence": "low", "sources": [] },
+    "time.replies_before_parent": { "min": 0, "max": 0, "severity": "fail", "confidence": "hard rule", "sources": [] },
+
+    "text.hashtag_share": { "min": 0.0, "max": 0.12, "target": 0.05, "min_n": 30, "severity": "warn", "confidence": "low (hashtag use has declined; estimates vary 1-20%)", "sources": [] },
+    "text.emoji_share": { "min": 0.06, "max": 0.35, "target": 0.15, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["kehoe2018"] },
+
+    "engagement.likes_gini": { "min": 0.55, "max": 0.97, "target": 0.7, "min_n": 30, "severity": "warn", "confidence": "high (heavy tail is universal)", "sources": ["goel2016"] },
+    "engagement.top10_like_share": { "min": 0.35, "max": 0.9, "target": 0.5, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["goel2016"] },
+    "engagement.likes_per_repost_median": { "min": 3, "max": 15, "target": 7, "min_n": 30, "severity": "warn", "confidence": "low (industry analyses: 2-10x)", "sources": [] },
+    "engagement.quotes_per_repost_median": { "min": 0.05, "max": 0.45, "target": 0.2, "min_n": 30, "severity": "warn", "confidence": "low", "sources": [] }
+  },
+  "media_policy": {
+    "kinds": ["image", "gif", "meme", "chart", "video", "link_card", "poll"],
+    "allowed_remote_hosts": ["upload.wikimedia.org"],
+    "ratings": ["g", "pg", "pg-13"],
+    "max_rating": "pg-13"
+  }
+}
