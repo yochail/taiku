@@ -28,7 +28,7 @@
   menuBtns.forEach((b) => b.addEventListener('click', () => setDrawer(root.dataset.drawer !== 'open', b)));
   scrim?.addEventListener('click', () => setDrawer(false));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && root.dataset.drawer === 'open') setDrawer(false); });
-  drawer?.addEventListener('click', (e) => { if (root.dataset.drawer === 'open' && e.target.closest('[data-gate], .theme-toggle')) setDrawer(false); });
+  drawer?.addEventListener('click', (e) => { if (root.dataset.drawer === 'open' && e.target.closest('[data-gate], .theme-toggle, .nav-install')) setDrawer(false); });
 
   // First-visit welcome: dismiss once, remembered.
   const wx = document.querySelector('.welcome-x');
@@ -383,6 +383,34 @@
     document.addEventListener('mouseout', (e) => {
       const a = e.target.closest('.post .avatar-link, .post-head .name, .wtf-link');
       if (a && !a.contains(e.relatedTarget)) hideCard();
+    });
+  }
+
+  // PWA: offline-capable service worker, plus an "Install app" menu item when the browser allows it.
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {}));
+  }
+  const installBtn = document.querySelector('.nav-install');
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  let installEvt = null;
+  if (installBtn && !standalone) {
+    addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      installEvt = e;
+      installBtn.hidden = false;
+    });
+    addEventListener('appinstalled', () => { installBtn.hidden = true; installEvt = null; });
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (ios) installBtn.hidden = false;
+    installBtn.addEventListener('click', async () => {
+      if (installEvt) {
+        installEvt.prompt();
+        const { outcome } = await installEvt.userChoice;
+        if (outcome === 'accepted') installBtn.hidden = true;
+        installEvt = null;
+      } else if (ios) {
+        openInfo('Install Taiku', 'In Safari, tap the Share button, then "Add to Home Screen".');
+      }
     });
   }
 })();

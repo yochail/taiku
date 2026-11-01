@@ -353,3 +353,10 @@ button.act { background: none; border: 0; font: inherit; cursor: pointer; border
 @media (max-width: 640px) {
   .ht-row { display: flex; }
 }
+
+/* --- PWA --- */
+.offline-msg { display: grid; justify-items: center; gap: 12px; padding: 64px 24px; text-align: center; }
+.offline-msg .logo { width: 56px; height: 56px; font-size: 32px; border-radius: 14px; }
+.offline-msg h2 { margin: 0; font-size: 24px; }
+.offline-msg p { margin: 0; max-width: 34ch; color: var(--muted); }
+.nav-install[hidden] { display: none !important; }

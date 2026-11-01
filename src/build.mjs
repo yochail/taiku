@@ -341,9 +341,14 @@ ${noindex ? '<meta name="robots" content="noindex">' : '<meta name="robots" cont
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(fullTitle)}">
 <meta name="twitter:description" content="${esc(truncate(description, 200))}">
-<meta name="theme-color" content="#0f1419" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Taiku">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="alternate" type="application/rss+xml" title="Taiku feed" href="/feed.xml">
 <link rel="stylesheet" href="/styles.css?v=${assetVersion}">
 <script>${HEAD_SCRIPT}</script>
@@ -357,6 +362,7 @@ ${ld.map(jsonLd).join('\n')}
     ${navHtml}
     <button class="theme-toggle" type="button" aria-label="Toggle dark mode"><span class="ni">🌓</span><span class="nl">Theme</span></button>
     <button class="nav-btn nav-login" type="button" data-gate="login"><span class="ni">👤</span><span class="nl">Log in / Sign up</span></button>
+    <button class="nav-btn nav-install" type="button" hidden><span class="ni">📲</span><span class="nl">Install app</span></button>
     <button class="btn post-btn" type="button" data-gate="post" aria-label="Post"><span class="nl">Post</span><span class="pb-icon">${ICONS.compose}</span></button>
   </nav>
   <div class="drawer-scrim" hidden></div>
@@ -676,6 +682,14 @@ function notFound() {
   write('/404.html', layout({ title: 'Not found', description: 'Page not found.', pathname: '/404.html', noindex: true, body: '<p class="empty">“I know that I know nothing” — and neither does this URL. <a href="/">Back to the feed</a>.</p>' }), { inSitemap: false });
 }
 
+/** PWA: offline fallback page and a service worker whose cache name follows the build. */
+function pwa() {
+  write('/offline.html', layout({ title: 'Offline', description: 'You are offline.', pathname: '/offline.html', noindex: true, body: '<div class="offline-msg"><span class="logo">太</span><h2>You’re offline</h2><p>The dead can wait. Reconnect and pull to refresh — pages you already opened still work.</p><a class="btn" href="/">Try again</a></div>' }), { inSitemap: false });
+  const shell = ['/offline.html', `/styles.css?v=${assetVersion}`, `/rank.js?v=${assetVersion}`, `/app.js?v=${assetVersion}`, '/favicon.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png'];
+  const sw = fs.readFileSync(path.join(ROOT, 'public', 'sw.js'), 'utf8').replace("'__VERSION__'", JSON.stringify(BUILD_ID)).replace('__SHELL__', JSON.stringify(shell));
+  fs.writeFileSync(path.join(OUT, 'sw.js'), sw);
+}
+
 /** Client-side Following timeline + hovercards: per-author pre-rendered cards and a compact persona index under /data/. */
 function followData() {
   const dir = path.join(OUT, 'data', 'u');
@@ -757,6 +771,7 @@ thinkersPage();
 const tagCount = tagPages();
 aboutPage();
 notFound();
+pwa();
 followData();
 forYouData();
 rss();

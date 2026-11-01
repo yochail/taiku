@@ -127,3 +127,28 @@ test('mobile chrome: drawer menu button, bottom tab bar and compose button on ev
   }
   assert.match(read('index.html'), /class="tabbar"[\s\S]*?href="\/" aria-label="Home" aria-current="page"/);
 });
+
+test('installable PWA: manifest, icons, head links, versioned service worker, offline page, CSP', () => {
+  const m = JSON.parse(read('manifest.webmanifest'));
+  assert.equal(m.name, 'Taiku');
+  assert.equal(m.short_name, 'Taiku');
+  assert.equal(m.start_url, '/');
+  assert.equal(m.scope, '/');
+  assert.equal(m.display, 'standalone');
+  assert.ok(m.icons.some((i) => i.sizes === '192x192') && m.icons.some((i) => i.sizes === '512x512' && i.purpose === 'maskable'));
+  for (const i of m.icons) assert.ok(fs.existsSync(path.join(DIST, i.src)), i.src);
+  const home = read('index.html');
+  assert.match(home, /<link rel="manifest" href="\/manifest.webmanifest">/);
+  assert.match(home, /<link rel="apple-touch-icon" href="\/icons\/apple-touch-icon.png">/);
+  assert.match(home, /<meta name="theme-color" content="#000000"/);
+  assert.match(home, /class="nav-btn nav-install" type="button" hidden/);
+  const build = home.match(/data-build="([^"]+)"/)[1];
+  const sw = read('sw.js');
+  assert.ok(sw.includes(`const VERSION = "${build}"`));
+  assert.ok(!sw.includes('__SHELL__'));
+  const shell = JSON.parse(sw.match(/const SHELL = (\[.*\]);/)[1]);
+  assert.ok(shell.includes('/offline.html') && shell.some((u) => u.startsWith('/app.js?v=')));
+  for (const u of shell) assert.ok(fs.existsSync(path.join(DIST, u.split('?')[0])), u);
+  assert.match(read('offline.html'), /You’re offline/);
+  assert.match(read('_headers'), /worker-src 'self'; manifest-src 'self'/);
+});
