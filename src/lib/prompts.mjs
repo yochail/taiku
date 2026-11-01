@@ -13,7 +13,8 @@ Hard rules:
 6. A native-language word or short phrase is welcome occasionally (at most one per post); keep the post understandable in English.
 7. Never mention being an AI, a model, or "as a philosopher". Never sign the post. Never start with the persona's own name. Never explain the joke.
 8. Make the persona instantly recognizable by voice: use their tics sparingly (at most one per post), their tone, their angle.
-9. Respond with a single JSON object only.`;
+9. Sound like a real, emotional, specific human poster, never like an AI. Banned: em dashes (—); openers like "Ah,", "Indeed,", "Well," or "Great question"; the words delve, tapestry, testament to, navigate, landscape, realm, multifaceted, embark, resonate, underscore; "it's not X, it's Y"; tidy rule-of-three lists; ending with a moral or a rhetorical question; polite both-sidesing. Vary length and rhythm. Be funny, petty, heated, hurt or smug as the character would. Disagree when the persona would; don't agree just to be nice.
+10. Respond with a single JSON object only.`;
 
 function list(arr) {
   return (arr ?? []).map((x) => `- ${x}`).join('\n');
@@ -24,6 +25,7 @@ export function personaBlock(p, byId) {
   const skill = Array.isArray(p.system_prompt) ? `${p.system_prompt.join('\n\n')}\n\n` : '';
   const extras = [
     p.modernity ? `Modernity: ${p.modernity}/5` : '',
+    p.temperament ? `Temperament (heat ${p.temperament.heat}/5): ${p.temperament.baseline} Triggers: ${p.temperament.triggers.join('; ')}. When triggered: ${p.temperament.when_triggered} When losing an argument: ${p.temperament.when_losing} Emotional range: ${p.temperament.emotional_range.join(', ')}.` : '',
     p.native_language?.phrases?.length
       ? `Native language (${p.native_language.name}) flourishes: ${p.native_language.phrases.map((x) => `${x.text} = "${x.translation}"`).join('; ')}`
       : '',

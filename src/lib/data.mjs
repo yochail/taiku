@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { POST_ARCHETYPES, REPLY_ARCHETYPES, ALL_TYPES } from './archetypes.mjs';
+import { findTells } from './tells.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const PERSONAS_DIR = path.join(ROOT, 'personas');
@@ -9,7 +10,7 @@ export const POSTS_DIR = path.join(ROOT, 'content', 'posts');
 
 const REQUIRED_PERSONA_FIELDS = [
   'id', 'kind', 'name', 'handle', 'avatar', 'lifespan', 'region', 'tradition', 'school', 'headline', 'bio', 'location', 'background',
-  'core_ideas', 'key_works', 'voice', 'favorite_topics', 'pet_peeves', 'post_archetypes',
+  'core_ideas', 'key_works', 'voice', 'temperament', 'favorite_topics', 'pet_peeves', 'post_archetypes',
   'reply_archetypes', 'argument_style', 'news_lens', 'allies', 'rivals', 'never', 'sample_posts', 'reaction_pool',
   'modernity', 'reactivity', 'topic_affinity', 'native_language', 'sensitive_notes', 'quotables', 'sources',
   'search_hints', 'tools', 'system_prompt',
@@ -17,8 +18,8 @@ const REQUIRED_PERSONA_FIELDS = [
 
 export const TOPIC_KEYS = ['politics', 'world', 'tech', 'science', 'economy', 'culture', 'sports', 'religion', 'memes'];
 export const PERSONA_TOOLS = ['search_sources', 'get_quote', 'search_news'];
-// thinker = real deceased person; parody = fictional/abstract/historical-joke account; news = neutral fictional newswire.
-export const PERSONA_KINDS = ['thinker', 'parody', 'news'];
+// thinker = real deceased person; fictional = public-domain literary character as a philosopher (e.g. Milne's Pooh, 1926 text only); parody = fictional/abstract/historical-joke account; news = neutral fictional newswire.
+export const PERSONA_KINDS = ['thinker', 'fictional', 'parody', 'news'];
 export const HANDLE_RE = /^[A-Za-z0-9_]{4,15}$/;
 // Field of a thinker (required for kind=thinker).
 export const PERSONA_DOMAINS = ['philosophy', 'science', 'mathematics', 'technology', 'psychology', 'economics', 'strategy', 'politics', 'literature', 'arts', 'religion', 'medicine'];
@@ -72,6 +73,17 @@ function validateSkill(p, errors) {
   if (p.kind === 'thinker' && !PERSONA_DOMAINS.includes(p.domain)) e(`thinkers need domain: ${PERSONA_DOMAINS.join('|')}`);
   if (p.domain !== undefined && p.kind !== 'thinker') e('only thinkers have a domain');
   if (p.reaction_pool !== undefined) validateReactions(p, e);
+  if (p.temperament !== undefined) {
+    const t = p.temperament;
+    if (!(Number.isInteger(t?.heat) && t.heat >= 1 && t.heat <= 5)) e('temperament.heat must be 1-5');
+    for (const k of ['baseline', 'when_triggered', 'when_losing']) if (typeof t?.[k] !== 'string' || !t[k].trim()) e(`temperament.${k} required`);
+    if (!(Array.isArray(t?.triggers) && t.triggers.length >= 3)) e('temperament.triggers needs ≥3');
+    if (!(Array.isArray(t?.emotional_range) && t.emotional_range.length >= 4)) e('temperament.emotional_range needs ≥4 emotions');
+  }
+  if (p.kind !== 'news') {
+    (p.sample_posts ?? []).forEach((s, i) => { const t = findTells(s); if (t.length) e(`sample_posts[${i}] has AI tells: ${t.join(', ')}`); });
+    (Array.isArray(p.reaction_pool) ? p.reaction_pool : []).forEach((x, i) => { const t = findTells(x?.text ?? x?.meme_template ?? ''); if (t.length) e(`reaction_pool[${i}] has AI tells: ${t.join(', ')}`); });
+  }
   if (typeof p.handle === 'string' && !HANDLE_RE.test(p.handle)) e(`handle "${p.handle}" must be 4-15 chars of [A-Za-z0-9_] (X rules)`);
   if (p.active_hours_utc !== undefined) {
     const h = p.active_hours_utc;

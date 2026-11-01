@@ -58,7 +58,7 @@ const ICONS = {
 };
 
 function kindLabel(a) {
-  if (a.kind === 'parody') return '<span class="kind-label">Parody</span>';
+  if (a.kind === 'parody' || a.kind === 'fictional') return '<span class="kind-label">Parody</span>';
   if (a.kind === 'news') return '<span class="kind-label">News</span>';
   return '';
 }

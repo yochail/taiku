@@ -13,6 +13,7 @@ import { createLlmProvider, llmConfig, parseJson } from './lib/llm.mjs';
 import { createMockProvider } from './lib/mock.mjs';
 import { fetchHeadlines, MOCK_HEADLINES } from './lib/news.mjs';
 import { postMessages, replyMessages } from './lib/prompts.mjs';
+import { findTells, scrubTells } from './lib/tells.mjs';
 import { rng, pick, weightedPick, newId, slugify } from './lib/util.mjs';
 
 const argv = process.argv.slice(2);
@@ -81,7 +82,7 @@ function chooseAuthor(exclude) {
   return weightedPick(
     rand,
     voices.filter((p) => !exclude.has(p.id) && isActive(p)),
-    (p) => (p.popularity ?? 5) * (p.kind === 'parody' ? 0.5 : 1) * Math.min(6, 1 + (now - lastPostedAt(p.id)) / (12 * HOUR)),
+    (p) => (p.popularity ?? 5) * (p.kind === 'parody' ? 0.5 : p.kind === 'fictional' ? 0.7 : 1) * Math.min(6, 1 + (now - lastPostedAt(p.id)) / (12 * HOUR)),
   );
 }
 
@@ -113,6 +114,9 @@ function cleanText(text, persona) {
   t = t.replace(/^["“](.*)["”]$/s, '$1').trim();
   t = t.replace(new RegExp(`^(${persona.name}|@${persona.handle})\\s*[:—-]\\s*`, 'i'), '');
   if (/\bas an ai\b|language model/i.test(t)) throw new Error('model broke character');
+  t = scrubTells(t);
+  const tells = findTells(t);
+  if (tells.length) throw new Error(`AI tell (${tells.join(', ')})`);
   if ([...t].length > 280) {
     const cut = t.slice(0, 280);
     const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
