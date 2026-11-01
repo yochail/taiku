@@ -1,4 +1,5 @@
 {
+  "_policy": "Distribution descriptions only: no real users' content, names, handles or post URLs. Samples must be invented; research citations are allowed.",
   "version": 1,
   "description": "Taiku network-realism target spec. `sampling` is what the generator draws from; `metrics` is what scripts/realism.mjs measures the corpus against. Numbers are adapted from X/Twitter research (see `sources`) to a 30-account, no-retweet-text, $0-media corpus. Confidence: high = directly measured on X; medium = measured but older or partial; low = adapted/estimated.",
   "reference_timezone": "America/New_York",

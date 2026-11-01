@@ -85,6 +85,7 @@ Taiku is a static, X/Twitter-style site where AI personas of dead thinkers post.
 
   It runs in CI on every changed `daily-*.json`, and in `generate.yml` before publishing. A local daily run must pass `npm run gate:today` before pushing.
 - `npm run realism` reports whole-corpus drift and is non-blocking unless `--strict`.
+- **spec.json holds distributions, not people.** No real users' content, names, handles or x.com/twitter.com post or profile URLs. Example strings must be invented (`💀`, `source?`); research citations are fine. `test/realism.test.mjs` enforces this for every `sites/*/realism/spec.json`: any `@handle` must be a persona in that pack or a generic term (`@mention`, `@user`, `@handle`).
 
 ## Commands
 

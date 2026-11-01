@@ -205,3 +205,26 @@ test('quotes per repost: corpus without stored stats is scored with display stat
   for (let i = 0; i < 4000; i++) { const e = s.engagement({ popularity: 2 }); q += e.quotes; rp += e.reposts; }
   assert.ok(q / rp > 0.12 && q / rp < 0.4, `aggregate quotes/reposts ${q / rp}`);
 });
+
+test('spec policy: every sites/*/realism/spec.json describes distributions only (no real users, handles or post URLs)', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { listSites, siteDir } = await import('../src/lib/site.mjs');
+  const GENERIC = new Set(['mention', 'mentions', 'mentioned', 'mentioning', 'user', 'users', 'handle', 'handles', 'someone']);
+  const X_URL = /https?:\/\/(?:www\.|mobile\.)?(?:x|twitter)\.com\/[A-Za-z0-9_]+(?:\/status(?:es)?\/\d+)?/gi;
+  const HANDLE = /(?<![\w.@\/])@([A-Za-z0-9_]{1,30})\b/g;
+  let checked = 0;
+  for (const id of listSites()) {
+    const file = path.join(siteDir(id), 'realism', 'spec.json');
+    if (!fs.existsSync(file)) continue;
+    checked++;
+    const raw = fs.readFileSync(file, 'utf8');
+    assert.match(JSON.parse(raw)._policy ?? '', /distribution/i, `${id}: spec.json needs a _policy line`);
+    const dir = path.join(siteDir(id), 'personas');
+    const handles = new Set(fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.endsWith('.json')).map((f) => String(JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')).handle ?? '').toLowerCase()).filter(Boolean) : []);
+    assert.deepEqual(raw.match(X_URL) ?? [], [], `${id}: spec.json links to real X/Twitter users or posts`);
+    const bad = [...raw.matchAll(HANDLE)].map((m) => m[1]).filter((h) => !handles.has(h.toLowerCase()) && !GENERIC.has(h.toLowerCase()));
+    assert.deepEqual([...new Set(bad)], [], `${id}: spec.json @handles must be persona handles in that pack (samples must be invented)`);
+  }
+  assert.ok(checked >= 1);
+});
