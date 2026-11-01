@@ -6,6 +6,7 @@ import path from 'node:path';
 import { displayName, publicFile, ROOT, SITE_DIR, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
 import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderText, slugify } from './lib/util.mjs';
 import { writeMediaFiles } from './lib/media.mjs';
+import { PostPack } from './lib/postpack.mjs';
 import { OUT_DIR, SITE_CONFIG } from './lib/site.mjs';
 import { t, fmtNumber, clientStrings, DIR } from './lib/i18n.mjs';
 
@@ -424,7 +425,13 @@ ${CLIENT_I18N}<script src="/rank.js?v=${assetVersion}" defer></script>
 }
 
 const sitemap = [];
-function write(pathname, html, { lastmod = BUILD_TIME, priority = 0.5, inSitemap = true } = {}) {
+// POST_PAGES=static writes /p/<id>/index.html files; default packs them into dist/_p for the Worker (src/worker).
+let postPack = null;
+function write(pathname, html, { lastmod = BUILD_TIME, priority = 0.5, inSitemap = true, pack = null } = {}) {
+  if (pack && postPack?.add(pack, html)) {
+    if (inSitemap) sitemap.push({ loc: url(pathname), lastmod, priority });
+    return;
+  }
   const rel = pathname.endsWith('/') ? pathname + 'index.html' : pathname;
   const file = path.join(OUT, rel);
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -553,7 +560,7 @@ function postPages() {
         aside: authorPanel(author) + whoToFollow(post.id, [author.id]),
         header: `<div class="topbar"><a class="back" href="/" aria-label="${t('nav.back')}">←</a><h1>${post.inReplyTo ? t('post.hReply') : post.type === 'thread' ? t('post.hThread') : t('post.hPost')}</h1></div>`,
       }),
-      { lastmod, priority: post.inReplyTo ? 0.5 : 0.7 },
+      { lastmod, priority: post.inReplyTo ? 0.5 : 0.7, pack: post.id },
     );
   }
 }
@@ -885,6 +892,9 @@ if (SITE_DIR !== ROOT && fs.existsSync(path.join(SITE_DIR, 'public'))) fs.cpSync
 const mediaOut = writeMediaFiles(posts, OUT);
 mediaByPost = mediaOut.byPost;
 feedPages();
+if (process.env.POST_PAGES !== 'static') {
+  postPack = new PostPack(OUT, layout({ title: '@@S0@@', description: '@@S1@@', pathname: '/p/@@S2@@/', body: '@@S3@@', ld: ['@@S4@@'], ogType: 'article', aside: '@@S5@@', header: '@@S6@@' }), BUILD_ID);
+}
 postPages();
 profilePages();
 thinkersPage();
@@ -898,4 +908,6 @@ forYouData();
 searchData();
 rss();
 seoFiles();
-console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags, ${mediaOut.written} rendered media)`);
+const packed = postPack?.finish();
+if (packed && packed.count < posts.length) console.warn(`post pack: ${posts.length - packed.count} page(s) didn't fit the template; written as static files`);
+console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags, ${mediaOut.written} rendered media${packed ? `, ${packed.count} post pages in ${packed.files} pack files` : ''})`);

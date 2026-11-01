@@ -5,11 +5,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { ROOT } from '../src/lib/data.mjs';
+import { readPostPage } from '../src/lib/postpack.mjs';
 
 const POSTS = path.join(ROOT, 'test', '.ui-fixture-posts');
 const OUT = 'dist-ui-test';
 const DIST = path.join(ROOT, OUT);
-const read = (rel) => fs.readFileSync(path.join(DIST, rel), 'utf8');
+const read = (rel) => (/^p\/[^/]+\/index\.html$/.test(rel) ? readPostPage(DIST, rel.split('/')[1]) : fs.readFileSync(path.join(DIST, rel), 'utf8'));
 const ago = (h) => new Date(Date.now() - h * 3600000).toISOString();
 
 const posts = [

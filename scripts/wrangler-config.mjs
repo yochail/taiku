@@ -11,10 +11,14 @@ const deploy = SITE_CONFIG.deploy || {};
 const host = SITE_CONFIG.domain;
 const config = {
   name: deploy.worker || SITE,
+  main: './src/worker/index.mjs',
   compatibility_date: '2025-01-01',
   workers_dev: true,
   assets: {
     directory: `./dist/${SITE}`,
+    binding: 'ASSETS',
+    // Assets first; the Worker only handles post pages (packed in dist/_p, see src/worker).
+    run_worker_first: ['/p/*'],
     html_handling: 'auto-trailing-slash',
     not_found_handling: '404-page',
   },

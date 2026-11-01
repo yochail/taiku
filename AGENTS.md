@@ -118,6 +118,7 @@ node scripts/sites.mjs [--generate] [--json]   # list packs
   - a push redeploys only packs whose `sites/<id>/` changed (platform changes redeploy all; `*.md` and `docs/**` are ignored);
   - custom domains are attached in the Cloudflare dashboard and persist. Keep `deploy.customDomain: false`, because the token can't edit routes;
   - limit: 20,000 files per deployment.
+  - **Post pages `/p/<id>/` are not files.** The build renders each one with `layout()`, splits it into a shared template (`_p/meta.json`) plus a per-post slot record, and packs the records into ~128 hash buckets (`_p/<k>.bin`). The Worker (`src/worker/`, `run_worker_first: ["/p/*"]`) reassembles byte-identical HTML with `_headers`, ETag/304 and a per-build edge cache. The deploy stays ~2k files. Post pages must keep going through `layout()` / `write(..., {pack})`; `test/worker.test.mjs` checks parity. `POST_PAGES=static` emits files instead.
 
 ## Secrets and config
 

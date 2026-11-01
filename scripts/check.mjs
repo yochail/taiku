@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { loadPersonas, loadPosts } from '../src/lib/data.mjs';
 import { OUT_DIR } from '../src/lib/site.mjs';
+import { readPostPage } from '../src/lib/postpack.mjs';
 
 const DIST = OUT_DIR;
 const failures = [];
@@ -28,7 +29,7 @@ must(profileDirs.length === personas.length, `expected ${personas.length} profil
 must(personas.filter((p) => p.kind === 'thinker').length >= 30, `expected at least 30 thinker personas, found ${personas.filter((p) => p.kind === 'thinker').length}`);
 
 let missingPosts = 0;
-for (const p of posts) if (!exists(`p/${p.id}/index.html`)) missingPosts++;
+for (const p of posts) if (readPostPage(DIST, p.id) == null) missingPosts++;
 must(missingPosts === 0, `${missingPosts} post pages missing`);
 
 let locCount = 0;
@@ -65,8 +66,8 @@ if (exists('index.html')) {
 const prof = profileDirs[0] && exists(`thinkers/${profileDirs[0]}/index.html`) ? read(`thinkers/${profileDirs[0]}/index.html`) : '';
 for (const leak of ['Core ideas', 'Pet peeves', 'How they argue', 'How this persona talks', 'Favorite topics', 'reaction_pool', 'temperament']) must(!prof.includes(leak), `profile leaks internal field: ${leak}`);
 const sample = posts.find((p) => !p.inReplyTo);
-if (sample && exists(`p/${sample.id}/index.html`)) {
-  const html = read(`p/${sample.id}/index.html`);
+if (sample && readPostPage(DIST, sample.id) != null) {
+  const html = readPostPage(DIST, sample.id);
   must(/DiscussionForumPosting/.test(html), 'post page lacks DiscussionForumPosting JSON-LD');
   for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     try { JSON.parse(m[1]); } catch { failures.push(`invalid JSON-LD on /p/${sample.id}/`); }

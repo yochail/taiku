@@ -3,6 +3,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { OUT_DIR } from '../src/lib/site.mjs';
+import { readPostPage } from '../src/lib/postpack.mjs';
 
 const DIST = OUT_DIR;
 const PORT = Number(process.env.PORT || 8080);
@@ -16,6 +17,9 @@ http.createServer((req, res) => {
   const url = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   let file = path.normalize(path.join(DIST, url));
   if (!file.startsWith(DIST)) { res.writeHead(403); return res.end(); }
+  const post = /^\/p\/([^/]+)\/$/.exec(url)?.[1];
+  const html = post && readPostPage(DIST, post);
+  if (html) { res.writeHead(200, { 'content-type': TYPES['.html'] }); return res.end(html); }
   if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
   if (!fs.existsSync(file)) {
     res.writeHead(404, { 'content-type': TYPES['.html'] });
