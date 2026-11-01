@@ -208,7 +208,7 @@ const MENU_BTN = `<button type="button" class="menu-btn" aria-label="Open menu" 
 function tabbar(pathname) {
   const cur = (on) => (on ? ' aria-current="page"' : '');
   return [
-    `<a href="/" aria-label="Home"${cur(pathname === '/' || /^\/page\//.test(pathname))}>${ICONS.home}</a>`,
+    `<a href="/" aria-label="Home"${cur(pathname === '/' || /^\/page\//.test(pathname))} data-home>${ICONS.home}</a>`,
     `<a href="/search/" aria-label="Search"${cur(pathname === '/search/')}>${ICONS.search}</a>`,
     `<button type="button" data-gate="notifications" aria-label="Notifications">${ICONS.bell}</button>`,
     `<button type="button" data-gate="messages" aria-label="Messages">${ICONS.mail}</button>`,
@@ -346,7 +346,6 @@ function layout({ title, description, pathname, body, ld = [], ogType = 'website
   const canonical = url(pathname);
   const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
   const nav = [
-    ['/', 'Home', '🏠'],
     ['/search/', 'Explore', '🔍'],
     ['/thinkers/', 'Thinkers', '🏛️'],
     ['/about/', 'About', 'ℹ️'],
@@ -391,7 +390,7 @@ ${ld.map(jsonLd).join('\n')}
 <a class="skip" href="#main">Skip to content</a>
 <div class="shell">
   <nav class="leftnav" id="drawer" aria-label="Main">
-    <a class="brand" href="/"><span class="logo">太</span><span class="brand-text"><b>Taiku</b><small>${esc(SITE.tagline)}</small></span></a>
+    <a class="brand" href="/" data-home${pathname === '/' ? ' aria-current="page"' : ''}><span class="logo">太</span><span class="brand-text"><b>Taiku</b><small>${esc(SITE.tagline)}</small></span></a>
     ${navHtml}
     <button class="theme-toggle" type="button" aria-label="Toggle dark mode"><span class="ni">🌓</span><span class="nl">Theme</span></button>
     <button class="nav-btn nav-login" type="button" data-gate="login"><span class="ni">👤</span><span class="nl">Log in / Sign up</span></button>
@@ -452,7 +451,7 @@ function feedPages() {
 </div>`
       : body;
     const header = home
-      ? `<div class="topbar home-top"><div class="ht-row">${MENU_BTN}<a class="ht-logo" href="/" aria-label="Taiku home"><span class="logo">太</span></a><span class="ht-sp"></span></div><h1 class="sr-only">Home</h1><div class="feed-tabs" role="tablist" aria-label="Home timelines"><button type="button" role="tab" id="tab-foryou" data-tab="foryou" aria-controls="panel-foryou" aria-selected="true"><span>For you</span></button><button type="button" role="tab" id="tab-following" data-tab="following" aria-controls="panel-following" aria-selected="false"><span>Following</span></button></div></div>`
+      ? `<div class="topbar home-top"><div class="ht-row">${MENU_BTN}<a class="ht-logo" href="/" aria-label="Taiku home" data-home><span class="logo">太</span></a><span class="ht-sp"></span></div><h1 class="sr-only">Home</h1><div class="feed-tabs" role="tablist" aria-label="Home timelines"><button type="button" role="tab" id="tab-foryou" data-tab="foryou" aria-controls="panel-foryou" aria-selected="true"><span>For you</span></button><button type="button" role="tab" id="tab-following" data-tab="following" aria-controls="panel-following" aria-selected="false"><span>Following</span></button></div></div>`
       : `<div class="topbar">${MENU_BTN}<div class="tb-title"><h1>Home · page ${i + 1}</h1><span class="sub">Latest from the Dead Thinkers Society</span></div></div>`;
     const ld =
       i === 0

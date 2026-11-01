@@ -30,6 +30,15 @@
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && root.dataset.drawer === 'open') setDrawer(false); });
   drawer?.addEventListener('click', (e) => { if (root.dataset.drawer === 'open' && e.target.closest('[data-gate], .theme-toggle, .nav-install')) setDrawer(false); });
 
+  // Logo (and the Home tab): on the home timeline, scroll to the top; already at the top, refresh it, like X.
+  document.querySelectorAll('[data-home]').forEach((a) => a.addEventListener('click', (e) => {
+    if (location.pathname !== '/' || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+    e.preventDefault();
+    if (root.dataset.drawer === 'open') setDrawer(false);
+    if (window.scrollY > 4) window.scrollTo({ top: 0, behavior: 'smooth' });
+    else location.reload();
+  }));
+
   // First-visit welcome: dismiss once, remembered.
   const wx = document.querySelector('.welcome-x');
   if (wx) wx.addEventListener('click', () => {

@@ -223,3 +223,10 @@ test('QA: handle links, image viewer, unique post ids, inline hashtag pages', ()
   assert.equal(new Set(ids).size, ids.length, 'duplicate post ids');
   assert.ok(fs.existsSync(path.join(DIST, 'tags', 'uitfixturetag', 'index.html')), 'inline hashtag page');
 });
+test('the logo is the way home: no separate Home item in the side menu', () => {
+  const home = read('index.html');
+  const nav = home.match(/<nav class="leftnav"[\s\S]*?<\/nav>/)[0];
+  assert.match(nav, /<a class="brand" href="\/" data-home aria-current="page">/);
+  assert.doesNotMatch(nav, /class="nl">Home</);
+  assert.match(home, /class="ht-logo" href="\/" aria-label="Taiku home" data-home/);
+});
