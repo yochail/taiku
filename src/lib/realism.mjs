@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT } from './data.mjs';
 import { rng as makeRng } from './util.mjs';
+import { renderProblems } from './media.mjs';
 
 export const SPEC_PATH = path.join(ROOT, 'realism', 'spec.json');
 export const VISUAL_KINDS = new Set(['image', 'gif', 'meme', 'chart', 'video']);
@@ -79,6 +80,23 @@ export function mediaOf(post) {
   return post.poll ? [...items, { kind: 'poll', options: post.poll.options }] : items;
 }
 
+const EMOJI_JUNK = /[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u200d\ufe0f\s\p{P}]/gu;
+
+/** Shape of a post: emoji_only | few_words | gif_only | meme_only | image_only | media_only | short | full. */
+export function replyFormOf(post) {
+  const text = String(post.text ?? '').trim();
+  if (!text) {
+    const kinds = mediaOf(post).map((m) => m.kind);
+    for (const k of ['gif', 'meme', 'image']) if (kinds.includes(k)) return `${k}_only`;
+    return 'media_only';
+  }
+  if (EMOJI.test(text) && !text.replace(EMOJI_JUNK, '')) return 'emoji_only';
+  const len = charLen(text);
+  const words = text.replace(EMOJI_JUNK, ' ').trim().split(/\s+/).filter(Boolean).length;
+  if (words <= 3 && len <= 25) return 'few_words';
+  return len <= 40 ? 'short' : 'full';
+}
+
 /** Hard safety/attribution rules for one media item. Returns a list of problems. */
 export function mediaProblems(item, policy) {
   const out = [];
@@ -108,6 +126,13 @@ export function mediaProblems(item, policy) {
     out.push('third-party media without credit {author, license, url}');
   }
   if (item.origin === 'ai' && item.ai_generated !== true) out.push('AI image without ai_generated: true');
+  if (item.origin === 'giphy') {
+    if (!item.giphy_id) out.push('GIPHY media without giphy_id');
+    const attribution = policy.giphy?.attribution ?? 'Powered by GIPHY';
+    if (item.attribution !== attribution) out.push(`GIPHY media without attribution "${attribution}"`);
+    if (!/^https:\/\/media\d?\.giphy\.com\//.test(item.src ?? '')) out.push('GIPHY media must be served from media*.giphy.com');
+  }
+  if (item.render) out.push(...renderProblems(item));
   if (needsSrc) {
     const ratings = policy.ratings;
     const r = item.rating ?? 'unrated';
@@ -122,7 +147,10 @@ export function mediaProblems(item, policy) {
  * Compute every metric in the spec. Returns { metricId: { value, n, detail? } }.
  * Optional post fields used when present: media[], stats { likes, reposts, quotes, views }.
  */
-export function measure(posts, personas, spec) {
+export function measure(allPosts, personas, spec) {
+  // Plain retaiks are not authored content; they are only counted.
+  const retaiks = allPosts.filter((p) => p.retaikOf);
+  const posts = allPosts.filter((p) => !p.retaikOf);
   const byId = new Map(posts.map((p) => [p.id, p]));
   const cls = new Map(posts.map((p) => [p.id, classify(p, byId)]));
   const of = (role) => posts.filter((p) => cls.get(p.id) === role);
@@ -138,7 +166,8 @@ export function measure(posts, personas, spec) {
   set('activity.quote_share', share(quotes.length, authored), authored);
 
   // media
-  const kindsOf = (p) => mediaOf(p).map((x) => x.kind);
+  // A news link renders as a link card, so it counts as one.
+  const kindsOf = (p) => [...mediaOf(p).map((x) => x.kind), ...(p.news?.url ? ['link_card'] : [])];
   const hasVisual = (p) => kindsOf(p).some((k) => VISUAL_KINDS.has(k));
   set('media.original.visual_share', share(originals.filter(hasVisual).length, originals.length), originals.length);
   set('media.original.link_card_share', share(originals.filter((p) => kindsOf(p).includes('link_card')).length, originals.length), originals.length);
@@ -146,12 +175,14 @@ export function measure(posts, personas, spec) {
   set('media.reply.visual_share', share(replies.filter(hasVisual).length, replies.length), replies.length);
   const visualItems = posts.flatMap((p) => mediaOf(p)).filter((x) => VISUAL_KINDS.has(x.kind));
   set('media.gif_share_of_visual', share(visualItems.filter((x) => x.kind === 'gif').length, visualItems.length), visualItems.length);
+  const gifs = visualItems.filter((x) => x.kind === 'gif');
+  set('media.gif.giphy_share', share(gifs.filter((x) => x.origin === 'giphy').length, gifs.length), gifs.length);
   const problems = [];
   for (const p of posts) for (const item of mediaOf(p)) for (const pr of mediaProblems(item, spec.media_policy)) problems.push(`${p.id}: ${pr}`);
   set('media.safety_violations', problems.length, posts.length, problems.slice(0, 20));
 
-  // length
-  const lens = posts.map((p) => charLen(p.text));
+  // length (media-only posts have no text and are left out)
+  const lens = posts.map((p) => charLen(p.text)).filter((l) => l > 0);
   const over = posts.filter((p) => charLen(p.text) > 280).map((p) => `${p.id} (${charLen(p.text)})`);
   set('length.max_chars', lens.length ? Math.max(...lens) : null, lens.length, over.slice(0, 20));
   set('length.median_chars', median(lens), lens.length);
@@ -235,12 +266,28 @@ export function measure(posts, personas, spec) {
       if (refId === p.inReplyTo && cls.get(p.id) === 'reply') delays.push(d);
     }
   }
+  for (const r of retaiks) {
+    const parent = byId.get(r.retaikOf);
+    if (parent && Date.parse(r.createdAt) < Date.parse(parent.createdAt)) early.push(`${r.id} (retaik) before ${parent.id}`);
+  }
   set('time.reply_delay_median_min', median(delays), delays.length);
   set('time.replies_before_parent', early.length, timed.length, early.slice(0, 20));
 
   // text
   set('text.hashtag_share', share(posts.filter((p) => HASHTAG.test(p.text ?? '')).length, posts.length), posts.length);
   set('text.emoji_share', share(posts.filter((p) => EMOJI.test(p.text ?? '')).length, posts.length), posts.length);
+
+  // reply forms
+  const replyForms = replies.map(replyFormOf);
+  const rf = (...forms) => share(replyForms.filter((f) => forms.includes(f)).length, replyForms.length);
+  set('reply_form.reply.emoji_only_share', rf('emoji_only'), replies.length);
+  set('reply_form.reply.few_words_share', rf('few_words'), replies.length);
+  set('reply_form.reply.media_only_share', rf('gif_only', 'meme_only', 'image_only', 'media_only'), replies.length);
+  set('reply_form.reply.short_share', rf('short'), replies.length);
+  set('reply_form.reply.full_share', rf('full'), replies.length);
+  const quoteForms = quotes.map(replyFormOf);
+  set('reply_form.quote.minimal_share', share(quoteForms.filter((f) => f === 'emoji_only' || f === 'few_words').length, quoteForms.length), quotes.length);
+  set('retaik.per_authored', authored ? retaiks.length / authored : null, authored);
 
   // engagement (only when the corpus carries stats)
   const withStats = posts.filter((p) => p.stats && Number.isFinite(p.stats.likes));
@@ -285,6 +332,15 @@ function weighted(rand, entries) {
   return list[list.length - 1][0];
 }
 
+/** terse | punchy | balanced | discursive. persona.reply_style wins, then the spec map, then balanced. */
+export function personaReplyStyle(spec, persona) {
+  const rf = spec.sampling.reply_forms;
+  const id = typeof persona === 'string' ? persona : persona?.id;
+  const own = typeof persona === 'object' ? persona?.reply_style : undefined;
+  const style = own ?? rf.persona_style[id] ?? 'balanced';
+  return rf.persona_styles[style] ? style : 'balanced';
+}
+
 /** Deterministic sampler over spec.sampling. */
 export function createSampler(spec = loadSpec(), seed = 'taiku') {
   const rand = makeRng(seed);
@@ -319,6 +375,35 @@ export function createSampler(spec = loadSpec(), seed = 'taiku') {
       const quotes = Math.round(reposts * lognormal(e.quotes_per_repost));
       const views = Math.round(likes * lognormal(e.views_per_like)) + 20;
       return { likes, reposts, quotes, views };
+    },
+    /** 'giphy' | 'local' source for a sampled gif */
+    gifSource: () => weighted(rand, Object.entries(s.gif_sources ?? { local: 1 })),
+    /**
+     * Shape of a reply or quote, biased by the persona's style.
+     * Returns { form, chars: { min, max }, maxWords?, media? }. A form with media has empty text;
+     * for text forms the generator may still call mediaKind(role).
+     */
+    replyForm: (role = 'reply', persona = null) => {
+      const rf = s.reply_forms;
+      const base = rf[role] ?? rf.reply;
+      const style = personaReplyStyle(spec, persona);
+      const mult = rf.persona_styles[style] ?? {};
+      const form = weighted(rand, Object.entries(base).map(([k, w]) => [k, w * (mult[k] ?? 1)]));
+      const def = rf.forms[form];
+      let [min, max] = def.chars;
+      if (form === 'full') {
+        const buckets = s.length_chars.buckets.filter(([lo]) => lo > 40);
+        const i = Number(weighted(rand, buckets.map((b, idx) => [String(idx), b[2]])));
+        [min, max] = buckets[i];
+      }
+      return { form, style, chars: { min, max }, ...(def.max_words ? { maxWords: def.max_words } : {}), ...(def.media ? { media: def.media } : {}) };
+    },
+    /** how many plain retaiks to emit for a batch of `authored` new posts */
+    retaikCount: (authored) => {
+      const mean = authored * (s.retaik?.per_authored ?? 0);
+      let n = Math.floor(mean);
+      if (rand() < mean - n) n++;
+      return n;
     },
     wantsHashtag: () => rand() < s.hashtag_probability,
     wantsEmoji: () => rand() < s.emoji_probability,

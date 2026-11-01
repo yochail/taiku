@@ -26,8 +26,8 @@
     },
     "text": {
       "type": "string",
-      "minLength": 1,
-      "description": "English text as displayed. ≤ 280 X-weighted chars (emoji/CJK = 2). Never truncated: overlong output is rejected and regenerated."
+      "minLength": 0,
+      "description": "English text as displayed. ≤ 280 X-weighted chars (emoji/CJK = 2). Never truncated: overlong output is rejected and regenerated. Empty only for media-only replies (text '' + media) and plain retaik rows (type 'retaik' + retaikOf)."
     },
     "original": {
       "type": [
@@ -447,6 +447,34 @@
           }
         }
       }
+    },
+    "retaikOf": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Plain retaik row: id of the reposted taik (type must be \"retaik\", text \"\"). Rendered with a \"↻ <name> retaiked\" header."
+    },
+    "stance": {
+      "type": "string",
+      "enum": [
+        "agree",
+        "disagree",
+        "mock",
+        "awe",
+        "confused",
+        "hype",
+        "neutral"
+      ],
+      "description": "Stance of this taik toward its parent/quoted taik or topic (generator-internal; used for micro-reaction selection; never rendered)."
+    },
+    "replyForm": {
+      "type": "string",
+      "description": "Realism reply form sampled via sampler.replyForm() (emoji_only, few_words, media_only, short, full, one_word_quote…). Internal; never rendered."
+    },
+    "reactionId": {
+      "type": "string",
+      "description": "reaction_pool entry key used for a no-LLM micro-reaction (cooldown tracking). Internal; never rendered."
     }
   }
 }

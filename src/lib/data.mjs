@@ -308,6 +308,16 @@ export function validate(personas, posts) {
       errors.push(`${where}: text too long (${taikLength(post.text)} > ${MAX_TAIK_CHARS} weighted chars)`);
     if (post.original?.text && taikLength(post.original.text) > MAX_TAIK_CHARS) errors.push(`${where}: original text too long`);
     if (!ALL_TYPES[post.type]) errors.push(`${where}: unknown type ${post.type}`);
+    const mediaOnly = Array.isArray(post.media) && post.media.length > 0;
+    if (post.text === '' && !mediaOnly && post.type !== 'retaik') errors.push(`${where}: empty text (allowed only for media-only replies and plain retaiks)`);
+    if ((post.type === 'retaik') !== Boolean(post.retaikOf)) errors.push(`${where}: retaik type and retaikOf go together`);
+    if (post.retaikOf) {
+      const t = byId.get(post.retaikOf);
+      if (!t) errors.push(`${where}: retaikOf missing ${post.retaikOf}`);
+      else if (t.retaikOf) errors.push(`${where}: cannot retaik a retaik`);
+      if (post.retaikOf === post.id) errors.push(`${where}: self-link`);
+      if (post.text !== '' || post.inReplyTo || post.quoteOf || post.media?.length || post.poll) errors.push(`${where}: plain retaik must have empty text and no reply/quote/media/poll`);
+    }
 
     // Structure by type.
     const isReplyType = Boolean(REPLY_ARCHETYPES[post.type]);
@@ -376,7 +386,7 @@ export function validate(personas, posts) {
   // Graph: chronology, DAG, depth caps.
   for (const post of posts) {
     const where = `post ${post.id} (${post._file})`;
-    for (const k of ['inReplyTo', 'quoteOf']) {
+    for (const k of ['inReplyTo', 'quoteOf', 'retaikOf']) {
       const target = byId.get(post[k]);
       if (target && Date.parse(post.createdAt) <= Date.parse(target.createdAt)) errors.push(`${where}: must be created after its ${k} target ${target.id}`);
     }
@@ -432,7 +442,7 @@ export function visiblePosts(posts, now = buildNow()) {
     if (guard.has(p.id)) return false;
     guard.add(p.id);
     let ok = Date.parse(p.createdAt) <= t;
-    for (const k of ['inReplyTo', 'quoteOf']) {
+    for (const k of ['inReplyTo', 'quoteOf', 'retaikOf']) {
       if (ok && p[k]) {
         const target = byId.get(p[k]);
         ok = Boolean(target) && visible(target, guard);

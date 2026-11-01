@@ -12,7 +12,10 @@
     "goel2016": "Goel, Anderson, Hofman, Watts, 'The Structural Virality of Online Diffusion', Management Science 62(1), 2016 (vast majority of cascades are size 1 or broadcast depth 1)",
     "goh2008": "Goh & Barabasi, 'Burstiness and memory in complex systems', EPL 81, 2008 (burstiness B=(sigma-mu)/(sigma+mu); human online activity has B>0)",
     "golder2011": "Golder & Macy, 'Diurnal and Seasonal Mood Vary with Work, Sleep, and Daylength Across Diverse Cultures', Science 333, 2011 (strong circadian rhythm in tweeting)",
-    "kehoe2018": "Kehoe & Gee, 'Analysing emojis in context in a corpus of Twitter data', 2018 (about 16% of English tweets contain an emoji)"
+    "kehoe2018": "Kehoe & Gee, 'Analysing emojis in context in a corpus of Twitter data', 2018 (about 16% of English tweets contain an emoji)",
+    "gligoric2018": "Gligorić, Anderson & West, 'How Constraints Affect Content: The Case of Twitter's Switch from 140 to 280 Characters', ICWSM 2018, https://arxiv.org/abs/1804.02318 (users write tersely: abbreviations, contractions; short posts are the norm)",
+    "wang2021gif": "Wang & Jurgens, 'An Animated Picture Says at Least a Thousand Words: Selecting GIF-based Replies in Multimodal Dialog', Findings of EMNLP 2021, https://arxiv.org/abs/2109.12212 (1.56M text-to-GIF reply turns from Twitter: GIFs and memes are a standard standalone reply)",
+    "reply_forms_note": "No published study breaks X replies down by form (emoji-only, few words, media-only). The reply_forms weights are estimates triangulated from twitter2018len (mode 33 chars), gligoric2018, wang2021gif and kehoe2018, then shifted toward full replies for teaching. Confidence: low."
   },
   "sampling": {
     "activity": {
@@ -24,7 +27,8 @@
     "media": {
       "_note": "Weights per role. Video folded into image/gif because there is no $0 video source. Kinds: none, image, gif, meme, chart, video, link_card, poll.",
       "original": { "none": 0.62, "image": 0.14, "meme": 0.07, "link_card": 0.08, "gif": 0.04, "chart": 0.04, "poll": 0.01, "video": 0.0 },
-      "reply": { "none": 0.875, "gif": 0.06, "image": 0.02, "meme": 0.02, "link_card": 0.015, "chart": 0.01, "poll": 0.0, "video": 0.0 },
+      "_reply_note": "reply weights apply to text reply forms only; gif/meme/image-only replies come from reply_forms (about 6% of replies). Together about 11% of replies are visual.",
+      "reply": { "none": 0.93, "gif": 0.03, "image": 0.01, "meme": 0.01, "link_card": 0.015, "chart": 0.005, "poll": 0.0, "video": 0.0 },
       "quote": { "none": 0.8, "image": 0.06, "meme": 0.05, "gif": 0.03, "chart": 0.03, "link_card": 0.03, "poll": 0.0, "video": 0.0 }
     },
     "length_chars": {
@@ -48,6 +52,37 @@
       "quotes_per_repost": { "median": 0.2, "sigma": 0.5 },
       "views_per_like": { "median": 45, "sigma": 0.4 }
     },
+    "gif_sources": { "_note": "Where a sampled gif comes from. giphy = GIPHY search at generation time (pop-culture reactions, like real X); local = self-made animated SVG on public-domain art (media/library.json). Falls back to local when GIPHY is unavailable or over budget.", "giphy": 0.5, "local": 0.5 },
+    "reply_forms": {
+      "_note": "Shape of a reply or quote, before persona bias. emoji_only: 1-3 emoji, no words ('💀', '😂😂'). few_words: 1-3 words ('this.', 'based', 'source?'). *_only: media with empty text. short: 4+ words up to 40 chars. full: over 40 chars. Sources: reply_forms_note.",
+      "forms": {
+        "emoji_only": { "chars": [1, 8] },
+        "few_words": { "chars": [1, 25], "max_words": 3 },
+        "gif_only": { "chars": [0, 0], "media": "gif" },
+        "meme_only": { "chars": [0, 0], "media": "meme" },
+        "image_only": { "chars": [0, 0], "media": "image" },
+        "short": { "chars": [10, 40] },
+        "full": { "chars": [41, 280] }
+      },
+      "reply": { "emoji_only": 0.07, "few_words": 0.12, "gif_only": 0.04, "meme_only": 0.01, "image_only": 0.01, "short": 0.2, "full": 0.55 },
+      "quote": { "emoji_only": 0.05, "few_words": 0.13, "short": 0.22, "full": 0.6 },
+      "persona_styles": {
+        "_note": "Multipliers on the base weights, renormalized. Persona JSON may set reply_style to override persona_style.",
+        "terse": { "emoji_only": 4, "few_words": 3, "gif_only": 3, "meme_only": 2.5, "image_only": 1, "short": 1.5, "full": 0.25 },
+        "punchy": { "emoji_only": 1.5, "few_words": 1.6, "gif_only": 1.5, "meme_only": 1.5, "image_only": 1, "short": 1.4, "full": 0.75 },
+        "balanced": {},
+        "discursive": { "emoji_only": 0.3, "few_words": 0.4, "gif_only": 0.5, "meme_only": 0.5, "image_only": 1, "short": 0.6, "full": 1.4 }
+      },
+      "persona_style": {
+        "diogenes": "terse",
+        "laozi": "punchy", "zhuangzi": "punchy", "socrates": "punchy", "hume": "punchy", "nietzsche": "punchy", "machiavelli": "punchy", "camus": "punchy", "dogen": "punchy", "epicurus": "punchy",
+        "kant": "discursive", "aristotle": "discursive", "spinoza": "discursive", "arendt": "discursive", "shankara": "discursive", "maimonides": "discursive", "ibn_rushd": "discursive", "al_ghazali": "discursive", "fanon": "discursive"
+      }
+    },
+    "retaik": {
+      "_note": "Plain retaiks (repost with no comment) by personas, shown as 'X retaiked' rows. X has 50.7% retweets vs 49.3% authored, about 1.03 per authored post (pfeffer2023). Taiku targets 0.6 so the feed of 30 accounts is not mostly duplicates. Stored as { id, authorId, retaikOf, createdAt, text: '' }.",
+      "per_authored": 0.6
+    },
     "hashtag_probability": 0.05,
     "emoji_probability": 0.15
   },
@@ -61,11 +96,12 @@
     "media.original.poll_share": { "min": 0.0, "max": 0.04, "target": 0.01, "min_n": 30, "severity": "warn", "confidence": "low", "sources": [] },
     "media.reply.visual_share": { "min": 0.03, "max": 0.2, "target": 0.11, "min_n": 30, "severity": "warn", "confidence": "low", "sources": [] },
     "media.gif_share_of_visual": { "min": 0.05, "max": 0.4, "target": 0.2, "min_n": 15, "severity": "warn", "confidence": "low (2.4% of X attachments are GIFs; reaction GIFs dominate replies, so raised)", "sources": ["pfeffer2023"] },
+    "media.gif.giphy_share": { "_def": "share of gif items sourced from GIPHY (rest are local public-domain reactions)", "min": 0.2, "max": 0.8, "target": 0.5, "min_n": 10, "severity": "warn", "confidence": "product choice (user-approved mix), not an X statistic", "sources": [] },
     "media.safety_violations": { "_def": "media items with unknown kind, missing alt, third-party without credit+license, AI image without ai_generated flag, non-allowlisted or non-https remote src, or rating above max_rating", "min": 0, "max": 0, "severity": "fail", "confidence": "hard rule", "sources": [] },
 
     "length.max_chars": { "min": 1, "max": 280, "severity": "fail", "confidence": "hard rule", "sources": [] },
     "length.median_chars": { "min": 55, "max": 140, "target": 100, "min_n": 30, "severity": "warn", "confidence": "medium (X mode is 33; shifted up for teaching)", "sources": ["twitter2018len"] },
-    "length.short_share": { "_def": "share <= 40 chars", "min": 0.08, "max": 0.35, "target": 0.18, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["twitter2018len"] },
+    "length.short_share": { "_def": "share <= 40 chars (posts with text)", "min": 0.08, "max": 0.42, "target": 0.27, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["twitter2018len"] },
     "length.over_140_share": { "min": 0.12, "max": 0.4, "target": 0.28, "min_n": 30, "severity": "warn", "confidence": "medium (X: 12%)", "sources": ["twitter2018len"] },
     "length.near_limit_share": { "_def": "share >= 261 chars", "min": 0.0, "max": 0.06, "target": 0.03, "min_n": 30, "severity": "warn", "confidence": "medium (X: 1% hit 280)", "sources": ["twitter2018len"] },
 
@@ -88,6 +124,14 @@
     "text.hashtag_share": { "min": 0.0, "max": 0.12, "target": 0.05, "min_n": 30, "severity": "warn", "confidence": "low (hashtag use has declined; estimates vary 1-20%)", "sources": [] },
     "text.emoji_share": { "min": 0.06, "max": 0.35, "target": 0.15, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["kehoe2018"] },
 
+    "reply_form.reply.emoji_only_share": { "_def": "replies whose text is only emoji (no media)", "min": 0.02, "max": 0.16, "target": 0.07, "min_n": 30, "severity": "warn", "confidence": "low", "sources": ["kehoe2018", "reply_forms_note"] },
+    "reply_form.reply.few_words_share": { "_def": "replies of 1-3 words, at most 25 chars", "min": 0.05, "max": 0.25, "target": 0.12, "min_n": 30, "severity": "warn", "confidence": "low", "sources": ["gligoric2018", "reply_forms_note"] },
+    "reply_form.reply.media_only_share": { "_def": "replies with gif/meme/image and empty text", "min": 0.02, "max": 0.14, "target": 0.06, "min_n": 30, "severity": "warn", "confidence": "low", "sources": ["wang2021gif", "reply_forms_note"] },
+    "reply_form.reply.short_share": { "_def": "replies of 4+ words, at most 40 chars", "min": 0.08, "max": 0.35, "target": 0.2, "min_n": 30, "severity": "warn", "confidence": "low", "sources": ["twitter2018len", "reply_forms_note"] },
+    "reply_form.reply.full_share": { "_def": "replies over 40 chars", "min": 0.35, "max": 0.75, "target": 0.55, "min_n": 30, "severity": "warn", "confidence": "low (real X is lower; shifted up for teaching)", "sources": ["twitter2018len", "reply_forms_note"] },
+    "reply_form.quote.minimal_share": { "_def": "quote posts whose comment is emoji-only or 1-3 words", "min": 0.06, "max": 0.35, "target": 0.18, "min_n": 15, "severity": "warn", "confidence": "low", "sources": ["reply_forms_note"] },
+    "retaik.per_authored": { "_def": "plain retaiks (retaikOf, no comment) per authored post", "min": 0.25, "max": 1.3, "target": 0.6, "min_n": 30, "severity": "warn", "confidence": "high for X (1.03); Taiku target is a product choice", "sources": ["pfeffer2023"] },
+
     "engagement.likes_gini": { "min": 0.55, "max": 0.97, "target": 0.7, "min_n": 30, "severity": "warn", "confidence": "high (heavy tail is universal)", "sources": ["goel2016"] },
     "engagement.top10_like_share": { "min": 0.35, "max": 0.9, "target": 0.5, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["goel2016"] },
     "engagement.likes_per_repost_median": { "min": 3, "max": 15, "target": 7, "min_n": 30, "severity": "warn", "confidence": "low (industry analyses: 2-10x)", "sources": [] },
@@ -95,7 +139,9 @@
   },
   "media_policy": {
     "kinds": ["image", "gif", "meme", "chart", "video", "link_card", "poll"],
-    "allowed_remote_hosts": ["upload.wikimedia.org"],
+    "allowed_remote_hosts": ["media.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com", "media4.giphy.com"],
+    "_remote_note": "Must match the img-src CSP in public/_headers. Public-domain art is stored locally (public/media/art), so Wikimedia is not hotlinked. GIPHY must be hotlinked from its CDN (GIPHY API terms) with 'Powered by GIPHY' attribution.",
+    "giphy": { "attribution": "Powered by GIPHY", "api_rating": "pg-13", "max_calls_per_run": 10, "_note": "Beta keys allow ~100 calls/hour; the generator searches server-side only and caches per query." },
     "ratings": ["g", "pg", "pg-13"],
     "max_rating": "pg-13"
   }

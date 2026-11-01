@@ -257,7 +257,9 @@ export const REPLY_ARCHETYPES = {
   },
 };
 
-export const ALL_TYPES = { ...POST_ARCHETYPES, ...REPLY_ARCHETYPES };
+// Plain retaik row ({retaikOf, text: ''}): a repost shown in the feed with a "↻ X retaiked" header. No LLM.
+export const RETAIK_TYPE = { retaik: { label: 'Retaik', guide: 'Plain repost of another taik; no text.' } };
+export const ALL_TYPES = { ...POST_ARCHETYPES, ...REPLY_ARCHETYPES, ...RETAIK_TYPE };
 
 export function typeLabel(type) {
   return ALL_TYPES[type]?.label ?? 'Post';

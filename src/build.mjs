@@ -6,6 +6,7 @@ import path from 'node:path';
 import { ROOT, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
 import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderText, slugify } from './lib/util.mjs';
 import { typeLabel } from './lib/archetypes.mjs';
+import { writeMediaFiles } from './lib/media.mjs';
 
 const OUT = path.join(ROOT, process.env.OUT_DIR || 'dist');
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
@@ -46,6 +47,40 @@ function stats(post) {
 }
 
 const AVATAR_PX = { xs: 20, sm: 40, '': 40, md: 48, lg: 48, xl: 120 };
+// post id -> resolved media items (filled in at run time, after dist/ is created)
+let mediaByPost = new Map();
+
+/** Text for titles/feeds; media-only posts (a bare GIF reply) fall back to their media label. */
+function shownText(p) {
+  if (p.text) return p.text;
+  const m = Array.isArray(p.media) ? p.media[0] : p.media;
+  return m ? `[${m.kind.toUpperCase()}] ${m.alt ?? ''}`.trim() : '';
+}
+
+function mediaCredit(m) {
+  if (m.origin === 'giphy') return `<a href="${esc(m.credit?.url ?? 'https://giphy.com')}" rel="nofollow noopener" target="_blank">${esc(m.attribution ?? 'Powered by GIPHY')}</a>${m.credit?.author && m.credit.author !== 'GIPHY' ? ` · ${esc(m.credit.author)}` : ''}`;
+  if (m.credit?.url) return `<a href="${esc(m.credit.url)}" rel="nofollow noopener" target="_blank">${esc(m.credit.title ? `${m.credit.title}, ${m.credit.author}` : m.credit.author)}</a> · ${esc(m.credit.license)}`;
+  return m.kind === 'chart' ? 'Chart drawn by Taiku' : '';
+}
+
+function mediaHtml(post) {
+  return (mediaByPost.get(post.id) ?? []).map((m) => {
+    if (m.kind === 'poll') {
+      const h = hash(post.id);
+      const raw = m.options.map((_, i) => 1 + ((h >>> (i * 5)) % 23));
+      const total = raw.reduce((a, b) => a + b, 0);
+      const rows = m.options.map((o, i) => `<li style="--w:${Math.round((raw[i] / total) * 100)}%"><span>${esc(o)}</span><b>${Math.round((raw[i] / total) * 100)}%</b></li>`).join('');
+      return `<div class="poll"><ol>${rows}</ol><span class="poll-note">Simulated votes · poll closed</span></div>`;
+    }
+    if (m.kind === 'link_card') return m.url ? `<a class="news-card" href="${esc(m.url)}" rel="nofollow noopener" target="_blank"><span class="nc-title">${esc(m.title ?? m.url)}</span></a>` : '';
+    if (!m.src) return '';
+    const size = m.width && m.height ? ` width="${m.width}" height="${m.height}"` : '';
+    const badge = m.kind === 'gif' ? '<span class="media-badge">GIF</span>' : '';
+    const credit = mediaCredit(m);
+    return `<figure class="media media-${esc(m.kind)}"><div class="media-frame"><img src="${esc(m.src)}" alt="${esc(m.alt)}" loading="lazy" decoding="async"${size}>${badge}</div>${credit ? `<figcaption>${credit}</figcaption>` : ''}</figure>`;
+  }).join('\n');
+}
+
 function avatar(persona, size = '') {
   const a = persona.avatar ?? {};
   if (a.image) {
@@ -90,7 +125,7 @@ function quoteEmbed(qid) {
   const qa = P.get(q.authorId);
   return `<a class="quote-embed" href="/p/${q.id}/">
     <span class="qe-head">${avatar(qa, 'xs')}<b>${esc(qa.name)}</b> <span class="handle">@${esc(qa.handle)}</span> · ${esc(shortDate(q.createdAt))}</span>
-    <span class="qe-text">${esc(truncate(q.text, 260))}</span>
+    <span class="qe-text">${esc(truncate(shownText(q), 260))}</span>
   </a>`;
 }
 
@@ -104,7 +139,9 @@ function postCard(post, opts = {}) {
     const pa = P.get(parent.authorId);
     parts.push(`<div class="replying">Replying to <a href="/thinkers/${pa.id}/">@${esc(pa.handle)}</a></div>`);
   }
-  parts.push(`<div class="text${focal ? ' text-lg' : ''}">${renderText(post.text, handleMap)}</div>`);
+  if (post.text) parts.push(`<div class="text${focal ? ' text-lg' : ''}">${renderText(post.text, handleMap)}</div>`);
+  const media = mediaHtml(post);
+  if (media) parts.push(media);
   if (post.citation) parts.push(`<div class="cite">📖 Quoted from <cite>${esc(post.citation)}</cite></div>`);
   if (post.news?.title) {
     const host = post.news.source || (post.news.url ? new URL(post.news.url).hostname.replace(/^www\./, '') : 'news');
@@ -168,7 +205,7 @@ function trending() {
     .sort((a, b) => b[1] - a[1] || b[0].createdAt.localeCompare(a[0].createdAt))
     .slice(0, 4);
   return `<section class="panel"><h2>Hot debates</h2>${debates
-    .map(([r, n]) => `<a class="trend" href="/p/${r.id}/"><span class="t-meta">${esc(P.get(r.authorId).name)} · ${n} replies</span><span class="t-title">${esc(truncate(r.text, 80))}</span></a>`)
+    .map(([r, n]) => `<a class="trend" href="/p/${r.id}/"><span class="t-meta">${esc(P.get(r.authorId).name)} · ${n} replies</span><span class="t-title">${esc(truncate(shownText(r), 80))}</span></a>`)
     .join('')}</section>
   <section class="panel"><h2>Trending topics</h2>${top
     .map(([t, n]) => `<a class="trend" href="/tags/${t}/"><span class="t-title">#${esc(t)}</span><span class="t-meta">${plural(n, 'post')}</span></a>`)
@@ -317,15 +354,15 @@ function postPages() {
     if (qs.length) body += `<h2 class="section-h">Quoted by</h2><div class="feed">${qs.map((q) => postCard(q)).join('')}</div>`;
 
     const parentAuthor = post.inReplyTo ? P.get(idx.byId.get(post.inReplyTo).authorId) : null;
-    const title = `${author.name} ${parentAuthor ? `replying to ${parentAuthor.name}` : 'on Taiku'}: “${truncate(post.text, 70)}”`;
+    const title = `${author.name} ${parentAuthor ? `replying to ${parentAuthor.name}` : 'on Taiku'}: “${truncate(shownText(post), 70)}”`;
     const allKids = idx.children.get(post.id) ?? [];
     const ld = {
       '@context': 'https://schema.org',
       '@type': 'DiscussionForumPosting',
       '@id': url(`/p/${post.id}/`),
       url: url(`/p/${post.id}/`),
-      headline: truncate(post.text, 110),
-      text: post.text,
+      headline: truncate(shownText(post), 110),
+      text: shownText(post),
       datePublished: post.createdAt,
       author: personLd(author),
       about: { '@type': 'Person', name: author.name, sameAs: author.wikipedia ? [author.wikipedia] : undefined },
@@ -346,7 +383,7 @@ function postPages() {
       `/p/${post.id}/`,
       layout({
         title,
-        description: `${post.text} — ${author.name} (@${author.handle}) on Taiku, the Dead Thinkers Society.`,
+        description: `${shownText(post)} — ${author.name} (@${author.handle}) on Taiku.`,
         pathname: `/p/${post.id}/`,
         body,
         ld: [ld],
@@ -535,7 +572,7 @@ function notFound() {
 function rss() {
   const items = roots.slice(0, 50).map((p) => {
     const a = P.get(p.authorId);
-    return `<item><title>${esc(`${a.name}: ${truncate(p.text, 90)}`)}</title><link>${url(`/p/${p.id}/`)}</link><guid isPermaLink="true">${url(`/p/${p.id}/`)}</guid><pubDate>${new Date(p.createdAt).toUTCString()}</pubDate><description>${esc(p.text)}</description></item>`;
+    return `<item><title>${esc(`${a.name}: ${truncate(shownText(p), 90)}`)}</title><link>${url(`/p/${p.id}/`)}</link><guid isPermaLink="true">${url(`/p/${p.id}/`)}</guid><pubDate>${new Date(p.createdAt).toUTCString()}</pubDate><description>${esc(shownText(p))}</description></item>`;
   });
   fs.writeFileSync(
     path.join(OUT, 'feed.xml'),
@@ -556,6 +593,8 @@ function seoFiles() {
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 fs.cpSync(path.join(ROOT, 'public'), OUT, { recursive: true });
+const mediaOut = writeMediaFiles(posts, OUT);
+mediaByPost = mediaOut.byPost;
 feedPages();
 postPages();
 profilePages();
@@ -565,4 +604,4 @@ aboutPage();
 notFound();
 rss();
 seoFiles();
-console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags)`);
+console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags, ${mediaOut.written} rendered media)`);
