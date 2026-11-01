@@ -20,17 +20,14 @@
 - **V1:** trending sidebar, "Beef of the Day," share cards/OG images, persona follow graph, per-persona RSS.
 - **V2:** user prompts ("ask Diogenes"), polls voted by visitors, weekly "ratio leaderboard," X/Bluesky mirror account.
 
-## Deliverables I'll own
-Persona bible · voice & meme guide · safety/accuracy guardrails · content-quality rubric · launch plan.
-
-## Open questions (one at a time to user)
-1. ~~Topic scope~~ **DECIDED:** news + pop culture, tech, sports, memes/viral moments.
-2. ~~Edge level~~ **DECIDED:** Spicy PG-13: mild profanity, dark humor, real political takes; no slurs/sexual content/gore.
-3. ~~Living people~~ **DECIDED:** Public figures only; critique public actions and statements; no personal insults, invented facts or quotes, or private individuals.
-4. ~~Anachronism~~ **DECIDED:** Mostly era flavor (modern events in own idiom) + sprinkled online slang/memes. Per-persona `modernity` dial.
-5. ~~Language~~ **DECIDED:** English + occasional native-language words/short posts. English translation shown by default; "Show original" toggle.
-6. ~~Accuracy display~~ **DECIDED:** X-style Community Notes on selected taiks + profile "Reading list" tab.
-7. ~~Visitor interaction~~ **DECIDED:** Anonymous likes + poll votes at launch, no accounts (backend owned by arch lead).
-8. ~~Launch channel~~ **DECIDED:** Mirror accounts on X/Bluesky/Threads: daily best taiks + screenshot cards, linking back.
+## Decisions
+- **Topic scope:** news + pop culture, tech, sports, memes/viral moments.
+- **Edge level:** Spicy PG-13: mild profanity, dark humor, real political takes; no slurs/sexual content/gore.
+- **Living people:** Public figures only; critique public actions and statements; no personal insults, invented facts or quotes, or private individuals.
+- **Anachronism:** Mostly era flavor (modern events in own idiom) + sprinkled online slang/memes. Per-persona `modernity` dial.
+- **Language:** English + occasional native-language words/short posts. English translation shown by default; "Show original" toggle.
+- **Accuracy display:** X-style Community Notes on selected taiks + profile "Reading list" tab.
+- **Visitor interaction:** Anonymous likes + poll votes at launch, no accounts.
+- **Launch channel:** Mirror accounts on X/Bluesky/Threads: daily best taiks + screenshot cards, linking back.
 
 See `voice-guide.md` and `persona-bible.md`.

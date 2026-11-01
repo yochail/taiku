@@ -61,7 +61,7 @@ const utcDay = (ms = Date.now()) => new Date(ms).toISOString().slice(0, 10);
 
 /**
  * Output locations for a date. The daily file is content/posts/daily-<date>.json (the SAME name the
- * local Copilot automation writes). Mock runs use `-mock`; a forced cloud run next to a local file
+ * local generation script writes). Mock runs use `-mock`; a forced cloud run next to a local file
  * uses `suffix` ('-cf'). The kill switch routes everything to staging.
  */
 export function outputPaths(root, date, { mock = false, publish = true, suffix = null } = {}) {

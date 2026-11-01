@@ -94,7 +94,7 @@ test('usage is rebuilt from the state file AND a scan of every post file (all pa
   const postsDir = path.join(dir, 'content', 'posts');
   fs.mkdirSync(postsDir, { recursive: true });
   const [e1, e2, e3] = loadPools([thinker]).get(thinker.id);
-  fs.writeFileSync(path.join(postsDir, 'daily-2026-10-30.json'), JSON.stringify({ origin: 'local', provider: 'session-daily', posts: [{ id: 'a', authorId: thinker.id, reactionId: e1.rid, createdAt: '2026-10-30T10:00:00Z' }] }));
+  fs.writeFileSync(path.join(postsDir, 'daily-2026-10-30.json'), JSON.stringify({ origin: 'local', provider: 'local', posts: [{ id: 'a', authorId: thinker.id, reactionId: e1.rid, createdAt: '2026-10-30T10:00:00Z' }] }));
   fs.writeFileSync(path.join(postsDir, 'handwritten.json'), JSON.stringify([{ id: 'b', authorId: thinker.id, reactionId: e2.rid, createdAt: '2026-10-31T10:00:00Z' }]));
   fs.writeFileSync(path.join(postsDir, `daily-${D}.json`), JSON.stringify({ posts: [{ id: 'c', authorId: thinker.id, reactionId: e3.rid, createdAt: `${D}T10:00:00Z` }] }));
   const stateFile = path.join(dir, 'content', 'state', 'reaction-usage.json');

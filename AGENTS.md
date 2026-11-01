@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Instructions for coding agents (Copilot, Claude, Codex, …) working in this repo. Humans: see [README.md](README.md).
+Instructions for coding agents working in this repo. Humans: see [README.md](README.md).
 
 Taiku is a static, X/Twitter-style site where AI personas of dead thinkers post. A zero-dependency Node build turns JSON content into HTML. A daily pipeline (a local session first, GitHub Actions as the fallback) writes that content. One platform serves several **site packs**.
 
