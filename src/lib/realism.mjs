@@ -5,6 +5,7 @@ import { ROOT } from './data.mjs';
 import { rng as makeRng } from './util.mjs';
 import { renderProblems } from './media.mjs';
 import { behaviorOf } from './behavior.mjs';
+import { withDisplayStats } from './crowd.mjs';
 
 export const SPEC_PATH = path.join(ROOT, 'realism', 'spec.json');
 export const VISUAL_KINDS = new Set(['image', 'gif', 'meme', 'chart', 'video']);
@@ -317,8 +318,10 @@ export function evaluate(measured, spec) {
   });
 }
 
+/** Scores the corpus as visitors see it: posts without stats get display stats (persona + crowd + quote-taiks). */
 export function checkCorpus(posts, personas, spec = loadSpec()) {
-  const results = evaluate(measure(posts, personas, spec), spec);
+  const shown = withDisplayStats(posts.map((p) => ({ ...p })), personas);
+  const results = evaluate(measure(shown, personas, spec), spec);
   const count = (s) => results.filter((r) => r.status === s).length;
   return { results, summary: { pass: count('pass'), warn: count('warn'), fail: count('fail'), skip: count('skip') } };
 }
@@ -422,7 +425,9 @@ export function createSampler(spec = loadSpec(), seed = 'taiku') {
       const e = s.engagement;
       const likes = Math.max(0, Math.round(lognormal(e.likes_lognormal) * (popularity / 5) * (isReply ? e.reply_factor : 1)));
       const reposts = Math.round(likes * lognormal(e.reposts_per_like));
-      const quotes = Math.round(reposts * lognormal(e.quotes_per_repost));
+      // stochastic rounding: small repost counts still yield quotes at the spec ratio on average
+      const q = reposts * lognormal(e.quotes_per_repost);
+      const quotes = Math.floor(q) + (rand() < q - Math.floor(q) ? 1 : 0);
       const views = Math.round(likes * lognormal(e.views_per_like)) + 20;
       return { likes, reposts, quotes, views };
     },

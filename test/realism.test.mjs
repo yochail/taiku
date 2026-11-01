@@ -190,3 +190,18 @@ test('persona bias: Diogenes is terse, Kant is long-winded, reply_style override
     if (r.form === 'full') assert.ok(r.chars.min > 40);
   }
 });
+
+test('quotes per repost: corpus without stored stats is scored with display stats (crowd + quote-taiks), not 0', () => {
+  const real = loadPersonas();
+  const s = createSampler(spec, 'qpr');
+  const posts = Array.from({ length: 300 }, (_, i) => ({ id: `q${i}`, authorId: real[i % real.length].id, text: 'hm', createdAt: new Date(Date.UTC(2026, 9, 1) + i * 7 * 60_000).toISOString() }));
+  for (let i = 0; i < 20; i++) posts.push({ id: `qq${i}`, authorId: real[(i + 3) % real.length].id, quoteOf: `q${i}`, text: 'no', createdAt: '2026-10-03T00:00:00Z' });
+  const r = checkCorpus(posts, real, spec).results.find((x) => x.id === 'engagement.quotes_per_repost_median');
+  assert.ok(r.n >= 30 && r.value > 0, `quotes_per_repost_median = ${r.value} (n=${r.n})`);
+  assert.equal(r.status, 'pass');
+  assert.ok(posts.every((p) => !p.stats), 'checkCorpus does not mutate its input');
+  // stochastic rounding keeps the ratio even for small repost counts
+  let q = 0; let rp = 0;
+  for (let i = 0; i < 4000; i++) { const e = s.engagement({ popularity: 2 }); q += e.quotes; rp += e.reposts; }
+  assert.ok(q / rp > 0.12 && q / rp < 0.4, `aggregate quotes/reposts ${q / rp}`);
+});
