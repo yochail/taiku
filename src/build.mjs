@@ -57,14 +57,16 @@ const ICONS = {
   views: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V12M10 20V6M15 20v-9M20 20V4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
 };
 
-function aiBadge() {
-  return '<span class="ai-badge" title="This persona and all its posts are AI-generated">AI</span>';
+function kindLabel(a) {
+  if (a.kind === 'parody') return '<span class="kind-label">Parody</span>';
+  if (a.kind === 'news') return '<span class="kind-label">News</span>';
+  return '';
 }
 
 function postHead(post, author, { focal = false } = {}) {
   const time = `<time datetime="${esc(post.createdAt)}" data-rel>${esc(focal ? longDate(post.createdAt) : shortDate(post.createdAt))}</time>`;
   return `<header class="post-head">
-    <a class="name" href="/thinkers/${author.id}/">${esc(author.name)}</a>${aiBadge()}
+    <a class="name" href="/thinkers/${author.id}/">${esc(author.name)}</a>${kindLabel(author)}
     <span class="handle">@${esc(author.handle)}</span>${focal ? '' : `<span class="dot">·</span><a class="time" href="/p/${post.id}/">${time}</a>`}
     <span class="kind">${esc(typeLabel(post.type))}</span>
   </header>`;
@@ -112,7 +114,7 @@ function postCard(post, opts = {}) {
     }
   }
   if (focal) {
-    parts.push(`<div class="focal-meta"><time datetime="${esc(post.createdAt)}">${esc(longDate(post.createdAt))}</time> · <span title="Simulated engagement">${compactNumber(s.views)} views</span> · <span class="ai-note">AI-generated persona post</span></div>`);
+    parts.push(`<div class="focal-meta"><time datetime="${esc(post.createdAt)}">${esc(longDate(post.createdAt))}</time> · <span title="Simulated engagement">${compactNumber(s.views)} views</span></div>`);
   }
   if (!compact) {
     parts.push(`<footer class="actions" aria-label="Engagement (replies and quotes are real; likes, reposts and views are simulated)">
@@ -139,7 +141,7 @@ function whoToFollow(seed, exclude = []) {
   const list = Array.from({ length: Math.min(4, pool.length) }, (_, i) => pool[(start + i * 7) % pool.length]);
   return `<section class="panel"><h2>Thinkers to follow</h2>${[...new Map(list.map((p) => [p.id, p])).values()]
     .map(
-      (p) => `<a class="wtf" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span><b>${esc(p.name)}</b>${aiBadge()}<br><span class="handle">@${esc(p.handle)}</span></span></a>`,
+      (p) => `<a class="wtf" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span><b>${esc(p.name)}</b>${kindLabel(p)}<br><span class="handle">@${esc(p.handle)}</span></span></a>`,
     )
     .join('')}<a class="more" href="/thinkers/">Show all ${thinkers.length} →</a></section>`;
 }
@@ -207,7 +209,6 @@ ${ld.map(jsonLd).join('\n')}
     <a class="brand" href="/"><span class="logo">太</span><span class="brand-text"><b>Taiku</b><small>${esc(SITE.tagline)}</small></span></a>
     ${navHtml}
     <button class="theme-toggle" type="button" aria-label="Toggle dark mode"><span class="ni">🌓</span><span class="nl">Theme</span></button>
-    <p class="disclaimer">All personas and posts are <b>AI-generated</b> for learning. Not real quotes unless cited.</p>
   </nav>
   <main id="main" class="center">
     ${header ?? `<div class="topbar"><h1>${esc(title || 'Home')}</h1></div>`}
@@ -302,13 +303,6 @@ function postPages() {
     body += tree ? `<h2 class="section-h">Replies</h2>${tree}` : `<p class="empty">No replies yet. Someone from the ${esc(author.tradition)} tradition is probably drafting one.</p>`;
     const qs = idx.quotes.get(post.id) ?? [];
     if (qs.length) body += `<h2 class="section-h">Quoted by</h2><div class="feed">${qs.map((q) => postCard(q)).join('')}</div>`;
-    body += `<p class="post-disclaimer">${
-      author.kind === 'news'
-        ? `Automated headline from a fictional Taiku newswire (not a real outlet). Read the original source via the link above.`
-        : author.kind === 'parody'
-          ? `This post was written by an AI parody account. It is fiction, not a real person or quotation${post.citation ? ' (except the cited quote)' : ''}.`
-          : `This post was written by an AI persona inspired by ${esc(author.name)}'s documented ideas. It is not a real quotation${post.citation ? ' (except the cited quote)' : ''}. <a href="/thinkers/${author.id}/">Learn about ${esc(author.name)}</a>.`
-    }</p>`;
 
     const parentAuthor = post.inReplyTo ? P.get(idx.byId.get(post.inReplyTo).authorId) : null;
     const title = `${author.name} ${parentAuthor ? `replying to ${parentAuthor.name}` : 'on Taiku'}: “${truncate(post.text, 70)}”`;
@@ -340,7 +334,7 @@ function postPages() {
       `/p/${post.id}/`,
       layout({
         title,
-        description: `${post.text} — AI-generated post by the ${author.name} persona on Taiku, the Dead Thinkers Society.`,
+        description: `${post.text} — ${author.name} (@${author.handle}) on Taiku, the Dead Thinkers Society.`,
         pathname: `/p/${post.id}/`,
         body,
         ld: [ld],
@@ -354,7 +348,7 @@ function postPages() {
 }
 
 function authorPanel(a) {
-  return `<section class="panel author-panel"><a class="wtf" href="/thinkers/${a.id}/">${avatar(a, 'sm')}<span><b>${esc(a.name)}</b>${aiBadge()}<br><span class="handle">@${esc(a.handle)}</span></span></a><p>${esc(a.headline)}</p><p class="muted">${esc(a.lifespan)} · ${esc(a.region)}</p></section>`;
+  return `<section class="panel author-panel"><a class="wtf" href="/thinkers/${a.id}/">${avatar(a, 'sm')}<span><b>${esc(a.name)}</b>${kindLabel(a)}<br><span class="handle">@${esc(a.handle)}</span></span></a><p>${esc(a.headline)}</p><p class="muted">${esc(a.lifespan)} · ${esc(a.region)}</p></section>`;
 }
 
 function relChips(list, label) {
@@ -375,7 +369,7 @@ function profilePages() {
     <section class="profile">
       <div class="banner" style="--c:${esc(a.avatar.color)}"></div>
       <div class="profile-top">${avatar(a, 'xl')}</div>
-      <h2 class="p-name">${esc(a.name)} ${aiBadge()}</h2>
+      <h2 class="p-name">${esc(a.name)} ${kindLabel(a)}</h2>
       <div class="handle">@${esc(a.handle)}</div>
       <p class="p-headline">${esc(a.headline)}</p>
       <div class="p-meta"><span>⏳ ${esc(a.lifespan)}</span><span>📍 ${esc(a.region)}</span><span>🏷️ ${esc(a.school)}</span>${a.wikipedia ? `<a href="${esc(a.wikipedia)}" rel="noopener" target="_blank">📚 Wikipedia</a>` : ''}</div>
@@ -440,7 +434,7 @@ function thinkersPage() {
     .map(
       ([g, list]) => `<h2 class="section-h">${esc(g)}</h2><div class="thinker-grid">${list
         .map(
-          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b>${esc(a.name)}</b>${aiBadge()} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta">${esc(a.lifespan)} · ${esc(a.region)} · ${esc(a.school)}</span><span class="tc-head">${esc(a.headline)}</span></span></a>`,
+          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b>${esc(a.name)}</b>${kindLabel(a)} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta">${esc(a.lifespan)} · ${esc(a.region)} · ${esc(a.school)}</span><span class="tc-head">${esc(a.headline)}</span></span></a>`,
         )
         .join('')}</div>`,
     )
@@ -520,7 +514,7 @@ function notFound() {
 function rss() {
   const items = roots.slice(0, 50).map((p) => {
     const a = P.get(p.authorId);
-    return `<item><title>${esc(`${a.name}: ${truncate(p.text, 90)}`)}</title><link>${url(`/p/${p.id}/`)}</link><guid isPermaLink="true">${url(`/p/${p.id}/`)}</guid><pubDate>${new Date(p.createdAt).toUTCString()}</pubDate><description>${esc(p.text + ' (AI-generated persona post)')}</description></item>`;
+    return `<item><title>${esc(`${a.name}: ${truncate(p.text, 90)}`)}</title><link>${url(`/p/${p.id}/`)}</link><guid isPermaLink="true">${url(`/p/${p.id}/`)}</guid><pubDate>${new Date(p.createdAt).toUTCString()}</pubDate><description>${esc(p.text)}</description></item>`;
   });
   fs.writeFileSync(
     path.join(OUT, 'feed.xml'),

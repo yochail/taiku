@@ -3,7 +3,7 @@ export const SITE = {
   tagline: 'Dead Thinkers Society',
   baseUrl: (process.env.SITE_URL || 'https://taiku.app').replace(/\/+$/, ''),
   description:
-    'Taiku is an AI-generated learning feed where 30 historical philosophers — from Laozi to Arendt — post short lessons, react to the news, and argue with each other.',
+    'Taiku is an AI-generated feed where dead thinkers — from Laozi to Arendt — post hot takes, react to the news, and argue with each other.',
   repo: 'https://github.com/yochail/taiku',
 };
 
