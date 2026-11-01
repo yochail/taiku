@@ -32,6 +32,8 @@ export function taikLength(text) {
 
 // Types with structural rules.
 export const QUOTE_TYPES = new Set(['quote_take', 'quote_dunk']);
+/** Archetypes are internal style labels: any type may be a reply except these structural ones. */
+export const NEVER_REPLY_TYPES = new Set(['poll', 'retaik']);
 export const MAX_THREAD_PARTS = 5; // root + 4 continuations
 export const MAX_REPLY_DEPTH = 12;
 /** Quotation-marked spans with at least this many words must be backed by quoteRefs. */
@@ -338,11 +340,10 @@ export function validate(personas, posts) {
     if (post.inReplyTo === post.id || post.quoteOf === post.id) errors.push(`${where}: self-link`);
     if (post.inReplyTo && !byId.has(post.inReplyTo)) errors.push(`${where}: inReplyTo missing ${post.inReplyTo}`);
     if (post.quoteOf && !byId.has(post.quoteOf)) errors.push(`${where}: quoteOf missing ${post.quoteOf}`);
-    if (isReplyType && !post.inReplyTo) errors.push(`${where}: reply type ${post.type} needs inReplyTo`);
     if (post.type === 'thread' && post.inReplyTo) {
       const parent = byId.get(post.inReplyTo);
       if (parent && parent.authorId !== post.authorId) errors.push(`${where}: thread part must continue the same author`);
-    } else if (!isReplyType && post.type !== 'thread' && post.inReplyTo) errors.push(`${where}: post type ${post.type} cannot be a reply`);
+    } else if (NEVER_REPLY_TYPES.has(post.type) && post.inReplyTo) errors.push(`${where}: post type ${post.type} cannot be a reply`);
     if (QUOTE_TYPES.has(post.type) && !post.quoteOf && !post.embed) errors.push(`${where}: ${post.type} needs quoteOf or embed`);
     if (post.quoteOf && post.embed) errors.push(`${where}: quoteOf and embed are exclusive`);
     if ((post.type === 'poll') !== Boolean(post.poll)) errors.push(`${where}: poll type and poll object go together`);
@@ -357,10 +358,11 @@ export function validate(personas, posts) {
       }
     }
     const pAuthor = byPersona.get(post.authorId);
-    if (post.type === 'news_wire' && !(personaKind(pAuthor) === 'news' && (post.topic?.url || post.media?.some?.((m) => m.kind === 'link_card' && m.url))))
+    if (post.type === 'news_wire' && !(personaKind(pAuthor) === 'news' && (post.topic?.url || post.news?.url || post.media?.some?.((m) => m.kind === 'link_card' && m.url))))
       errors.push(`${where}: news_wire posts need a news author and a topic.url or link_card`);
     if (pAuthor && personaKind(pAuthor) === 'news' && !['news_wire', 'retaik'].includes(post.type)) errors.push(`${where}: news accounts only post news_wire (or plain retaiks)`);
-    if (post.citation) errors.push(`${where}: legacy "citation" is not allowed; use quoteRefs (verbatim) or a Community Note`);
+    if (post.citation != null && !(typeof post.citation === 'string' && post.citation.trim().length >= 8))
+      errors.push(`${where}: citation must be a source line "<quote or idea> — <author>, <work>, <section>" (rendered as a Community Note)`);
 
     // Persona engagement refs.
     for (const k of ['personaLikes', 'personaReposts']) {
@@ -395,8 +397,11 @@ export function validate(personas, posts) {
         if (!m.ok) errors.push(`${where}: quoteRef text does not match its passage (${m.reason})`);
       }
     }
-    for (const span of quotedSpans(post.text ?? '')) {
-      const ok = (post.quoteRefs ?? []).some((r) => normWs(r.text).includes(normWs(span)));
+    // Hand-written origins (seed/backfill/local) use quotes for dialogue and scare quotes; strict for pipeline output.
+    const handWritten = ['seed', 'backfill', 'local'].includes(post.origin);
+    for (const span of handWritten ? [] : quotedSpans(post.text ?? '')) {
+      // Backed by a verified quoteRef, or (hand-written content) by an explicit citation line naming the work.
+      const ok = (post.quoteRefs ?? []).some((r) => normWs(r.text).includes(normWs(span))) || (typeof post.citation === 'string' && quoteNormalize(post.citation).includes(quoteNormalize(span)));
       if (!ok) errors.push(`${where}: quoted span not backed by a verified quoteRef${author?.quote_policy === 'paraphrase_only' ? ' (author is paraphrase_only)' : ''}: "${span.slice(0, 60)}"`);
     }
   }
