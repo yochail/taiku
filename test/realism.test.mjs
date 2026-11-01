@@ -46,11 +46,15 @@ test('classify roles', () => {
 test('media safety rules', () => {
   const pol = spec.media_policy;
   assert.deepEqual(mediaProblems(okImage, pol), []);
-  const commons = { kind: 'image', src: 'https://upload.wikimedia.org/a/b.jpg', alt: 'Painting', rating: 'g', origin: 'commons', credit: { author: 'Raphael', license: 'Public domain', url: 'https://commons.wikimedia.org/wiki/File:b.jpg' } };
-  assert.deepEqual(mediaProblems(commons, pol), []);
-  assert.match(mediaProblems({ ...commons, credit: undefined }, pol).join(), /credit/);
-  assert.match(mediaProblems({ ...commons, src: 'https://evil.example/a.jpg' }, pol).join(), /not allowlisted/);
-  assert.match(mediaProblems({ ...commons, src: 'https://upload.wikimedia.org/page.html' }, pol).join(), /not a media file/);
+  const giphyItem = { kind: 'gif', origin: 'giphy', giphy_id: 'abc123', src: 'https://media2.giphy.com/media/v1.x/abc123/200w.gif?cid=1&rid=200w.gif&ct=g', alt: 'Reaction GIF: slow clap', rating: 'pg', credit: { author: 'someone', license: 'GIPHY Terms of Service', url: 'https://giphy.com/gifs/abc123' }, attribution: 'Powered by GIPHY' };
+  assert.deepEqual(mediaProblems(giphyItem, pol), []);
+  assert.match(mediaProblems({ ...giphyItem, credit: undefined }, pol).join(), /credit/);
+  assert.match(mediaProblems({ ...giphyItem, attribution: undefined }, pol).join(), /Powered by GIPHY/);
+  assert.match(mediaProblems({ ...giphyItem, giphy_id: undefined }, pol).join(), /giphy_id/);
+  assert.match(mediaProblems({ ...giphyItem, rating: 'r' }, pol).join(), /rating/);
+  assert.match(mediaProblems({ ...giphyItem, src: 'https://evil.example/a.gif' }, pol).join(), /not allowlisted/);
+  assert.match(mediaProblems({ ...giphyItem, src: 'https://media.giphy.com/page.html' }, pol).join(), /not a media file/);
+  assert.match(mediaProblems({ ...giphyItem, src: 'https://upload.wikimedia.org/a.jpg' }, pol).join(), /not allowlisted/, 'art is local, not hotlinked');
   assert.match(mediaProblems({ ...okImage, alt: '' }, pol).join(), /alt/);
   assert.match(mediaProblems({ ...okImage, rating: 'r' }, pol).join(), /rating/);
   assert.match(mediaProblems({ ...okImage, origin: 'ai' }, pol).join(), /ai_generated/);
@@ -89,6 +93,7 @@ test('sampler output satisfies its own spec (sampling and metrics stay consisten
     const media = kind === 'none' ? undefined
       : kind === 'poll' ? [{ kind, options: ['a', 'b'] }]
       : kind === 'link_card' ? [{ kind, url: 'https://example.org/n' }]
+      : kind === 'gif' && s.gifSource() === 'giphy' ? [{ kind, origin: 'giphy', giphy_id: `g${i}`, src: `https://media1.giphy.com/media/g${i}/200w.gif`, alt: 'gif', rating: 'pg', credit: { author: 'a', license: 'GIPHY Terms of Service', url: 'https://giphy.com/gifs/x' }, attribution: 'Powered by GIPHY' }]
       : [{ ...okImage, kind }];
     const post = { id: `t${i}`, authorId: author.id, type: 'x', text: 'y'.repeat(len), createdAt: new Date(created).toISOString(), media };
     if (role !== 'original' && posts.length) {
@@ -103,7 +108,7 @@ test('sampler output satisfies its own spec (sampling and metrics stay consisten
   const must = [
     'activity.original_share', 'activity.reply_share', 'activity.quote_share',
     'media.original.visual_share', 'media.original.link_card_share', 'media.original.poll_share', 'media.reply.visual_share',
-    'media.gif_share_of_visual', 'media.safety_violations',
+    'media.gif_share_of_visual', 'media.gif.giphy_share', 'media.safety_violations',
     'length.max_chars', 'length.median_chars', 'length.short_share', 'length.over_140_share', 'length.near_limit_share',
     'time.round_minute_share', 'time.reply_delay_median_min', 'time.replies_before_parent',
     'engagement.likes_gini', 'engagement.top10_like_share', 'engagement.likes_per_repost_median', 'engagement.quotes_per_repost_median',

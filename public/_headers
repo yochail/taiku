@@ -2,8 +2,11 @@
   Cache-Control: public, max-age=86400
 /*.js
   Cache-Control: public, max-age=86400
+/media/*
+  Cache-Control: public, max-age=604800
 /og.png
   Cache-Control: public, max-age=604800
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: img-src 'self' data: https://media.giphy.com https://media0.giphy.com https://media1.giphy.com https://media2.giphy.com https://media3.giphy.com https://media4.giphy.com; object-src 'none'; base-uri 'self'

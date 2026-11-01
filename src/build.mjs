@@ -6,6 +6,7 @@ import path from 'node:path';
 import { ROOT, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
 import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderText, slugify } from './lib/util.mjs';
 import { typeLabel } from './lib/archetypes.mjs';
+import { writeMediaFiles } from './lib/media.mjs';
 
 const OUT = path.join(ROOT, process.env.OUT_DIR || 'dist');
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
@@ -42,6 +43,33 @@ function stats(post) {
   const reposts = Math.round(likes * (0.06 + ((h >>> 10) % 100) / 900));
   const views = likes * (22 + ((h >>> 3) % 40)) + 100;
   return { replies, quotes, likes, reposts, views };
+}
+
+// post id -> resolved media items (filled in at run time, after dist/ is created)
+let mediaByPost = new Map();
+
+function mediaCredit(m) {
+  if (m.origin === 'giphy') return `<a href="${esc(m.credit?.url ?? 'https://giphy.com')}" rel="nofollow noopener" target="_blank">${esc(m.attribution ?? 'Powered by GIPHY')}</a>${m.credit?.author && m.credit.author !== 'GIPHY' ? ` · ${esc(m.credit.author)}` : ''}`;
+  if (m.credit?.url) return `<a href="${esc(m.credit.url)}" rel="nofollow noopener" target="_blank">${esc(m.credit.title ? `${m.credit.title}, ${m.credit.author}` : m.credit.author)}</a> · ${esc(m.credit.license)}`;
+  return m.kind === 'chart' ? 'Chart drawn by Taiku' : '';
+}
+
+function mediaHtml(post) {
+  return (mediaByPost.get(post.id) ?? []).map((m) => {
+    if (m.kind === 'poll') {
+      const h = hash(post.id);
+      const raw = m.options.map((_, i) => 1 + ((h >>> (i * 5)) % 23));
+      const total = raw.reduce((a, b) => a + b, 0);
+      const rows = m.options.map((o, i) => `<li style="--w:${Math.round((raw[i] / total) * 100)}%"><span>${esc(o)}</span><b>${Math.round((raw[i] / total) * 100)}%</b></li>`).join('');
+      return `<div class="poll"><ol>${rows}</ol><span class="poll-note">Simulated votes · poll closed</span></div>`;
+    }
+    if (m.kind === 'link_card') return m.url ? `<a class="news-card" href="${esc(m.url)}" rel="nofollow noopener" target="_blank"><span class="nc-title">${esc(m.title ?? m.url)}</span></a>` : '';
+    if (!m.src) return '';
+    const size = m.width && m.height ? ` width="${m.width}" height="${m.height}"` : '';
+    const badge = m.kind === 'gif' ? '<span class="media-badge">GIF</span>' : '';
+    const credit = mediaCredit(m);
+    return `<figure class="media media-${esc(m.kind)}"><div class="media-frame"><img src="${esc(m.src)}" alt="${esc(m.alt)}" loading="lazy" decoding="async"${size}>${badge}</div>${credit ? `<figcaption>${credit}</figcaption>` : ''}</figure>`;
+  }).join('\n');
 }
 
 function avatar(persona, size = '') {
@@ -90,6 +118,8 @@ function postCard(post, opts = {}) {
     parts.push(`<div class="replying">Replying to <a href="/thinkers/${pa.id}/">@${esc(pa.handle)}</a></div>`);
   }
   parts.push(`<div class="text${focal ? ' text-lg' : ''}">${renderText(post.text, handleMap)}</div>`);
+  const media = mediaHtml(post);
+  if (media) parts.push(media);
   if (post.citation) parts.push(`<div class="cite">📖 Quoted from <cite>${esc(post.citation)}</cite></div>`);
   if (post.news?.title) {
     const host = post.news.source || (post.news.url ? new URL(post.news.url).hostname.replace(/^www\./, '') : 'news');
@@ -534,6 +564,8 @@ function seoFiles() {
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 fs.cpSync(path.join(ROOT, 'public'), OUT, { recursive: true });
+const mediaOut = writeMediaFiles(posts, OUT);
+mediaByPost = mediaOut.byPost;
 feedPages();
 postPages();
 profilePages();
@@ -543,4 +575,4 @@ aboutPage();
 notFound();
 rss();
 seoFiles();
-console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${personas.length} thinkers, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags)`);
+console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${personas.length} thinkers, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags, ${mediaOut.written} rendered media)`);

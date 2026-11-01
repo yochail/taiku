@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT } from './data.mjs';
 import { rng as makeRng } from './util.mjs';
+import { renderProblems } from './media.mjs';
 
 export const SPEC_PATH = path.join(ROOT, 'realism', 'spec.json');
 export const VISUAL_KINDS = new Set(['image', 'gif', 'meme', 'chart', 'video']);
@@ -107,6 +108,13 @@ export function mediaProblems(item, policy) {
     out.push('third-party media without credit {author, license, url}');
   }
   if (item.origin === 'ai' && item.ai_generated !== true) out.push('AI image without ai_generated: true');
+  if (item.origin === 'giphy') {
+    if (!item.giphy_id) out.push('GIPHY media without giphy_id');
+    const attribution = policy.giphy?.attribution ?? 'Powered by GIPHY';
+    if (item.attribution !== attribution) out.push(`GIPHY media without attribution "${attribution}"`);
+    if (!/^https:\/\/media\d?\.giphy\.com\//.test(item.src ?? '')) out.push('GIPHY media must be served from media*.giphy.com');
+  }
+  if (item.render) out.push(...renderProblems(item));
   if (needsSrc) {
     const ratings = policy.ratings;
     const r = item.rating ?? 'unrated';
@@ -137,7 +145,8 @@ export function measure(posts, personas, spec) {
   set('activity.quote_share', share(quotes.length, authored), authored);
 
   // media
-  const kindsOf = (p) => mediaOf(p).map((x) => x.kind);
+  // A news link renders as a link card, so it counts as one.
+  const kindsOf = (p) => [...mediaOf(p).map((x) => x.kind), ...(p.news?.url ? ['link_card'] : [])];
   const hasVisual = (p) => kindsOf(p).some((k) => VISUAL_KINDS.has(k));
   set('media.original.visual_share', share(originals.filter(hasVisual).length, originals.length), originals.length);
   set('media.original.link_card_share', share(originals.filter((p) => kindsOf(p).includes('link_card')).length, originals.length), originals.length);
@@ -145,6 +154,8 @@ export function measure(posts, personas, spec) {
   set('media.reply.visual_share', share(replies.filter(hasVisual).length, replies.length), replies.length);
   const visualItems = posts.flatMap((p) => mediaOf(p)).filter((x) => VISUAL_KINDS.has(x.kind));
   set('media.gif_share_of_visual', share(visualItems.filter((x) => x.kind === 'gif').length, visualItems.length), visualItems.length);
+  const gifs = visualItems.filter((x) => x.kind === 'gif');
+  set('media.gif.giphy_share', share(gifs.filter((x) => x.origin === 'giphy').length, gifs.length), gifs.length);
   const problems = [];
   for (const p of posts) for (const item of mediaOf(p)) for (const pr of mediaProblems(item, spec.media_policy)) problems.push(`${p.id}: ${pr}`);
   set('media.safety_violations', problems.length, posts.length, problems.slice(0, 20));
@@ -319,6 +330,8 @@ export function createSampler(spec = loadSpec(), seed = 'taiku') {
       const views = Math.round(likes * lognormal(e.views_per_like)) + 20;
       return { likes, reposts, quotes, views };
     },
+    /** 'giphy' | 'local' source for a sampled gif */
+    gifSource: () => weighted(rand, Object.entries(s.gif_sources ?? { local: 1 })),
     wantsHashtag: () => rand() < s.hashtag_probability,
     wantsEmoji: () => rand() < s.emoji_probability,
   };

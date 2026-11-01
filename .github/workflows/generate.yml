@@ -41,6 +41,9 @@ jobs:
           LLM_MODEL: ${{ vars.LLM_MODEL }}
           GEN_POSTS: ${{ github.event.inputs.posts || vars.GEN_POSTS || '3' }}
           GEN_REPLIES: ${{ github.event.inputs.replies || vars.GEN_REPLIES || '7' }}
+          # GIPHY beta key: server-side search only (rating=pg-13), capped per run.
+          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+          GIPHY_MAX_CALLS: ${{ vars.GIPHY_MAX_CALLS || '10' }}
         run: npm run generate
 
       - name: Build & check (fail before committing broken content)
