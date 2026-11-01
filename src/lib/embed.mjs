@@ -54,7 +54,12 @@ export function cosineVec(a, b) {
   return na && nb ? d / Math.sqrt(na * nb) : 0;
 }
 
-const withTimeout = (p, ms, what) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(`${what} timed out after ${ms}ms`)), ms).unref?.())]);
+const withTimeout = (p, ms, what) => {
+  // Ref'd timer (an unref'd one lets the loop exit with the race pending); cleared once settled.
+  let t;
+  const timer = new Promise((_, rej) => { t = setTimeout(() => rej(new Error(` timed out after ${ms}ms`)), ms); });
+  return Promise.race([p, timer]).finally(() => clearTimeout(t));
+};
 
 /**
  * Create an embedder. mode: 'auto' (try MiniLM, fall back to none), 'minilm', 'hash', 'none'.
