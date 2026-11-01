@@ -244,6 +244,23 @@ export function findQuotable(p, id) {
   return (p?.quotables ?? []).find((q) => q.id === id) ?? null;
 }
 
+/** Name as shown on the feed: x_profile.display_name (emoji/kaomoji/bio tag) or the plain name. */
+export function displayName(p) {
+  return String(p?.x_profile?.display_name || p?.name || '');
+}
+
+/** A display name must still read as the persona: it contains a word of the real name and no @/URL. */
+export function displayNameProblems(p) {
+  const dn = p?.x_profile?.display_name;
+  if (dn === undefined) return [];
+  const out = [];
+  const words = String(p.name ?? '').toLowerCase().split(/[^\p{L}']+/u).filter((w) => w.length >= 3);
+  if (!words.some((w) => dn.toLowerCase().includes(w))) out.push(`display_name "${dn}" does not contain the persona's name`);
+  if (/@|https?:|\.\w{2,4}\b/.test(dn)) out.push('display_name has a handle or link');
+  if ([...dn].length > 50) out.push('display_name over 50 chars');
+  return out;
+}
+
 function validatePersonas(personas, errors) {
   const schema = loadSchema(ROOT, 'persona');
   const ids = new Set();
@@ -252,6 +269,7 @@ function validatePersonas(personas, errors) {
     for (const e of validateSchema(p, schema)) errors.push(`persona ${p._file}: ${e}`);
     if (personaKind(p) === 'thinker') for (const k of THINKER_FIELDS) if (p[k] === undefined) errors.push(`persona ${p.id}: thinker missing "${k}"`);
     validatePersonaKind(p, errors);
+    for (const e of displayNameProblems(p)) errors.push(`persona ${p.id}: ${e}`);
     for (const t of p.tools ?? []) if (!PERSONA_TOOLS.includes(t)) errors.push(`persona ${p.id}: unknown tool ${t}`);
     for (const img of [p.avatar?.image, p.avatar?.banner, ...Object.values(p.avatar?.srcset ?? {})].filter(Boolean)) {
       if (!fs.existsSync(publicFile(img))) errors.push(`persona ${p.id}: missing image public${img}`);

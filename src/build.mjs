@@ -3,7 +3,7 @@
 // content/posts/*.json, writes indexable HTML to dist/.
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, SITE_DIR, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
+import { displayName, ROOT, SITE_DIR, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
 import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderText, slugify } from './lib/util.mjs';
 import { writeMediaFiles } from './lib/media.mjs';
 import { OUT_DIR } from './lib/site.mjs';
@@ -228,7 +228,7 @@ function kindLabel(a) {
 function postHead(post, author, { focal = false } = {}) {
   const time = `<time datetime="${esc(post.createdAt)}" data-rel>${esc(focal ? longDate(post.createdAt) : shortDate(post.createdAt))}</time>`;
   return `<header class="post-head">
-    <a class="name" href="/thinkers/${author.id}/">${esc(author.name)}</a>${kindLabel(author)}
+    <a class="name" href="/thinkers/${author.id}/">${esc(displayName(author))}</a>${kindLabel(author)}
     <a class="handle" href="/thinkers/${author.id}/" tabindex="-1">@${esc(author.handle)}</a>${focal ? '' : `<span class="dot">·</span><a class="time" href="/p/${post.id}/">${time}</a>`}
   </header>`;
 }
@@ -238,7 +238,7 @@ function quoteEmbed(qid) {
   if (!q) return '';
   const qa = P.get(q.authorId);
   return `<a class="quote-embed" href="/p/${q.id}/">
-    <span class="qe-head">${avatar(qa, 'xs')}<b>${esc(qa.name)}</b> <span class="handle">@${esc(qa.handle)}</span> · ${esc(shortDate(q.createdAt))}</span>
+    <span class="qe-head">${avatar(qa, 'xs')}<b>${esc(displayName(qa))}</b> <span class="handle">@${esc(qa.handle)}</span> · ${esc(shortDate(q.createdAt))}</span>
     <span class="qe-text">${esc(truncate(shownText(q), 260))}</span>
   </a>`;
 }
@@ -246,7 +246,7 @@ function quoteEmbed(qid) {
 function postCard(post, opts = {}) {
   if (post.type === 'retaik' && post.retaikOf && idx.byId.get(post.retaikOf)) {
     const ra = P.get(post.authorId);
-    return `<div class="retaik-row"><div class="retaik-head">${ICONS.repost}<a href="/thinkers/${ra.id}/">${esc(ra.name)}</a> retaiked</div>${postCard(idx.byId.get(post.retaikOf), { ...opts, focal: false, noId: true })}</div>`;
+    return `<div class="retaik-row"><div class="retaik-head">${ICONS.repost}<a href="/thinkers/${ra.id}/">${esc(displayName(ra))}</a> retaiked</div>${postCard(idx.byId.get(post.retaikOf), { ...opts, focal: false, noId: true })}</div>`;
   }
   const { focal = false, connector = false, showReplying = false, participants = false, threadLink = false, compact = false } = opts;
   const author = P.get(post.authorId);
@@ -313,7 +313,7 @@ function followBtn(p, size = '') {
 }
 
 function wtfRow(p) {
-  return `<div class="wtf"><a class="wtf-link" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span class="wtf-names"><b>${esc(p.name)}</b>${kindLabel(p)}<span class="handle">@${esc(p.handle)}</span></span></a>${followBtn(p, 'btn-sm')}</div>`;
+  return `<div class="wtf"><a class="wtf-link" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span class="wtf-names"><b>${esc(displayName(p))}</b>${kindLabel(p)}<span class="handle">@${esc(p.handle)}</span></span></a>${followBtn(p, 'btn-sm')}</div>`;
 }
 
 function whoToFollow(seed, exclude = []) {
@@ -555,7 +555,7 @@ function postPages() {
 }
 
 function authorPanel(a) {
-  return `<section class="panel author-panel"><a class="wtf" href="/thinkers/${a.id}/">${avatar(a, 'sm')}<span><b>${esc(a.name)}</b>${kindLabel(a)}<br><span class="handle">@${esc(a.handle)}</span></span></a><p>${esc(a.headline)}</p><p class="muted">${esc(a.lifespan)} · ${esc(a.region)}</p></section>`;
+  return `<section class="panel author-panel"><a class="wtf" href="/thinkers/${a.id}/">${avatar(a, 'sm')}<span><b>${esc(displayName(a))}</b>${kindLabel(a)}<br><span class="handle">@${esc(a.handle)}</span></span></a><p>${esc(a.headline)}</p><p class="muted">${esc(a.lifespan)} · ${esc(a.region)}</p></section>`;
 }
 
 function relChips(list, label) {
@@ -563,7 +563,7 @@ function relChips(list, label) {
   return `<div class="rel"><h3>${label}</h3>${list
     .map((r) => {
       const o = P.get(r.id);
-      return `<a class="chip" href="/thinkers/${o.id}/" title="${esc(r.why)}">${avatar(o, 'xs')}${esc(o.name)}</a>`;
+      return `<a class="chip" href="/thinkers/${o.id}/" title="${esc(r.why)}">${avatar(o, 'xs')}${esc(displayName(o))}</a>`;
     })
     .join('')}</div>`;
 }
@@ -594,11 +594,11 @@ function profileHeader(a, { count, back = '/thinkers/', backLabel = STR.back } =
   const av = avatar(a, 'xl');
   const banner = `<div class="banner" style="--c:${esc(a.avatar.color)}${a.avatar.banner ? `;background-image:url('${esc(a.avatar.banner)}')` : ''}"></div>`;
   const g = graph;
-  return `<div class="topbar"><a class="back" href="${back}" aria-label="${esc(backLabel)}">←</a><div class="tb-title"><h1>${esc(a.name)}</h1><span class="sub">${plural(count, 'post')}</span></div></div>
+  return `<div class="topbar"><a class="back" href="${back}" aria-label="${esc(backLabel)}">←</a><div class="tb-title"><h1>${esc(displayName(a))}</h1><span class="sub">${plural(count, 'post')}</span></div></div>
     <section class="profile">
       ${a.avatar.banner ? `<button type="button" class="banner-btn" data-zoom="${esc(a.avatar.banner)}" data-zoom-alt="${esc(STR.bannerOf(a.name))}" aria-label="${esc(STR.viewBanner)}">${banner}</button>` : banner}
       <div class="profile-top">${full ? `<button type="button" class="p-avatar-btn" data-zoom="${esc(full)}" data-zoom-alt="${esc(a.name)}" aria-label="${esc(STR.viewPhoto)}">${av}</button>` : av}${followBtn(a, 'follow')}</div>
-      <h2 class="p-name">${esc(a.name)}${kindLabel(a)}</h2>
+      <h2 class="p-name">${esc(displayName(a))}${kindLabel(a)}</h2>
       <div class="handle">@${esc(a.handle)}</div>
       <p class="p-bio">${renderText(a.bio, handleMap)}</p>
       <div class="p-meta">${a.location ? `<span>📍 ${esc(a.location)}</span>` : ''}${a.x_profile?.website ? `<a href="${esc(a.x_profile.website)}" rel="nofollow noopener" target="_blank">🔗 ${esc(new URL(a.x_profile.website).hostname.replace(/^www\./, ''))}</a>` : ''}${a.x_profile?.joined ? `<span>🗓️ ${esc(a.x_profile.joined)}</span>` : ''}</div>
@@ -677,7 +677,7 @@ function profilePages() {
           title: `${STR[kind]} · ${a.name} (@${a.handle})`,
           description: `${a.name}'s ${kind} on Taiku.`,
           pathname: `/thinkers/${a.id}/${kind}/`,
-          header: `<div class="topbar"><a class="back" href="/thinkers/${a.id}/" aria-label="${esc(STR.back)}">←</a><div class="tb-title"><h1>${esc(a.name)}</h1><span class="sub">@${esc(a.handle)}</span></div></div>${tabs}`,
+          header: `<div class="topbar"><a class="back" href="/thinkers/${a.id}/" aria-label="${esc(STR.back)}">←</a><div class="tb-title"><h1>${esc(displayName(a))}</h1><span class="sub">@${esc(a.handle)}</span></div></div>${tabs}`,
           body: rows ? rows + note : `<div class="p-empty"><h2>${esc(STR.noFollows(kind, a.handle))}</h2></div>`,
           aside,
           noindex: true,
@@ -698,7 +698,7 @@ function thinkersPage() {
     .map(
       ([g, list]) => `<h2 class="section-h">${esc(g)}</h2><div class="thinker-grid">${list
         .map(
-          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b>${esc(a.name)}</b>${kindLabel(a)} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta">${esc(a.location ?? '')}</span><span class="tc-head">${esc(a.bio)}</span></span></a>`,
+          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b>${esc(displayName(a))}</b>${kindLabel(a)} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta">${esc(a.location ?? '')}</span><span class="tc-head">${esc(a.bio)}</span></span></a>`,
         )
         .join('')}</div>`,
     )
@@ -837,7 +837,7 @@ function followData() {
     fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify({ v: BUILD_ID, posts: items }));
   }
   const index = Object.fromEntries(
-    personas.map((a) => [a.id, { n: a.name, h: a.handle, b: truncate(a.bio ?? '', 160), a: a.avatar?.srcset?.[96] ?? a.avatar?.image ?? '', c: a.avatar?.color ?? '#64748b', fr: a.x_profile?.followers ?? 0, fg: a.x_profile?.following ?? 0 }]),
+    personas.map((a) => [a.id, { n: displayName(a), h: a.handle, b: truncate(a.bio ?? '', 160), a: a.avatar?.srcset?.[96] ?? a.avatar?.image ?? '', c: a.avatar?.color ?? '#64748b', fr: a.x_profile?.followers ?? 0, fg: a.x_profile?.following ?? 0 }]),
   );
   fs.writeFileSync(path.join(OUT, 'data', 'personas.json'), JSON.stringify({ v: BUILD_ID, personas: index }));
 }

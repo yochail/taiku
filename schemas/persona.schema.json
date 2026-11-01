@@ -665,6 +665,12 @@
     "x_profile": {
       "type": "object",
       "properties": {
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "description": "X-style display name: the persona's name (or part of it) plus emoji, kaomoji or a short bio tag. The handle never changes. Optional; spec.sampling.profile.decorated_name_share sets how many personas carry one."
+        },
         "joined": {
           "type": "string"
         },

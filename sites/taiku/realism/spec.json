@@ -96,6 +96,12 @@
       "_note": "Plain retaiks (repost with no comment) by personas, shown as 'X retaiked' rows. X has 50.7% retweets vs 49.3% authored, about 1.03 per authored post (pfeffer2023). Taiku targets 0.6 so the feed of 30 accounts is not mostly duplicates. Stored as { id, authorId, retaikOf, createdAt, text: '' }.",
       "per_authored": 0.6
     },
+    "profile": {
+      "_note": "X display-name tradition: some accounts decorate the name with emoji, kaomoji or ASCII, or a short bio-style tag after a bar ('Kant | 3:30pm walks'). The handle never changes. The share is a product choice from browsing X; no measured source was found. Stored in persona x_profile.display_name.",
+      "decorated_name_share": 0.33,
+      "bio_tag_share_of_decorated": 0.1,
+      "confidence": "low (product choice)"
+    },
     "mentions": {
       "_note": "Non-leading @mentions written into the text (tagging someone mid-post, co-mentions). A reply's leading @ to its parent is the 'Replying to' header and is not counted. Role rates from boyd2010 (~5% of all tweets carry a non-leading mention) and huberman2008. Count (co-mentions), target weights and persona multipliers are product choices with no verified source.",
       "rate": { "original": 0.06, "reply": 0.05, "quote": 0.08 },
@@ -151,6 +157,7 @@
     "time.replies_before_parent": { "min": 0, "max": 0, "severity": "fail", "confidence": "hard rule", "sources": [] },
 
     "text.hashtag_share": { "_def": "share of posts with text that contain a #hashtag", "min": 0.01, "max": 0.12, "target": 0.05, "min_n": 30, "severity": "warn", "confidence": "medium (5% boyd2010, 10.1% suh2010)", "sources": ["boyd2010", "suh2010"] },
+    "profile.decorated_name_share": { "_def": "share of personas whose shown name carries emoji/kaomoji/ASCII or a bio tag", "min": 0.25, "max": 0.35, "target": 0.33, "min_n": 20, "severity": "warn", "confidence": "low (product choice)", "sources": [] },
     "text.mention_share": { "_def": "share of posts with text that @mention a persona outside a leading reply @", "min": 0.02, "max": 0.12, "target": 0.055, "min_n": 30, "severity": "warn", "confidence": "medium (~5% boyd2010)", "sources": ["boyd2010", "huberman2008"] },
     "text.co_mention_share": { "_def": "of posts with a non-leading mention, share naming 2+ handles", "min": 0.0, "max": 0.45, "target": 0.2, "min_n": 15, "severity": "warn", "confidence": "low (product choice)", "sources": [] },
     "text.emoji_share": { "min": 0.06, "max": 0.35, "target": 0.15, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["kehoe2018"] },

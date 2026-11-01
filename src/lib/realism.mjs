@@ -293,6 +293,8 @@ export function measure(allPosts, personas, spec) {
 
   // text
   set('text.hashtag_share', share(posts.filter((p) => HASHTAG.test(p.text ?? '')).length, posts.length), posts.length);
+  const decorated = personas.filter((p) => /[^\p{L}\p{M}\p{N}\s.,'’()&-]/u.test(p.x_profile?.display_name || p.name || ''));
+  set('profile.decorated_name_share', share(decorated.length, personas.length), personas.length);
   const knownHandles = new Set(personas.map((p) => String(p.handle ?? '').toLowerCase()).filter(Boolean));
   const mentionCounts = posts.map((p) => textMentions(p.text, knownHandles).length);
   const mentioning = mentionCounts.filter((n) => n > 0);
