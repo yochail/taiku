@@ -5,7 +5,7 @@
     {
       "id": "bf20261024-1",
       "authorId": "oracle_breaking",
-      "type": "news_take",
+      "type": "news_wire",
       "text": "🚨 BREAKING: Yellow vests return in second wave of protests across France / About 410,000 march, more than 1,000 arrested; clashes also reported in Italy, Albania and Barcelona.",
       "createdAt": "2026-10-24T08:05:00Z",
       "inReplyTo": null,
@@ -225,7 +225,7 @@
     {
       "id": "bf20261024-8",
       "authorId": "delphi_trends",
-      "type": "quote_post",
+      "type": "news_wire",
       "text": "📈 Trending: #GiletsJaunes, #FlamingoRevolution (Albania), Barcelona. Protest-related posts up across France, Italy, Albania and Spain today.",
       "createdAt": "2026-10-24T12:00:00Z",
       "inReplyTo": null,
@@ -233,7 +233,11 @@
       "tags": [
         "trending"
       ],
-      "news": null,
+      "news": {
+        "title": "France protests: second wave of mass demonstrations; unrest in Italy, Albania and Spain",
+        "url": "https://www.theguardian.com/world/live/2026/oct/24/france-demonstrations-police-macron-italy-albania-belgium-spain-ukraine-russia-europe-latest-news",
+        "source": "The Guardian"
+      },
       "citation": null,
       "origin": "backfill"
     },
@@ -638,7 +642,7 @@
     {
       "id": "bf20261024-9",
       "authorId": "agora_daily",
-      "type": "news_take",
+      "type": "news_wire",
       "text": "British Columbia Conservatives win snap election, forming government for the first time in nearly a century and ending nine years of NDP rule. Premier David Eby resigns as party leader.",
       "createdAt": "2026-10-24T23:05:00Z",
       "inReplyTo": null,

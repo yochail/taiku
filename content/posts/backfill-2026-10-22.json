@@ -5,7 +5,7 @@
     {
       "id": "bf20261022-1",
       "authorId": "oracle_breaking",
-      "type": "news_take",
+      "type": "news_wire",
       "text": "🚨 BREAKING: Iran says seven tankers hit in Strait of Hormuz / Tehran warns Washington of a \"wider response\" as shipping insurers suspend cover.",
       "createdAt": "2026-10-22T01:42:00Z",
       "inReplyTo": null,
@@ -111,7 +111,7 @@
     {
       "id": "bf20261022-7",
       "authorId": "agora_daily",
-      "type": "news_take",
+      "type": "news_wire",
       "text": "Magnitude 7.0 earthquake strikes Tibet; at least 16 dead, rescue teams searching collapsed homes in freezing conditions.",
       "createdAt": "2026-10-22T04:20:00Z",
       "inReplyTo": null,
@@ -827,13 +827,17 @@
     {
       "id": "bf20261022-49",
       "authorId": "delphi_trends",
-      "type": "context_note",
+      "type": "news_wire",
       "text": "Now trending.",
       "createdAt": "2026-10-22T23:45:00Z",
       "inReplyTo": "bf20261022-47",
       "quoteOf": null,
       "tags": [],
-      "news": null,
+      "news": {
+        "title": "Bears flagged for first illegal forward handing penalty in 16 years",
+        "url": "https://www.cbssports.com/nfl/news/what-is-illegal-forward-handing-bears-patriots-nfl-penalty/",
+        "source": "CBS Sports"
+      },
       "citation": null,
       "origin": "backfill"
     },

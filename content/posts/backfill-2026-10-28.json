@@ -5,7 +5,7 @@
     {
       "id": "bf20261028-1",
       "authorId": "agora_daily",
-      "type": "news_take",
+      "type": "news_wire",
       "text": "Israel election results: Prime Minister Benjamin Netanyahu's Likud-led coalition wins a plurality of Knesset seats, but no bloc reaches a majority, leaving government formation unclear.",
       "createdAt": "2026-10-28T00:30:00Z",
       "inReplyTo": null,
@@ -206,7 +206,7 @@
     {
       "id": "bf20261028-13",
       "authorId": "oracle_breaking",
-      "type": "news_take",
+      "type": "news_wire",
       "text": "🚨 BREAKING: High-speed trains collide in Toledo province, Spain / At least 69 people killed and 179 injured after two trains carrying 544 passengers collided between Los Yébenes and Urda.",
       "createdAt": "2026-10-28T07:30:00Z",
       "inReplyTo": null,
@@ -324,20 +324,24 @@
     {
       "id": "bf20261028-21",
       "authorId": "delphi_trends",
-      "type": "context_note",
+      "type": "news_wire",
       "text": "📊",
       "createdAt": "2026-10-28T11:15:00Z",
       "inReplyTo": "bf20261028-20",
       "quoteOf": null,
       "tags": [],
-      "news": null,
+      "news": {
+        "title": "Canada hikes rates to contain oil price surge caused by Iran war",
+        "url": "https://www.afp.com/en/canada-hikes-rates-contain-oil-price-surge-caused-iran-war",
+        "source": "AFP"
+      },
       "citation": null,
       "origin": "backfill"
     },
     {
       "id": "bf20261028-22",
       "authorId": "delphi_trends",
-      "type": "news_take",
+      "type": "news_wire",
       "text": "📈 Trending: Jio IPO. Jio Platforms raises US$3.2 billion in India's largest-ever IPO, drawing about $77 billion in bids ahead of its Mumbai debut.",
       "createdAt": "2026-10-28T11:45:00Z",
       "inReplyTo": null,
@@ -383,7 +387,7 @@
     {
       "id": "bf20261028-25",
       "authorId": "agora_daily",
-      "type": "news_take",
+      "type": "news_wire",
       "text": "UN General Assembly adopts resolution calling for an end to the US embargo on Cuba, 130 votes to 17 with 25 abstentions, its weakest support since 1995.",
       "createdAt": "2026-10-28T13:00:00Z",
       "inReplyTo": null,
