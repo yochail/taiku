@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { POST_ARCHETYPES, REPLY_ARCHETYPES, ALL_TYPES } from './archetypes.mjs';
 import { validateSchema, loadSchema } from './schema.mjs';
+import { findTells } from './tells.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const PERSONAS_DIR = path.join(ROOT, 'personas');
@@ -165,7 +166,8 @@ const THINKER_FIELDS = ['lifespan', 'region', 'school', 'core_ideas', 'key_works
 
 
 // thinker = real deceased person; parody = fictional/joke account; news = neutral fictional newswire.
-export const PERSONA_KINDS = ['thinker', 'parody', 'news'];
+// fictional = public-domain literary character as a philosopher (e.g. Milne's Pooh); shown with the Parody label.
+export const PERSONA_KINDS = ['thinker', 'fictional', 'parody', 'news'];
 export const HANDLE_RE = /^[A-Za-z0-9_]{4,15}$/;
 export const PERSONA_DOMAINS = ['philosophy', 'science', 'mathematics', 'technology', 'psychology', 'economics', 'strategy', 'politics', 'literature', 'arts', 'religion', 'medicine'];
 export const REACTION_STANCES = ['agree', 'disagree', 'mock', 'awe', 'confused', 'hype'];
@@ -219,6 +221,18 @@ function validatePersonaKind(p, errors) {
   if (kind === 'news' && p.post_archetypes && !(p.post_archetypes.length === 1 && p.post_archetypes[0] === 'news_wire')) e('news accounts must use only the news_wire post archetype');
   if (kind !== 'news' && p.post_archetypes?.includes('news_wire')) e('only news accounts may use news_wire');
   if (p.sources && !p.sources.some((s) => s.reading_list)) e('at least one source must have reading_list: true');
+  if (kind === 'thinker' && p.temperament === undefined) e('thinker missing "temperament"');
+  if (p.temperament !== undefined) {
+    const t = p.temperament;
+    if (!(Number.isInteger(t?.heat) && t.heat >= 1 && t.heat <= 5)) e('temperament.heat must be 1-5');
+    for (const k of ['baseline', 'when_triggered', 'when_losing']) if (typeof t?.[k] !== 'string' || !t[k].trim()) e(`temperament.${k} required`);
+    if (!(Array.isArray(t?.triggers) && t.triggers.length >= 3)) e('temperament.triggers needs ≥3');
+    if (!(Array.isArray(t?.emotional_range) && t.emotional_range.length >= 4)) e('temperament.emotional_range needs ≥4 emotions');
+  }
+  if (kind !== 'news') {
+    (p.sample_posts ?? []).forEach((s, i) => { const t = findTells(s); if (t.length) e(`sample_posts[${i}] has AI tells: ${t.join(', ')}`); });
+    (Array.isArray(p.reaction_pool) ? p.reaction_pool : []).forEach((x, i) => { const t = findTells(x?.text ?? x?.meme_template ?? ''); if (t.length) e(`reaction_pool[${i}] has AI tells: ${t.join(', ')}`); });
+  }
 }
 
 /** Public-domain/verified quotable passage lookup: quote_bank (local source spans) + quotables (content-lead verified lines). */

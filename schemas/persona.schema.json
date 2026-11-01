@@ -28,6 +28,7 @@
     "kind": {
       "enum": [
         "thinker",
+        "fictional",
         "parody",
         "news"
       ],
@@ -707,6 +708,10 @@
       "items": {
         "type": "object"
       }
+    },
+    "temperament": {
+      "type": "object",
+      "description": "Emotional profile (content lead): heat 1-5, baseline, triggers[≥3], when_triggered, when_losing, emotional_range[≥4]. Drives prompts; never rendered."
     }
   }
 }

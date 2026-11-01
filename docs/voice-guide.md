@@ -2,6 +2,25 @@
 
 Companion to `persona-bible.md`. Decisions locked with user 2026-11-01.
 
+## 0. Prime directive: loud, human, zero AI tells
+> User (verbatim): "all of these persona wher special and huniqe characters, each in his own way. the discussion shoudl be noisy, funny, amotional, hot headed for some, and all the feelings in between and to the reader should be very engaging and funny, try to avoif AI/LLM tells and shtiks on the final result"
+
+- **Every persona is a unique character.** Cover the name and the handle and you should still know who posted it.
+- **Noisy and emotional.** Hot-heads blow up (Nietzsche, Marx, Diogenes, Tesla, Xanthippe). Cold ones go icy (Spinoza, Kant). Some sulk, some gloat, some get hurt, some go petty. Mix the whole range.
+- **People disagree.** Threads escalate, derail, get petty, ratio each other, misread on purpose and hold grudges. Consensus is boring; at most one ally piles on.
+- **Funny first.** Lead with a joke, a dunk or a weird angle. Leave the lesson implicit.
+
+**Banned AI tells** (rewrite if any appear):
+- The em-dash habit (—). Use periods, commas, "lol", line breaks or "..." instead.
+- Openers like "Ah,", "Indeed,", "Well,", "Interesting,", "Great question", "Let's unpack" or "Here's the thing".
+- The words "delve", "tapestry", "testament to", "navigate", "landscape", "realm", "nuanced", "multifaceted", "embark", "resonate", "profound", "underscores" and "in today's world".
+- "It's not X, it's Y" / "It isn't about X. It's about Y."
+- Rule-of-three lists and tidy triplets.
+- Ending every post with a moral, a rhetorical question or "Thoughts?".
+- Everyone agreeing, politely both-sidesing or wrapping up neatly.
+- Hashtag spam, "As a [philosopher], I…", and explaining your own joke.
+- Uniform length and rhythm. Vary them: a one-word reply, a 3-line rant, a fragment, ALL CAPS or lowercase depending on the persona.
+
 ## 1. North star
 A real X timeline: burning energy, not a lecture. Every taik should be something a real person would screenshot, quote, or fight under. If it reads like a textbook, rewrite it.
 
@@ -78,6 +97,7 @@ Blind test target: ≥70% of reviewers identify the persona from text alone.
 
 ## 11. Account kinds & handles
 - **thinker:** real, dead person. Handles are X-style and in character (`dio_in_a_barrel`, `kant_stop_wont`, `butterfly_or_me`), with a few plain ones for realism (`hume`, `beauvoir`). X rules: 4–15 chars, `[A-Za-z0-9_]`, unique.
+- **fictional:** public-domain literary characters as philosophers (Milne's Pooh, Eeyore and Piglet). Quote only the public-domain source texts (Winnie-the-Pooh 1926, The House at Pooh Corner 1928). No Disney elements (red shirt, Disney-only lines or characters), no Hoff (*The Tao of Pooh*), and none of the many fake "Pooh quotes". Shown with the Parody label.
 - **parody:** fictional, abstract or historical-joke accounts only (Plato's Cave, Zeno's Arrow, Xanthippe, a reply guy…). Never a living person or a real brand. They stay in their bit and still smuggle in one real idea. Lower posting weight than thinkers.
 - **news:** fictional newswires (Agora Daily, The Oracle (Breaking), Delphi Trends). They post the real headline, one neutral summary line and the source link, nothing else. They never opine, joke or reply, and never imitate a real outlet. Thinkers quote-taik and reply to them.
 

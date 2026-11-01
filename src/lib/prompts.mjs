@@ -44,6 +44,7 @@ export function compactProfile(persona, byId = new Map()) {
     voice: { style: v.style, tone: v.tone, formatting: v.formatting, tics: pick(v.tics, 4), do: pick(v.do, 4), dont: pick(v.dont, 4) },
     signature_moves: pick(persona.signature_moves, 4),
     modernity: MODERNITY[persona.modernity ?? 3],
+    ...(persona.temperament ? { temperament: { heat: `/5`, baseline: persona.temperament.baseline, triggers: pick(persona.temperament.triggers, 5), when_triggered: persona.temperament.when_triggered, when_losing: persona.temperament.when_losing, emotional_range: persona.temperament.emotional_range } } : {}),
     never: pick(persona.never, 5),
     sensitive_notes: pick(persona.sensitive_notes, 3),
     native_phrases: pick(persona.native_language?.phrases, 6).map((p) => `${p.text} = ${p.translation}`),
