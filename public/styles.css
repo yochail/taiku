@@ -158,7 +158,7 @@ a:hover { text-decoration: underline; }
 .profile { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
 .banner { --c: #64748b; height: 150px; background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 40%, #000)); background-size: cover; background-position: center; }
 img.avatar { object-fit: cover; padding: 0; background: var(--c, #64748b); }
-.credit { color: var(--muted); font-size: 12px; margin-top: 16px; }
+.credit { color: var(--muted); font-size: 12px; margin: 16px 16px 12px; overflow-wrap: anywhere; }
 .profile-top { padding: 0 16px; margin-top: -64px; }
 .profile .p-name { margin: 8px 16px 0; font-size: 22px; }
 .profile .handle { margin: 0 16px; }
@@ -193,7 +193,7 @@ img.avatar { object-fit: cover; padding: 0; background: var(--c, #64748b); }
   .rightbar { display: none; }
 }
 @media (max-width: 640px) {
-  .shell { grid-template-columns: 1fr; }
+  .shell { grid-template-columns: minmax(0, 1fr); }
   .leftnav { position: fixed; bottom: 0; top: auto; left: 0; right: 0; height: auto; flex-direction: row; justify-content: space-around; padding: 4px; background: var(--bg); border-top: 1px solid var(--line); z-index: 20; }
   .leftnav a, .theme-toggle, .nav-btn { padding: 10px; font-size: 20px; }
   .brand { margin: 0; }
@@ -234,7 +234,7 @@ button.act { background: none; border: 0; font: inherit; cursor: pointer; border
 :root[data-welcomed='1'] .intro.welcome { display: none; }
 .profile-top { display: flex; justify-content: space-between; align-items: flex-end; }
 .profile-top .follow { margin-bottom: 8px; }
-.p-bio { margin: 10px 0 6px; white-space: pre-line; }
+.p-bio { margin: 10px 16px 8px; white-space: pre-line; overflow-wrap: anywhere; }
 .p-stats b { color: var(--fg); }
 .p-tabs { display: flex; border-bottom: 1px solid var(--line); }
 .p-tabs span { flex: 1; text-align: center; padding: 14px 0; color: var(--muted); font-weight: 600; }
@@ -244,3 +244,19 @@ button.act { background: none; border: 0; font: inherit; cursor: pointer; border
 .retaik-head a { color: inherit; }
 .retaik-row > .post { border-top: 0; }
 .media-chart .alt-badge { left: auto; bottom: auto; top: 8px; right: 8px; }
+
+/* Profile header on phones: X proportions (3:1 banner, 80px avatar overlapping by half, 16px gutters). */
+.center { min-width: 0; }
+.profile .p-name, .profile .handle, .p-headline, .p-meta, .p-stats { overflow-wrap: anywhere; }
+@media (max-width: 500px) {
+  .banner { height: auto; aspect-ratio: 3 / 1; }
+  .profile-top { margin-top: -44px; padding: 0 16px; align-items: flex-end; gap: 12px; }
+  .profile-top .avatar.xl { width: 88px; height: 88px; font-size: 44px; border-width: 4px; }
+  .profile-top .follow { margin-bottom: 0; }
+  .profile .p-name { margin: 10px 16px 0; font-size: 20px; line-height: 1.2; }
+  .profile .handle { margin: 2px 16px 0; font-size: 15px; }
+  .p-bio { margin: 12px 16px; font-size: 15px; }
+  .p-meta { margin: 0 16px 10px; gap: 4px 12px; font-size: 15px; }
+  .p-stats { margin: 0 16px; font-size: 14px; }
+  .p-tabs span { padding: 14px 4px; font-size: 15px; }
+}
