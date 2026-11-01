@@ -44,9 +44,16 @@ function stats(post) {
   return { replies, quotes, likes, reposts, views };
 }
 
+const AVATAR_PX = { xs: 20, sm: 40, '': 40, md: 48, lg: 48, xl: 120 };
 function avatar(persona, size = '') {
   const a = persona.avatar ?? {};
-  if (a.image) return `<img class="avatar ${size}" src="${esc(a.image)}" alt="" width="400" height="400" loading="lazy" decoding="async">`;
+  if (a.image) {
+    const px = AVATAR_PX[size] ?? 40;
+    const set = Object.entries(a.srcset ?? {}).map(([w, u]) => `${esc(u)} ${w}w`).join(', ');
+    const src = a.srcset?.[96] ?? a.image;
+    const attrs = set ? ` srcset="${set}" sizes="${px}px"` : '';
+    return `<img class="avatar ${size}" src="${esc(src)}"${attrs} alt="" width="${px}" height="${px}" loading="${size === 'xl' ? 'eager' : 'lazy'}" decoding="async">`;
+  }
   return `<span class="avatar ${size}" style="--c:${esc(a.color || '#64748b')}" aria-hidden="true">${esc(a.emoji || a.initials || persona.name[0])}</span>`;
 }
 
