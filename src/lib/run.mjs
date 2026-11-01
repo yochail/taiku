@@ -21,7 +21,8 @@ import { crowdFor, loadDistribution } from './crowd.mjs';
 import { createSampler, replyFormOf } from './realism.mjs';
 import { planMedia } from './media.mjs';
 import { createGiphyClient } from './giphy.mjs';
-import { calibrate, cascade, createReactor } from './react.mjs';
+import { MAX_DEPTH, calibrate, cascade, createReactor, relationOf } from './react.mjs';
+import { mentionDebts, mentionDecision } from './followon.mjs';
 import { mentionTargets } from './tags.mjs';
 import { FEEDS, domainOf, fetchPool, fixtureFetch, sanitizeUntrusted } from './news.mjs';
 import { selectTopics, topicCount } from './topics.mjs';
@@ -139,7 +140,7 @@ function pickType(rand, persona, node, media) {
  * the budget's content plan, then the reaction cascade (with reply forms). `exec` says how each
  * node is generated: wire | single | thread | openers | originals | full | short | pool.
  */
-export function planDay({ personas, spec, topics, date, seed, nonce, tz, content, formFn = null, affinityFn = null, calibrationFile = null, writeCalibration = false }) {
+export function planDay({ personas, spec, topics, date, seed, nonce, tz, content, formFn = null, affinityFn = null, calibrationFile = null, writeCalibration = false, past = [], postIdOf = (id) => id }) {
   const day = editorialDay(date, tz);
   const rand = seededRng('plan', seed, nonce);
   const sampler = createSampler(spec, `plan:${seed}:${nonce}`);
@@ -221,13 +222,66 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
   const reactor = createReactor({ personas, spec, seed: `${date}:${seed}`, nonce, calibration: cal, llmCap, formFn, affinityFn });
   for (const n of nodes) if (n.kind !== 'wire') reactor.spend(n.authorId);
   for (const [wire, o] of opens) reactor.force(wire, o.authorId, o.role, 'topic-opener', o.createdAt);
-  const all = cascade(reactor, nodes, { horizon: day.end + 2 * 3.6e6, personas });
+  const horizon = day.end + 2 * 3.6e6;
+  // Past posts that get a reaction today enter the plan as 'external' nodes (already written, never re-emitted).
+  const externals = new Map();
+  const extNode = (post) => {
+    if (!externals.has(post.id)) {
+      const a = pById.get(post.authorId);
+      const key = Object.entries(a?.topic_affinity ?? { philosophy: 1 }).sort((x, y) => y[1] - x[1])[0]?.[0] ?? 'philosophy';
+      externals.set(post.id, node({ id: `x-${post.id}`, authorId: post.authorId, createdAt: Date.parse(post.createdAt), vector: { [key]: 1 }, role: 'original', kind: 'external', exec: 'external', external: post }));
+    }
+    return externals.get(post.id);
+  };
+  const reactionNode = (parent, pid, action, at, reason) => {
+    const persona = pById.get(pid);
+    const f = formFn ? formFn(persona, action, parent) : { form: 'full', cheap: false };
+    reactor.force(parent, pid, action, reason, at);
+    const n = node({
+      id: `${parent.id}.${reason === 'mention' ? 'm' : 'f'}-${pid}`,
+      authorId: pid,
+      createdAt: at,
+      vector: parent.vector,
+      topicId: parent.kind === 'external' ? null : parent.topicId,
+      depth: (parent.depth ?? 0) + 1,
+      role: action,
+      parent: action === 'reply' ? parent.id : null,
+      quoteOf: action === 'quote' ? parent.id : null,
+      rel: relationOf(persona, pById.get(parent.authorId)),
+      form: f.form,
+      cheap: f.cheap,
+      exec: f.cheap ? 'pool' : f.form === 'short' ? 'short' : 'full',
+      followOn: reason,
+    });
+    n.mentions.add(parent.authorId);
+    return n;
+  };
+  // Mention reactions owed by earlier days (stateless: same seeded draw as on the day of the post).
+  const carried = mentionDebts({ past, personas, spec, start: day.start, end: day.end }).map((e) => reactionNode(extNode(e.post), e.personaId, e.action, e.at, e.reason));
+  const all = cascade(reactor, [...nodes, ...carried], { horizon, personas });
   for (const n of all) {
     if (n.exec) continue;
     n.exec = n.cheap ? 'pool' : n.form === 'short' ? 'short' : 'full';
     n.form ??= 'full';
   }
   for (const n of all) if ((n.role === 'reply' || n.role === 'quote') && n.exec !== 'pool' && !n.textMentions) tagNode(n, n.role, n.form === 'short' ? 1 : 3);
+  // Mention → reaction (spec.sampling.mention_response): every @mentioned persona gets one seeded
+  // outcome. Replies/quotes landing before the horizon run today; later ones are carried by tomorrow's run.
+  const answered = new Set(all.filter((x) => x.parent || x.quoteOf).map((x) => `${x.parent ?? x.quoteOf}:${x.authorId}`));
+  for (const n of [...all]) {
+    if (!n.textMentions?.length || (n.depth ?? 0) >= MAX_DEPTH) continue;
+    for (const mid of n.textMentions) {
+      const persona = pById.get(mid);
+      if (!persona || isNews(persona) || mid === n.authorId || answered.has(`${n.id}:${mid}`)) continue;
+      const d = mentionDecision(spec, persona, postIdOf(n.id), pById.get(n.authorId));
+      if (d.action === 'like' && !n.likes.includes(mid)) n.likes.push(mid);
+      const at = n.createdAt + d.delayMin * 6e4;
+      if ((d.action !== 'reply' && d.action !== 'quote') || at > horizon) continue;
+      answered.add(`${n.id}:${mid}`);
+      all.push(reactionNode(n, mid, d.action, at, 'mention'));
+    }
+  }
+  all.push(...externals.values());
   // Self-thread: continuation parts by the same author, a minute or two apart (same depth level).
   for (const n of all.filter((x) => x.exec === 'thread' && x.kind === 'thread')) {
     let prev = n;
@@ -437,14 +491,16 @@ export async function runDaily(opts = {}) {
     const f = formSampler.replyForm(action === 'quote' ? 'quote' : 'reply', persona);
     return { form: f.form, cheap: CHEAP_FORMS.has(f.form) };
   };
-  const plan = planDay({ personas, spec, topics, date, seed, nonce, tz, content, formFn, affinityFn, calibrationFile: path.join(root, 'content', 'state', 'calibration.json'), writeCalibration: !dryRun && !mock });
   const prefix = `${mock ? 'm' : paths.suffix === '-cf' ? 'c' : 'd'}${date.replace(/-/g, '')}`;
   const postIdOf = (taskId) => `${prefix}-${hash8(`${date}:${taskId}`)}`;
+  const others = loadOtherPosts(paths.postsDir, [paths.posts]);
+  const plan = planDay({ personas, spec, topics, date, seed, nonce, tz, content, formFn, affinityFn, calibrationFile: path.join(root, 'content', 'state', 'calibration.json'), writeCalibration: !dryRun && !mock, past: others, postIdOf });
   const nodeById = new Map(plan.nodes.map((n) => [n.id, n]));
   const hasPassages = (p) => (p.quotables ?? []).length + (p.quote_bank ?? []).length + (p.sources ?? []).filter((s) => s.local).length > 0;
   const gClient = !offline && schemaAllowsGiphy() ? createGiphyClient({ apiKey: env.GIPHY_API_KEY, maxCalls: Number(env.GIPHY_MAX_CALLS || 10) }) : null;
   const giphy = gClient?.enabled ? gClient : null;
-  const tasks = plan.nodes.map((n) => {
+  const externalTasks = plan.nodes.filter((n) => n.kind === 'external').map((n) => ({ taskId: n.id, kind: 'external', role: 'original', exec: 'external', level: -1, personaId: n.authorId, postId: n.external.id, parentTaskId: null, topicId: null, at: n.external.createdAt, status: 'done', fields: { text: n.external.text ?? '' }, stance: n.external.stance ?? null, source: 'corpus' }));
+  const tasks = plan.nodes.filter((n) => n.kind !== 'external').map((n) => {
     const persona = byId.get(n.authorId);
     const spec1 = taskSpec({ node: n, persona, topic: topicById.get(n.topicId), sampler: plan.sampler, rand: plan.rand, postId: postIdOf(n.id), hasPassages: hasPassages(persona), giphy });
     if (n.role === 'reply' && n.exec !== 'pool' && plan.rand() < 0.3) spec1.mention = byId.get(nodeById.get(n.parent)?.authorId)?.handle ?? null;
@@ -479,8 +535,8 @@ export async function runDaily(opts = {}) {
   const work = workDoc && workDoc.nonce === nonce ? workDoc.results ?? {} : {};
   const policyCtx = policyContext(personas, { allowNames: String(env.POLICY_ALLOW_NAMES ?? '').split(',').map((s) => s.trim()).filter(Boolean) });
   const newsPool = (topicsDoc.pool ?? []).length ? topicsDoc.pool : topics.map((t) => ({ id: t.id, title: t.title, domain: t.domain }));
-  const taskById = new Map(tasks.map((t) => [t.taskId, t]));
-  const textOf = new Map();
+  const taskById = new Map([...externalTasks, ...tasks].map((t) => [t.taskId, t]));
+  const textOf = new Map(externalTasks.map((t) => [t.taskId, t.fields.text]));
   const blockedTopics = new Map();
   const turnRand = seededRng('turn', seed, nonce);
   const tracker = createStyleTracker();
@@ -508,7 +564,7 @@ export async function runDaily(opts = {}) {
     }
     return out;
   };
-  const postToTask = new Map(tasks.map((t) => [t.postId, t.taskId]));
+  const postToTask = new Map([...externalTasks, ...tasks].map((t) => [t.postId, t.taskId]));
   const threadFn = (postId) => chain(postToTask.get(postId) ?? '', 6);
   const topicCtx = (topic) => (topic ? { id: topic.id, title: topic.title, domain: topic.domain || domainOf(topic.url ?? '') || topic.source } : null);
   const ctxFor = (t) => {
@@ -829,7 +885,6 @@ export async function runDaily(opts = {}) {
 
   // 9) Split published vs staged, then validate the whole corpus.
   const stagedTopic = (id) => !publish || topicById.get(id)?.tier === 'community';
-  const others = loadOtherPosts(paths.postsDir, [paths.posts]);
   const otherIds = new Set(others.map((p) => p.id));
   const fresh = allPosts.filter((p) => !otherIds.has(p.id)); // already promoted elsewhere → never duplicate
   // Staging is closed downward: anything replying to / quoting / retaiking a staged post is staged too.

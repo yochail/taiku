@@ -111,6 +111,14 @@
       "confidence": { "rate": "medium", "count": "low (product choice)", "targets": "low (product choice)", "persona": "low (product choice)" },
       "sources": ["boyd2010", "huberman2008"]
     },
+    "mention_response": {
+      "_note": "What a persona does when @mentioned in someone's text (a notification). One outcome per (post, mentioned persona), seeded by both ids so the next day's run can recompute it: reply | quote | like | ignore, after a lognormal delay (median 35 min; the tail crosses into the next day). Action weights are a product choice (no measured source for reply-to-mention rates); talk = (base + clapback·clapback_rate)·(0.7 + 0.15·heat)/1.15 multiplies reply and quote, ignore is scaled by max(0.2, 1.4 − clapback_rate), and the relation to the author tilts the mix. Delay shape follows reply_delay_minutes (kwak2010: most reactions within an hour, a long tail over days).",
+      "actions": { "reply": 0.42, "quote": 0.08, "like": 0.3, "ignore": 0.2 },
+      "persona": { "base": 0.6, "clapback": 0.8 },
+      "relation": { "rival": { "reply": 1.4, "quote": 1.5, "like": 0.4 }, "frenemy": { "reply": 1.2, "quote": 1.2 }, "ally": { "like": 1.6, "quote": 0.6 } },
+      "delay_minutes": { "lognormal": { "median": 35, "sigma": 1.5 }, "max": 2880 },
+      "confidence": "low (product choice)"
+    },
     "hashtags": {
       "_note": "Hashtags written into the text. Originals follow suh2010 (10.1%); replies and quotes use fewer, so the corpus share lands near boyd2010 (5%). Count and persona multipliers are product choices. The house-style strip keeps only the sampled number of tags.",
       "rate": { "original": 0.1, "reply": 0.03, "quote": 0.06 },
@@ -158,6 +166,7 @@
 
     "text.hashtag_share": { "_def": "share of posts with text that contain a #hashtag", "min": 0.01, "max": 0.12, "target": 0.05, "min_n": 30, "severity": "warn", "confidence": "medium (5% boyd2010, 10.1% suh2010)", "sources": ["boyd2010", "suh2010"] },
     "profile.decorated_name_share": { "_def": "share of personas whose shown name carries emoji/kaomoji/ASCII or a bio tag", "min": 0.25, "max": 0.35, "target": 0.33, "min_n": 20, "severity": "warn", "confidence": "low (product choice)", "sources": [] },
+    "engagement.mention_answered_share": { "_def": "share of in-text persona @mentions (posts at least 48h before the newest post) answered by a reply or quote from the mentioned persona", "min": 0.25, "max": 0.8, "target": 0.5, "min_n": 20, "severity": "warn", "confidence": "low (product choice)", "sources": [] },
     "text.mention_share": { "_def": "share of posts with text that @mention a persona outside a leading reply @", "min": 0.02, "max": 0.12, "target": 0.055, "min_n": 30, "severity": "warn", "confidence": "medium (~5% boyd2010)", "sources": ["boyd2010", "huberman2008"] },
     "text.co_mention_share": { "_def": "of posts with a non-leading mention, share naming 2+ handles", "min": 0.0, "max": 0.45, "target": 0.2, "min_n": 15, "severity": "warn", "confidence": "low (product choice)", "sources": [] },
     "text.emoji_share": { "min": 0.06, "max": 0.35, "target": 0.15, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["kehoe2018"] },

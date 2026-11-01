@@ -90,7 +90,7 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
 
   // 1) Spec metrics on the day's posts, bands widened for this n.
   const blocking = new Set(gate.blocking ?? []);
-  const results = evaluate(measure(day, personas, spec), spec);
+  const results = evaluate(measure(day, personas, spec, { context }), spec);
   for (const r of results) {
     const t = spec.metrics[r.id];
     const isBlocking = blocking.has(r.id) || t.severity === 'fail';

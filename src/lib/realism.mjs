@@ -165,7 +165,7 @@ export function mediaProblems(item, policy) {
  * Compute every metric in the spec. Returns { metricId: { value, n, detail? } }.
  * Optional post fields used when present: media[], stats { likes, reposts, quotes, views }.
  */
-export function measure(allPosts, personas, spec) {
+export function measure(allPosts, personas, spec, { context = [] } = {}) {
   // Plain retaiks are not authored content; they are only counted.
   const retaiks = allPosts.filter((p) => p.retaikOf);
   const posts = allPosts.filter((p) => !p.retaikOf);
@@ -299,6 +299,24 @@ export function measure(allPosts, personas, spec) {
   const mentionCounts = posts.map((p) => textMentions(p.text, knownHandles).length);
   const mentioning = mentionCounts.filter((n) => n > 0);
   set('text.mention_share', share(mentioning.length, posts.length), posts.length);
+  // Mentions answered: a mention can be answered up to 48h later (possibly in another day's file).
+  const scope = [...context.filter((p) => !p.retaikOf), ...posts];
+  const latest = Math.max(...scope.map((p) => Date.parse(p.createdAt)).filter(Number.isFinite));
+  const answered = new Map();
+  for (const p of scope) for (const ref of [p.inReplyTo, p.quoteOf]) if (ref) answered.set(`${ref}:${p.authorId}`, true);
+  const byHandle = new Map(personas.map((p) => [String(p.handle ?? '').toLowerCase(), p]));
+  let owed = 0;
+  let paid = 0;
+  for (const p of posts) {
+    if (!(Date.parse(p.createdAt) <= latest - 48 * 3.6e6)) continue;
+    for (const h of textMentions(p.text, knownHandles)) {
+      const m = byHandle.get(h);
+      if (!m || m.id === p.authorId || (m.kind ?? 'thinker') === 'news') continue;
+      owed++;
+      if (answered.has(`${p.id}:${m.id}`)) paid++;
+    }
+  }
+  set('engagement.mention_answered_share', owed ? paid / owed : null, owed);
   set('text.co_mention_share', share(mentioning.filter((n) => n >= 2).length, mentioning.length), mentioning.length);
   set('text.emoji_share', share(posts.filter((p) => EMOJI.test(p.text ?? '')).length, posts.length), posts.length);
 
