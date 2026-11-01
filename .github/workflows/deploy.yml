@@ -1,0 +1,109 @@
+# Build and deploy every site pack (sites/<id>/) to Cloudflare Workers Static Assets with wrangler.
+# $0: public repo = free Actions minutes; static-asset requests on Workers Free are free and unlimited;
+# no Pages build quota involved. Limit: 20,000 files per deployment.
+#
+# Triggers
+#   push to main  → only sites whose files changed (a change outside sites/ redeploys every site)
+#   schedule      → drip release: day files carry future createdAt times that only appear on rebuild
+#   dispatch      → all sites, or one via the `site` input
+# Note: pushes made with GITHUB_TOKEN (generate.yml fallback publish) don't trigger `push`; the drip covers them.
+#
+# Secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID (or CF_ACCOUNT_ID).
+name: deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'test/**'
+      - '.github/ISSUE_TEMPLATE/**'
+  schedule:
+    - cron: '7 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      site:
+        description: 'Site id to deploy (empty = all)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      sites: ${{ steps.plan.outputs.sites }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          ONLY: ${{ inputs.site }}
+        run: |
+          all=$(node scripts/sites.mjs --json)
+          if [ -n "$ONLY" ]; then
+            sites=$(node -e 'const a=JSON.parse(process.argv[1]);const s=process.argv[2];if(!a.includes(s)){console.error("unknown site "+s);process.exit(1)}console.log(JSON.stringify([s]))' "$all" "$ONLY")
+          elif [ "$EVENT" = "push" ] && [ -n "$BEFORE" ] && ! echo "$BEFORE" | grep -qE '^0+$' && git cat-file -e "$BEFORE" 2>/dev/null; then
+            git diff --name-only "$BEFORE" "$AFTER" > changed.txt
+            sites=$(node -e '
+              const fs=require("fs");const all=JSON.parse(process.argv[1]);
+              const files=fs.readFileSync("changed.txt","utf8").split("\n").filter(Boolean);
+              const platform=files.some(f=>!f.startsWith("sites/"));
+              console.log(JSON.stringify(all.filter(id=>platform||files.some(f=>f.startsWith(`sites/${id}/`)))));
+            ' "$all")
+          else
+            sites="$all"
+          fi
+          echo "sites=$sites" >> "$GITHUB_OUTPUT"
+          echo "Deploying: $sites" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: plan
+    if: needs.plan.outputs.sites != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        site: ${{ fromJSON(needs.plan.outputs.sites) }}
+    env:
+      SITE: ${{ matrix.site }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate & build
+        run: |
+          npm run validate
+          npm run build
+          n=$(find "dist/$SITE" -type f | wc -l)
+          echo "$SITE: $n files (Cloudflare limit 20000)" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$n" -gt 19000 ]; then echo "::warning::$SITE is at $n files; near the 20k per-deployment cap"; fi
+      - name: Deploy to Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::CLOUDFLARE_API_TOKEN / account id not set; built but not deployed"
+            exit 0
+          fi
+          cfg=$(node scripts/wrangler-config.mjs)
+          npx --yes wrangler@4 deploy --config "$cfg" | tee deploy.log
+          grep -Eo 'https://[^ ]+' deploy.log | sed "s/^/$SITE → /" >> "$GITHUB_STEP_SUMMARY" || true
