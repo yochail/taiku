@@ -1,17 +1,20 @@
-name: Generate posts
+name: Daily feed
 
 on:
   schedule:
-    # ~3 times a day (UTC). Adjust freely.
-    - cron: "17 6,13,20 * * *"
+    # Once a day (UTC): scan news/trends → 3-5 topics → root taiks + simulated replies/likes/quotes/reposts.
+    - cron: "23 7 * * *"
   workflow_dispatch:
     inputs:
-      posts:
-        description: "New top-level posts"
-        default: "3"
-      replies:
-        description: "New replies"
-        default: "7"
+      topics:
+        description: "Topics this run (3-5)"
+        default: ""
+      max_calls:
+        description: "Max LLM calls this run (GitHub Models free tier: keep ~25-40)"
+        default: ""
+      seed:
+        description: "RNG seed (blank = time-based)"
+        default: ""
 
 permissions:
   contents: write
@@ -31,16 +34,22 @@ jobs:
         with:
           node-version: 22
 
-      - name: Generate new posts & replies
+      - name: Generate the daily batch
         env:
           # Default provider: GitHub Models, authenticated with the workflow token (models: read).
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Optional overrides (Settings → Secrets and variables → Actions).
+          # Optional overrides (Settings → Secrets and variables → Actions). Empty values fall back to defaults.
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
           LLM_MODEL: ${{ vars.LLM_MODEL }}
-          GEN_POSTS: ${{ github.event.inputs.posts || vars.GEN_POSTS || '3' }}
-          GEN_REPLIES: ${{ github.event.inputs.replies || vars.GEN_REPLIES || '7' }}
+          LLM_DELAY_MS: ${{ vars.LLM_DELAY_MS }}
+          GEN_TOPICS: ${{ github.event.inputs.topics || vars.GEN_TOPICS || '4' }}
+          GEN_MAX_CALLS: ${{ github.event.inputs.max_calls || vars.GEN_MAX_CALLS || '30' }}
+          GEN_SEED: ${{ github.event.inputs.seed || '' }}
+          GEN_EVERGREEN_RATE: ${{ vars.GEN_EVERGREEN_RATE }}
+          NEWS_FEEDS: ${{ vars.NEWS_FEEDS }}
+          TRENDS_FEEDS: ${{ vars.TRENDS_FEEDS }}
+          NEWS_DISABLED: ${{ vars.NEWS_DISABLED }}
         run: npm run generate
 
       - name: Build & check (fail before committing broken content)
@@ -54,6 +63,6 @@ jobs:
           git config user.name "taiku-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add content
-          git commit -m "content: generated batch $(date -u +%Y-%m-%dT%H:%MZ)"
+          git commit -m "content: daily batch $(date -u +%Y-%m-%d)"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"

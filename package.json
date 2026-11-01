@@ -15,6 +15,7 @@
     "generate": "node src/generate.mjs",
     "generate:dry": "node src/generate.mjs --dry-run",
     "generate:mock": "node src/generate.mjs --mock",
+    "generate:topics": "node src/generate.mjs --topics-only",
     "validate": "node scripts/validate.mjs",
     "serve": "node scripts/serve.mjs"
   }

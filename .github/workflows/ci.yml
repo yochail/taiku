@@ -20,5 +20,5 @@ jobs:
         run: npm run validate
       - name: Build & check
         run: npm test
-      - name: Generator dry-run (mock, no key, writes nothing)
-        run: npm run generate:dry -- --posts 2 --replies 3
+      - name: Generator dry-run (offline fixtures + mock provider, network blocked, writes nothing)
+        run: npm run generate:dry -- --seed ci --summary-only

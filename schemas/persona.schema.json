@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taiku.app/schemas/persona.schema.json",
+  "title": "Taiku persona (full profile, schemaVersion 2)",
+  "description": "One file per persona: personas/<id>.json. Everything the generator needs to run an agentic LLM turn as this persona (skill = system prompt, tools search its quote bank + local public-domain sources) and everything the site needs for the X-style profile.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "id", "name", "handle", "born", "died", "lifespan", "era_group", "region", "tradition", "school",
+    "wikipedia", "popularity", "modernity", "reactivity", "headline", "bio", "core_ideas", "voice", "signature_moves",
+    "topic_affinity", "favorite_topics", "pet_peeves", "argument_style", "news_lens", "allies", "rivals",
+    "native_lang", "native_phrases", "anchors", "reading_list", "sources", "quote_policy", "quote_bank",
+    "sensitive_notes", "never", "post_archetypes", "reply_archetypes", "sample_posts", "x_behavior", "x_profile",
+    "avatar", "avatar_prompt", "skill"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,30}$", "description": "Stable id = file name = URL slug (/thinkers/<id>/)." },
+    "name": { "type": "string", "minLength": 2 },
+    "handle": { "type": "string", "pattern": "^[A-Za-z0-9_]{1,15}$", "description": "X-style @handle without the @ (≤15 chars)." },
+    "born": { "type": "integer", "description": "Birth year; negative = BCE. Used for sorting." },
+    "died": { "type": "integer", "description": "Death year; negative = BCE. Only deceased persons." },
+    "lifespan": { "type": "string", "description": "Display string, e.g. 'c. 470–399 BCE'." },
+    "birth_display": { "type": "string" },
+    "death_display": { "type": "string" },
+    "era_group": { "enum": ["Ancient world (before 500 CE)", "Medieval & early modern (500–1700)", "Enlightenment & 19th century (1700–1900)", "20th century"] },
+    "region": { "type": "string" },
+    "tradition": { "type": "string" },
+    "school": { "type": "string" },
+    "wikipedia": { "type": "string", "format": "https-uri" },
+    "popularity": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "modernity": { "type": "integer", "minimum": 1, "maximum": 5, "description": "Voice guide §3: 1 = fully era voice … 5 = terminally online." },
+    "reactivity": { "type": "integer", "minimum": 1, "maximum": 5, "description": "How often they jump into replies (1 rare … 5 constant)." },
+    "headline": { "type": "string", "maxLength": 200, "description": "X bio line (in voice)." },
+    "bio": { "type": "string", "minLength": 80, "description": "Factual biography summary (third person)." },
+    "core_ideas": { "type": "array", "minItems": 3, "items": { "type": "string" } },
+    "voice": {
+      "type": "object",
+      "required": ["style", "tone", "humor", "formatting", "tics"],
+      "properties": {
+        "style": { "type": "string" },
+        "tone": { "type": "string" },
+        "humor": { "type": "string" },
+        "formatting": { "type": "string" },
+        "tics": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+        "slang_examples": { "type": "array", "items": { "type": "string" } },
+        "do": { "type": "array", "items": { "type": "string" } },
+        "dont": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "signature_moves": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+    "topic_affinity": {
+      "type": "object",
+      "description": "topic → 0..1. Keys from: politics, tech, ai, science, business, economy, sports, culture, celebrity, religion, health, education, war, climate, law, media, memes, relationships, work.",
+      "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 }
+    },
+    "favorite_topics": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+    "pet_peeves": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "argument_style": { "type": "string" },
+    "news_lens": { "type": "string" },
+    "allies": { "type": "array", "items": { "$ref": "#/$defs/relation" } },
+    "rivals": { "type": "array", "items": { "$ref": "#/$defs/relation" } },
+    "frenemies": { "type": "array", "items": { "$ref": "#/$defs/relation" } },
+    "native_lang": {
+      "type": "object",
+      "required": ["code", "name"],
+      "properties": {
+        "code": { "type": "string", "description": "BCP-47-ish code: grc, la, lzh (Classical Chinese), sa, ar, he, ja, gez, de, fr, it, da, nl, en, sco…" },
+        "name": { "type": "string" }
+      }
+    },
+    "native_phrases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["original", "english"],
+        "additionalProperties": false,
+        "properties": {
+          "original": { "type": "string" },
+          "translit": { "type": "string" },
+          "english": { "type": "string" }
+        }
+      }
+    },
+    "anchors": {
+      "type": "array",
+      "minItems": 2,
+      "description": "Real-idea anchors: grounding for takes; source of Community Notes.",
+      "items": {
+        "type": "object",
+        "required": ["idea", "work"],
+        "additionalProperties": false,
+        "properties": {
+          "idea": { "type": "string" },
+          "work": { "type": "string" },
+          "section": { "type": "string" },
+          "url": { "type": "string", "format": "https-uri" }
+        }
+      }
+    },
+    "reading_list": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Profile 'Reading list' tab: key works, with a free/legit link where available.",
+      "items": {
+        "type": "object",
+        "required": ["title"],
+        "additionalProperties": false,
+        "properties": {
+          "title": { "type": "string" },
+          "year": { "type": ["integer", "string"] },
+          "url": { "type": "string", "format": "https-uri" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "description": "Public-domain texts. If `local` is set, an excerpt file is committed at that repo path (fetched by scripts/fetch-sources.mjs) and search_quotes searches it offline.",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "license", "url", "quotable"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "translator": { "type": "string" },
+          "year": { "type": ["integer", "string"] },
+          "license": { "enum": ["public-domain", "cc-by", "cc-by-sa"] },
+          "url": { "type": "string", "format": "https-uri", "description": "Human-readable page (Wikisource, Gutenberg, ctext.org…)." },
+          "download": { "type": "string", "format": "https-uri", "description": "Plain-text download URL used by the fetch script." },
+          "local": { "type": "string", "pattern": "^sources/[a-z0-9_]+/[a-z0-9_.-]+\\.txt$" },
+          "quotable": { "type": "boolean", "description": "May verbatim spans from this text appear in quotation marks (with citation)?" },
+          "excerpt": { "type": "object", "description": "Optional slicing rules for the fetch script (start/end markers, maxChars)." }
+        }
+      }
+    },
+    "quote_policy": { "enum": ["quote_bank", "paraphrase_only"], "description": "paraphrase_only = this persona may never use quotation marks to present words as theirs (copyrighted or no reliable PD translation)." },
+    "quote_bank": {
+      "type": "array",
+      "description": "Curated verbatim passages. `text` must be an exact substring (whitespace-normalised) of the local file of `sourceId`.",
+      "items": {
+        "type": "object",
+        "required": ["id", "text", "sourceId", "work", "section"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+          "text": { "type": "string", "minLength": 10, "maxLength": 240 },
+          "sourceId": { "type": "string" },
+          "work": { "type": "string" },
+          "section": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "sensitive_notes": { "type": "array", "items": { "type": "string" }, "description": "e.g. repugnant historical views: never voiced approvingly; may be dunked on by others." },
+    "never": { "type": "array", "items": { "type": "string" } },
+    "post_archetypes": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+    "reply_archetypes": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+    "sample_posts": { "type": "array", "minItems": 3, "items": { "type": "string" } },
+    "x_behavior": {
+      "type": "object",
+      "required": ["activity", "reply_rate", "like_rate", "quote_rate", "repost_rate"],
+      "description": "Engagement-simulation traits (0..1 rates etc.)."
+    },
+    "x_profile": {
+      "type": "object",
+      "required": ["location", "joined", "following", "followers", "banner"],
+      "additionalProperties": false,
+      "properties": {
+        "location": { "type": "string" },
+        "joined": { "type": "string", "description": "In-joke 'Joined' line, e.g. 'Joined 399 BCE (posthumously)'." },
+        "website": { "type": "string", "format": "https-uri" },
+        "following": { "type": "integer", "minimum": 0 },
+        "followers": { "type": "integer", "minimum": 0, "description": "Simulated." },
+        "pinned": { "type": ["string", "null"], "description": "Post id of the pinned taik." },
+        "banner": {
+          "type": "object",
+          "required": ["from", "to", "motif"],
+          "additionalProperties": false,
+          "properties": {
+            "from": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+            "to": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+            "motif": { "enum": ["columns", "waves", "mountains", "stars", "grid", "sun", "ink", "garden", "city", "desert", "lens", "barrel"] }
+          }
+        }
+      }
+    },
+    "avatar": {
+      "type": "object",
+      "required": ["emoji", "initials", "color"],
+      "additionalProperties": false,
+      "properties": {
+        "emoji": { "type": "string" },
+        "initials": { "type": "string", "maxLength": 3 },
+        "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "image": { "type": "string", "description": "Optional committed image path under public/ (e.g. /img/avatars/kant.svg)." }
+      }
+    },
+    "avatar_prompt": { "type": "string" },
+    "skill": {
+      "type": "string",
+      "minLength": 400,
+      "description": "The persona 'skill': system-prompt text loaded for every LLM turn as this persona (second person, voice + rules + how to use tools)."
+    }
+  },
+  "$defs": {
+    "relation": {
+      "type": "object",
+      "required": ["id", "why"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "why": { "type": "string" }
+      }
+    }
+  }
+}

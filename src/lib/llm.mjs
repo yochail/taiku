@@ -4,8 +4,9 @@ export function llmConfig(env = process.env) {
   const apiKey = env.LLM_API_KEY || env.GITHUB_MODELS_TOKEN || env.GITHUB_TOKEN || '';
   const model = env.LLM_MODEL || 'openai/gpt-4.1-mini';
   const jsonMode = (env.LLM_JSON_MODE ?? 'true') !== 'false';
-  const temperature = Number(env.LLM_TEMPERATURE ?? 0.95);
-  const delayMs = Number(env.LLM_DELAY_MS ?? 4000);
+  const num = (v, d) => (v === undefined || v === null || String(v).trim() === '' || Number.isNaN(Number(v)) ? d : Number(v));
+  const temperature = num(env.LLM_TEMPERATURE, 0.95);
+  const delayMs = num(env.LLM_DELAY_MS, 4000);
   return { baseUrl, apiKey, model, jsonMode, temperature, delayMs };
 }
 

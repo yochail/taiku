@@ -88,12 +88,75 @@ Generator flags: `--posts N` (default 3), `--replies N` (default 7), `--seed X`,
 
 ## Generation
 
-Each run does two things:
+`src/generate.mjs` is a **daily pipeline** that makes the feed look like a real X timeline: hot takes, ratios, quote-dunks, pastas, polls-as-text, clapbacks and 2–3-deep rival fights. It does not read like a lecture.
 
-1. It writes **new top-level posts**. Authors are picked with weighting by popularity and by how long since their last post. Each post gets an archetype (aphorism, lesson, 🧵 thread, hot take, question, quote-post, news take…). News takes react to a fresh RSS headline (BBC by default).
-2. It writes **replies** to recent posts. Repliers are weighted toward the author's rivals and allies, and toward thinkers already in the conversation. Reply archetypes (steelman-and-rebut, counterexample, dunk, concession, context note, …) are filtered by that relationship. This is how debate threads emerge across runs.
+1. **Scan topics** (`src/lib/news.mjs`). The real X trending list has no free API, so the scan uses public RSS as a proxy. It is free and needs no key:
+   - News: BBC (world, tech, science, business), NPR, Al Jazeera, Hacker News, Google News.
+   - Trends: Google Trends daily RSS. Each trend is the search query plus its related article.
 
-The output is validated and cleaned: length limits, no "as an AI" text, tag slugs, and duplicate checks. It is then written as a new JSON batch in `content/posts/`.
+   Feeds are fetched in parallel with a timeout each. A failing feed is skipped. Items are de-duplicated by URL and by title, and every item keeps its source link.
+2. **Pick 3–5 topics** (`src/lib/topics.mjs`):
+   - Candidates are scored on how philosophically ripe they are (themes like AI, power, labor, status), how relevant they are to the personas, and how fresh they are.
+   - A diversity penalty applies across sections, sources and themes.
+   - Topics the feed already covered in the last 7 days are skipped (same URL or a similar title).
+   - At most one grave topic (deaths, war, disasters) per run. It goes only to serious personas, in serious formats, with no memes and no dunking.
+   - In live mode, one LLM call can re-rank the shortlist; the heuristic is the fallback.
+   - About half of runs add one **evergreen** shitpost topic ("people who clap when the plane lands", "the 5am club"…).
+3. **Root taiks**. For each topic, 1–2 personas post about it, chosen by topic relevance, activity and popularity. When there is a second author, a rival of the first is preferred.
+   - Each persona's `post_archetypes` plus its `x_behavior.formats` decide the format: hot take, unpopular opinion, POV, shitpost, pasta, poll, subtweet, hear me out, meme, news take…
+   - The taik can reference the topic directly, or indirectly like a subtweet.
+   - 🧵 self-threads (2–4 parts) are rare: at most about 10% of roots.
+4. **Engagement simulation** (`src/lib/engagement.mjs`). Every *other* persona gets probabilities to reply, like, quote-taik, repost or ignore. These come from:
+   - its `x_behavior` profile (see below);
+   - its relationship to the author: rivals reply and quote-dunk more, allies like and repost;
+   - topic relevance, and whether the root's vibe matches what it likes.
+
+   Outcomes are sampled with the seeded RNG. Likes fill `likedBy` and reposts fill `repostedBy`. Replies and quotes are queued by likelihood and written by the LLM under a **call budget** (`GEN_MAX_CALLS`). The queue is round-robined so every root gets action and the same few accounts don't dominate.
+   - Authors may **clap back**, and the replier may fire back again (chains up to 3 deep).
+   - Allies of the dunked-on author can jump in.
+   - Once the budget is spent, meme-brained personas can still drop a free 💀/😭 reply.
+5. **Counts**. Simulated `engagement` (likes, reposts, views, bookmarks) is heavy-tailed, roughly lognormal:
+   - Scaled by author popularity, format (memes travel, threads get bookmarked), in-feed interactions, and the post's age.
+   - A rival's dunk sometimes **ratios** the original (more likes than the root).
+   - Reply and quote counts are not stored; the build computes them from real posts.
+6. **Timestamps** fall across the past ~22h:
+   - Roots land in their author's waking hours (`x_behavior.utc_offset` / `active_hours`).
+   - Replies come after their parent, with a lognormal delay (median ~25 min).
+   - Nothing is in the future.
+
+Every taik is cleaned:
+- Hard limit of 280 characters. If a taik is longer, the LLM is asked to shorten it (up to 2×), then it is smart-trimmed at a sentence or word boundary.
+- Lowercase personas stay lowercase.
+- No "as an AI" text, and no duplicates.
+
+The merged set (existing posts plus the new batch) is validated before anything is written.
+
+Each persona's `x_behavior` profile is in `personas/<id>.json`. Defaults and the reasoning behind them are in `src/lib/behavior.mjs`; sync them with `node scripts/sync-x-behavior.mjs`. The profile has these fields:
+- Rates from 0 to 1: `activity`, `reply_rate`, `like_rate`, `quote_rate`, `repost_rate`, `dunk_tendency`, `meme_affinity`, `thread_tendency`, `shitpost_level`, `clapback_rate`, `emoji_use`, `caps_use`.
+- `casing`: `lowercase`, `standard` or `caps`.
+- `emoji`, `slang`, `formats` (preferred archetypes), `beats` (themes it posts about).
+- `likes_vibe`: `calm`, `spicy`, `funny` or `smart`.
+- `utc_offset` and `active_hours`.
+
+Some examples:
+- Diogenes: activity .9, dunk .95, shitpost 1, all-lowercase.
+- Kant: rarely posts, threads .85, no memes.
+- Marcus Aurelius: almost never replies, likes calm posts.
+- Nietzsche: quote-dunks, CAPS.
+
+| Flag | Meaning |
+|---|---|
+| `--dry-run` | Run everything, print a summary plus the batch JSON, write nothing. Offline (fixtures + mock) unless `--live` is also given. |
+| `--mock` | Offline fixture topics and a template-based mock provider (on-voice, deterministic with `--seed`). Writes `content/posts/<stamp>-mock.json`. |
+| `--live` | With `--dry-run`: real RSS and real LLM, but nothing is written. |
+| `--topics-only` | Scan, score and select topics, print them with feed status, and exit. No LLM calls. Add `--mock` to use fixtures. |
+| `--seed S` | Seed for the RNG (topic pick, personas, interactions, timing, counts). |
+| `--topics N` | Number of topics (3–5). |
+| `--max-calls N` | LLM call budget for this run. |
+| `--summary-only` | Dry run without the JSON dump. |
+| `--quiet` | Hide progress logs. |
+
+In `--mock` and `--dry-run` (without `--live`), `fetch` is hard-blocked: the summary prints `network blocked, 0 fetch attempts`. A live run writes `content/posts/<stamp>-daily.json`.
 
 ### LLM provider & environment
 
@@ -107,9 +170,15 @@ The client works with any **OpenAI-compatible** `/chat/completions` endpoint.
 | `LLM_TEMPERATURE` | `0.95` | |
 | `LLM_JSON_MODE` | `true` | set `false` if your endpoint rejects `response_format` |
 | `LLM_DELAY_MS` | `4000` | pause between calls (rate limits) |
-| `GEN_POSTS` / `GEN_REPLIES` | `3` / `7` | batch size |
-| `NEWS_FEEDS` | BBC World/Tech/Science RSS | comma-separated RSS URLs |
-| `NEWS_DISABLED` | – | `true` disables news takes |
+| `GEN_TOPICS` | `4` | topics per run (clamped to 3–5) |
+| `GEN_MAX_CALLS` | `30` | LLM call budget per run (roots, replies, quotes, shortening, ranking) |
+| `GEN_SEED` | time-based | RNG seed |
+| `GEN_EVERGREEN_RATE` | `0.5` | chance of adding one evergreen shitpost topic |
+| `GEN_LLM_RANK` | `true` | `false` turns off LLM re-ranking of topics (heuristic only) |
+| `NEWS_FEEDS` | BBC, NPR, Al Jazeera, HN, Google News | comma-separated RSS/Atom URLs, optional `section\|url`; `none` disables |
+| `TRENDS_FEEDS` | Google Trends daily (US) | same format; `none` disables |
+| `NEWS_DISABLED` | – | `true` skips all fetching (evergreen topics only) |
+| `NEWS_TIMEOUT_MS` / `NEWS_PER_FEED` | `8000` / `20` | timeout and item cap per feed |
 | `SITE_URL` | `https://taiku.app` | used for canonical/OG/sitemap URLs at build time |
 
 Locally, with a GitHub token that has access to GitHub Models:
@@ -122,12 +191,12 @@ $env:GITHUB_TOKEN = (gh auth token); npm run generate; npm run build
 
 ### GitHub Actions
 
-- **`ci.yml`** runs on every push and PR: validate → build → checks → mock dry-run.
-- **`generate.yml`** runs about 3×/day on cron (and manually via *Run workflow*): generate → build + checks → commit `content/` → push. The push triggers a Cloudflare Pages deploy.
+- **`ci.yml`** runs on every push and PR: validate → build → checks → offline generator dry-run (`npm run generate:dry -- --seed ci --summary-only`, fixtures plus mock, with the network blocked).
+- **`generate.yml`** ("Daily feed") runs **once a day** on cron and manually via *Run workflow*, with optional inputs `topics`, `max_calls` and `seed`. Steps: generate → build + checks → commit `content/` as `taiku-bot` → `pull --rebase` → push. The push triggers a Cloudflare Pages deploy.
   - It uses **GitHub Models** with the built-in `GITHUB_TOKEN`. The workflow already declares `permissions: models: read, contents: write`.
   - Make sure *Settings → Actions → General → Workflow permissions* allows workflows to write, or at least doesn't restrict below what the workflow requests.
-  - The free GitHub Models tier is rate-limited. The defaults (3 posts + 7 replies per run, with a 4s delay between calls) stay well within it.
-  - To use another provider, add a repository **secret** `LLM_API_KEY` and repository **variables** `LLM_BASE_URL` / `LLM_MODEL` (Settings → Secrets and variables → Actions). Optional variables: `GEN_POSTS` and `GEN_REPLIES`.
+  - The free GitHub Models tier is rate-limited. One run uses at most `GEN_MAX_CALLS` calls (default 30, 4s apart). If the provider rate-limits mid-run, the generator stops calling it and keeps what it already has.
+  - To use another provider, add a repository **secret** `LLM_API_KEY` and repository **variables** `LLM_BASE_URL` / `LLM_MODEL` (Settings → Secrets and variables → Actions). Optional variables: `GEN_TOPICS`, `GEN_MAX_CALLS`, `GEN_EVERGREEN_RATE`, `LLM_DELAY_MS`, `NEWS_FEEDS`, `TRENDS_FEEDS`, `NEWS_DISABLED`. Empty values fall back to the defaults.
 
 ## Deploy: Cloudflare Pages + taiku.app
 
