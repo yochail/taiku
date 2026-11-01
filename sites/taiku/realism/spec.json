@@ -12,6 +12,9 @@
     "goel2016": "Goel, Anderson, Hofman, Watts, 'The Structural Virality of Online Diffusion', Management Science 62(1), 2016 (vast majority of cascades are size 1 or broadcast depth 1)",
     "goh2008": "Goh & Barabasi, 'Burstiness and memory in complex systems', EPL 81, 2008 (burstiness B=(sigma-mu)/(sigma+mu); human online activity has B>0)",
     "golder2011": "Golder & Macy, 'Diurnal and Seasonal Mood Vary with Work, Sleep, and Daylength Across Diverse Cultures', Science 333, 2011 (strong circadian rhythm in tweeting)",
+    "boyd2010": "boyd, Golder & Lotan, 'Tweet, Tweet, Retweet: Conversational Aspects of Retweeting on Twitter', HICSS-43 2010, https://www.danah.org/papers/TweetTweetRetweet.pdf (720k tweets, Jan-Jun 2009: 36% of tweets mention a user as @user and 86% of those begin with @user, so ~5% of all tweets carry a non-leading mention; 5% contain a hashtag; 22% a URL; 18% of retweets contain a hashtag)",
+    "huberman2008": "Huberman, Romero & Wu, 'Social networks that matter: Twitter under the microscope', First Monday 2009, https://arxiv.org/abs/0812.1045 (309k users: 25.4% of posts are directed with @)",
+    "suh2010": "Suh, Hong, Pirolli & Chi, 'Want to be Retweeted? Large Scale Analytics on Factors Impacting Retweet in Twitter Network', SocialCom 2010, https://www.peterpirolli.com/ewExternalFiles/2010-04-15-retweetability-v18-final.pdf (74M tweets: 10.1% of tweets have at least one hashtag; 20.8% of retweets do)",
     "kehoe2018": "Kehoe & Gee, 'Analysing emojis in context in a corpus of Twitter data', 2018 (about 16% of English tweets contain an emoji)",
     "gligoric2018": "Gligorić, Anderson & West, 'How Constraints Affect Content: The Case of Twitter's Switch from 140 to 280 Characters', ICWSM 2018, https://arxiv.org/abs/1804.02318 (users write tersely: abbreviations, contractions; short posts are the norm)",
     "wang2021gif": "Wang & Jurgens, 'An Animated Picture Says at Least a Thousand Words: Selecting GIF-based Replies in Multimodal Dialog', Findings of EMNLP 2021, https://arxiv.org/abs/2109.12212 (1.56M text-to-GIF reply turns from Twitter: GIFs and memes are a standard standalone reply)",
@@ -93,7 +96,23 @@
       "_note": "Plain retaiks (repost with no comment) by personas, shown as 'X retaiked' rows. X has 50.7% retweets vs 49.3% authored, about 1.03 per authored post (pfeffer2023). Taiku targets 0.6 so the feed of 30 accounts is not mostly duplicates. Stored as { id, authorId, retaikOf, createdAt, text: '' }.",
       "per_authored": 0.6
     },
-    "hashtag_probability": 0.05,
+    "mentions": {
+      "_note": "Non-leading @mentions written into the text (tagging someone mid-post, co-mentions). A reply's leading @ to its parent is the 'Replying to' header and is not counted. Role rates from boyd2010 (~5% of all tweets carry a non-leading mention) and huberman2008. Count (co-mentions), target weights and persona multipliers are product choices with no verified source.",
+      "rate": { "original": 0.06, "reply": 0.05, "quote": 0.08 },
+      "count": { "1": 0.8, "2": 0.15, "3": 0.05 },
+      "targets": { "rival": 3, "frenemy": 2.5, "ally": 2, "other": 0.3 },
+      "persona": { "_note": "multiplier = 0.5 + 0.6*dunk_tendency + 0.4*clapback_rate + 0.1*(heat-3), clamped", "min": 0.4, "max": 2 },
+      "confidence": { "rate": "medium", "count": "low (product choice)", "targets": "low (product choice)", "persona": "low (product choice)" },
+      "sources": ["boyd2010", "huberman2008"]
+    },
+    "hashtags": {
+      "_note": "Hashtags written into the text. Originals follow suh2010 (10.1%); replies and quotes use fewer, so the corpus share lands near boyd2010 (5%). Count and persona multipliers are product choices. The house-style strip keeps only the sampled number of tags.",
+      "rate": { "original": 0.1, "reply": 0.03, "quote": 0.06 },
+      "count": { "1": 0.75, "2": 0.2, "3": 0.05 },
+      "persona": { "_note": "multiplier = (0.4 + 0.2*modernity) * kind factor, clamped", "kind": { "parody": 1.8, "news": 1.5, "fictional": 1.2 }, "min": 0.3, "max": 2.5 },
+      "confidence": { "rate": "medium", "count": "low (product choice)", "persona": "low (product choice)" },
+      "sources": ["boyd2010", "suh2010"]
+    },
     "emoji_probability": 0.15
   },
   "metrics": {
@@ -131,7 +150,9 @@
     "time.reply_delay_median_min": { "min": 3, "max": 180, "target": 25, "min_n": 20, "severity": "warn", "confidence": "low", "sources": [] },
     "time.replies_before_parent": { "min": 0, "max": 0, "severity": "fail", "confidence": "hard rule", "sources": [] },
 
-    "text.hashtag_share": { "min": 0.0, "max": 0.12, "target": 0.05, "min_n": 30, "severity": "warn", "confidence": "low (hashtag use has declined; estimates vary 1-20%)", "sources": [] },
+    "text.hashtag_share": { "_def": "share of posts with text that contain a #hashtag", "min": 0.01, "max": 0.12, "target": 0.05, "min_n": 30, "severity": "warn", "confidence": "medium (5% boyd2010, 10.1% suh2010)", "sources": ["boyd2010", "suh2010"] },
+    "text.mention_share": { "_def": "share of posts with text that @mention a persona outside a leading reply @", "min": 0.02, "max": 0.12, "target": 0.055, "min_n": 30, "severity": "warn", "confidence": "medium (~5% boyd2010)", "sources": ["boyd2010", "huberman2008"] },
+    "text.co_mention_share": { "_def": "of posts with a non-leading mention, share naming 2+ handles", "min": 0.0, "max": 0.45, "target": 0.2, "min_n": 15, "severity": "warn", "confidence": "low (product choice)", "sources": [] },
     "text.emoji_share": { "min": 0.06, "max": 0.35, "target": 0.15, "min_n": 30, "severity": "warn", "confidence": "medium", "sources": ["kehoe2018"] },
 
     "reply_form.reply.emoji_only_share": { "_def": "replies whose text is only emoji (no media)", "min": 0.02, "max": 0.16, "target": 0.07, "min_n": 30, "severity": "warn", "confidence": "low", "sources": ["kehoe2018", "reply_forms_note"] },
@@ -160,7 +181,8 @@
     "persona_min_items": 5,
     "persona_short_chars": 40,
     "persona_slack": 0.2,
-    "persona_z": 2
+    "persona_z": 2,
+    "persona_alpha": 0.002
   },
   "media_policy": {
     "kinds": ["image", "gif", "meme", "chart", "video", "link_card", "poll"],

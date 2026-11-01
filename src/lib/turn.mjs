@@ -9,6 +9,7 @@ import { BudgetError, parseJsonLoose } from './llm.mjs';
 import { checkPost, repairHint } from './policy.mjs';
 import { formatRepair, quoteRepair, shortenRepair, systemMessage, targetCeiling, targetRepair, userMessage } from './prompts.mjs';
 import { createToolbox } from './tools.mjs';
+import { ensureMentions } from './tags.mjs';
 
 export const MAX_TOOL_ROUNDS = 2;
 export const MAX_REPAIRS = 3;
@@ -83,7 +84,8 @@ const tagsOf = (t) => [...new Set((Array.isArray(t) ? t : []).map((x) => String(
  */
 export async function validateItem(out, { task, persona, passages, policyCtx, ctx = {}, tracker = null, rand = Math.random, giphy = null }) {
   if (!out || typeof out !== 'object' || typeof out.text !== 'string' || !out.text.trim()) return { problem: formatRepair(), kind: 'format' };
-  const text = stripTells(out.text.replace(/\r\n?/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim());
+  const stripped = stripTells(out.text.replace(/\r\n?/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim(), { hashtags: task.hashtags ?? (task.hashtag ? 1 : 0) });
+  const text = stripped && task.mentions?.length ? ensureMentions(stripped, task.mentions, task.length && task.role !== 'wire' ? Math.min(MAX_TAIK_CHARS, targetCeiling(task.length)) : MAX_TAIK_CHARS) : stripped;
   if (!text) return { problem: formatRepair(), kind: 'format' };
   const len = taikLength(text);
   if (len > MAX_TAIK_CHARS) return { problem: shortenRepair(len, task.length.min, Math.min(task.length.max, MAX_TAIK_CHARS)), kind: 'length' };
@@ -177,7 +179,9 @@ export async function assembleFields({ out, text, refs, task, persona, passages,
     const note = buildNote(persona, { passage: chosen, rand });
     if (note) fields.note = note;
   }
-  const tags = tagsOf(out.tags);
+  // Text #hashtags come first so every rendered #tag link has a tag page.
+  const textTags = [...String(fields.text ?? text).matchAll(/(^|[^\w&/])#([A-Za-z][A-Za-z0-9_]{1,40})/g)].map((m) => m[2]);
+  const tags = tagsOf([...textTags, ...(Array.isArray(out.tags) ? out.tags : [])]);
   if (tags.length) fields.tags = tags;
   return fields;
 }

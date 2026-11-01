@@ -62,6 +62,20 @@ function expectedShape(spec, persona, role, shortChars) {
  *   context:   every other post (parents/quotes for timing + role checks)
  *   personas, spec
  */
+/** P(X <= k) for X ~ Binomial(n, p). */
+export function binomCdf(k, n, p) {
+  if (k < 0) return 0;
+  if (k >= n) return 1;
+  p = Math.min(1 - 1e-9, Math.max(1e-9, p));
+  let term = (1 - p) ** n;
+  let sum = term;
+  for (let i = 1; i <= k; i++) {
+    term *= ((n - i + 1) / i) * (p / (1 - p));
+    sum += term;
+  }
+  return Math.min(1, sum);
+}
+
 export function gateDay({ posts, context = [], personas, spec, label = 'day' }) {
   const gate = spec.gate ?? {};
   const byP = new Map(personas.map((p) => [p.id, p]));
@@ -134,8 +148,13 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
     const tol = tolOf(exp);
     const tolLong = tolOf(expLong);
     const sorted = items.map(lenOf).sort((a, b) => a - b);
-    const tooLong = obs < exp - tol || obsLong > expLong + tolLong;
-    const tooShort = obs > exp + tol;
+    // A band miss must also be unlikely under the binomial (alpha per persona): with ~20 personas a
+    // day, a 7-item persona at the band edge is otherwise a routine false alarm.
+    const alpha = gate.persona_alpha ?? 0.002;
+    const kShort = items.filter((p) => lenOf(p) <= shortChars).length;
+    const kLong = items.filter((p) => lenOf(p) > 140).length;
+    const tooLong = (obs < exp - tol && binomCdf(kShort, n, exp) < alpha) || (obsLong > expLong + tolLong && 1 - binomCdf(kLong - 1, n, expLong) < alpha);
+    const tooShort = obs > exp + tol && 1 - binomCdf(kShort - 1, n, exp) < alpha;
     const row = { personaId: pid, style: personaReplyStyle(spec, persona), n, expectedShort: exp, shortShare: obs, tolerance: tol, expectedLong: expLong, longShare: obsLong, toleranceLong: tolLong, median: sorted[n >> 1], status: tooLong || tooShort ? 'fail' : 'pass', tooLong, items };
     personaRows.push(row);
   }

@@ -99,10 +99,19 @@ function stripSegment(s) {
 
 /**
  * Deterministic house-style strip applied to every generated taik before the lint: no em-dashes,
- * no hashtags (outside quoted spans). Whitespace is tidied; line breaks are kept.
+ * no hashtags (outside quoted spans) beyond the `hashtags` the task sampled (the first N are kept).
+ * Whitespace is tidied; line breaks are kept.
  */
-export function stripTells(text) {
-  const t = String(text ?? '');
+export function stripTells(text, { hashtags = 0 } = {}) {
+  let t = String(text ?? '');
+  const kept = [];
+  if (hashtags > 0) {
+    t = t.replace(new RegExp(`(^|[\\s(])(${TAG.source})`, 'gu'), (m, pre, tag) => {
+      if (kept.length >= hashtags) return m;
+      kept.push(tag);
+      return `${pre}\uE000${kept.length - 1}\uE001`;
+    });
+  }
   let out = '';
   let last = 0;
   for (const m of t.matchAll(QUOTED)) {
@@ -110,6 +119,7 @@ export function stripTells(text) {
     last = m.index + m[0].length;
   }
   out += stripSegment(t.slice(last));
+  if (kept.length) out = out.replace(/\uE000(\d+)\uE001/g, (m, i) => kept[Number(i)]);
   return out.replace(/[ \t]{2,}/g, ' ').replace(/ +([,.!?])/g, '$1').replace(/,\s*,/g, ',').replace(/\.\s*\./g, '.').replace(/[ \t]+\n/g, '\n').trim();
 }
 

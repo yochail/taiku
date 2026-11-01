@@ -199,7 +199,10 @@ function compose(ctx, passages, rand, { repairing }) {
     quoteRefs = undefined;
   }
   if (/use 1-2 emoji/.test(spec.emoji ?? '') && taikLength(text) + 3 <= MAX_TAIK_CHARS && !/emoji only/.test(spec.form ?? '')) text = `${text} ${pick(EMOJI, rand)}`;
-  if (/add one/i.test(spec.hashtag ?? '') && taikLength(text) + 14 <= MAX_TAIK_CHARS) text = `${text} #${pick(['discourse', 'philosophy', 'touchgrass', 'agora'], rand)}`;
+  const tagged = String(spec.tag ?? '').match(/@[A-Za-z0-9_]+/g) ?? [];
+  if (tagged.length && rand() < 0.85 && taikLength(text) + 2 + tagged.join(' ').length <= max) text = rand() < 0.5 ? `${text} ${tagged.join(' ')}` : `${pick(['ok', 'look', 'lol', 'see', 'hey'], rand)} ${tagged.join(' ')}, ${text}`;
+  const nTags = Number(String(spec.hashtag ?? '').match(/add exactly (\d+)/)?.[1] ?? (/add one/i.test(spec.hashtag ?? '') ? 1 : 0));
+  for (let i = 0; i < nTags && taikLength(text) + 14 <= Math.min(max, MAX_TAIK_CHARS); i++) text = `${text} #${pick(['discourse', 'touchgrass', 'agora', 'ratioed', 'barrelLife', 'notMyCategory'], rand)}`;
   if (!repairing && spec.role !== 'wire' && rand() < 0.04) text = `${text} ${'and another thing, '.repeat(16)}`; // overshoot → exercises shorten-repair
   out.text = text;
   if (quoteRefs) out.quoteRefs = quoteRefs;

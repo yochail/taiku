@@ -5,7 +5,7 @@ import path from 'node:path';
 import { after, before, test } from 'node:test';
 import { withDisplayStats } from '../src/lib/crowd.mjs';
 import { ROOT, loadPersonas } from '../src/lib/data.mjs';
-import { gateDay, widenBand } from '../src/lib/daygate.mjs';
+import { binomCdf, gateDay, widenBand } from '../src/lib/daygate.mjs';
 import { checkCorpus, loadSpec } from '../src/lib/realism.mjs';
 import { outputPaths, runDaily } from '../src/lib/run.mjs';
 
@@ -150,4 +150,10 @@ test('realism on mock output: 0 warnings across days except product-choice metri
   const { results } = checkCorpus(posts, personas, spec);
   const bad = results.filter((r) => (r.status === 'warn' || r.status === 'fail') && !PRODUCT_CHOICE.has(r.id));
   assert.deepEqual(bad.map((r) => `${r.id}=${r.value}`), []);
+});
+
+test('per-persona misses must be binomially unlikely: 4 of 7 long at p=.12 is noise, 7 of 7 is not', () => {
+  assert.ok(1 - binomCdf(3, 7, 0.12) > spec.gate.persona_alpha);
+  assert.ok(1 - binomCdf(6, 7, 0.12) < spec.gate.persona_alpha);
+  assert.equal(binomCdf(7, 7, 0.5), 1);
 });

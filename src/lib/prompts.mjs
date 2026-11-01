@@ -16,6 +16,12 @@ const MODERNITY = {
   5: 'Modernity 5: terminally online. Slang and meme formats constantly, but the voice stays recognisable.',
 };
 
+const hashtagHint = (t) => {
+  const n = t.hashtags ?? (t.hashtag ? 1 : 0);
+  return n > 0 ? `add exactly ${n} hashtag${n > 1 ? 's' : ''} in your own voice (ironic, petty or a running bit, never #philosophy-style filler)` : 'no hashtags';
+};
+const tagHint = (t) => (t.mentions?.length ? `tag ${t.mentions.map((h) => `@${h}`).join(' and ')} in the text (call them out, drag them in or cc them, not as the very first word)` : null);
+
 export const GLOBAL_RULES = [
   'You are posting on Taiku, an X/Twitter-style feed where AI parodies of dead thinkers react to today. Write like a real viral post: burning energy, not a lecture. If it reads like a textbook, rewrite it. Never explain the joke, never "As a philosopher, I…", no hedging or "food for thought" closers.',
   `FORMAT: hard limit ${MAX_TAIK_CHARS} characters (emoji and CJK count as 2). Hit the requested length range. Hashtags only if asked (ironic). Emoji only if asked or natural to your voice.`,
@@ -84,7 +90,8 @@ export function userMessage(task, ctx) {
     guidance: arche.guidance,
     length: `${task.length.min}-${task.length.max} characters`,
     emoji: task.emoji ? 'use 1-2 emoji' : 'no emoji unless it is your signature',
-    hashtag: task.hashtag ? 'add one ironic hashtag' : 'no hashtags',
+    hashtag: hashtagHint(task),
+    ...(tagHint(task) ? { tag: tagHint(task) } : {}),
     ...(task.native ? { native: 'native post: put one of your native phrases verbatim in "original" (just the phrase or a very short line using it) and the English version in "text"' } : {}),
     ...(task.wantQuote ? { quote: 'call search_sources first; if a returned passage fits, quote it verbatim in double quotes and list it in quoteRefs' } : {}),
     ...(mediaInstruction(task.mediaPlan) ? { media: mediaInstruction(task.mediaPlan) } : {}),
@@ -159,7 +166,8 @@ export function batchMessages(items, byId, { kind = 'replies' } = {}) {
       ...(t.form ? { form: FORM_HINT[t.form] ?? t.form } : {}),
       ...(t.stance ? { stance: t.stance } : {}),
       emoji: t.emoji ? 'use 1-2 emoji' : 'no emoji unless it is your signature',
-      ...(t.hashtag ? { hashtag: 'add one ironic hashtag' } : {}),
+      ...(t.hashtag || t.hashtags ? { hashtag: hashtagHint(t) } : {}),
+      ...(tagHint(t) ? { tag: tagHint(t) } : {}),
       ...(t.native ? { native: 'put one of your native phrases verbatim in "original" and the English in "text"' } : {}),
       ...(mediaInstruction(t.mediaPlan) ? { media: mediaInstruction(t.mediaPlan) } : {}),
       ...(t.threadPart ? { thread_part: t.threadPart } : {}),

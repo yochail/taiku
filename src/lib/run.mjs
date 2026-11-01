@@ -22,6 +22,7 @@ import { createSampler, replyFormOf } from './realism.mjs';
 import { planMedia } from './media.mjs';
 import { createGiphyClient } from './giphy.mjs';
 import { calibrate, cascade, createReactor } from './react.mjs';
+import { mentionTargets } from './tags.mjs';
 import { FEEDS, domainOf, fetchPool, fixtureFetch, sanitizeUntrusted } from './news.mjs';
 import { selectTopics, topicCount } from './topics.mjs';
 import { BudgetError, llmConfig, loadLlmConfig } from './llm.mjs';
@@ -201,6 +202,19 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
     const exec = i <= singles ? 'single' : i === threadAt ? 'thread' : 'originals';
     nodes.push(node({ id: `s${i}`, authorId: pid, createdAt: sessionAt(pid), vector: { [key]: 1 }, role: 'original', kind: exec === 'thread' ? 'thread' : 'standalone', exec, theme: key }));
   }
+  // In-text @mentions (spec.sampling.mentions): originals are tagged before the cascade so the
+  // tagged personas get the reactor's mention boost; LLM replies/quotes are tagged after it.
+  const pById = new Map(personas.map((p) => [p.id, p]));
+  const tagNode = (n, role, cap = 3) => {
+    const author = pById.get(n.authorId);
+    const k = Math.min(cap, sampler.mentionCount(role, author));
+    if (!k) return;
+    const ids = mentionTargets({ author, personas, n: k, spec, rand, exclude: [...n.mentions] });
+    if (!ids.length) return;
+    n.textMentions = ids;
+    for (const id of ids) n.mentions.add(id);
+  };
+  for (const n of nodes) if (n.role === 'original' && n.kind !== 'wire') tagNode(n, 'original');
   const authoredOriginals = nodes.filter((n) => n.role === 'original' && n.kind !== 'wire').length;
   const cal = calibrate({ personas, spec, originalsPerDay: authoredOriginals, cacheFile: calibrationFile, writeCache: writeCalibration });
   const llmCap = Math.max(0, (content.llmReplies ?? 0) + opens.length);
@@ -213,6 +227,7 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
     n.exec = n.cheap ? 'pool' : n.form === 'short' ? 'short' : 'full';
     n.form ??= 'full';
   }
+  for (const n of all) if ((n.role === 'reply' || n.role === 'quote') && n.exec !== 'pool' && !n.textMentions) tagNode(n, n.role, n.form === 'short' ? 1 : 3);
   // Self-thread: continuation parts by the same author, a minute or two apart (same depth level).
   for (const n of all.filter((x) => x.exec === 'thread' && x.kind === 'thread')) {
     let prev = n;
@@ -257,6 +272,7 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
   const emoji = role !== 'wire' && (sampler.wantsEmoji() || (modern >= 4 && sampler.wantsEmoji())) && !(modern <= 2 && rand() < 0.5);
   const type = pickType(rand, persona, node, media);
   const llm = role !== 'wire' && !cheap;
+  const hashtags = llm && !short ? sampler.hashtagCount(role, persona) : 0;
   return {
     taskId: node.id,
     postId,
@@ -264,7 +280,8 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
     archetype: type,
     length,
     emoji: llm && emoji,
-    hashtag: llm && !short && sampler.wantsHashtag(),
+    hashtag: hashtags > 0,
+    hashtags,
     native: llm && !short && Boolean(persona.native_language?.phrases?.length) && rand() < NATIVE_RATE,
     wantQuote: llm && !short && hasPassages && rand() < (QUOTE_RATE[role] ?? 0.2),
     media,
@@ -431,6 +448,7 @@ export async function runDaily(opts = {}) {
     const persona = byId.get(n.authorId);
     const spec1 = taskSpec({ node: n, persona, topic: topicById.get(n.topicId), sampler: plan.sampler, rand: plan.rand, postId: postIdOf(n.id), hasPassages: hasPassages(persona), giphy });
     if (n.role === 'reply' && n.exec !== 'pool' && plan.rand() < 0.3) spec1.mention = byId.get(nodeById.get(n.parent)?.authorId)?.handle ?? null;
+    if (n.textMentions?.length) spec1.mentions = n.textMentions.map((id) => byId.get(id)?.handle).filter(Boolean);
     const t = { taskId: n.id, kind: n.kind ?? n.role, role: spec1.role, exec: n.exec, form: n.form ?? null, level: n.kind === 'thread-part' ? 0 : n.depth ?? 0, personaId: n.authorId, postId: spec1.postId, parentTaskId: n.parent ?? n.quoteOf ?? null, topicId: n.topicId, at: iso(n.createdAt), archetype: spec1.archetype, media: spec1.media, status: 'pending', spec: spec1 };
     t.sig = sig(t);
     return t;

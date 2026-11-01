@@ -57,6 +57,22 @@ const share = (num, den) => (den ? num / den : null);
 const charLen = (text) => [...String(text ?? '')].length;
 const HASHTAG = /(^|\s)#[\p{L}\p{N}_]+/u;
 const EMOJI = /\p{Extended_Pictographic}/u;
+const LEADING_AT = /^(?:\s*@[A-Za-z0-9_]{2,30}\b)+\s*/;
+const AT = /(^|[^\w/&])@([A-Za-z0-9_]{2,30})\b/g;
+
+/**
+ * Handles @mentioned in the text outside a leading run of @handles (a reply's leading @ is the
+ * "Replying to" header, not a tag). Pass `known` (a Set of lowercase handles) to keep only personas.
+ */
+export function textMentions(text, known = null) {
+  const body = String(text ?? '').replace(LEADING_AT, '');
+  const out = [];
+  for (const m of body.matchAll(AT)) {
+    const h = m[2].toLowerCase();
+    if ((!known || known.has(h)) && !out.includes(h)) out.push(h);
+  }
+  return out;
+}
 
 export function localHour(iso, timeZone) {
   const h = new Intl.DateTimeFormat('en-US', { timeZone, hour: 'numeric', hourCycle: 'h23' }).format(new Date(iso));
@@ -277,6 +293,11 @@ export function measure(allPosts, personas, spec) {
 
   // text
   set('text.hashtag_share', share(posts.filter((p) => HASHTAG.test(p.text ?? '')).length, posts.length), posts.length);
+  const knownHandles = new Set(personas.map((p) => String(p.handle ?? '').toLowerCase()).filter(Boolean));
+  const mentionCounts = posts.map((p) => textMentions(p.text, knownHandles).length);
+  const mentioning = mentionCounts.filter((n) => n > 0);
+  set('text.mention_share', share(mentioning.length, posts.length), posts.length);
+  set('text.co_mention_share', share(mentioning.filter((n) => n >= 2).length, mentioning.length), mentioning.length);
   set('text.emoji_share', share(posts.filter((p) => EMOJI.test(p.text ?? '')).length, posts.length), posts.length);
 
   // reply forms
@@ -390,6 +411,25 @@ export function mediaFactor(spec, persona = null) {
   return Math.min(cfg.max ?? 1.6, Math.max(cfg.min ?? 0.5, f));
 }
 
+/** @mention multiplier from x_behavior (dunks, clapbacks) and temperament heat; spec.sampling.mentions.persona. */
+export function mentionFactor(spec, persona = null) {
+  if (!persona || typeof persona !== 'object') return 1;
+  const cfg = spec.sampling.mentions?.persona ?? {};
+  const b = behaviorOf(persona);
+  const heat = Math.min(5, Math.max(1, persona.temperament?.heat ?? 3));
+  const f = 0.5 + 0.6 * (b.dunk_tendency ?? 0.4) + 0.4 * (b.clapback_rate ?? 0.4) + 0.1 * (heat - 3);
+  return Math.min(cfg.max ?? 2, Math.max(cfg.min ?? 0.4, f));
+}
+
+/** #hashtag multiplier from modernity and account kind; spec.sampling.hashtags.persona. */
+export function hashtagFactor(spec, persona = null) {
+  if (!persona || typeof persona !== 'object') return 1;
+  const cfg = spec.sampling.hashtags?.persona ?? {};
+  const modern = Math.min(5, Math.max(1, persona.modernity ?? 3));
+  const f = (0.4 + 0.2 * modern) * (cfg.kind?.[persona.kind] ?? 1);
+  return Math.min(cfg.max ?? 2.5, Math.max(cfg.min ?? 0.3, f));
+}
+
 /** Deterministic sampler over spec.sampling. */
 export function createSampler(spec = loadSpec(), seed = 'taiku') {
   const rand = makeRng(seed);
@@ -461,7 +501,21 @@ export function createSampler(spec = loadSpec(), seed = 'taiku') {
       if (rand() < mean - n) n++;
       return n;
     },
-    wantsHashtag: () => rand() < s.hashtag_probability,
+    /** number of non-leading @mentions to write (0 = none; 2+ = co-mention) */
+    mentionCount: (role = 'original', persona = null) => {
+      const m = s.mentions;
+      if (!m) return 0;
+      const p = Math.min(0.9, (m.rate[role] ?? m.rate.original) * mentionFactor(spec, persona));
+      return rand() < p ? Number(weighted(rand, Object.entries(m.count))) : 0;
+    },
+    /** number of #hashtags to write (0 = none) */
+    hashtagCount: (role = 'original', persona = null) => {
+      const h = s.hashtags;
+      if (!h) return rand() < (s.hashtag_probability ?? 0) ? 1 : 0;
+      const p = Math.min(0.9, (h.rate[role] ?? h.rate.original) * hashtagFactor(spec, persona));
+      return rand() < p ? Number(weighted(rand, Object.entries(h.count))) : 0;
+    },
+    wantsHashtag: (role = 'original', persona = null) => rand() < Math.min(0.9, (s.hashtags?.rate?.[role] ?? s.hashtag_probability ?? 0) * hashtagFactor(spec, persona)),
     wantsEmoji: () => rand() < s.emoji_probability,
   };
 }
