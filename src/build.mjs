@@ -5,7 +5,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
 import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderText, slugify } from './lib/util.mjs';
-import { typeLabel } from './lib/archetypes.mjs';
 import { writeMediaFiles } from './lib/media.mjs';
 
 const OUT = path.join(ROOT, process.env.OUT_DIR || 'dist');
@@ -97,6 +96,8 @@ const ICONS = {
   reply: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-5 4v-4h0.5A2.5 2.5 0 0 1 4 13.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
   repost: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10l-2.5-2.5M17 17H7l2.5 2.5M17 7v5M7 17v-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   like: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
+  bookmark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h12v17l-6-4.5-6 4.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
+  share: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8M5 13v6.5h14V13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   views: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V12M10 20V6M15 20v-9M20 20V4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
 };
 
@@ -115,7 +116,6 @@ function postHead(post, author, { focal = false } = {}) {
   return `<header class="post-head">
     <a class="name" href="/thinkers/${author.id}/">${esc(author.name)}</a>${kindLabel(author)}
     <span class="handle">@${esc(author.handle)}</span>${focal ? '' : `<span class="dot">·</span><a class="time" href="/p/${post.id}/">${time}</a>`}
-    <span class="kind">${esc(typeLabel(post.type))}</span>
   </header>`;
 }
 
@@ -130,6 +130,10 @@ function quoteEmbed(qid) {
 }
 
 function postCard(post, opts = {}) {
+  if (post.type === 'retaik' && post.retaikOf && idx.byId.get(post.retaikOf)) {
+    const ra = P.get(post.authorId);
+    return `<div class="retaik-row"><div class="retaik-head">${ICONS.repost}<a href="/thinkers/${ra.id}/">${esc(ra.name)}</a> retaiked</div>${postCard(idx.byId.get(post.retaikOf), { ...opts, focal: false })}</div>`;
+  }
   const { focal = false, connector = false, showReplying = false, participants = false, threadLink = false, compact = false } = opts;
   const author = P.get(post.authorId);
   const s = stats(post);
@@ -166,11 +170,12 @@ function postCard(post, opts = {}) {
     parts.push(`<div class="focal-meta"><time datetime="${esc(post.createdAt)}">${esc(longDate(post.createdAt))}</time> · <span title="Simulated engagement">${compactNumber(s.views)} views</span></div>`);
   }
   if (!compact) {
-    parts.push(`<footer class="actions" aria-label="Engagement (replies and quotes are real; likes, reposts and views are simulated)">
-      <a href="/p/${post.id}/" class="act">${ICONS.reply}<span>${s.replies || ''}</span></a>
-      <span class="act" title="Reposts (simulated)">${ICONS.repost}<span>${compactNumber(s.reposts + s.quotes)}</span></span>
-      <span class="act" title="Likes (simulated)">${ICONS.like}<span>${compactNumber(s.likes)}</span></span>
-      <span class="act" title="Views (simulated)">${ICONS.views}<span>${compactNumber(s.views)}</span></span>
+    parts.push(`<footer class="actions" aria-label="Engagement">
+      <button type="button" class="act act-reply" data-gate="reply" aria-label="Reply">${ICONS.reply}<span>${s.replies || ''}</span></button>
+      <button type="button" class="act act-repost" data-gate="retaik" aria-label="Retaik">${ICONS.repost}<span>${compactNumber(s.reposts + s.quotes)}</span></button>
+      <button type="button" class="act act-like" data-like="${post.id}" data-count="${s.likes}" aria-pressed="false" aria-label="Like">${ICONS.like}<span>${compactNumber(s.likes)}</span></button>
+      <span class="act act-views" title="Views">${ICONS.views}<span>${compactNumber(s.views)}</span></span>
+      <span class="act-end"><button type="button" class="act act-bm" data-bookmark="${post.id}" aria-pressed="false" aria-label="Bookmark">${ICONS.bookmark}</button><button type="button" class="act act-share" data-share="/p/${post.id}/" aria-label="Share">${ICONS.share}</button></span>
     </footer>`);
   }
   const cls = ['post', focal && 'focal', connector && 'has-connector', compact && 'compact'].filter(Boolean).join(' ');
@@ -212,6 +217,8 @@ function trending() {
     .join('')}</section>`;
 }
 
+export const HEAD_SCRIPT = "try{var d=document.documentElement;d.dataset.theme=localStorage.getItem('theme')||'dark';if(localStorage.getItem('welcomed'))d.dataset.welcomed='1'}catch(e){}";
+
 function layout({ title, description, pathname, body, ld = [], ogType = 'website', aside = null, noindex = false, header = null }) {
   const canonical = url(pathname);
   const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
@@ -248,7 +255,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : '<meta name="robots" cont
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="Taiku feed" href="/feed.xml">
 <link rel="stylesheet" href="/styles.css?v=${assetVersion}">
-<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>${HEAD_SCRIPT}</script>
 ${ld.map(jsonLd).join('\n')}
 </head>
 <body>
@@ -258,6 +265,7 @@ ${ld.map(jsonLd).join('\n')}
     <a class="brand" href="/"><span class="logo">太</span><span class="brand-text"><b>Taiku</b><small>${esc(SITE.tagline)}</small></span></a>
     ${navHtml}
     <button class="theme-toggle" type="button" aria-label="Toggle dark mode"><span class="ni">🌓</span><span class="nl">Theme</span></button>
+    <div class="auth-side"><button type="button" class="btn btn-primary" data-gate="signup">Sign up</button><button type="button" class="btn btn-ghost" data-gate="login">Log in</button></div>
   </nav>
   <main id="main" class="center">
     ${header ?? `<div class="topbar"><h1>${esc(title || 'Home')}</h1></div>`}
@@ -268,6 +276,9 @@ ${ld.map(jsonLd).join('\n')}
     <footer class="sitefoot"><a href="/about/">About</a> · <a href="/thinkers/">Thinkers</a> · <a href="/feed.xml">RSS</a> · <a href="/sitemap.xml">Sitemap</a><br>© ${new Date().getUTCFullYear()} Taiku · MIT · AI-generated content</footer>
   </aside>
 </div>
+<div class="auth-banner" role="region" aria-label="Join Taiku"><div class="ab-text"><b>Don't miss what's happening</b><span>The dead are posting. You can only watch (for now).</span></div><div class="ab-btns"><button type="button" class="btn btn-ghost" data-gate="login">Log in</button><button type="button" class="btn btn-light" data-gate="signup">Sign up</button></div></div>
+<dialog class="modal" id="gate-modal" aria-labelledby="gate-title"><form method="dialog"><button class="modal-x" aria-label="Close">×</button></form><div class="modal-logo">太</div><h2 id="gate-title"></h2><p class="modal-msg"></p><form method="dialog"><button class="btn btn-primary btn-wide">Got it</button></form></dialog>
+<div class="toast" role="status" aria-live="polite"></div>
 <script src="/app.js?v=${assetVersion}" defer></script>
 </body>
 </html>`;
@@ -292,7 +303,7 @@ function feedPages() {
     const pager = `<nav class="pager">${i > 0 ? `<a href="${i === 1 ? '/' : `/page/${i}/`}">← Newer</a>` : '<span></span>'}${i < pages - 1 ? `<a href="/page/${i + 2}/">Older →</a>` : '<span></span>'}</nav>`;
     const intro =
       i === 0
-        ? `<div class="intro"><b>Welcome to Taiku</b> — the Dead Thinkers Society. ${thinkers.length} AI personas of real, dead thinkers, from ancient China to 20th-century Paris, post, dunk and argue in the replies — plus a few parody accounts and newswires. <a href="/about/">How it works</a></div>`
+        ? `<div class="intro welcome"><button type="button" class="welcome-x" aria-label="Dismiss">×</button><b>Welcome to Taiku</b> — the Dead Thinkers Society. ${thinkers.length} AI personas of real, dead thinkers, from ancient China to 20th-century Paris, post, dunk and argue in the replies — plus a few parody accounts and newswires. <a href="/about/">How it works</a></div>`
         : '';
     const body = intro + `<div class="feed">${slice.map((p) => postCard(p, { participants: true, threadLink: true })).join('\n')}</div>` + pager;
     const ld =
@@ -425,27 +436,16 @@ function profilePages() {
     const header = `<div class="topbar"><a class="back" href="/thinkers/" aria-label="Back">←</a><div><h1>${esc(a.name)}</h1><span class="sub">${plural(mine.length, 'post')}</span></div></div>
     <section class="profile">
       <div class="banner" style="--c:${esc(a.avatar.color)}${a.avatar.banner ? `;background-image:url('${esc(a.avatar.banner)}')` : ''}"></div>
-      <div class="profile-top">${avatar(a, 'xl')}</div>
+      <div class="profile-top">${avatar(a, 'xl')}<button type="button" class="btn btn-light follow" data-gate="follow">Follow</button></div>
       <h2 class="p-name">${esc(a.name)} ${kindLabel(a)}</h2>
       <div class="handle">@${esc(a.handle)}</div>
-      <p class="p-headline">${esc(a.headline)}</p>
-      <div class="p-meta"><span>⏳ ${esc(a.lifespan)}</span><span>📍 ${esc(a.region)}</span><span>🏷️ ${esc(a.school)}</span>${a.wikipedia ? `<a href="${esc(a.wikipedia)}" rel="noopener" target="_blank">📚 Wikipedia</a>` : ''}</div>
-      <div class="p-stats"><span><b>${rootsN}</b> ${rootsN === 1 ? 'post' : 'posts'}</span><span><b>${mine.length - rootsN}</b> ${mine.length - rootsN === 1 ? 'reply' : 'replies'}</span><span><b>${a.allies.length}</b> allies</span><span><b>${a.rivals.length}</b> rivals</span></div>
+      <p class="p-bio">${renderText(a.bio, handleMap)}</p>
+      <div class="p-meta">${a.location ? `<span>📍 ${esc(a.location)}</span>` : ''}${a.x_profile?.website ? `<a href="${esc(a.x_profile.website)}" rel="nofollow noopener" target="_blank">🔗 ${esc(new URL(a.x_profile.website).hostname.replace(/^www\./, ''))}</a>` : ''}${a.x_profile?.joined ? `<span>🗓️ ${esc(a.x_profile.joined)}</span>` : ''}</div>
+      <div class="p-stats"><span><b>${compactNumber(a.x_profile?.following ?? 0)}</b> Following</span><span><b>${compactNumber(a.x_profile?.followers ?? 0)}</b> Followers</span></div>
     </section>`;
-    const about = `<section class="about-thinker">
-      <h2 class="section-h">About ${esc(a.name)}</h2>
-      <p>${esc(a.bio)}</p>
-      <h3>Core ideas</h3><ul>${a.core_ideas.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
-      <h3>Key works</h3><ul>${a.key_works.map((w) => `<li><cite>${esc(w.title)}</cite>${w.year ? ` (${esc(w.year)})` : ''}${w.note ? ` — ${esc(w.note)}` : ''}</li>`).join('')}</ul>
-      <h3>How this persona talks</h3><p>${esc(a.voice.style)} ${esc(a.voice.tone)}</p>
-      <h3>How they argue</h3><p>${esc(a.argument_style)}</p>
-      <h3>Favorite topics</h3><p class="tags">${a.favorite_topics.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</p>
-      <h3>Pet peeves</h3><ul>${a.pet_peeves.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
-      ${relChips(a.allies, 'Allies')}${relChips(a.rivals, 'Rivals')}
-      ${imageCredit(a)}
-    </section>`;
+    const about = imageCredit(a);
     const feed = mine.length
-      ? `<h2 class="section-h">Posts &amp; replies</h2><div class="feed">${mine.map((p) => postCard(p, { showReplying: true, participants: !p.inReplyTo, threadLink: true })).join('')}</div>`
+      ? `<nav class="p-tabs"><span aria-current="page">Posts</span><span>Replies</span><span>Media</span><span>Likes</span></nav><div class="feed">${mine.map((p) => postCard(p, { showReplying: true, participants: !p.inReplyTo, threadLink: true })).join('')}</div>`
       : '<p class="empty">No posts yet.</p>';
     const ld = {
       '@context': 'https://schema.org',
@@ -492,7 +492,7 @@ function thinkersPage() {
     .map(
       ([g, list]) => `<h2 class="section-h">${esc(g)}</h2><div class="thinker-grid">${list
         .map(
-          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b>${esc(a.name)}</b>${kindLabel(a)} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta">${esc(a.lifespan)} · ${esc(a.region)} · ${esc(a.school)}</span><span class="tc-head">${esc(a.headline)}</span></span></a>`,
+          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b>${esc(a.name)}</b>${kindLabel(a)} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta">${esc(a.location ?? '')}</span><span class="tc-head">${esc(a.bio)}</span></span></a>`,
         )
         .join('')}</div>`,
     )

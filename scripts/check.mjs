@@ -1,4 +1,5 @@
 // Post-build sanity checks for dist/.
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, loadPersonas, loadPosts } from '../src/lib/data.mjs';
@@ -51,7 +52,17 @@ if (exists('index.html')) {
   must(/property="og:title"/.test(home), 'home lacks og:title');
   must(/application\/ld\+json/.test(home), 'home lacks JSON-LD');
   must(/AI-generated/i.test(home), 'home lacks AI-generated label');
+  // Every inline executable script must be allowed by a sha256 in the CSP (_headers).
+  const csp = exists('_headers') ? read('_headers') : '';
+  for (const m of home.matchAll(/<script>([\s\S]*?)<\/script>/g)) {
+    const h = `sha256-${crypto.createHash('sha256').update(m[1]).digest('base64')}`;
+    must(csp.includes(`'${h}'`), `_headers CSP lacks '${h}' for an inline script`);
+  }
+  must(!/ on[a-z]+="/.test(home), 'inline event handler on home (blocked by CSP)');
 }
+// Profiles show only public X-style fields, never prompt internals.
+const prof = profileDirs[0] && exists(`thinkers/${profileDirs[0]}/index.html`) ? read(`thinkers/${profileDirs[0]}/index.html`) : '';
+for (const leak of ['Core ideas', 'Pet peeves', 'How they argue', 'How this persona talks', 'Favorite topics', 'reaction_pool', 'temperament']) must(!prof.includes(leak), `profile leaks internal field: ${leak}`);
 const sample = posts.find((p) => !p.inReplyTo);
 if (sample && exists(`p/${sample.id}/index.html`)) {
   const html = read(`p/${sample.id}/index.html`);

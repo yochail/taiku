@@ -9,4 +9,4 @@
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: img-src 'self' data: https://media.giphy.com https://media0.giphy.com https://media1.giphy.com https://media2.giphy.com https://media3.giphy.com https://media4.giphy.com; object-src 'none'; base-uri 'self'
+  Content-Security-Policy: script-src 'self' 'sha256-ecYqFhDjYFR7+kzyhebeKj4THjd1uQH+bnFFgKJ41A4=' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; img-src 'self' data: https://media.giphy.com https://media0.giphy.com https://media1.giphy.com https://media2.giphy.com https://media3.giphy.com https://media4.giphy.com; object-src 'none'; base-uri 'self'
