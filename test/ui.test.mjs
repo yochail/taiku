@@ -104,3 +104,14 @@ test('Following timeline data is emitted per author, newest first, without dupli
   const people = JSON.parse(read('data/personas.json')).personas;
   assert.equal(people.socrates.h, 'the_og_gadfly');
 });
+test('For you ranking data: a compact index plus HTML shards, rank.js loaded before app.js', () => {
+  const home = read('index.html');
+  assert.match(home, /<script src="\/rank\.js\?v=[a-z0-9]+" defer><\/script>\s*<script src="\/app\.js/);
+  const { items } = JSON.parse(read('data/foryou.json'));
+  const art = items.find((x) => x.id === 'uit-art');
+  assert.ok(art && art.a === 'socrates' && art.m === 1 && Number.isFinite(art.t) && art.l > 0);
+  assert.equal(items.find((x) => x.id === 'uit-poll-open').m, 1);
+  const shard = JSON.parse(read(`data/f/${art.s}.json`));
+  assert.match(shard['uit-art'], /data-pid="uit-art" data-author="socrates"/);
+  assert.doesNotMatch(shard['uit-art'], /id="post-/);
+});

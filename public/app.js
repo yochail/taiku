@@ -114,7 +114,7 @@
       likes.has(id) ? likes.delete(id) : likes.add(id);
       store.set('likes', [...likes]);
       document.querySelectorAll(`[data-like="${CSS.escape(id)}"]`).forEach(paintLike);
-      if (likes.has(id)) { like.classList.remove('pop'); void like.offsetWidth; like.classList.add('pop'); }
+      if (likes.has(id)) { like.classList.remove('pop'); void like.offsetWidth; like.classList.add('pop'); bumpAffinity(like.closest('[data-author]')?.dataset.author, 1); }
       return;
     }
     const mark = e.target.closest('[data-bookmark]');
@@ -209,8 +209,83 @@
     fFeed.setAttribute('aria-busy', 'false');
     hydrate(fFeed);
   }
-  const tabs = [...document.querySelectorAll('.feed-tabs [role="tab"]')];
-  const selectTab = (name, focus) => {
+  // "For you": client-side ranking (public/rank.js) over /data/foryou.json, with seen-tracking and infinite scroll.
+  const R = window.TaikuRank;
+  function bumpAffinity(author, w) {
+    if (!author) return;
+    const aff = store.get('taiku_aff', {});
+    aff[author] = Math.min(20, (aff[author] || 0) + w);
+    store.set('taiku_aff', aff);
+  }
+  const focal = document.querySelector('.post.focal[data-author]');
+  if (focal) bumpAffinity(focal.dataset.author, 0.5);
+  const profileFollow = document.querySelector('.profile [data-follow]');
+  if (profileFollow) bumpAffinity(profileFollow.dataset.follow, 0.5);
+
+  const seenNow = new Set();
+  const seenTimers = new Map();
+  const recordSeen = (id) => {
+    if (!R || seenNow.has(id)) return;
+    seenNow.add(id);
+    const seen = R.markSeen(store.get('taiku_seen', {}), id, Date.now());
+    store.set('taiku_seen', R.pruneSeen(seen));
+  };
+  const seenObs = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+    for (const en of entries) {
+      const id = en.target.dataset.pid;
+      if (en.isIntersecting) { if (!seenTimers.has(id)) seenTimers.set(id, setTimeout(() => { recordSeen(id); seenObs.unobserve(en.target); }, 1000)); }
+      else { clearTimeout(seenTimers.get(id)); seenTimers.delete(id); }
+    }
+  }, { threshold: 0.5 }) : null;
+  const watchSeen = (scope) => { if (seenObs) scope.querySelectorAll('.post[data-pid]').forEach((el) => seenObs.observe(el)); };
+
+  const fyFeed = document.querySelector('#panel-foryou .feed');
+  if (fyFeed && R && window.fetch) {
+    let seed = Number(sessionStorage.getItem('taiku_seed'));
+    if (!seed) { seed = Math.floor(Math.random() * 2 ** 31) + 1; try { sessionStorage.setItem('taiku_seed', String(seed)); } catch (e) {} }
+    const shards = new Map();
+    const shard = (n) => {
+      if (!shards.has(n)) shards.set(n, fetch(`/data/f/${n}.json?v=${build}`).then((r) => (r.ok ? r.json() : {})).catch(() => ({})));
+      return shards.get(n);
+    };
+    fetch(`/data/foryou.json?v=${build}`).then((r) => (r.ok ? r.json() : Promise.reject())).then(async (data) => {
+      const { fresh, seen } = R.rankFeed(data.items, { now: Date.now(), seed, seen: store.get('taiku_seen', {}), follows, affinity: store.get('taiku_aff', {}) });
+      const queue = [...fresh, ...(seen.length ? [{ divider: true }] : []), ...seen];
+      const BATCH = 15;
+      let pos = 0;
+      let busy = false;
+      const sentinel = document.createElement('div');
+      sentinel.className = 'feed-sentinel';
+      const more = async () => {
+        if (busy || pos >= queue.length) return;
+        busy = true;
+        const batch = queue.slice(pos, pos + BATCH);
+        pos += batch.length;
+        const html = await Promise.all(batch.map(async (it) => (it.divider
+          ? '<div class="caught-up" role="separator"><b>You\u2019re all caught up</b><span>You\u2019ve seen the new posts. Here\u2019s what you scrolled past before.</span></div>'
+          : (await shard(it.s))[it.id] || '')));
+        const frag = document.createElement('div');
+        frag.innerHTML = html.join('');
+        hydrate(frag);
+        const nodes = [...frag.childNodes];
+        sentinel.before(...nodes);
+        nodes.forEach((n) => n.nodeType === 1 && watchSeen(n));
+        if (pos >= queue.length) {
+          sentinel.remove();
+          fyFeed.insertAdjacentHTML('beforeend', `<div class="caught-up end"><b>${fresh.length ? 'That\u2019s everything for now' : 'You\u2019re all caught up'}</b><span>New taiks land every few hours. Meanwhile, <a href="/thinkers/">meet the thinkers</a>.</span></div>`);
+        }
+        busy = false;
+        if (pos < queue.length && sentinel.getBoundingClientRect().top < innerHeight * 2) more();
+      };
+      fyFeed.replaceChildren(sentinel);
+      fyFeed.dataset.ranked = '1';
+      document.querySelector('#panel-foryou .pager')?.setAttribute('hidden', '');
+      await more();
+      if ('IntersectionObserver' in window) new IntersectionObserver((en) => { if (en[0].isIntersecting) more(); }, { rootMargin: '1200px 0px' }).observe(sentinel);
+    }).catch(() => watchSeen(fyFeed));
+  }
+
+  const tabs = [...document.querySelectorAll('.feed-tabs [role="tab"]')];  const selectTab = (name, focus) => {
     root.dataset.tab = name;
     try { localStorage.setItem('feedTab', name); } catch (e) {}
     tabs.forEach((t) => {

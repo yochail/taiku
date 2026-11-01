@@ -27,7 +27,7 @@ const idx = indexPosts(posts);
 const newestFirst = (a, b) => b.createdAt.localeCompare(a.createdAt);
 const roots = posts.filter((p) => !p.inReplyTo).sort(newestFirst);
 const url = (p) => SITE.baseUrl + p;
-const assetVersion = hash(fs.readFileSync(path.join(ROOT, 'public', 'styles.css'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8')).toString(36);
+const assetVersion = hash(fs.readFileSync(path.join(ROOT, 'public', 'styles.css'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'rank.js'), 'utf8')).toString(36);
 const BUILD_ID = hash(`${assetVersion}|${posts.length}|${BUILD_TIME}`).toString(36);
 
 // ---------- helpers ----------
@@ -251,7 +251,7 @@ function postCard(post, opts = {}) {
     </footer>`);
   }
   const cls = ['post', focal && 'focal', connector && 'has-connector', compact && 'compact'].filter(Boolean).join(' ');
-  return `<article class="${cls}"${opts.noId ? '' : ` id="post-${post.id}"`} data-href="/p/${post.id}/">
+  return `<article class="${cls}"${opts.noId ? '' : ` id="post-${post.id}"`} data-href="/p/${post.id}/" data-pid="${post.id}" data-author="${author.id}">
   <div class="gutter"><a href="/thinkers/${author.id}/" class="avatar-link" aria-label="${esc(author.name)}">${avatar(author, focal ? 'lg' : '')}</a>${connector ? '<span class="connector"></span>' : ''}</div>
   <div class="post-body">${postHead(post, author, { focal })}${parts.join('\n')}</div>
 </article>`;
@@ -354,6 +354,7 @@ ${ld.map(jsonLd).join('\n')}
 </div>
 <dialog class="modal" id="gate-modal" aria-labelledby="gate-title"><form method="dialog"><button class="modal-x" aria-label="Close">×</button></form><div class="modal-logo">太</div><h2 id="gate-title"></h2><p class="modal-msg"></p><form method="dialog"><button class="btn btn-primary btn-wide">Got it</button></form></dialog>
 <div class="toast" role="status" aria-live="polite"></div>
+<script src="/rank.js?v=${assetVersion}" defer></script>
 <script src="/app.js?v=${assetVersion}" defer></script>
 </body>
 </html>`;
@@ -678,8 +679,33 @@ function followData() {
   fs.writeFileSync(path.join(OUT, 'data', 'personas.json'), JSON.stringify({ v: BUILD_ID, personas: index }));
 }
 
-function rss() {
-  const items = roots.slice(0, 50).map((p) => {
+/** "For you" candidates: a compact scoring index plus HTML shards; ranking happens client-side (public/rank.js). */
+const FY_SHARD = 30;
+function forYouData() {
+  const dir = path.join(OUT, 'data', 'f');
+  fs.mkdirSync(dir, { recursive: true });
+  const items = [];
+  for (let i = 0; i < roots.length; i += FY_SHARD) {
+    const shard = {};
+    for (const p of roots.slice(i, i + FY_SHARD)) {
+      const s = stats(p);
+      const visual = (mediaByPost.get(p.id) ?? []).length > 0 || !!p.poll || !!textPoll(p);
+      items.push({ id: p.id, a: p.authorId, t: Date.parse(p.createdAt), l: s.likes, r: s.replies, rt: s.reposts + s.quotes, m: visual ? 1 : 0, s: i / FY_SHARD });
+      const kids = (idx.children.get(p.id) ?? []).filter((k) => k.authorId !== p.authorId || k.type !== 'thread');
+      const top = kids.slice().sort((a, b) => stats(b).likes - stats(a).likes)[0];
+      if (top) {
+        const more = idx.descendants(p).length - 1;
+        shard[p.id] = `<div class="conv">${postCard(p, { connector: true, threadLink: true, noId: true })}${postCard(top, { noId: true })}${more > 0 ? `<a class="conv-more" href="/p/${p.id}/">Show ${more} more ${more === 1 ? 'reply' : 'replies'}</a>` : ''}</div>`;
+      } else {
+        shard[p.id] = postCard(p, { participants: true, threadLink: true, noId: true });
+      }
+    }
+    fs.writeFileSync(path.join(dir, `${i / FY_SHARD}.json`), JSON.stringify(shard));
+  }
+  fs.writeFileSync(path.join(OUT, 'data', 'foryou.json'), JSON.stringify({ v: BUILD_ID, items }));
+}
+
+function rss() {  const items = roots.slice(0, 50).map((p) => {
     const a = P.get(p.authorId);
     return `<item><title>${esc(`${a.name}: ${truncate(shownText(p), 90)}`)}</title><link>${url(`/p/${p.id}/`)}</link><guid isPermaLink="true">${url(`/p/${p.id}/`)}</guid><pubDate>${new Date(p.createdAt).toUTCString()}</pubDate><description>${esc(shownText(p))}</description></item>`;
   });
@@ -712,6 +738,7 @@ const tagCount = tagPages();
 aboutPage();
 notFound();
 followData();
+forYouData();
 rss();
 seoFiles();
 console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags, ${mediaOut.written} rendered media)`);
