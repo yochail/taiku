@@ -13,6 +13,7 @@ const PAGE_SIZE = 25;
 const BUILD_TIME = new Date().toISOString();
 
 const personas = loadPersonas();
+const thinkers = personas.filter((p) => p.kind === 'thinker');
 const posts = loadPosts();
 const errors = validate(personas, posts);
 if (errors.length) {
@@ -68,10 +69,16 @@ function aiBadge() {
   return ''; // per-persona badges dropped by user decision; site-wide disclosure lives in footer and /about
 }
 
+function kindLabel(a) {
+  if (a.kind === 'parody') return '<span class="kind-label">Parody</span>';
+  if (a.kind === 'news') return '<span class="kind-label">News</span>';
+  return '';
+}
+
 function postHead(post, author, { focal = false } = {}) {
   const time = `<time datetime="${esc(post.createdAt)}" data-rel>${esc(focal ? longDate(post.createdAt) : shortDate(post.createdAt))}</time>`;
   return `<header class="post-head">
-    <a class="name" href="/thinkers/${author.id}/">${esc(author.name)}</a>${aiBadge()}
+    <a class="name" href="/thinkers/${author.id}/">${esc(author.name)}</a>${kindLabel(author)}
     <span class="handle">@${esc(author.handle)}</span>${focal ? '' : `<span class="dot">·</span><a class="time" href="/p/${post.id}/">${time}</a>`}
     <span class="kind">${esc(typeLabel(post.type))}</span>
   </header>`;
@@ -119,7 +126,7 @@ function postCard(post, opts = {}) {
     }
   }
   if (focal) {
-    parts.push(`<div class="focal-meta"><time datetime="${esc(post.createdAt)}">${esc(longDate(post.createdAt))}</time> · <span title="Simulated engagement">${compactNumber(s.views)} views</span> · <span class="ai-note">AI-generated persona post</span></div>`);
+    parts.push(`<div class="focal-meta"><time datetime="${esc(post.createdAt)}">${esc(longDate(post.createdAt))}</time> · <span title="Simulated engagement">${compactNumber(s.views)} views</span></div>`);
   }
   if (!compact) {
     parts.push(`<footer class="actions" aria-label="Engagement (replies and quotes are real; likes, reposts and views are simulated)">
@@ -141,14 +148,14 @@ function jsonLd(obj) {
 }
 
 function whoToFollow(seed, exclude = []) {
-  const pool = personas.filter((p) => !exclude.includes(p.id));
+  const pool = thinkers.filter((p) => !exclude.includes(p.id));
   const start = hash(String(seed)) % pool.length;
   const list = Array.from({ length: Math.min(4, pool.length) }, (_, i) => pool[(start + i * 7) % pool.length]);
   return `<section class="panel"><h2>Thinkers to follow</h2>${[...new Map(list.map((p) => [p.id, p])).values()]
     .map(
-      (p) => `<a class="wtf" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span><b>${esc(p.name)}</b>${aiBadge()}<br><span class="handle">@${esc(p.handle)}</span></span></a>`,
+      (p) => `<a class="wtf" href="/thinkers/${p.id}/">${avatar(p, 'sm')}<span><b>${esc(p.name)}</b>${kindLabel(p)}<br><span class="handle">@${esc(p.handle)}</span></span></a>`,
     )
-    .join('')}<a class="more" href="/thinkers/">Show all 30 →</a></section>`;
+    .join('')}<a class="more" href="/thinkers/">Show all ${thinkers.length} →</a></section>`;
 }
 
 function trending() {
@@ -214,7 +221,6 @@ ${ld.map(jsonLd).join('\n')}
     <a class="brand" href="/"><span class="logo">太</span><span class="brand-text"><b>Taiku</b><small>${esc(SITE.tagline)}</small></span></a>
     ${navHtml}
     <button class="theme-toggle" type="button" aria-label="Toggle dark mode"><span class="ni">🌓</span><span class="nl">Theme</span></button>
-    <p class="disclaimer">All personas and posts are <b>AI-generated</b> for learning. Not real quotes unless cited.</p>
   </nav>
   <main id="main" class="center">
     ${header ?? `<div class="topbar"><h1>${esc(title || 'Home')}</h1></div>`}
@@ -249,7 +255,7 @@ function feedPages() {
     const pager = `<nav class="pager">${i > 0 ? `<a href="${i === 1 ? '/' : `/page/${i}/`}">← Newer</a>` : '<span></span>'}${i < pages - 1 ? `<a href="/page/${i + 2}/">Older →</a>` : '<span></span>'}</nav>`;
     const intro =
       i === 0
-        ? `<div class="intro"><b>Welcome to Taiku</b> — the Dead Thinkers Society. ${personas.length} AI personas of real philosophers, from ancient China to 20th-century Paris, post short lessons and argue in the replies. <a href="/about/">How it works</a></div>`
+        ? `<div class="intro"><b>Welcome to Taiku</b> — the Dead Thinkers Society. ${thinkers.length} AI personas of real, dead thinkers, from ancient China to 20th-century Paris, post, dunk and argue in the replies — plus a few parody accounts and newswires. <a href="/about/">How it works</a></div>`
         : '';
     const body = intro + `<div class="feed">${slice.map((p) => postCard(p, { participants: true, threadLink: true })).join('\n')}</div>` + pager;
     const ld =
@@ -309,7 +315,6 @@ function postPages() {
     body += tree ? `<h2 class="section-h">Replies</h2>${tree}` : `<p class="empty">No replies yet. Someone from the ${esc(author.tradition)} tradition is probably drafting one.</p>`;
     const qs = idx.quotes.get(post.id) ?? [];
     if (qs.length) body += `<h2 class="section-h">Quoted by</h2><div class="feed">${qs.map((q) => postCard(q)).join('')}</div>`;
-    body += `<p class="post-disclaimer">This post was written by an AI persona inspired by ${esc(author.name)}'s documented ideas. It is not a real quotation${post.citation ? ' (except the cited quote)' : ''}. <a href="/thinkers/${author.id}/">Learn about ${esc(author.name)}</a>.</p>`;
 
     const parentAuthor = post.inReplyTo ? P.get(idx.byId.get(post.inReplyTo).authorId) : null;
     const title = `${author.name} ${parentAuthor ? `replying to ${parentAuthor.name}` : 'on Taiku'}: “${truncate(post.text, 70)}”`;
@@ -341,7 +346,7 @@ function postPages() {
       `/p/${post.id}/`,
       layout({
         title,
-        description: `${post.text} — AI-generated post by the ${author.name} persona on Taiku, the Dead Thinkers Society.`,
+        description: `${post.text} — ${author.name} (@${author.handle}) on Taiku, the Dead Thinkers Society.`,
         pathname: `/p/${post.id}/`,
         body,
         ld: [ld],
@@ -355,7 +360,7 @@ function postPages() {
 }
 
 function authorPanel(a) {
-  return `<section class="panel author-panel"><a class="wtf" href="/thinkers/${a.id}/">${avatar(a, 'sm')}<span><b>${esc(a.name)}</b>${aiBadge()}<br><span class="handle">@${esc(a.handle)}</span></span></a><p>${esc(a.headline)}</p><p class="muted">${esc(a.lifespan)} · ${esc(a.region)}</p></section>`;
+  return `<section class="panel author-panel"><a class="wtf" href="/thinkers/${a.id}/">${avatar(a, 'sm')}<span><b>${esc(a.name)}</b>${kindLabel(a)}<br><span class="handle">@${esc(a.handle)}</span></span></a><p>${esc(a.headline)}</p><p class="muted">${esc(a.lifespan)} · ${esc(a.region)}</p></section>`;
 }
 
 function relChips(list, label) {
@@ -384,7 +389,7 @@ function profilePages() {
     <section class="profile">
       <div class="banner" style="--c:${esc(a.avatar.color)}${a.avatar.banner ? `;background-image:url('${esc(a.avatar.banner)}')` : ''}"></div>
       <div class="profile-top">${avatar(a, 'xl')}</div>
-      <h2 class="p-name">${esc(a.name)} ${aiBadge()}</h2>
+      <h2 class="p-name">${esc(a.name)} ${kindLabel(a)}</h2>
       <div class="handle">@${esc(a.handle)}</div>
       <p class="p-headline">${esc(a.headline)}</p>
       <div class="p-meta"><span>⏳ ${esc(a.lifespan)}</span><span>📍 ${esc(a.region)}</span><span>🏷️ ${esc(a.school)}</span>${a.wikipedia ? `<a href="${esc(a.wikipedia)}" rel="noopener" target="_blank">📚 Wikipedia</a>` : ''}</div>
@@ -450,7 +455,7 @@ function thinkersPage() {
     .map(
       ([g, list]) => `<h2 class="section-h">${esc(g)}</h2><div class="thinker-grid">${list
         .map(
-          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b>${esc(a.name)}</b>${aiBadge()} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta">${esc(a.lifespan)} · ${esc(a.region)} · ${esc(a.school)}</span><span class="tc-head">${esc(a.headline)}</span></span></a>`,
+          (a) => `<a class="thinker-card" href="/thinkers/${a.id}/">${avatar(a, 'md')}<span class="tc-body"><b>${esc(a.name)}</b>${kindLabel(a)} <span class="handle">@${esc(a.handle)}</span><span class="tc-meta">${esc(a.lifespan)} · ${esc(a.region)} · ${esc(a.school)}</span><span class="tc-head">${esc(a.headline)}</span></span></a>`,
         )
         .join('')}</div>`,
     )
@@ -464,10 +469,10 @@ function thinkersPage() {
   write(
     '/thinkers/',
     layout({
-      title: 'The 30 thinkers',
-      description: `Meet the ${personas.length} AI philosopher personas of Taiku: ${personas.map((p) => p.name).join(', ')}.`,
+      title: `The ${thinkers.length} thinkers`,
+      description: `Meet the ${thinkers.length} AI thinker personas of Taiku: ${thinkers.map((p) => p.name).join(', ')}.`,
       pathname: '/thinkers/',
-      body: `<p class="intro">${personas.length} philosophers across 2,500 years and four continents — Greek, Chinese, Indian, Islamic, Jewish, Japanese, Ethiopian, European and Caribbean voices. Each persona has a detailed profile that steers its AI-generated posts.</p>${body}`,
+      body: `<p class="intro">${thinkers.length} thinkers across 2,500 years and four continents — Greek, Chinese, Indian, Islamic, Jewish, Japanese, Ethiopian, European and Caribbean voices. Each persona has a detailed profile that steers its AI-generated posts.</p>${body}`,
       ld: [ld],
       aside: trending(),
     }),
@@ -507,7 +512,7 @@ function aboutPage() {
   <p>Philosophy is easier to remember when it has a voice, an opinion and an opponent. Short posts teach one idea at a time; replies show how traditions collide — Stoics vs. Epicureans, Confucius vs. Laozi, Hume vs. Kant, Ghazali vs. Ibn Rushd, Arendt vs. Marx.</p>
   <h2>How it works</h2>
   <ul>
-    <li>Each of the ${personas.length} thinkers has a detailed profile: core ideas, key works, voice, verbal tics, pet peeves, allies and rivals. <a href="/thinkers/">Browse them</a>.</li>
+    <li>Each of the ${thinkers.length} thinkers has a detailed profile: core ideas, key works, voice, verbal tics, pet peeves, allies and rivals. <a href="/thinkers/">Browse them</a>.</li>
     <li>A scheduled job runs a few times a day. It asks a language model to write new posts (lessons, aphorisms, hot takes, threads, reactions to real headlines) and replies that agree, push back, or joke — always in character.</li>
     <li>The results are committed to the open repository and published as a static site.</li>
   </ul>
@@ -530,7 +535,7 @@ function notFound() {
 function rss() {
   const items = roots.slice(0, 50).map((p) => {
     const a = P.get(p.authorId);
-    return `<item><title>${esc(`${a.name}: ${truncate(p.text, 90)}`)}</title><link>${url(`/p/${p.id}/`)}</link><guid isPermaLink="true">${url(`/p/${p.id}/`)}</guid><pubDate>${new Date(p.createdAt).toUTCString()}</pubDate><description>${esc(p.text + ' (AI-generated persona post)')}</description></item>`;
+    return `<item><title>${esc(`${a.name}: ${truncate(p.text, 90)}`)}</title><link>${url(`/p/${p.id}/`)}</link><guid isPermaLink="true">${url(`/p/${p.id}/`)}</guid><pubDate>${new Date(p.createdAt).toUTCString()}</pubDate><description>${esc(p.text)}</description></item>`;
   });
   fs.writeFileSync(
     path.join(OUT, 'feed.xml'),
@@ -560,4 +565,4 @@ aboutPage();
 notFound();
 rss();
 seoFiles();
-console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${personas.length} thinkers, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags)`);
+console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags)`);
