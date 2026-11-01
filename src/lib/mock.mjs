@@ -9,6 +9,7 @@
 // - micro (<micro_spec>): tiny replies + new reaction-pool entries
 // - media: fills whatever planMedia asked for (meme templates, gif reactions/queries, art, charts, polls)
 import { quoteMatches, taikLength, MAX_TAIK_CHARS } from './data.mjs';
+import { lintTaik } from './house-style.mjs';
 import { seededRng, sha256 } from './pipeline-util.mjs';
 
 const tagContent = (s, tag) => s.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`))?.[1] ?? null;
@@ -169,6 +170,20 @@ function mediaFill(media, ctx, rand, text) {
   return text ? null : null;
 }
 
+function clipWords(text, max) {
+  const words = String(text).split(/\s+/);
+  while (words.length > 1 && taikLength(words.join(' ')) > max) words.pop();
+  const out = words.join(' ').replace(/[,;:—-]+$/, '');
+  return taikLength(out) <= max ? out : [...out].slice(0, max).join('');
+}
+
+/** On a repair round, a compliant model fixes what it was told: recompose until clean and in range. */
+function composeOk(ctx, passages, rand, opts) {
+  let out = compose(ctx, passages, rand, opts);
+  for (let i = 0; opts.repairing && i < 8 && (lintTaik(out.text).length || taikLength(out.text) > ctx.max); i++) out = compose(ctx, passages, rand, opts);
+  return out;
+}
+
 /** Build the final JSON object for one item (as the model would return it). */
 function compose(ctx, passages, rand, { repairing }) {
   const out = {};
@@ -198,7 +213,9 @@ function compose(ctx, passages, rand, { repairing }) {
     text = `${phrase.trim()}. ${String(translation ?? '').split(/[;,(]/)[0].trim()}. that's the post.`;
     quoteRefs = undefined;
   }
-  if (/use 1-2 emoji/.test(spec.emoji ?? '') && taikLength(text) + 3 <= MAX_TAIK_CHARS && !/emoji only/.test(spec.form ?? '')) text = `${text} ${pick(EMOJI, rand)}`;
+  // A model asked for N chars cuts to fit; the overshoot path below exercises shorten-repair on purpose.
+  if (taikLength(text) > max && !quoteRefs) text = clipWords(text, max);
+  if (/use 1-2 emoji/.test(spec.emoji ?? '') && taikLength(text) + 3 <= Math.min(max, MAX_TAIK_CHARS) && !/emoji only/.test(spec.form ?? '')) text = `${text} ${pick(EMOJI, rand)}`;
   const tagged = String(spec.tag ?? '').match(/@[A-Za-z0-9_]+/g) ?? [];
   if (tagged.length && rand() < 0.85 && taikLength(text) + 2 + tagged.join(' ').length <= max) text = rand() < 0.5 ? `${text} ${tagged.join(' ')}` : `${pick(['ok', 'look', 'lol', 'see', 'hey'], rand)} ${tagged.join(' ')}, ${text}`;
   const nTags = Number(String(spec.hashtag ?? '').match(/add exactly (\d+)/)?.[1] ?? (/add one/i.test(spec.hashtag ?? '') ? 1 : 0));
@@ -227,7 +244,7 @@ function composeBatch(ctx, messages, rand) {
       targetHandle: thread.at(-1)?.match(/@([\w-]+)/)?.[1] ?? null,
       ...rangeOf(it.length),
     };
-    return { id: it.id, ...compose(sub, it.passages ?? [], rand, { repairing: Boolean(repairMsg) }) };
+    return { id: it.id, ...composeOk(sub, it.passages ?? [], rand, { repairing: Boolean(repairMsg) }) };
   });
   if (!repairMsg && items.length > 2 && rand() < 0.08) items.pop(); // partial array → regenerated
   const body = JSON.stringify(items);
@@ -303,7 +320,7 @@ export function createMockClient({ maxCalls = 1000, tools = 'on', nonce = '', mo
         return reply({ content: null, tool_calls: [{ id: `call_${calls}`, type: 'function', function: { name: 'search_sources', arguments: JSON.stringify({ query }) } }] });
       }
       const repairing = /Too long:|not verbatim|not a valid JSON|content policy|House style:/.test(lastOf(messages, 'user')?.content ?? '');
-      return reply({ content: JSON.stringify(compose(ctx, returnedPassages(messages), rand, { repairing })) });
+      return reply({ content: JSON.stringify(composeOk(ctx, returnedPassages(messages), rand, { repairing })) });
     },
   };
 }

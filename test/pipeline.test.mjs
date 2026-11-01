@@ -86,6 +86,8 @@ test('idempotent + resumable: rerunning the same date skips done tasks and never
   const root = freshRoot();
   const a = await run({ root, nonce: undefined });
   const paths = outputPaths(root, DATE, { mock: true });
+  // The mock's repair round always fixes the item; a failed task here would make run B legitimately add posts.
+  assert.deepEqual(a.manifest.tasks.filter((t) => t.status === 'failed').map((t) => `${t.taskId}: ${t.error}`), [], 'mock repairs succeed');
   const first = read(paths.posts).posts.map((p) => p.id);
   const manifest = read(paths.run);
   assert.ok(manifest.nonce, 'nonce is logged');
@@ -104,6 +106,9 @@ test('idempotent + resumable: rerunning the same date skips done tasks and never
   assert.equal(a.manifest.tasks[0].taskId, b.manifest.tasks[0].taskId, 'stable task ids');
   // replay with the logged nonce in a new root gives the same plan
   const c = await run({ root: freshRoot(), nonce: manifest.nonce });
+  const c2 = await run({ root: freshRoot(), nonce: undefined });
+  assert.equal(c2.manifest.nonce, manifest.nonce, 'default nonce is derived from (date, seed)');
+  assert.deepEqual(c2.published.map((p) => p.id), a.published.map((p) => p.id), 'a fresh root reproduces the day');
   assert.deepEqual(c.manifest.tasks.map((t) => t.taskId), b.manifest.tasks.map((t) => t.taskId));
   const d = await run({ root: freshRoot(), nonce: 'other-nonce' });
   assert.notDeepEqual(d.manifest.reactions.map((x) => `${x.taskId}:${x.personaId}:${x.action}`), c.manifest.reactions.map((x) => `${x.taskId}:${x.personaId}:${x.action}`));

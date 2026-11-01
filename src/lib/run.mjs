@@ -9,11 +9,11 @@
 //
 // Idempotent + resumable: task ids derive from the topic and the reaction graph, which is fully
 // determined by (seed, nonce, topics, content plan); all four are reused from the previous manifest,
+// the default nonce is derived from (date, seed) so a fresh rerun reproduces the same day,
 // finished items are cached in content/runs/<date>.work.json, and the posts file is rewritten
 // atomically. Content is only published when completeness thresholds are met.
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { SITE_DIR, loadPersonas, personaKind, safeUrl, validate } from './data.mjs';
 import { POST_ARCHETYPES, REPLY_ARCHETYPES } from './archetypes.mjs';
 import { behaviorOf } from './behavior.mjs';
@@ -40,7 +40,7 @@ import { createToolbox } from './tools.mjs';
 import { PROMPT_VERSION } from './prompts.mjs';
 import { checkPost, policyContext } from './policy.mjs';
 import { runTurn } from './turn.mjs';
-import { clamp, editorialDay, hash8, readJson, round3, seededRng, sha256, shuffle, weightedPick, writeJsonAtomic } from './pipeline-util.mjs';
+import { clamp, editorialDay, hash8, readJson, round3, seededRng, sha256, weightedPick, writeJsonAtomic } from './pipeline-util.mjs';
 
 export const DEFAULT_MAX_CALLS = 90;
 export const DEFAULT_MIN_COMPLETE = 0.7;
@@ -378,8 +378,9 @@ export async function runDaily(opts = {}) {
   const paths = outputPaths(root, date, { mock, publish, suffix: opts.suffix ?? null });
   const runPath = mock ? 'mock' : dryRun && offline ? 'dry-run' : 'cloudflare';
   const prev = opts.fresh ? null : readJson(paths.run);
-  const nonce = opts.nonce ?? prev?.nonce ?? crypto.randomBytes(6).toString('hex');
   const seed = String(opts.seed ?? env.GEN_SEED ?? prev?.seed ?? date);
+  // Deterministic from (date, seed) unless a nonce is given (replay / deliberate re-roll).
+  const nonce = opts.nonce ?? prev?.nonce ?? hash8(`nonce:${date}:${seed}`);
   const maxCalls = Number(opts.maxCalls ?? env.GEN_MAX_CALLS) || DEFAULT_MAX_CALLS;
   const minComplete = clamp(Number(env.GEN_MIN_COMPLETE) || DEFAULT_MIN_COMPLETE, 0, 1);
   const runId = `daily-${date}${paths.suffix}`;
@@ -867,7 +868,7 @@ export async function runDaily(opts = {}) {
   const origin = mock ? 'mock' : 'cloudflare';
   const done = tasks.filter((t) => t.status === 'done');
   const posts = done.map((t) => assemblePost({ t, node: nodeById.get(t.taskId), taskById, byId, topic: topicById.get(t.topicId), runId, origin, rand: seededRng('votes', t.taskId, nonce) }));
-  const retaiks = retaikRows({ posts, byId, sampler: createSampler(spec, `retaik:${seed}:${nonce}`), rand: seededRng('retaik', seed, nonce), prefix, date, runId, origin });
+  const retaiks = retaikRows({ posts, byId, sampler: createSampler(spec, `retaik:${seed}:${nonce}`), pairSampler: (k) => createSampler(spec, `retaik:${seed}:${nonce}:${k}`), key: `${seed}:${nonce}`, prefix, date, runId, origin });
   const allPosts = [...posts, ...retaiks];
 
   // 8) Completeness.
@@ -997,36 +998,42 @@ function linkCard(topic) {
 /**
  * Plain retaik rows ({type:'retaik', retaikOf, text:''}) from persona reposts, sized by the realism
  * spec (sampler.retaikCount). Never of a retaik; always strictly after the original.
+ * Each (post, reposter) pair is ranked and timed from its own hash, so a rerun that adds a retried
+ * post only adds candidates; it never reshuffles the retaiks of posts that were already there.
  */
-export function retaikRows({ posts, byId, sampler, rand, prefix, date, runId, origin }) {
+export function retaikRows({ posts, byId, sampler, pairSampler = () => sampler, key = '', prefix, date, runId, origin }) {
+  const rank = ([p, pid]) => hash8(`${key}:${date}:rt-rank:${p.id}:${pid}`);
+  const byRank = (a, b) => rank(a).localeCompare(rank(b));
   const pairs = [];
   for (const p of posts) for (const pid of p.personaReposts ?? []) if (pid !== p.authorId && byId.has(pid)) pairs.push([p, pid]);
   const want = sampler.retaikCount(posts.length);
   // Not enough persona reposts for the spec's retaik rate: some likers also retaik (and become reposters).
   if (pairs.length < want) {
-    const extra = shuffle(rand, posts.filter((p) => p.type !== 'retaik').flatMap((p) => (p.personaLikes ?? []).filter((pid) => pid !== p.authorId && byId.has(pid) && !(p.personaReposts ?? []).includes(pid)).map((pid) => [p, pid])));
+    const extra = (posts.filter((p) => p.type !== 'retaik').flatMap((p) => (p.personaLikes ?? []).filter((pid) => pid !== p.authorId && byId.has(pid) && !(p.personaReposts ?? []).includes(pid)).map((pid) => [p, pid]))).sort(byRank);
     for (const [p, pid] of extra.slice(0, want - pairs.length)) {
       p.personaReposts = [...(p.personaReposts ?? []), pid];
       pairs.push([p, pid]);
     }
   }
   const n = Math.min(pairs.length, want);
-  return shuffle(rand, pairs)
+  return [...pairs]
+    .sort(byRank)
     .slice(0, n)
-    .map(([p, pid]) => ({
+    .map(([p, pid]) => [p, pid, pairSampler(`${p.id}:${pid}`), seededRng('retaik', key, p.id, pid)])
+    .map(([p, pid, ps, rand]) => ({
       id: `${prefix}-${hash8(`${date}:rt:${p.id}:${pid}`)}`,
       authorId: pid,
       type: 'retaik',
       retaikOf: p.id,
       text: '',
-      createdAt: iso(Date.parse(p.createdAt) + (Math.min(240, sampler.replyDelayMinutes()) + 1) * 60000 + Math.floor(rand() * 60000)),
+      createdAt: iso(Date.parse(p.createdAt) + (Math.min(240, ps.replyDelayMinutes()) + 1) * 60000 + Math.floor(rand() * 60000)),
       runId,
       taskId: `rt:${p.taskId}:${pid}`,
       origin,
       promptVersion: PROMPT_VERSION,
       model: 'none',
     }))
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
 }
 
 function assemblePost({ t, node, taskById, byId, topic, runId, origin, rand }) {

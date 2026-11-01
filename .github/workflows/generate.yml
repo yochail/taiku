@@ -26,7 +26,7 @@ on:
         description: "Date YYYY-MM-DD (blank = today, UTC)"
         default: ""
       nonce:
-        description: "Replay a logged run nonce (blank = random)"
+        description: "Run nonce: replay a logged one or re-roll the day (blank = derived from date + seed)"
         default: ""
       topics:
         description: "Topics this run (3-5, blank = budget plan)"
