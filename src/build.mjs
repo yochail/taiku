@@ -3,7 +3,7 @@
 // content/posts/*.json, writes indexable HTML to dist/.
 import fs from 'node:fs';
 import path from 'node:path';
-import { displayName, ROOT, SITE_DIR, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
+import { displayName, publicFile, ROOT, SITE_DIR, loadPersonas, loadPosts, validate, indexPosts } from './lib/data.mjs';
 import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderText, slugify } from './lib/util.mjs';
 import { writeMediaFiles } from './lib/media.mjs';
 import { OUT_DIR, SITE_CONFIG } from './lib/site.mjs';
@@ -802,7 +802,8 @@ function searchPage() {
 /** PWA: offline fallback page and a service worker whose cache name follows the build. */
 function pwa() {
   write('/offline.html', layout({ title: t('offline.title'), description: t('offline.desc'), pathname: '/offline.html', noindex: true, body: `<div class="offline-msg"><span class="logo">${LOGO}</span><h2>${t('offline.heading')}</h2><p>${t('offline.text')}</p><a class="btn" href="/">${t('offline.retry')}</a></div>` }), { inSitemap: false });
-  const shell = ['/offline.html', `/styles.css?v=${assetVersion}`, `/rank.js?v=${assetVersion}`, `/app.js?v=${assetVersion}`, '/favicon.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png'];
+  const shell = ['/offline.html', `/styles.css?v=${assetVersion}`, `/rank.js?v=${assetVersion}`, `/app.js?v=${assetVersion}`, '/favicon.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png']
+    .filter((u) => !/^\/(favicon|manifest|icons)/.test(u) || fs.existsSync(publicFile(u.slice(1))));
   const sw = fs.readFileSync(path.join(ROOT, 'public', 'sw.js'), 'utf8').replace("'__VERSION__'", JSON.stringify(BUILD_ID)).replace('__SHELL__', JSON.stringify(shell));
   fs.writeFileSync(path.join(OUT, 'sw.js'), sw);
 }
