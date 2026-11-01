@@ -66,8 +66,15 @@
 
   // Returns { fresh, seen }: unseen posts ranked, then posts seen once (shown after "You're all caught up"); 2+ views are dropped.
   function rankFeed(items, ctx) {
-    const scored = items.map((it) => ({ it, s: score(it, ctx), n: seenCount(it, ctx) })).filter((x) => x.n < 2);
     const by = (a, b) => b.s - a.s || (a.it.id < b.it.id ? -1 : 1);
+    // A retaik (k = original id) and its original are one story: keep the best-scored copy.
+    const keys = new Set();
+    const scored = items.map((it) => ({ it, s: score(it, ctx), n: seenCount(it, ctx) })).filter((x) => x.n < 2).sort(by).filter((x) => {
+      const k = x.it.k || x.it.id;
+      if (keys.has(k)) return false;
+      keys.add(k);
+      return true;
+    });
     const fresh = scored.filter((x) => x.n === 0).sort(by).map((x) => x.it);
     const seen = scored.filter((x) => x.n === 1).sort(by).map((x) => x.it);
     return { fresh: diversify(fresh), seen: diversify(seen) };

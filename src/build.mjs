@@ -170,7 +170,22 @@ const ICONS = {
   share: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8M5 13v6.5h14V13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
   views: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V12M10 20V6M15 20v-9M20 20V4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
-};
+  home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.5 12 3.5l8.5 7V20a.5.5 0 0 1-.5.5h-5v-6h-6v6H4a.5.5 0 0 1-.5-.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+  search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  bell: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+  compose: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',};
+
+const MENU_BTN = `<button type="button" class="menu-btn" aria-label="Open menu" aria-controls="drawer" aria-expanded="false">${ICONS.user}</button>`;
+function tabbar(pathname) {
+  const cur = (on) => (on ? ' aria-current="page"' : '');
+  return [
+    `<a href="/" aria-label="Home"${cur(pathname === '/' || /^\/page\//.test(pathname))}>${ICONS.home}</a>`,
+    `<a href="/thinkers/" aria-label="Explore thinkers"${cur(pathname.startsWith('/thinkers/'))}>${ICONS.search}</a>`,
+    `<button type="button" data-gate="notifications" aria-label="Notifications">${ICONS.bell}</button>`,
+    `<button type="button" data-gate="messages" aria-label="Messages">${ICONS.mail}</button>`,
+  ].join('');
+}
 
 function aiBadge() {
   return ''; // per-persona badges dropped by user decision; site-wide disclosure lives in footer and /about
@@ -310,7 +325,7 @@ function layout({ title, description, pathname, body, ld = [], ogType = 'website
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(truncate(description, 300))}">
 <link rel="canonical" href="${esc(canonical)}">
@@ -337,14 +352,16 @@ ${ld.map(jsonLd).join('\n')}
 <body data-build="${BUILD_ID}">
 <a class="skip" href="#main">Skip to content</a>
 <div class="shell">
-  <nav class="leftnav" aria-label="Main">
+  <nav class="leftnav" id="drawer" aria-label="Main">
     <a class="brand" href="/"><span class="logo">太</span><span class="brand-text"><b>Taiku</b><small>${esc(SITE.tagline)}</small></span></a>
     ${navHtml}
     <button class="theme-toggle" type="button" aria-label="Toggle dark mode"><span class="ni">🌓</span><span class="nl">Theme</span></button>
     <button class="nav-btn nav-login" type="button" data-gate="login"><span class="ni">👤</span><span class="nl">Log in / Sign up</span></button>
+    <button class="btn post-btn" type="button" data-gate="post" aria-label="Post"><span class="nl">Post</span><span class="pb-icon">${ICONS.compose}</span></button>
   </nav>
+  <div class="drawer-scrim" hidden></div>
   <main id="main" class="center">
-    ${header ?? `<div class="topbar"><h1>${esc(title || 'Home')}</h1></div>`}
+    ${header ?? `<div class="topbar">${MENU_BTN}<h1>${esc(title || 'Home')}</h1></div>`}
     ${body}
   </main>
   <aside class="rightbar">
@@ -353,6 +370,8 @@ ${ld.map(jsonLd).join('\n')}
   </aside>
 </div>
 <dialog class="modal" id="gate-modal" aria-labelledby="gate-title"><form method="dialog"><button class="modal-x" aria-label="Close">×</button></form><div class="modal-logo">太</div><h2 id="gate-title"></h2><p class="modal-msg"></p><form method="dialog"><button class="btn btn-primary btn-wide">Got it</button></form></dialog>
+<nav class="tabbar" aria-label="Sections">${tabbar(pathname)}</nav>
+<button class="fab" type="button" data-gate="post" aria-label="Post">${ICONS.compose}</button>
 <div class="toast" role="status" aria-live="polite"></div>
 <script src="/rank.js?v=${assetVersion}" defer></script>
 <script src="/app.js?v=${assetVersion}" defer></script>
@@ -392,7 +411,7 @@ function feedPages() {
 </div>`
       : body;
     const header = home
-      ? `<div class="topbar home-top"><div class="ht-row"><button type="button" class="menu-btn" aria-label="Open menu" aria-expanded="false">${ICONS.user}</button><a class="ht-logo" href="/" aria-label="Taiku home"><span class="logo">太</span></a><span class="ht-sp"></span></div><h1 class="sr-only">Home</h1><div class="feed-tabs" role="tablist" aria-label="Home timelines"><button type="button" role="tab" id="tab-foryou" data-tab="foryou" aria-controls="panel-foryou" aria-selected="true"><span>For you</span></button><button type="button" role="tab" id="tab-following" data-tab="following" aria-controls="panel-following" aria-selected="false"><span>Following</span></button></div></div>`
+      ? `<div class="topbar home-top"><div class="ht-row">${MENU_BTN}<a class="ht-logo" href="/" aria-label="Taiku home"><span class="logo">太</span></a><span class="ht-sp"></span></div><h1 class="sr-only">Home</h1><div class="feed-tabs" role="tablist" aria-label="Home timelines"><button type="button" role="tab" id="tab-foryou" data-tab="foryou" aria-controls="panel-foryou" aria-selected="true"><span>For you</span></button><button type="button" role="tab" id="tab-following" data-tab="following" aria-controls="panel-following" aria-selected="false"><span>Following</span></button></div></div>`
       : `<div class="topbar"><h1>Home · page ${i + 1}</h1><span class="sub">Latest from the Dead Thinkers Society</span></div>`;
     const ld =
       i === 0
@@ -690,7 +709,7 @@ function forYouData() {
     for (const p of roots.slice(i, i + FY_SHARD)) {
       const s = stats(p);
       const visual = (mediaByPost.get(p.id) ?? []).length > 0 || !!p.poll || !!textPoll(p);
-      items.push({ id: p.id, a: p.authorId, t: Date.parse(p.createdAt), l: s.likes, r: s.replies, rt: s.reposts + s.quotes, m: visual ? 1 : 0, s: i / FY_SHARD });
+      items.push({ id: p.id, a: p.authorId, t: Date.parse(p.createdAt), l: s.likes, r: s.replies, rt: s.reposts + s.quotes, m: visual ? 1 : 0, s: i / FY_SHARD, ...(p.retaikOf ? { k: p.retaikOf } : {}) });
       const kids = (idx.children.get(p.id) ?? []).filter((k) => k.authorId !== p.authorId || k.type !== 'thread');
       const top = kids.slice().sort((a, b) => stats(b).likes - stats(a).likes)[0];
       if (top) {
@@ -705,7 +724,8 @@ function forYouData() {
   fs.writeFileSync(path.join(OUT, 'data', 'foryou.json'), JSON.stringify({ v: BUILD_ID, items }));
 }
 
-function rss() {  const items = roots.slice(0, 50).map((p) => {
+function rss() {
+  const items = roots.slice(0, 50).map((p) => {
     const a = P.get(p.authorId);
     return `<item><title>${esc(`${a.name}: ${truncate(shownText(p), 90)}`)}</title><link>${url(`/p/${p.id}/`)}</link><guid isPermaLink="true">${url(`/p/${p.id}/`)}</guid><pubDate>${new Date(p.createdAt).toUTCString()}</pubDate><description>${esc(shownText(p))}</description></item>`;
   });

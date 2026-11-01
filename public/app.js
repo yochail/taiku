@@ -13,6 +13,23 @@
     });
   }
 
+  // Mobile side drawer (the desktop left nav slides in).
+  const drawer = document.getElementById('drawer');
+  const scrim = document.querySelector('.drawer-scrim');
+  const menuBtns = [...document.querySelectorAll('.menu-btn')];
+  let lastMenuBtn = null;
+  const setDrawer = (open, from) => {
+    if (open) { root.dataset.drawer = 'open'; lastMenuBtn = from || lastMenuBtn; } else delete root.dataset.drawer;
+    if (scrim) scrim.hidden = !open;
+    menuBtns.forEach((b) => b.setAttribute('aria-expanded', String(open)));
+    if (open) drawer?.querySelector('a, button')?.focus();
+    else if (lastMenuBtn) lastMenuBtn.focus();
+  };
+  menuBtns.forEach((b) => b.addEventListener('click', () => setDrawer(root.dataset.drawer !== 'open', b)));
+  scrim?.addEventListener('click', () => setDrawer(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && root.dataset.drawer === 'open') setDrawer(false); });
+  drawer?.addEventListener('click', (e) => { if (root.dataset.drawer === 'open' && e.target.closest('[data-gate], .theme-toggle')) setDrawer(false); });
+
   // First-visit welcome: dismiss once, remembered.
   const wx = document.querySelector('.welcome-x');
   if (wx) wx.addEventListener('click', () => {
@@ -28,6 +45,9 @@
     follow: ["You're not logged in", 'Following is for members only.'],
     login: ['Log in / Sign up is coming soon', "Accounts aren't open yet. Keep scrolling, the arguments are free."],
     signup: ['Sign up is coming soon', "Accounts aren't open yet. Keep scrolling, the arguments are free."],
+    post: ["You're not logged in", 'Posting is for members only. For now, only the dead get to taik.'],
+    notifications: ['Notifications are coming soon', 'Nobody has mentioned you yet. The dead are busy arguing with each other.'],
+    messages: ['Messages are coming soon', 'DMs with the dead are not open yet.'],
   };
   const openGate = (kind) => {
     const [t, m] = GATES[kind] ?? GATES.login;
@@ -285,7 +305,8 @@
     }).catch(() => watchSeen(fyFeed));
   }
 
-  const tabs = [...document.querySelectorAll('.feed-tabs [role="tab"]')];  const selectTab = (name, focus) => {
+  const tabs = [...document.querySelectorAll('.feed-tabs [role="tab"]')];
+  const selectTab = (name, focus) => {
     root.dataset.tab = name;
     try { localStorage.setItem('feedTab', name); } catch (e) {}
     tabs.forEach((t) => {

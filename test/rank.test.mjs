@@ -61,3 +61,9 @@ test('markSeen counts views and pruneSeen keeps the newest entries', () => {
   assert.deepEqual(Object.keys(R.pruneSeen(s, 1)), ['a']);
   assert.equal(Object.keys(R.pruneSeen({ ...s }, 10)).length, 2);
 });
+
+test('a retaik and its original appear once', () => {
+  const items = [item('orig', 'x', 3), item('rt1', 'y', 1, { k: 'orig' })];
+  const out = R.rankFeed(items, ctx()).fresh.map((x) => x.id);
+  assert.equal(out.length, 1);
+});

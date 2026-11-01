@@ -115,3 +115,15 @@ test('For you ranking data: a compact index plus HTML shards, rank.js loaded bef
   assert.match(shard['uit-art'], /data-pid="uit-art" data-author="socrates"/);
   assert.doesNotMatch(shard['uit-art'], /id="post-/);
 });
+test('mobile chrome: drawer menu button, bottom tab bar and compose button on every page', () => {
+  for (const rel of ['index.html', 'thinkers/index.html']) {
+    const html = read(rel);
+    assert.match(html, /<nav class="leftnav" id="drawer"/);
+    assert.match(html, /class="menu-btn"[^>]*aria-controls="drawer"[^>]*aria-expanded="false"/);
+    assert.match(html, /<nav class="tabbar" aria-label="Sections">/);
+    assert.match(html, /class="fab"[^>]*data-gate="post"/);
+    assert.match(html, /viewport-fit=cover/);
+    assert.equal((html.match(/Log in \/ Sign up/g) ?? []).length, 1);
+  }
+  assert.match(read('index.html'), /class="tabbar"[\s\S]*?href="\/" aria-label="Home" aria-current="page"/);
+});
