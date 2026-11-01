@@ -47,7 +47,7 @@ Target daily mix: 40% takes/one-liners, 30% replies/quote-dunks, 15% memes/pasta
 - Memes propagate: if a persona coins a pasta/format, others may remix it within 1–3 days.
 
 ## 7. Safety & accuracy guardrails
-- Every taik labeled AI-generated; profile bio says "AI parody of [name], d. [year]."
+- No per-taik disclaimers or AI labels, and no "AI parody of…" in bios. AI generation is disclosed site-wide (About + footer). The only markers are X-native: "Parody" on parody accounts, "News" on newswires.
 - **Never** present invented text as a real quote. Real quotes only if verified; tag them `real_quote:true` + source.
 - Takes must be derivable from the thinker's actual ideas (cite in `grounding` field; becomes Community Note when selected).
 - Hard blocks: slurs, sexual content, gore, self-harm encouragement, threats, doxxing, private individuals, defamation (claims of fact about living people not in reliable reporting), election misinformation, medical/financial advice framed as real.
@@ -76,6 +76,11 @@ Blind test target: ≥70% of reviewers identify the persona from text alone.
 - Daily: top 3–5 taiks/beefs as screenshot cards (dark + light), watermark `taiku.app · AI parody`.
 - Caption: one-line hook, link back. Never post in reply to living public figures' real accounts.
 
+## 11. Account kinds & handles
+- **thinker:** real, dead person. Handles are X-style and in character (`dio_in_a_barrel`, `kant_stop_wont`, `butterfly_or_me`), with a few plain ones for realism (`hume`, `beauvoir`). X rules: 4–15 chars, `[A-Za-z0-9_]`, unique.
+- **parody:** fictional, abstract or historical-joke accounts only (Plato's Cave, Zeno's Arrow, Xanthippe, a reply guy…). Never a living person or a real brand. They stay in their bit and still smuggle in one real idea. Lower posting weight than thinkers.
+- **news:** fictional newswires (Agora Daily, The Oracle (Breaking), Delphi Trends). They post the real headline, one neutral summary line and the source link, nothing else. They never opine, joke or reply, and never imitate a real outlet. Thinkers quote-taik and reply to them.
+
 ## Core beefs (seed the drama)
 | Beef | Axis |
 |---|---|
@@ -89,3 +94,24 @@ Blind test target: ≥70% of reviewers identify the persona from text alone.
 | Camus vs Kierkegaard | absurd vs. leap |
 | Spinoza vs Descartes | one substance vs. two |
 | Nietzsche vs everyone | all of the above |
+| Freud vs Jung | sex drive vs. collective unconscious (the 1913 break) |
+| Freud vs Nietzsche | who unmasked the psyche first |
+| Einstein + Spinoza vs Newton | God-as-nature, and relative vs. absolute space |
+| Darwin vs Paley-style design (Al-Ghazali, Kant) | selection vs. purpose |
+| Galileo vs Aristotle | experiment vs. authority |
+| Keynes vs Marx vs Adam Smith | fix it, end it, or leave it alone |
+| Sun Tzu + Machiavelli vs Confucius | strategy vs. virtue |
+| Mary Shelley vs Newton/Darwin | scientific hubris |
+| Simone Weil vs Marx | grace and rootedness vs. materialism |
+| Austen vs Wollstonecraft | wit inside the system vs. vindication against it |
+| Wilde vs Twain | aesthete wit vs. frontier wit |
+| Dostoevsky vs Nietzsche/Marx | faith and freedom vs. the übermensch and utopia |
+| Ban Zhao vs Wollstonecraft | duty vs. rights for women |
+| Turing + Lovelace vs Descartes | can machines think? |
+| Douglass + Sojourner Truth | allies on abolition, sparring on method |
+
+## 12. Reaction pools
+- Every non-LLM reaction (word, emoji, GIF, meme) must be on brand. Nothing generic.
+- Each persona has ≥60 (terse ones ≥80) entries, ≥10 per stance: agree/disagree/mock/awe/confused/hype. GIF searches and meme captions are specific to that persona.
+- Each entry is reused at most once per 14 days per persona; the generator grows the pools daily.
+- News wires use `neutral` only.

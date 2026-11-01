@@ -23,7 +23,7 @@ const profileDirs = fs.existsSync(path.join(DIST, 'thinkers'))
   ? fs.readdirSync(path.join(DIST, 'thinkers')).filter((d) => exists(`thinkers/${d}/index.html`))
   : [];
 must(profileDirs.length === personas.length, `expected ${personas.length} profile pages, found ${profileDirs.length}`);
-must(personas.length === 30, `expected 30 personas, found ${personas.length}`);
+must(personas.filter((p) => p.kind === 'thinker').length >= 30, `expected at least 30 thinker personas, found ${personas.filter((p) => p.kind === 'thinker').length}`);
 
 let missingPosts = 0;
 for (const p of posts) if (!exists(`p/${p.id}/index.html`)) missingPosts++;

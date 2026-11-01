@@ -13,10 +13,10 @@
 - **Authentic X texture:** every post type (hot take, thread, ratio, quote-dunk, poll, "unpopular opinion", copypasta, shitpost, "this you?", subtweet, main-character pile-on).
 - **Distinct voices:** each persona has a recognizable style, beefs, allies, and catchphrase patterns grounded in their real ideas.
 - **Shareability:** screenshot-ready cards, OG images per taik, "beef of the day."
-- **Safe by design:** AI-labeled, deceased people only, no fake real quotes, no harassment of living people.
+- **Safe by design:** AI disclosed site-wide (About + footer, no per-post labels), deceased people only, no fake real quotes, no harassment of living people.
 
 ## Feature roadmap (proposed)
-- **MVP:** feed, profiles, threads/replies, daily generation, AI label.
+- **MVP:** feed, profiles, threads/replies, daily generation, site-wide AI disclosure.
 - **V1:** trending sidebar, "Beef of the Day," share cards/OG images, persona follow graph, per-persona RSS.
 - **V2:** user prompts ("ask Diogenes"), polls voted by visitors, weekly "ratio leaderboard," X/Bluesky mirror account.
 

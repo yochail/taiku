@@ -163,6 +163,64 @@ export const PERSONA_TOOLS = ['search_sources', 'get_quote', 'search_news', 'get
 export const personaKind = (p) => p?.kind ?? 'thinker';
 const THINKER_FIELDS = ['lifespan', 'region', 'school', 'core_ideas', 'key_works', 'voice', 'allies', 'rivals', 'never', 'sample_posts', 'modernity', 'native_language', 'quotables', 'sources', 'post_archetypes', 'reply_archetypes'];
 
+
+// thinker = real deceased person; parody = fictional/joke account; news = neutral fictional newswire.
+export const PERSONA_KINDS = ['thinker', 'parody', 'news'];
+export const HANDLE_RE = /^[A-Za-z0-9_]{4,15}$/;
+export const PERSONA_DOMAINS = ['philosophy', 'science', 'mathematics', 'technology', 'psychology', 'economics', 'strategy', 'politics', 'literature', 'arts', 'religion', 'medicine'];
+export const REACTION_STANCES = ['agree', 'disagree', 'mock', 'awe', 'confused', 'hype'];
+export const REACTION_KINDS = { text: 80, emoji: 12, gif_query: 60, meme_template: 100 };
+/** The single content key of a reaction_pool entry: text|emoji|gif_query|meme_template. */
+export const reactionKind = (x) => Object.keys(REACTION_KINDS).find((k) => x?.[k] !== undefined);
+
+// Pre-written, no-LLM micro-reactions (content-lead contract); each reused at most once per 14 days.
+function validateReactions(p, e) {
+  const r = p.reaction_pool;
+  if (!Array.isArray(r)) return e('reaction_pool must be an array of objects');
+  const news = personaKind(p) === 'news';
+  const seen = new Set();
+  const count = {};
+  r.forEach((x, i) => {
+    const w = `reaction_pool[${i}]`;
+    if (!x || typeof x !== 'object') return e(`${w} must be an object`);
+    const kinds = Object.keys(REACTION_KINDS).filter((k) => x[k] !== undefined);
+    if (kinds.length !== 1) return e(`${w} needs exactly one of ${Object.keys(REACTION_KINDS).join('|')}`);
+    const v = x[kinds[0]];
+    if (typeof v !== 'string' || !v.trim() || [...v].length > REACTION_KINDS[kinds[0]]) e(`${w}.${kinds[0]} must be a non-empty string ≤${REACTION_KINDS[kinds[0]]} chars`);
+    if (kinds[0] === 'meme_template' && !/^[^:]+: .+/.test(v)) e(`${w}.meme_template must look like "<Template>: <caption>"`);
+    const key = `${kinds[0]}:${v}`;
+    if (seen.has(key)) e(`${w} duplicate`);
+    seen.add(key);
+    const okStance = news ? x.stance === 'neutral' : REACTION_STANCES.includes(x.stance);
+    if (!okStance) e(`${w}.stance must be ${news ? 'neutral (news)' : REACTION_STANCES.join('|')}`);
+    if (!(Array.isArray(x.tags) && x.tags.length >= 1 && x.tags.length <= 4 && x.tags.every((t) => typeof t === 'string' && /^[a-z0-9_-]+$/.test(t)))) e(`${w}.tags must be 1-4 lowercase tags`);
+    if (typeof x.tone !== 'string' || !x.tone.trim()) e(`${w}.tone required`);
+    count[kinds[0]] = (count[kinds[0]] ?? 0) + 1;
+    count[x.stance] = (count[x.stance] ?? 0) + 1;
+  });
+  if (news) {
+    if (r.length < 20 || r.length > 200) e('news reaction_pool must have 20-200 entries');
+    return;
+  }
+  if (r.length < 60 || r.length > 200) e('reaction_pool must have 60-200 entries');
+  for (const s of REACTION_STANCES) if ((count[s] ?? 0) < 10) e(`reaction_pool needs ≥10 "${s}" reactions (has ${count[s] ?? 0})`);
+  for (const k of ['gif_query', 'meme_template']) if ((count[k] ?? 0) < 6) e(`reaction_pool needs ≥6 ${k}`);
+  for (const k of ['text', 'emoji']) if (!count[k]) e(`reaction_pool needs at least one ${k}`);
+}
+
+function validatePersonaKind(p, errors) {
+  const e = (m) => errors.push(`persona ${p.id}: ${m}`);
+  const kind = personaKind(p);
+  if (!PERSONA_KINDS.includes(kind)) e(`kind must be one of ${PERSONA_KINDS.join('|')}`);
+  if (kind === 'thinker' && p.domain !== undefined && !PERSONA_DOMAINS.includes(p.domain)) e(`domain must be one of ${PERSONA_DOMAINS.join('|')}`);
+  if (p.domain !== undefined && kind !== 'thinker') e('only thinkers have a domain');
+  if (p.reaction_pool !== undefined) validateReactions(p, e);
+  if (typeof p.handle === 'string' && !HANDLE_RE.test(p.handle)) e(`handle "${p.handle}" must be 4-15 chars of [A-Za-z0-9_] (X rules)`);
+  if (kind === 'news' && p.post_archetypes && !(p.post_archetypes.length === 1 && p.post_archetypes[0] === 'news_wire')) e('news accounts must use only the news_wire post archetype');
+  if (kind !== 'news' && p.post_archetypes?.includes('news_wire')) e('only news accounts may use news_wire');
+  if (p.sources && !p.sources.some((s) => s.reading_list)) e('at least one source must have reading_list: true');
+}
+
 /** Public-domain/verified quotable passage lookup: quote_bank (local source spans) + quotables (content-lead verified lines). */
 export function findQuotable(p, id) {
   return (p?.quotables ?? []).find((q) => q.id === id) ?? null;
@@ -175,8 +233,9 @@ function validatePersonas(personas, errors) {
   for (const p of personas) {
     for (const e of validateSchema(p, schema)) errors.push(`persona ${p._file}: ${e}`);
     if (personaKind(p) === 'thinker') for (const k of THINKER_FIELDS) if (p[k] === undefined) errors.push(`persona ${p.id}: thinker missing "${k}"`);
+    validatePersonaKind(p, errors);
     for (const t of p.tools ?? []) if (!PERSONA_TOOLS.includes(t)) errors.push(`persona ${p.id}: unknown tool ${t}`);
-    for (const img of [p.avatar?.image, p.avatar?.banner].filter(Boolean)) {
+    for (const img of [p.avatar?.image, p.avatar?.banner, ...Object.values(p.avatar?.srcset ?? {})].filter(Boolean)) {
       if (!fs.existsSync(path.join(ROOT, 'public', img))) errors.push(`persona ${p.id}: missing image public${img}`);
     }
     if (p.avatar?.image && !(p.attribution?.author || p.attribution?.source)) errors.push(`persona ${p.id}: image without attribution`);

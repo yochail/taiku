@@ -16,9 +16,9 @@ const out = [
   '',
   'Each persona file is loaded as the full system prompt for every LLM turn: `system_prompt` + the structured profile + `quotables` (the only lines the model may quote) + `sources` (for the `search_sources` / `get_quote` tools, Community Notes and the profile Reading list).',
   '',
-  '| Persona | Handle | Lifespan | School | Modernity | Reactivity | Quotables | Sources |',
-  '|---|---|---|---|---|---|---|---|',
-  ...personas.map((p) => `| [${p.name}](#${p.id}) | @${p.handle} | ${p.lifespan} | ${p.school} | ${p.modernity} | ${p.reactivity} | ${p.quotables.length} | ${p.sources.length} |`),
+  '| Persona | Kind | Domain | Handle | Lifespan | School | Modernity | Reactivity | Quotables | Sources |',
+  '|---|---|---|---|---|---|---|---|---|---|',
+  ...personas.map((p) => `| [${p.name}](#${p.id}) | ${p.kind} | ${p.domain ?? '—'} | @${p.handle} | ${p.lifespan} | ${p.school} | ${p.modernity} | ${p.reactivity} | ${p.quotables.length} | ${p.sources.length} |`),
   '',
 ];
 
@@ -26,7 +26,7 @@ for (const p of personas) {
   const top = Object.entries(p.topic_affinity).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k]) => k).join(', ');
   out.push(
     `<a id="${p.id}"></a>`,
-    `## ${p.name} · @${p.handle}`,
+    `## ${p.name} · @${p.handle}${p.kind === 'thinker' ? '' : ` (${p.kind})`}`,
     `*${p.lifespan} · ${p.region} · ${p.school}* · modernity ${p.modernity} · reactivity ${p.reactivity} · hottest topics: ${top}`,
     '',
     `> ${p.bio} · 📍 ${p.location}`,
@@ -37,8 +37,8 @@ for (const p of personas) {
     `- **Argues by:** ${p.argument_style}`,
     `- **Allies:** ${rel(p.allies)}`,
     `- **Rivals:** ${rel(p.rivals)}`,
-    `- **Native (${p.native_language.name}):** ${p.native_language.phrases.map((x) => `${x.text} = "${x.translation}"`).join(' · ')}`,
-    `- **Quotables:** ${p.quotables.map((q) => `"${q.text}" — ${q.citation}`).join(' · ')}`,
+    ...(p.native_language?.phrases?.length ? [`- **Native (${p.native_language.name}):** ${p.native_language.phrases.map((x) => `${x.text} = "${x.translation}"`).join(' · ')}`] : []),
+    `- **Quotables:** ${p.quotables.map((q) => `"${q.text}" — ${q.citation}`).join(' · ') || '—'}`,
     `- **Reading list:** ${p.sources.filter((s) => s.reading_list).map((s) => `[${s.title}](${s.url})`).join(' · ')}`,
     ...(p.sensitive_notes.length ? [`- **Sensitive:** ${p.sensitive_notes.join(' ')}`] : []),
     '',

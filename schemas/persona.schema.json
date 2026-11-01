@@ -71,6 +71,14 @@
         "banner": {
           "type": "string",
           "pattern": "^/avatars/[a-z0-9_-]+\\.(webp|png|jpg|svg)$"
+        },
+        "srcset": {
+          "type": "object",
+          "description": "Width → image path variants (96/192/400) for srcset.",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^/avatars/[a-z0-9_-]+\\.webp$"
+          }
         }
       }
     },
@@ -111,7 +119,10 @@
       }
     },
     "born": {
-      "type": "integer"
+      "type": [
+        "integer",
+        "null"
+      ]
     },
     "died": {
       "type": "integer"
@@ -138,7 +149,10 @@
       "type": "string"
     },
     "wikipedia": {
-      "type": "string",
+      "type": [
+        "string",
+        "null"
+      ],
       "format": "https-uri"
     },
     "popularity": {
@@ -358,7 +372,10 @@
       }
     },
     "native_language": {
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "required": [
         "name",
         "phrases"
@@ -682,6 +699,13 @@
             }
           }
         }
+      }
+    },
+    "reaction_pool": {
+      "type": "array",
+      "description": "No-LLM micro-reactions (content lead). Each item has exactly one of text|emoji|gif_query|meme_template plus stance, tags[1-4], tone. Each entry is used at most once per 14 days per persona (content/state/reaction-usage.json). Detailed rules in data.mjs validateReactions.",
+      "items": {
+        "type": "object"
       }
     }
   }
