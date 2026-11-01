@@ -8,7 +8,8 @@
 #   dispatch      → all sites, or one via the `site` input
 # Note: pushes made with GITHUB_TOKEN (generate.yml fallback publish) don't trigger `push`; the drip covers them.
 #
-# Secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID (or CF_ACCOUNT_ID).
+# Secrets: CLOUDFLARE_API_TOKEN (Account › Workers Scripts: Edit), CLOUDFLARE_ACCOUNT_ID (or CF_ACCOUNT_ID).
+# Custom domains are attached in the dashboard and persist; deploys never touch routes (deploy.customDomain=false).
 name: deploy
 
 on:

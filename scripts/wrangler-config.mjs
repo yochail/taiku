@@ -1,7 +1,8 @@
 // Writes wrangler.<site>.json for `wrangler deploy` of dist/<site> as a static-assets-only Worker.
 //   SITE=<id> node scripts/wrangler-config.mjs   → prints the config path
-// site.json "deploy": { "worker": "<name>" (default: site id), "customDomain": true|false (default false) }.
-// Keep customDomain false until the domain is detached from the old Pages project, then flip it on.
+// site.json "deploy": { "worker": "<name>" (default: site id), "customDomain": false }.
+// Keep customDomain false: domains are attached once in the Cloudflare dashboard and persist across deploys;
+// the CI token has no zone/DNS permissions, so deploys must not touch routes.
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SITE, SITE_CONFIG } from '../src/lib/site.mjs';
