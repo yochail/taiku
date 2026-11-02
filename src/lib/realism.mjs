@@ -6,6 +6,7 @@ import { rng as makeRng } from './util.mjs';
 import { renderProblems } from './media.mjs';
 import { behaviorOf } from './behavior.mjs';
 import { withDisplayStats } from './crowd.mjs';
+import { rotateMediaWeights } from './formats.mjs';
 
 export const SPEC_PATH = sitePath('realism', 'spec.json');
 export const VISUAL_KINDS = new Set(['image', 'gif', 'meme', 'chart', 'video']);
@@ -476,9 +477,10 @@ export function createSampler(spec = loadSpec(), seed = 'taiku') {
     /** 'original' | 'reply' | 'quote' */
     activity: () => weighted(rand, Object.entries(s.activity)),
     /** media kind for a role, or 'none'; visual kinds scale with the persona's meme affinity */
-    mediaKind: (role = 'original', persona = null) => {
+    mediaKind: (role = 'original', persona = null, rotation = null) => {
       const f = mediaFactor(spec, persona);
-      return weighted(rand, Object.entries(s.media[role] ?? s.media.original).map(([k, w]) => [k, VISUAL_KINDS.has(k) && typeof w === 'number' ? w * f : w]));
+      const ws = Object.entries(s.media[role] ?? s.media.original).map(([k, w]) => [k, VISUAL_KINDS.has(k) && typeof w === 'number' ? w * f : w]);
+      return weighted(rand, rotation ? rotateMediaWeights(ws, rotation.rot, rotation.pid, role === 'quote' ? 'quote:' : '') : ws);
     },
     /** { min, max } character range to ask the LLM for (never truncate to fit); persona-tilted buckets */
     lengthRange: (persona = null) => {

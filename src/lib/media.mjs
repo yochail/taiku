@@ -328,7 +328,7 @@ function sample(rand, arr, k) {
  *   when ctx.giphy is enabled, else the local public-domain reactions.
  */
 export function planMedia(sampler, role = 'original', ctx = {}) {
-  const kind = ctx.kind ?? sampler.mediaKind(role, ctx.persona ?? null);
+  const kind = ctx.kind ?? sampler.mediaKind(role, ctx.persona ?? null, ctx.rotation ?? null);
   const rand = sampler.rand;
   const lib = loadLibrary();
   if (kind === 'none' || kind === 'video') return null;

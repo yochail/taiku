@@ -123,6 +123,11 @@
       "delay_minutes": { "lognormal": { "median": 35, "sigma": 1.5 }, "max": 2880 },
       "confidence": "low (product choice)"
     },
+    "format_rotation": {
+      "_note": "Per-persona format rotation (src/lib/formats.mjs). Format = media kind (meme, image, chart, gif, poll, ref = link/x/bsky card), quote, thread, or the text archetype (hot_take, aphorism, daily_life, ...); replies and plain retaiks are conversation-driven and don't rotate. Each candidate format is weighted penalty^k for k uses among the persona's last lookback items (across days); media kinds are renormalised among themselves so the spec's media shares are unchanged. News/wire accounts are exempt. Product choice.",
+      "lookback": 5,
+      "penalty": 0.3
+    },
     "resurfacing": {
       "_note": "Virality / cross-day follow-ons (src/lib/followon.mjs resurface). Each daily run picks seed posts from the last window_days (authored, at least min_age_hours old by the end of the day) weighted by traction = (1 + likes + 2*reposts + 3*(replies+quotes))^traction_exponent * 0.5^(age_h/half_life_hours): heavy-tailed toward already-popular posts with a long power-law-like tail (zhao2015, crane2008). Seeds ~ Poisson(seeds_per_day_mean); each draws 1 reactor plus more with more_probability up to max_per_seed; a quote_share of them quote-taik rather than reply. With pile_on.probability_per_day one top-traction post (weights squared) gets a pile-on of pile_on.reactors. Reactors are weighted by relation, reactivity and dunk tendency, never repeat a persona already in that thread, and post no earlier than earliest_hour local and at least 1h after the seed. Deterministic from (date, seed). Rates are product choices sized so cross-day reactions are ~5-15% of a day's replies+quotes.",
       "window_days": 7,
@@ -220,7 +225,12 @@
     "persona_short_chars": 40,
     "persona_slack": 0.2,
     "persona_z": 2,
-    "persona_alpha": 0.002
+    "persona_alpha": 0.002,
+    "format_window_days": 7,
+    "format_min_items": 5,
+    "max_format_run": 4,
+    "min_format_entropy_bits": 1.0,
+    "_format_note": "Per persona (news accounts exempt), over the day plus the previous format_window_days-1 days: a run of more than max_format_run items of the same format that ends today fails the gate; 7-day format entropy below min_format_entropy_bits (with >= format_min_items items) is a warning."
   },
   "media_policy": {
     "kinds": ["image", "gif", "meme", "chart", "video", "link_card", "poll", "x_post", "bsky_post"],

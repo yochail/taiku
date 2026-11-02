@@ -110,6 +110,12 @@ export const POST_ARCHETYPES = {
     guidance: 'Opens with "hear me out", "be honest" or "genuinely asking". Sounds unhinged, is actually doctrine.',
     vibe: 'spicy',
   },
+  daily_life: {
+    label: 'Daily life',
+    skeleton: 'just [mundane action]. [what the thinker\'s philosophy makes of it] / day 3 of [small habit]: [wry observation]',
+    guidance: 'A funny first-person bit about an ordinary daily action (coffee, commute, laundry, a queue, a bad night\'s sleep, a walk) seen through the thinker\'s ideas. Mundane setup, philosophical punchline. No lecture.',
+    vibe: 'funny',
+  },
   quote_take: {
     label: 'Quote',
     skeleton: '[Your take on the quoted taik — agree, add, or twist]',

@@ -33,6 +33,7 @@ import { OPENERS_PER_BATCH, ORIGINALS_PER_BATCH, REPLIES_PER_BATCH, SHORTS_PER_B
 import { cosineVec, createEmbedder, personaVectors, stanceAnchors, stanceHint, tokens } from './embed.mjs';
 import { MICRO_REFILL_MAX, MICRO_REFILL_PERSONAS, MICRO_REPLIES, runMicro } from './micro.mjs';
 import { chooseStance, createPoolPicker, entryMedia, loadPools, loadReactionUsage, reactionId, saveReactionUsage, usageFile } from './pools.mjs';
+import { createRotation as createFormatRotation, formatOfTask } from './formats.mjs';
 import { defaultFill, enforceUniqueVisuals, materializeFor, planFor, schemaAllowsGiphy } from './gen-media.mjs';
 import { handleRates } from './handles.mjs';
 import { runBatch } from './gen-batch.mjs';
@@ -52,7 +53,7 @@ export const MIN_TOPIC_SHARE = 0.6;
 const NOTE_RATE = 0.2;
 const NATIVE_RATE = 0.06;
 const QUOTE_RATE = { original: 0.35, reply: 0.15, quote: 0.25 };
-const STANDALONE_TYPES = ['hot_take', 'aphorism', 'teaching', 'reminder', 'question', 'unpopular_opinion', 'shitpost', 'subtweet', 'pov', 'hear_me_out', 'listicle', 'meme'];
+const STANDALONE_TYPES = ['hot_take', 'aphorism', 'teaching', 'reminder', 'question', 'unpopular_opinion', 'shitpost', 'subtweet', 'pov', 'hear_me_out', 'listicle', 'meme', 'daily_life'];
 const NO_STANDALONE = new Set(['news_take', 'news_wire', 'quote_post', 'thread', 'poll', 'quote_take', 'quote_dunk', 'copypasta']);
 /** Reply forms served without the LLM (reaction pools / art library). */
 export const CHEAP_FORMS = new Set(['emoji_only', 'few_words', 'gif_only', 'meme_only', 'image_only']);
@@ -120,7 +121,7 @@ function topicAffinity(persona, keys = {}) {
 }
 
 /** Type (archetype) for a planned node. */
-function pickType(rand, persona, node, media) {
+function pickType(rand, persona, node, media, rot = null) {
   if (node.kind === 'wire') return 'news_wire';
   if (node.kind === 'thread' || node.kind === 'thread-part') return 'thread';
   if (node.role === 'quote') return node.rel === 'rival' || node.rel === 'frenemy' ? 'quote_dunk' : 'quote_take';
@@ -133,10 +134,15 @@ function pickType(rand, persona, node, media) {
     return weightedPick(rand, Object.keys(REPLY_ARCHETYPES).filter(ok).map((k) => [k, own.has(k) ? 4 : 1])) ?? 'joke';
   }
   if (media === 'poll') return 'poll';
-  if (node.kind === 'topic-root') return rand() < 0.65 ? 'news_take' : 'hot_take';
+  if (node.kind === 'topic-root') {
+    const r = (k) => (rot && !media ? rot.factor(persona.id, k) : 1);
+    return weightedPick(rand, [['news_take', 0.65 * r('news_take')], ['hot_take', 0.35 * r('hot_take')]]) ?? 'news_take';
+  }
   if (media === 'meme' && rand() < 0.5) return 'meme';
   const own = new Set((persona.post_archetypes ?? []).filter((k) => POST_ARCHETYPES[k] && !NO_STANDALONE.has(k)));
-  return weightedPick(rand, [...new Set([...own, ...STANDALONE_TYPES])].map((k) => [k, own.has(k) ? 3 : 1])) ?? 'hot_take';
+  // Format rotation: an archetype the persona used k times in its last few items weighs penalty^k.
+  const rotw = (k) => (rot && !media ? rot.factor(persona.id, k) : 1);
+  return weightedPick(rand, [...new Set([...own, ...STANDALONE_TYPES])].map((k) => [k, (own.has(k) ? 3 : 1) * rotw(k)])) ?? 'hot_take';
 }
 
 /**
@@ -313,7 +319,7 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
 }
 
 /** Per-task generation spec (length, media plan, emoji, …) drawn from the realism sampler. */
-function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, giphy }) {
+function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, giphy, rot = null }) {
   const role = node.kind === 'wire' ? 'wire' : node.role;
   const form = node.form ?? null;
   const cheap = node.exec === 'pool';
@@ -324,9 +330,10 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
     // Quotes and replies aimed at someone else's taik may use the screenshot dunk; the quoted text is
     // bound at turn time (bindDunkQuote) once the target has been written.
     const aimed = (role === 'quote' || role === 'reply') && (node.quoteOf || node.parent);
-    mediaPlan = planFor(sampler, role === 'original' ? 'original' : role, { news, giphy, persona, topic, ...(aimed ? { quote: { pending: true, text: ' ' } } : {}) });
+    const rotation = rot && persona && !isNews(persona) ? { rot, pid: persona.id } : null;
+    mediaPlan = planFor(sampler, role === 'original' ? 'original' : role, { news, giphy, persona, topic, rotation, ...(aimed ? { quote: { pending: true, text: ' ' } } : {}) });
     // Topic roots re-draw so link cards keep their spec share despite URL-less standalones.
-    if (role === 'original' && !mediaPlan && news) for (let i = 0; i < 2 && mediaPlan?.kind !== 'link_card'; i++) mediaPlan = planFor(sampler, 'original', { news, giphy, persona }) ?? mediaPlan;
+    if (role === 'original' && !mediaPlan && news) for (let i = 0; i < 2 && mediaPlan?.kind !== 'link_card'; i++) mediaPlan = planFor(sampler, 'original', { news, giphy, persona, rotation }) ?? mediaPlan;
     if (mediaPlan?.kind === 'poll' && (role !== 'original' || node.kind === 'thread' || node.kind === 'thread-part')) mediaPlan = null;
     if (mediaPlan?.kind === 'link_card' && !news) mediaPlan = null;
   }
@@ -345,7 +352,7 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
   if (media === 'poll') length = { min: Math.max(20, length.min), max: Math.max(60, Math.min(length.max, 140)) };
   const modern = clamp(persona.modernity ?? 3, 1, 5);
   const emoji = role !== 'wire' && (sampler.wantsEmoji() || (modern >= 4 && sampler.wantsEmoji())) && !(modern <= 2 && rand() < 0.5);
-  const type = pickType(rand, persona, node, media);
+  const type = pickType(rand, persona, node, media, rot && !isNews(persona) ? rot : null);
   const llm = role !== 'wire' && !cheap;
   const hashtags = llm && !short ? sampler.hashtagCount(role, persona) : 0;
   return {
@@ -556,9 +563,13 @@ export async function runDaily(opts = {}) {
   const gClient = !offline && schemaAllowsGiphy() ? createGiphyClient({ apiKey: env.GIPHY_API_KEY, maxCalls: Number(env.GIPHY_MAX_CALLS || 10) }) : null;
   const giphy = gClient?.enabled ? gClient : null;
   const externalTasks = plan.nodes.filter((n) => n.kind === 'external').map((n) => ({ taskId: n.id, kind: 'external', role: 'original', exec: 'external', level: -1, personaId: n.authorId, postId: n.external.id, parentTaskId: null, topicId: null, at: n.external.createdAt, status: 'done', fields: { text: n.external.text ?? '' }, stance: n.external.stance ?? null, source: 'corpus' }));
+  // Per-persona format rotation, seeded from the persona's last items before today (later files must not
+  // change a rerun); plan order is time order.
+  const rot = createFormatRotation(others.filter((p) => Date.parse(p.createdAt) < plan.day.start), spec.sampling.format_rotation);
   const tasks = plan.nodes.filter((n) => n.kind !== 'external').map((n) => {
     const persona = byId.get(n.authorId);
-    const spec1 = taskSpec({ node: n, persona, topic: topicById.get(n.topicId), sampler: plan.sampler, rand: plan.rand, postId: postIdOf(n.id), hasPassages: hasPassages(persona), giphy });
+    const spec1 = taskSpec({ node: n, persona, topic: topicById.get(n.topicId), sampler: plan.sampler, rand: plan.rand, postId: postIdOf(n.id), hasPassages: hasPassages(persona), giphy, rot });
+    if (n.kind !== 'thread-part') rot.push(n.authorId, formatOfTask({ role: spec1.role, media: spec1.media, archetype: spec1.archetype, kind: n.kind }));
     if (n.role === 'reply' && n.exec !== 'pool' && plan.rand() < 0.3) spec1.mention = byId.get(nodeById.get(n.parent)?.authorId)?.handle ?? null;
     if (n.followOn === 'resurface' || n.followOn === 'pile-on') spec1.followOn = n.followOn;
     if (n.textMentions?.length) spec1.mentions = n.textMentions.map((id) => byId.get(id)?.handle).filter(Boolean);

@@ -10,6 +10,7 @@
 // Returns offenders [{ postId, taskId, reason, length? }] the pipeline can regenerate once
 // (generate --repair), and a short markdown scorecard.
 import { withDisplayStats } from './crowd.mjs';
+import { rotationStats } from './formats.mjs';
 import { classify, evaluate, expectedReplyForms, lengthWeights, measure, mediaOf, personaReplyStyle } from './realism.mjs';
 
 const charLen = (text) => [...String(text ?? '')].length;
@@ -160,6 +161,19 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
   }
   const personaFails = personaRows.filter((r) => r.status === 'fail');
   add({ id: 'persona.length_mix', status: personaFails.length ? 'fail' : 'pass', value: personaFails.length, n: personaRows.length, min: 0, max: 0, blocking: true, detail: personaFails.map((r) => `${r.personaId} (${r.style}): ${pct(r.shortShare)} short (expected ${pct(r.expectedShort)} ±${pct(r.tolerance)}), ${pct(r.longShare)} over 140 (expected ${pct(r.expectedLong)} +${pct(r.toleranceLong)})`) });
+
+  // 3b) Per persona format rotation over the day + previous days (news accounts exempt).
+  const winDays = gate.format_window_days ?? 7;
+  const dayStart = Math.min(...day.map((p) => Date.parse(p.createdAt)).filter((t) => !Number.isNaN(t)));
+  const todayIds = new Set(day.map((p) => p.id));
+  const window = Number.isFinite(dayStart) ? [...context.filter((p) => { const t = Date.parse(p.createdAt); return t < dayStart && t >= dayStart - (winDays - 1) * 864e5; }), ...day] : day;
+  const rotRows = rotationStats(window).filter((r) => byP.get(r.personaId) && (byP.get(r.personaId).kind ?? 'thinker') !== 'news' && r.n >= (gate.format_min_items ?? 5));
+  const maxRunAllowed = gate.max_format_run ?? 4;
+  const runFails = rotRows.filter((r) => r.maxRun > maxRunAllowed && r.run.ids.some((id) => todayIds.has(id)));
+  add({ id: 'persona.format_run', status: runFails.length ? 'fail' : 'pass', value: Math.max(0, ...rotRows.map((r) => r.maxRun)), n: rotRows.length, min: null, max: maxRunAllowed, blocking: true, detail: runFails.map((r) => `${r.personaId}: ${r.maxRun}× ${r.run.f} in a row (${r.run.ids.slice(-3).join(', ')})`) });
+  const minH = gate.min_format_entropy_bits ?? 1;
+  const lowH = rotRows.filter((r) => r.entropy < minH && r.formats.length >= Math.max(gate.format_min_items ?? 5, 6));
+  add({ id: 'persona.format_entropy', status: lowH.length ? 'warn' : 'pass', value: rotRows.length ? Math.min(...rotRows.map((r) => r.entropy)) : null, n: rotRows.length, min: minH, max: null, blocking: false, detail: lowH.map((r) => `${r.personaId}: ${r.entropy.toFixed(2)} bits over ${r.n}`) });
 
   // 4) Offenders the pipeline can regenerate (text items with a taskId; timing/role-mix are planner-level).
   const offenders = new Map();
