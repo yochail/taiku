@@ -738,14 +738,6 @@ function relChips(list, label) {
 /** Wikipedia article in the content language (persona field wikipedia_<lang>, e.g. wikipedia_he), if any. */
 const wikiLocal = (a) => a[`wikipedia_${CONTENT_LOCALE.split('-')[0]}`] || null;
 
-/** Educational About block (who they were, key works, Wikipedia), in the content language. Opt-in per pack: site.json profile.about. */
-function aboutSection(a) {
-  if (!SITE_CONFIG.profile?.about) return '';
-  const works = (a.key_works ?? []).slice(0, 6).map((w) => `<li${CA}>${esc(w.title)}${w.year ? ` (${esc(w.year)})` : ''}</li>`).join('');
-  const wiki = wikiLocal(a) || a.wikipedia;
-  if (!a.background && !works && !wiki) return '';
-  return `<section class="p-about"><h2>${t('profile.about')}</h2>${a.background ? `<p${CA}>${esc(a.background)}</p>` : ''}${works ? `<h3>${t('profile.works')}</h3><ul>${works}</ul>` : ''}${wiki ? `<p><a href="${esc(wiki)}" rel="noopener" target="_blank">${t('profile.wikipedia')}</a></p>` : ''}</section>`;
-}
 
 function imageCredit(a) {
   const c = a.attribution;
@@ -831,7 +823,6 @@ function profileHeader(a, { count, back = '/thinkers/', backLabel = STR.back } =
       <h2 class="p-name">${cw(esc(displayName(a)))}${kindLabel(a)}</h2>
       <div class="handle">@${esc(a.handle)}</div>
       <p class="p-bio"${CA}>${renderText(a.bio, handleMap)}</p>
-      <a class="p-about-link" href="/thinkers/${a.id}/about/">${esc(t('profile.aboutName', { name: a.name }))} →</a>
       <div class="p-meta">${a.location ? `<span>📍 ${cw(esc(a.location))}</span>` : ''}${a.x_profile?.website ? `<a href="${esc(a.x_profile.website)}" rel="nofollow noopener" target="_blank">🔗 ${esc(new URL(a.x_profile.website).hostname.replace(/^www\./, ''))}</a>` : ''}${a.x_profile?.joined ? `<span>🗓️ ${esc(a.x_profile.joined)}</span>` : ''}</div>
       <div class="p-stats"><a href="/thinkers/${a.id}/following/"><b>${compactNumber(Math.max(a.x_profile?.following ?? 0, g.following.get(a.id).size))}</b> ${STR.following}</a><a href="/thinkers/${a.id}/followers/"><b data-followers="${esc(a.id)}" data-count="${a.x_profile?.followers ?? 0}">${compactNumber(a.x_profile?.followers ?? 0)}</b> ${STR.followers}</a></div>
     </section>`;
@@ -887,7 +878,7 @@ function profilePages() {
           title: main ? t('profile.title', { name: a.name, handle: a.handle }) : about ? t('profile.aboutTitle', { name: a.name, lifespan: a.lifespan ?? '' }) : `${STR.tabTitle[key]} · ${a.name} (@${a.handle})`,
           description: about ? truncate(a.background || `${a.headline} ${a.bio}`, 300) : `${a.headline} ${a.bio}`,
           pathname: `/thinkers/${a.id}/${sub}`,
-          body: (main ? aboutSection(a) + imageCredit(a) : '') + feed,
+          body: feed,
           ld: main ? [ld] : about ? [aboutLd(a)] : [],
           ogType: 'profile',
           header,

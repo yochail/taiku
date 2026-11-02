@@ -278,7 +278,7 @@ test('persona About tab: educational content, indexable Person JSON-LD, no inter
   const about = read('thinkers/kant/about/index.html');
   assert.match(posts, /<nav class="p-tabs"[\s\S]*?href="\/thinkers\/kant\/about\/"[^>]*>About</);
   assert.doesNotMatch(posts, /href="\/thinkers\/kant\/likes\/"/);
-  assert.match(posts, /class="p-about-link" href="\/thinkers\/kant\/about\/">About Immanuel Kant/);
+  for (const x of [/p-about/, /class="credit"/, /Read more on Wikipedia/, /Key ideas/]) assert.doesNotMatch(posts, x, `default profile view stays X-like: ${x}`);
   assert.match(about, /<a [^>]*aria-current="page"[^>]*>About</);
   assert.match(about, /<meta name="robots" content="index,follow/);
   assert.match(about, /"@type":"Person"[^<]*"sameAs":\["https:\/\/en\.wikipedia\.org\/wiki\/Immanuel_Kant"/);

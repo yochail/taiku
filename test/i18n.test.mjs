@@ -85,12 +85,14 @@ test('Hebrew-content pack: English LTR chrome, Hebrew RTL content elements, Unic
   assert.ok(fs.existsSync(path.join(OUT, 'tags', 'ירושלים', 'index.html')) || fs.readdirSync(path.join(OUT, 'tags')).some((d) => d.includes('ירושלים')), 'Hebrew tag page');
 });
 
-test('Hebrew-content pack: profile name, bio and About (with Hebrew Wikipedia) are content; tabs are chrome', () => {
+test('Hebrew-content pack: profile name, bio and About tab (with Hebrew Wikipedia) are content; tabs are chrome', () => {
   const p = html(path.join('thinkers', 'socrates', 'index.html'));
+  const ab = html(path.join('thinkers', 'socrates', 'about', 'index.html'));
+  assert.doesNotMatch(p, /p-about|Read more on Wikipedia/, 'About content stays in the About tab');
   assert.match(p, /<p class="p-bio" lang="he" dir="rtl">שואל שאלות בשוק\.<\/p>/);
   assert.match(p, /<h2 class="p-name"><span lang="he" dir="rtl">/);
-  assert.match(p, /<section class="p-about"><h2>About<\/h2><p lang="he" dir="rtl">פילוסוף אתונאי\.<\/p>/);
-  assert.match(p, /<a href="https:\/\/he\.wikipedia\.org\/wiki\/[^"]+" rel="noopener" target="_blank">Read more on Wikipedia<\/a>/);
+  assert.match(ab, /<p lang="he" dir="rtl">פילוסוף אתונאי\.<\/p>/);
+  assert.match(ab, /<a href="https:\/\/he\.wikipedia\.org\/wiki\/[^"]+" rel="noopener" target="_blank">Read more on Wikipedia<\/a>/);
   assert.match(p, />Posts<\/a>/);
   assert.match(p, /"sameAs":\["https:\/\/en\.wikipedia\.org[^"]*","https:\/\/he\.wikipedia\.org/);
 });
