@@ -31,6 +31,12 @@ test('unfurl: parses og meta, resolves relative image/icon, keeps same-site cano
   assert.equal(card.image.url, 'https://www.example.com/img/quake.jpg');
 });
 
+test('unfurl: a page without og:image has no image (never the page URL itself)', () => {
+  const m = parseMeta('<html><head><title>Plain page</title></head></html>', 'https://example.org/article');
+  assert.equal(m.image, null);
+  assert.equal(m.title, 'Plain page');
+});
+
 test('unfurl: blocked page falls back to feed data + favicon; cache hit avoids refetch', async () => {
   const cache = { items: {} };
   let calls = 0;

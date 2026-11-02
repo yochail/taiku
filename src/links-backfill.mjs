@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 // Backfill real link data into the committed corpus (idempotent; re-run safely):
 //  - unfurls every link_card / news.url / topic.url through the fetch cache (og:image hotlinked, never downloaded);
-//  - news items without a URL: look up the real article (Bing News RSS, title match >= --min-overlap,
-//    same outlet preferred); if none is found the post stays card-less (no invented URLs);
+//  - news items without a URL: look up the real article, in order: titles already in the unfurl cache,
+//    Bing News RSS, then the Hacker News search API (hn.algolia.com; HN-sourced items keep the HN item URL).
+//    A hit needs a title match >= --min-overlap and a date near the post; otherwise the post stays
+//    card-less (no invented URLs). Misses are remembered per searcher, so a new searcher retries them;
 //  - x.com / bsky.app links become x_post / bsky_post quotes when the account is allowlisted
 //    (real-accounts.json); otherwise the card is dropped;
 //  - cards whose page is gone (404/410) are dropped.
@@ -46,6 +48,30 @@ async function bingNews(query) {
   }).filter((x) => x.url);
 }
 
+async function hnSearch(query) {
+  const res = await fetch(`https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=10`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(10000) });
+  if (!res.ok) return [];
+  const doc = await res.json();
+  return (doc.hits ?? []).map((h) => ({ title: h.title ?? '', url: safeUrl(h.url ?? ''), hnUrl: `https://news.ycombinator.com/item?id=${h.objectID}`, pubDate: h.created_at ?? null }));
+}
+
+/** Titles the unfurl cache already fetched (a real page we saw), as search hits. */
+const cacheHits = (cache) => Object.values(cache.items ?? {}).filter((e) => e.ok && e.meta?.title && safeUrl(e.url ?? '')).map((e) => ({ title: e.meta.title, url: e.url, pubDate: e.meta.published ?? null }));
+
+const best = (news, hits) => {
+  const want = outletDomain(news.source);
+  return hits.map((h) => ({ ...h, score: overlap(news.title, h.title) + (want && h.url && domainOf(h.url).endsWith(want) ? 0.1 : 0) })).sort((a, b) => b.score - a.score)[0] ?? null;
+};
+const SEARCHERS = {
+  cache: async (news, ctx) => best(news, ctx.cacheHits),
+  'bing-news-rss': async (news) => findArticle(news),
+  'hn-algolia': async (news) => {
+    const hn = /hacker news/i.test(news.source ?? '');
+    const hits = (await hnSearch(news.title).catch(() => [])).map((h) => ({ ...h, url: hn || !h.url ? h.hnUrl : h.url }));
+    return best(news, hits);
+  },
+};
+
 async function findArticle(news) {
   const want = outletDomain(news.source);
   const hits = await bingNews(news.title).catch(() => []);
@@ -87,13 +113,25 @@ async function main() {
   const needsUrl = (p) => p.news?.title && (!safeUrl(p.news.url ?? '') || gone(p.news.url)) && !(p.media ?? []).some((m) => m.kind === 'link_card' && !gone(m.url));
   const missing = [...new Map(posts.filter(needsUrl).map((p) => [p.news.title, p.news])).values()];
   const found = new Map(Object.entries(cache.search ?? {}));
-  if (search) {
-    await pool(missing.filter((n) => !found.has(n.title)), 3, async (n) => {
+  const ctx = { cacheHits: cacheHits(cache) };
+  const tried = (e) => (e?.url ? null : new Set(e?.tried ?? (e === null ? ['bing-news-rss'] : [])));
+  const datedOk = (n, hit) => accept({ ...hit, published: hit.pubDate }, { news: n, createdAt: n._at });
+  for (const p of posts.filter(needsUrl)) missing.find((n) => n.title === p.news.title)._at ??= p.createdAt;
+  await pool(missing.filter((n) => !found.get(n.title)?.url), 3, async (n) => {
+    const done = tried(found.get(n.title));
+    for (const [via, fn] of Object.entries(SEARCHERS)) {
+      if (done.has(via) || (via !== 'cache' && !search)) continue;
       stats.searched++;
-      const hit = await findArticle(n);
-      found.set(n.title, hit ? { url: hit.url, title: hit.title, published: hit.pubDate, score: Math.round(hit.score * 100) / 100, via: 'bing-news-rss' } : null);
-    });
-  }
+      const hit = await fn(n, ctx);
+      if (hit?.url && datedOk(n, hit)) {
+        found.set(n.title, { url: hit.url, title: hit.title, published: hit.pubDate, score: Math.round(hit.score * 100) / 100, via });
+        return;
+      }
+      if (via !== 'cache') done.add(via);
+      found.set(n.title, { url: null, tried: [...done].sort() });
+    }
+  });
+  for (const n of missing) delete n._at;
   cache.search = Object.fromEntries([...found].sort(([a], [b]) => a.localeCompare(b)));
 
   // 2) Unfurl / fetch every URL we may render.
@@ -171,6 +209,7 @@ async function main() {
     else delete p.media;
   }
 
+  if (flag('--show')) for (const [t, e] of found) if (e?.url) console.error(`${e.via} ${e.score} | ${t} | ${e.title} | ${e.url}`);
   if (!dryRun) {
     saveUnfurlCache(cache);
     for (const d of docs) {

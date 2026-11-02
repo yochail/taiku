@@ -91,9 +91,6 @@
           "domain": "msn.com",
           "title": "MSN",
           "site_name": "Reuters",
-          "image": {
-            "url": "https://www.msn.com/en-us/news/other/martian-meteorite-found-in-the-sahara-is-41-billion-years-old/ar-AA2gniDj"
-          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -253,11 +250,21 @@
       ],
       "news": {
         "title": "Qwenputer: a functioning, deterministic RISC-V CPU inside Qwen3.5",
-        "url": null,
+        "url": "https://news.ycombinator.com/item?id=50282838",
         "source": "Hacker News"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://news.ycombinator.com/item?id=50282838",
+          "domain": "news.ycombinator.com",
+          "title": "Qwenputer: a functioning, deterministic RISC-V CPU inside Qwen3.5",
+          "site_name": "Hacker News",
+          "icon": "https://news.ycombinator.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "bf20261029-45",
@@ -676,9 +683,6 @@
           "domain": "msn.com",
           "title": "MSN",
           "site_name": "Reuters",
-          "image": {
-            "url": "https://www.msn.com/en-us/money/general/ecb-to-hold-rates-as-investors-focus-on-french-bonds-lagarde-s-future/ar-AA2ghacz"
-          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -2217,11 +2221,27 @@
       ],
       "news": {
         "title": "We're releasing the weights of Mistral Large 4",
-        "url": null,
+        "url": "https://mistral.ai/news/mistral-large-4-oss/",
         "source": "Mistral AI"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://mistral.ai/news/mistral-large-4-oss/",
+          "domain": "mistral.ai",
+          "title": "Mistral Large 4 (Le Chonk) is now open weight | Mistral",
+          "description": "The weights of Mistral Large 4 (Le Chonk) are now open. A 1T parameter multimodal model, and best open-weight model for coding, trained in Europe.",
+          "site_name": "Mistral",
+          "image": {
+            "url": "https://mistral.ai/cms-media/api/media/file/cover-mistral-sovereign%20copie.webp",
+            "width": 1200,
+            "height": 630
+          },
+          "icon": "https://mistral.ai/favicon.ico"
+        }
+      ]
     },
     {
       "id": "bf20261029-57",

@@ -31,7 +31,9 @@ const attr = (tag, name) => {
   return m ? decode(m[2] ?? m[3] ?? m[4] ?? '').trim() : '';
 };
 
+// An empty value must stay empty: new URL('', base) is the page itself (an og:image that is the article).
 const abs = (u, base) => {
+  if (!String(u ?? '').trim()) return null;
   try {
     return safeUrl(new URL(u, base).href);
   } catch {

@@ -188,9 +188,6 @@
           "domain": "msn.com",
           "title": "MSN",
           "site_name": "AFP via France 24",
-          "image": {
-            "url": "https://www.msn.com/en-us/news/world/greenhouse-gas-levels-hit-new-record-highs-in-2025-un/ar-AA2gaIoc"
-          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -293,7 +290,7 @@
       ],
       "news": {
         "title": "AI promised less work. I've never worked more",
-        "url": null,
+        "url": "https://news.ycombinator.com/item?id=50257325",
         "source": "Hacker News"
       },
       "citation": null,
@@ -316,6 +313,14 @@
             "url": "https://www.artic.edu/artworks/235046",
             "title": "The Harvest of Buckwheat"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://news.ycombinator.com/item?id=50257325",
+          "domain": "news.ycombinator.com",
+          "title": "AI promised less work. I've never worked more",
+          "site_name": "Hacker News",
+          "icon": "https://news.ycombinator.com/favicon.ico"
         }
       ]
     },
@@ -1050,9 +1055,6 @@
           "domain": "msn.com",
           "title": "MSN",
           "site_name": "AFP via The Straits Times",
-          "image": {
-            "url": "https://www.msn.com/en-us/news/world/french-senate-weighs-bill-to-make-protesters-pay-for-unrest-damage/ar-AA2gbKdX"
-          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -1407,9 +1409,6 @@
           "domain": "msn.com",
           "title": "MSN",
           "site_name": "AFP",
-          "image": {
-            "url": "https://www.msn.com/en-ca/news/other/cruise-for-life-strands-passengers-in-cambodia-as-operator-goes-bust/ar-AA2ggMXU"
-          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -1605,9 +1604,6 @@
           "domain": "msn.com",
           "title": "MSN",
           "site_name": "AFP",
-          "image": {
-            "url": "https://www.msn.com/en-ca/news/other/cruise-for-life-strands-passengers-in-cambodia-as-operator-goes-bust/ar-AA2ggMXU"
-          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -1696,9 +1692,6 @@
           "domain": "msn.com",
           "title": "MSN",
           "site_name": "AFP via The Straits Times",
-          "image": {
-            "url": "https://www.msn.com/en-us/news/world/french-senate-weighs-bill-to-make-protesters-pay-for-unrest-damage/ar-AA2gbKdX"
-          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -1824,11 +1817,22 @@
       ],
       "news": {
         "title": "Python's experimental JIT to be removed",
-        "url": null,
+        "url": "https://lwn.net/SubscriberLink/1102102/0c00e4d550f25f8c/",
         "source": "LWN"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://lwn.net/SubscriberLink/1102102/0c00e4d550f25f8c/",
+          "domain": "lwn.net",
+          "title": "Python's experimental JIT to be removed",
+          "description": "Python's experimental just-in-time (JIT) compiler, which was added to CPython in 2024 for the 3 ...",
+          "site_name": "LWN.net",
+          "icon": "https://static.lwn.net/images/favicon.png"
+        }
+      ]
     },
     {
       "id": "bf20261027-48",
@@ -2031,11 +2035,28 @@
       ],
       "news": {
         "title": "Wikipedia's cleanup of AI-generated content",
-        "url": null,
+        "url": "https://spectrum.ieee.org/wikipedia-wikiproject-ai-writing-cleanup",
         "source": "IEEE Spectrum"
       },
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://spectrum.ieee.org/wikipedia-wikiproject-ai-writing-cleanup",
+          "domain": "spectrum.ieee.org",
+          "title": "Inside Wikipedia’s Cleanup Effort Against AI Text",
+          "description": "AI-generated text is harder to spot, but that hasn’t deterred them",
+          "site_name": "IEEE Spectrum",
+          "published": "2026-10-21T13:00:02.000Z",
+          "image": {
+            "url": "https://spectrum.ieee.org/media-library/surreal-collage-of-a-womans-face-with-geometric-shapes-pencil-and-wikipedia-globe.png?id=68486571&width=1200&height=600&coordinates=0%2C167%2C0%2C168",
+            "width": 1200,
+            "height": 600
+          },
+          "icon": "https://assets.rebelmouse.io/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbWFnZSI6Imh0dHBzOi8vYXNzZXRzLnJibC5tcy8yNjU5NjY0OS9vcmlnaW4ucG5nIiwiZXhwaXJlc19hdCI6MTg0ODgxODUwNn0.1LlzHtxZSVXyzapxWjeSrRIRu5qo3CeB8FaWpd2tl_o/img.png?width=192&height=192"
+        }
+      ]
     },
     {
       "id": "bf20261027-114",

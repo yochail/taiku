@@ -73,9 +73,6 @@
           "domain": "msn.com",
           "title": "MSN",
           "site_name": "Kyiv Independent",
-          "image": {
-            "url": "https://www.msn.com/en-us/news/other/plague-death-triggers-quarantine-mask-mandates-in-russia-s-irkutsk-region-in-siberia/ar-AA2dyzQq"
-          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -500,9 +497,6 @@
           "domain": "msn.com",
           "title": "MSN",
           "site_name": "1011 Now",
-          "image": {
-            "url": "https://www.msn.com/en-us/money/general/more-questions-than-answers-about-lincoln-s-google-data-center-water-and-electricity-usage/ar-AA2dhVlC"
-          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -532,13 +526,23 @@
       ],
       "news": {
         "title": "Car is a smartphone on wheels. Here's who's listening",
-        "url": null,
+        "url": "https://automatictransmission.khoury.northeastern.edu/",
         "source": "Northeastern Khoury"
       },
       "citation": null,
       "origin": "backfill",
       "personaReposts": [
         "galileo"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://automatictransmission.khoury.northeastern.edu/",
+          "domain": "automatictransmission.khoury.northeastern.edu",
+          "title": "Automatic Transmission — a data-privacy study of connected vehicles",
+          "site_name": "Northeastern Khoury",
+          "icon": "https://automatictransmission.khoury.northeastern.edu/favicon.ico"
+        }
       ]
     },
     {
@@ -892,7 +896,7 @@
       ],
       "news": {
         "title": "We're going to need default hard budget caps on pretty much everything",
-        "url": null,
+        "url": "https://simonwillison.net/2026/Oct/3/default-hard-budget-caps/",
         "source": "Simon Willison"
       },
       "citation": null,
@@ -918,6 +922,15 @@
             "url": "https://commons.wikimedia.org/wiki/File:Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg",
             "title": "The Scream"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://simonwillison.net/2026/Oct/3/default-hard-budget-caps/",
+          "domain": "simonwillison.net",
+          "title": "We’re going to need default hard budget caps on pretty much everything",
+          "description": "Here’s a product feature which the world is going to need a whole lot more of over the coming months and years: default hard budget caps. I’m talking about the ...",
+          "site_name": "Simon Willison’s Weblog",
+          "icon": "https://simonwillison.net/favicon.ico"
         }
       ]
     },
@@ -1199,7 +1212,7 @@
       ],
       "news": {
         "title": "Turn off Apple Intelligence on macOS 27 and get its disk space back",
-        "url": null,
+        "url": "https://github.com/omlahore/RemoveMacAI",
         "source": "GitHub"
       },
       "citation": null,
@@ -1222,6 +1235,18 @@
             "url": "https://www.metmuseum.org/art/collection/search/400400",
             "title": "Diogenes"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://github.com/omlahore/RemoveMacAI",
+          "domain": "github.com",
+          "title": "GitHub - omlahore/RemoveMacAI: Debloat macOS: turn off Apple Intelligence, analytics, ads and pop-ups. A native app and CLI, and every change can be undone.",
+          "description": "Debloat macOS: turn off Apple Intelligence, analytics, ads and pop-ups. A native app and CLI, and every change can be undone. - omlahore/RemoveMacAI",
+          "site_name": "GitHub",
+          "image": {
+            "url": "https://repository-images.githubusercontent.com/1394989252/13dcf083-d511-4f51-9681-c6ccbda3cae9"
+          },
+          "icon": "https://github.githubassets.com/favicons/favicon.png"
         }
       ],
       "personaReposts": [
