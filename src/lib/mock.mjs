@@ -8,6 +8,7 @@
 //   missing item (partial-array path); repairs return just the failed ids
 // - micro (<micro_spec>): tiny replies + new reaction-pool entries
 // - media: fills whatever planMedia asked for (meme templates, gif reactions/queries, art, charts, polls)
+import { MOVE_HINT } from './conversation.mjs';
 import { quoteMatches, taikLength, MAX_TAIK_CHARS } from './data.mjs';
 import { lintTaik } from './house-style.mjs';
 import { seededRng, sha256 } from './pipeline-util.mjs';
@@ -112,10 +113,22 @@ function sentences(ctx, rand) {
   }
   const pools = {
     original: [`hot take: ${s} is just ${i} with better marketing.`, `everyone arguing about ${s} and nobody checking what it does to the soul.`, `${s}. we really did this to ourselves.`, `nobody:\nme, two thousand years early: ${i}.`, `unpopular opinion: ${s} is the most honest thing to happen this week.`, `${i} still applies to ${s}. i will not be taking questions.`, `i have thought about ${s} for ten minutes and i am already tired.`, `${s} is ${i} wearing a lanyard.`, `imagine reading about ${s} and not thinking about ${i}. couldn't be me.`, `ok so ${s}. lol. lmao even.`],
-    reply: [`${at}respectfully, you skipped the part where ${i} ruins your whole point.`, `${at}counterpoint: no.`, `${at}this is what happens when you skip ${i}.`, `${at}decent take, shame about ${i}.`, `${at}you said this with your whole chest and it is still wrong.`, `${at}yes, and it gets worse once you factor in ${i}.`, `${at}be so for real.`, `${at}finally someone said it.`, `${at}i'm logging off. this is too stupid even for here.`],
+    reply: [`${at}respectfully, you skipped the part where ${i} ruins your whole point.`, `${at}counterpoint: no.`, `${at}this is what happens when you skip ${i}.`, `${at}decent take, shame about ${i}.`, `${at}you said this with your whole chest and it is still wrong.`, `${at}yes, and it gets worse once you factor in ${i}.`, `${at}fair on ${s}. but ${i} is still the whole point.`, `${at}and what does ${i} do to that?`, `${at}i'm logging off. this is too stupid even for here.`],
     quote: [`this take on ${s} is why we can't have nice things.`, `quoting this so future historians know who to blame.`, `reading this and thinking about ${i} very hard.`, `the ratio this deserves is cosmic.`, `this is the whole argument against ${i}, live, in public.`, `half right, which is the most dangerous kind of right.`],
   };
+  const moves = {
+    rebuttal: [`${at}no, because ${i} already answers this.`, `${at}that only works if you ignore ${i}, and you can't.`],
+    disagree: [`${at}counterpoint: no. ${i} says otherwise.`, `${at}you said this with your whole chest and it is still wrong.`],
+    concede_pivot: [`${at}fair, you're right about ${s}. but ${i} is still the point.`, `${at}granted. now do ${i}.`],
+    sharp_question: [`${at}and what does ${i} say about that?`, `${at}by what method do you know that?`],
+    example: [`${at}example: ${i}. your rule can't handle it.`, `${at}try it on ${s} and watch it break.`],
+    extend: [`${at}yes, and it gets worse once you factor in ${i}.`],
+    joke: [`${at}i'm logging off. this is too stupid even for here.`],
+  };
   const list = [...(pools[role] ?? pools.original)].sort(() => rand() - 0.5);
+  // Mock replies honour the sampled move first (no filler agreement).
+  const mv = Object.keys(MOVE_HINT).find((k) => MOVE_HINT[k] === ctx.spec.move);
+  if (role !== 'original' && moves[mv]) list.unshift(...[...moves[mv]].sort(() => rand() - 0.5));
   if (tic && rand() < 0.4) list.unshift(String(tic));
   return list;
 }

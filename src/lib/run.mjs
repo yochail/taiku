@@ -22,6 +22,7 @@ import { createSampler, replyFormOf } from './realism.mjs';
 import { planMedia } from './media.mjs';
 import { createGiphyClient } from './giphy.mjs';
 import { MAX_DEPTH, calibrate, cascade, createReactor, relationOf } from './react.mjs';
+import { MOVE_ARCHETYPES, conversationOf, pickMove, turnOf } from './conversation.mjs';
 import { mentionDebts, mentionDecision, resurface } from './followon.mjs';
 import { mentionTargets } from './tags.mjs';
 import { FEEDS, domainOf, fetchPool, fixtureFetch, sanitizeUntrusted } from './news.mjs';
@@ -132,6 +133,14 @@ function pickType(rand, persona, node, media, rot = null) {
       return r === 'any' || (r === 'rival' && (node.rel === 'rival' || node.rel === 'frenemy')) || (r === 'ally' && (node.rel === 'ally' || node.rel === 'follows'));
     };
     const own = new Set(persona.reply_archetypes ?? []);
+    // The sampled move (spec.sampling.conversation.moves) picks the archetype family; the relation
+    // filter applies when the family has a fitting member.
+    if (MOVE_ARCHETYPES[node.move]) {
+      const fam = MOVE_ARCHETYPES[node.move].filter((k) => REPLY_ARCHETYPES[k] && (k !== 'clapback' || (node.turn ?? 1) >= 2));
+      const fit = fam.filter(ok);
+      const pool = fit.length ? fit : fam;
+      if (pool.length) return weightedPick(rand, pool.map((k) => [k, own.has(k) ? 4 : 1])) ?? pool[0];
+    }
     return weightedPick(rand, Object.keys(REPLY_ARCHETYPES).filter(ok).map((k) => [k, own.has(k) ? 4 : 1])) ?? 'joke';
   }
   if (media === 'poll') return 'poll';
@@ -228,7 +237,8 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
   };
   for (const n of nodes) if (n.role === 'original' && n.kind !== 'wire') tagNode(n, 'original');
   const authoredOriginals = nodes.filter((n) => n.role === 'original' && n.kind !== 'wire').length;
-  const cal = calibrate({ personas, spec, originalsPerDay: authoredOriginals, cacheFile: calibrationFile, writeCache: writeCalibration });
+  const forced = { original: nodes.filter((n) => n.kind === 'wire').length, reply: opens.filter(([, o]) => o.role === 'reply').length, quote: opens.filter(([, o]) => o.role === 'quote').length };
+  const cal = calibrate({ personas, spec, originalsPerDay: authoredOriginals, cacheFile: calibrationFile, writeCache: writeCalibration, forced });
   const llmCap = Math.max(0, (content.llmReplies ?? 0) + opens.length);
   const reactor = createReactor({ personas, spec, seed: `${date}:${seed}`, nonce, calibration: cal, llmCap, formFn, affinityFn });
   for (const n of nodes) if (n.kind !== 'wire') reactor.spend(n.authorId);
@@ -263,6 +273,7 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
       cheap: f.cheap,
       exec: f.cheap ? 'pool' : f.form === 'short' ? 'short' : 'full',
       followOn: reason,
+      ...(action === 'reply' ? { pairAuthor: parent.authorId, turn: turnOf(parent, pid) } : {}),
     });
     n.mentions.add(parent.authorId);
     return n;
@@ -320,7 +331,7 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
 }
 
 /** Per-task generation spec (length, media plan, emoji, …) drawn from the realism sampler. */
-function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, giphy, rot = null }) {
+function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, giphy, rot = null, conv = null }) {
   const role = node.kind === 'wire' ? 'wire' : node.role;
   const form = node.form ?? null;
   const cheap = node.exec === 'pool';
@@ -353,6 +364,8 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
   if (media === 'poll') length = { min: Math.max(20, length.min), max: Math.max(60, Math.min(length.max, 140)) };
   const modern = clamp(persona.modernity ?? 3, 1, 5);
   const emoji = role !== 'wire' && (sampler.wantsEmoji() || (modern >= 4 && sampler.wantsEmoji())) && !(modern <= 2 && rand() < 0.5);
+  // Reply move (rebuttal, concession, sharp question, example, …), own seeded stream per node.
+  if (conv && (role === 'reply' || role === 'quote') && !cheap && !node.move) node.move = pickMove(seededRng('move', node.id), conv, node.rel, node.turn ?? 1);
   const type = pickType(rand, persona, node, media, rot && !isNews(persona) ? rot : null);
   const llm = role !== 'wire' && !cheap;
   const hashtags = llm && !short ? sampler.hashtagCount(role, persona) : 0;
@@ -371,6 +384,9 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
     mediaPlan,
     form,
     mention: null,
+    ...(node.move ? { move: node.move } : {}),
+    ...(node.turn >= 2 ? { exchange: node.turn } : {}),
+    ...(node.joined ? { joined: true } : {}),
     wantNote: llm && !short && node.kind !== 'thread-part' && rand() < NOTE_RATE,
     ...(node.threadPart ? { threadPart: `${node.threadPart}/${THREAD_PARTS}` } : node.kind === 'thread' ? { threadPart: `1/${THREAD_PARTS}` } : {}),
   };
@@ -586,9 +602,10 @@ export async function runDaily(opts = {}) {
     if (!noveltyCtx.has(persona.id)) noveltyCtx.set(persona.id, noveltyContext(persona, pastBy.get(persona.id) ?? [], plan.day.start, ncfg));
     return noveltyCtx.get(persona.id);
   };
+  const conv = conversationOf(spec);
   const tasks = plan.nodes.filter((n) => n.kind !== 'external').map((n) => {
     const persona = byId.get(n.authorId);
-    const spec1 = taskSpec({ node: n, persona, topic: topicById.get(n.topicId), sampler: plan.sampler, rand: plan.rand, postId: postIdOf(n.id), hasPassages: hasPassages(persona), giphy, rot });
+    const spec1 = taskSpec({ node: n, persona, topic: topicById.get(n.topicId), sampler: plan.sampler, rand: plan.rand, postId: postIdOf(n.id), hasPassages: hasPassages(persona), giphy, rot, conv });
     if (n.kind !== 'thread-part') rot.push(n.authorId, formatOfTask({ role: spec1.role, media: spec1.media, archetype: spec1.archetype, kind: n.kind }));
     if (n.role === 'reply' && n.exec !== 'pool' && plan.rand() < 0.3) spec1.mention = byId.get(nodeById.get(n.parent)?.authorId)?.handle ?? null;
     if (n.followOn === 'resurface' || n.followOn === 'pile-on') spec1.followOn = n.followOn;

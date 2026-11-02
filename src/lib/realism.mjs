@@ -239,6 +239,38 @@ export function measure(allPosts, personas, spec, { context = [] } = {}) {
   set('threads.depth1_share_of_conversations', share(convos.filter((t) => t.depth === 1).length, convos.length), convos.length);
   set('threads.deep_share_of_conversations', share(convos.filter((t) => t.depth >= 4).length, convos.length), convos.length);
   set('threads.replies_per_root_gini', trees.length ? gini(trees.map((t) => t.count)) : null, trees.length);
+  set('threads.replies_per_root_mean', trees.length ? trees.reduce((s, t) => s + t.count, 0) / trees.length : null, trees.length);
+  // Back-and-forth: a reply that answers the person who just replied to you (A→B→A) is turn 2+ of
+  // an exchange (react.mjs turnOf). Share of conversations with one, longest exchange, third joiners.
+  const turn = new Map();
+  const turnOfPost = (p) => {
+    if (turn.has(p.id)) return turn.get(p.id);
+    turn.set(p.id, 1);
+    const parent = byId.get(p.inReplyTo);
+    const grand = parent && cls.get(parent.id) === 'reply' ? byId.get(parent.inReplyTo) : null;
+    const t = grand && parent.authorId !== p.authorId && grand.authorId === p.authorId ? turnOfPost(parent) + 1 : 1;
+    turn.set(p.id, t);
+    return t;
+  };
+  const rootOf = (p) => {
+    let cur = p;
+    for (let i = 0; i < 64 && cur.inReplyTo && byId.has(cur.inReplyTo); i++) cur = byId.get(cur.inReplyTo);
+    return cur.id;
+  };
+  const exch = new Map();
+  for (const r of replies) {
+    const t = turnOfPost(r);
+    if (t < 2) continue;
+    const root = rootOf(r);
+    const e = exch.get(root) ?? { turns: 0, authors: new Set() };
+    e.turns = Math.max(e.turns, t);
+    exch.set(root, e);
+  }
+  for (const r of replies) if (exch.has(rootOf(r))) exch.get(rootOf(r)).authors.add(r.authorId);
+  const ex = [...exch.values()];
+  set('threads.back_and_forth_share', share(ex.length, convos.length), convos.length);
+  set('threads.exchange_turns_median', ex.length ? median(ex.map((e) => e.turns)) : null, ex.length);
+  set('threads.third_party_join_share', share(ex.filter((e) => e.authors.size >= 3).length, ex.length), ex.length);
 
   // authors and reply graph
   const counts = new Map(personas.map((p) => [p.id, 0]));

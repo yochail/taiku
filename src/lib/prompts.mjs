@@ -2,6 +2,7 @@
 // global rules (voice guide, safety, format, quoting) + a compact profile. User = a JSON task spec,
 // untrusted topic data inside <untrusted_source> and timeline context inside <thread_context>.
 import { ALL_TYPES } from './archetypes.mjs';
+import { MOVE_HINT, NO_FILLER } from './conversation.mjs';
 import { houseStyle } from './house-style.mjs';
 import { MAX_TAIK_CHARS } from './data.mjs';
 import { wrapUntrusted, sanitizeUntrusted } from './news.mjs';
@@ -97,6 +98,7 @@ export function userMessage(task, ctx) {
     ...(mediaInstruction(task.mediaPlan) ? { media: mediaInstruction(task.mediaPlan) } : {}),
     ...(task.stance ? { stance: `your stance toward the post: ${task.stance}` } : {}),
     ...(task.form ? { form: FORM_HINT[task.form] ?? task.form } : {}),
+    ...convoHints(task),
     ...(ctx.relation ? { relationship: `${ctx.relation.kind} — ${ctx.relation.why ?? ''}`.slice(0, 160) } : {}),
     ...(task.followOn ? { timing: task.followOn === 'pile-on' ? 'the post is from an earlier day and is blowing up today; everyone is piling in, so add your own angle' : 'the post is from an earlier day and is circulating again; react as someone who just came across it' } : {}),
     ...(task.mention ? { mention: `you may address @${task.mention}` } : {}),
@@ -128,6 +130,15 @@ export const targetRepair = (len, min, max) => `Too long: ${len} characters for 
 export const targetCeiling = (length) => Math.min(MAX_TAIK_CHARS, Math.max(Math.round((length?.max ?? MAX_TAIK_CHARS) * 1.5), (length?.max ?? MAX_TAIK_CHARS) + 40));
 export const quoteRepair = (spans) => `These double-quoted spans are not verbatim passages from your tool results in this conversation: ${spans.map((s) => `‘${String(s).slice(0, 60)}’`).join('; ')}. Remove the double quotes (paraphrase, or use single curly quotes), or quote a returned passage exactly with its passageId in quoteRefs. Return the JSON object only.`;
 export const formatRepair = () => 'That was not a valid JSON object with a non-empty "text". Return ONLY the JSON object.';
+
+/** Reply move + back-and-forth hints (spec.sampling.conversation). */
+export function convoHints(t) {
+  return {
+    ...(MOVE_HINT[t.move] ? { move: MOVE_HINT[t.move], no_filler: NO_FILLER } : {}),
+    ...(t.exchange ? { exchange: `turn ${t.exchange} of a back-and-forth: answer their latest point directly, move the argument forward, never restate your earlier reply` } : {}),
+    ...(t.joined ? { joining: 'you are jumping into a running argument between two others: take a side with a reason or open a third angle' } : {}),
+  };
+}
 
 export const FORM_HINT = {
   short: 'short reply: 10-40 characters, one punchy line',
@@ -170,6 +181,7 @@ export function batchMessages(items, byId, { kind = 'replies' } = {}) {
       length: `${t.length.min}-${t.length.max} characters`,
       ...(t.form ? { form: FORM_HINT[t.form] ?? t.form } : {}),
       ...(t.stance ? { stance: t.stance } : {}),
+      ...convoHints(t),
       emoji: t.emoji ? 'use 1-2 emoji' : 'no emoji unless it is your signature',
       ...(t.hashtag || t.hashtags ? { hashtag: hashtagHint(t) } : {}),
       ...(tagHint(t) ? { tag: tagHint(t) } : {}),

@@ -22,10 +22,71 @@
   },
   "sampling": {
     "activity": {
-      "_note": "Share of authored items (retweets/retaiks are counters, not posts). pfeffer2023 non-retweet split: 20.8/49.3 original, 24.2/49.3 reply, 4.3/49.3 quote.",
-      "original": 0.42,
-      "reply": 0.49,
-      "quote": 0.09
+      "_note": "Share of authored items (retweets/retaiks are counters, not posts). pfeffer2023 non-retweet split: 20.8/49.3 original, 24.2/49.3 reply, 4.3/49.3 quote (0.42/0.49/0.09). Taiku deliberately runs more replies than real X (0.34/0.58/0.08) so ideas get argued back and forth: an educational choice, not a measured X ratio.",
+      "real_x": {
+        "original": 0.42,
+        "reply": 0.49,
+        "quote": 0.09
+      },
+      "original": 0.34,
+      "reply": 0.58,
+      "quote": 0.08
+    },
+    "conversation": {
+      "_note": "Deliberate departure from real-X ratios for educational value: on X most replies get no answer and reply trees are shallow (nishi2016, goel2016). Taiku keeps the heavy tail (most taiks get a few replies, hot ones get long threads) but makes the person replied to answer back more often, so A<->B exchanges of 2-4 turns happen, and a third persona from either side's clash/ally graph sometimes joins. Replies are steered toward a move the thread can answer (rebuttal with a reason, concession and pivot, sharp question, example) instead of filler agreement. Weights are product choices. Confidence: product choice.",
+      "continue_probability": 0.6,
+      "continue_decay": 0.7,
+      "max_turns": 4,
+      "relation_boost": {
+        "rival": 1.3,
+        "frenemy": 1.25,
+        "ally": 1,
+        "follows": 0.85,
+        "none": 0.7
+      },
+      "third_party_join": 0.18,
+      "third_party_relation_weight": {
+        "rival": 3,
+        "frenemy": 2.5,
+        "ally": 2
+      },
+      "moves": {
+        "rebuttal": 0.26,
+        "disagree": 0.13,
+        "concede_pivot": 0.14,
+        "sharp_question": 0.17,
+        "example": 0.15,
+        "extend": 0.09,
+        "joke": 0.06
+      },
+      "relation_moves": {
+        "ally": {
+          "extend": 2.5,
+          "concede_pivot": 1.4,
+          "disagree": 0.4,
+          "rebuttal": 0.7
+        },
+        "rival": {
+          "rebuttal": 1.3,
+          "disagree": 1.6,
+          "extend": 0.15
+        },
+        "frenemy": {
+          "rebuttal": 1.2,
+          "disagree": 1.3,
+          "extend": 0.4
+        }
+      },
+      "late_turn_moves": {
+        "concede_pivot": 1.8,
+        "sharp_question": 1.3,
+        "joke": 1.3,
+        "extend": 0.6
+      },
+      "sources": [
+        "nishi2016",
+        "goel2016"
+      ]
     },
     "media": {
       "_note": "Weights per role. Video folded into image/gif because there is no $0 video source. Kinds: none, image, gif, meme, chart, video, link_card, poll.",
@@ -614,31 +675,33 @@
   },
   "metrics": {
     "activity.original_share": {
-      "min": 0.3,
-      "max": 0.55,
-      "target": 0.42,
+      "min": 0.24,
+      "max": 0.46,
+      "target": 0.34,
       "min_n": 30,
       "severity": "warn",
       "confidence": "high (adapted: retweets excluded)",
       "sources": [
         "pfeffer2023"
-      ]
+      ],
+      "_note": "Taiku departure (more debate than real X, see sampling.conversation._note); real X 0.42"
     },
     "activity.reply_share": {
-      "min": 0.35,
-      "max": 0.62,
-      "target": 0.49,
+      "min": 0.45,
+      "max": 0.7,
+      "target": 0.58,
       "min_n": 30,
       "severity": "warn",
       "confidence": "high (adapted)",
       "sources": [
         "pfeffer2023"
-      ]
+      ],
+      "_note": "Taiku departure (more debate than real X, see sampling.conversation._note); real X 0.49"
     },
     "activity.quote_share": {
-      "min": 0.04,
+      "min": 0.03,
       "max": 0.16,
-      "target": 0.09,
+      "target": 0.08,
       "min_n": 30,
       "severity": "warn",
       "confidence": "high (adapted)",
@@ -722,15 +785,16 @@
       "sources": []
     },
     "length.median_chars": {
-      "min": 55,
+      "min": 48,
       "max": 95,
-      "target": 70,
+      "target": 65,
       "min_n": 30,
       "severity": "warn",
       "confidence": "medium (X mode is 33)",
       "sources": [
         "twitter2018len"
-      ]
+      ],
+      "_note": "more replies pull the median down (replies are shorter)"
     },
     "length.short_share": {
       "_def": "share <= 40 chars (posts with text)",
@@ -769,8 +833,8 @@
     },
     "threads.zero_reply_root_share": {
       "min": 0.3,
-      "max": 0.7,
-      "target": 0.5,
+      "max": 0.75,
+      "target": 0.55,
       "min_n": 20,
       "severity": "warn",
       "confidence": "medium (most X posts get no reply; Taiku wants debate so capped at 70%)",
@@ -781,27 +845,29 @@
     },
     "threads.depth1_share_of_conversations": {
       "_def": "share of roots with replies whose max reply depth is 1",
-      "min": 0.35,
-      "max": 0.8,
-      "target": 0.55,
+      "min": 0.15,
+      "max": 0.7,
+      "target": 0.4,
       "min_n": 15,
       "severity": "warn",
       "confidence": "medium",
       "sources": [
         "nishi2016"
-      ]
+      ],
+      "_note": "Taiku departure (more debate than real X, see sampling.conversation._note): back-and-forth makes conversations deeper"
     },
     "threads.deep_share_of_conversations": {
       "_def": "share of roots with replies whose max reply depth is >= 4",
-      "min": 0.02,
-      "max": 0.25,
-      "target": 0.1,
+      "min": 0.05,
+      "max": 0.4,
+      "target": 0.2,
       "min_n": 15,
       "severity": "warn",
       "confidence": "medium",
       "sources": [
         "nishi2016"
-      ]
+      ],
+      "_note": "Taiku departure (more debate than real X, see sampling.conversation._note)"
     },
     "threads.replies_per_root_gini": {
       "min": 0.45,
@@ -814,6 +880,51 @@
         "nishi2016",
         "goel2016"
       ]
+    },
+    "threads.replies_per_root_mean": {
+      "_def": "replies per root (originals + quotes)",
+      "min": 0.8,
+      "max": 2.5,
+      "target": 1.3,
+      "min_n": 20,
+      "severity": "warn",
+      "confidence": "low (Taiku departure (more debate than real X, see sampling.conversation._note))",
+      "sources": [
+        "nishi2016"
+      ]
+    },
+    "threads.back_and_forth_share": {
+      "_def": "share of conversations with an A->B->A reply exchange (someone answers the person who answered them)",
+      "min": 0.2,
+      "max": 0.85,
+      "target": 0.5,
+      "min_n": 10,
+      "severity": "warn",
+      "confidence": "low (Taiku departure (more debate than real X, see sampling.conversation._note))",
+      "sources": [
+        "nishi2016",
+        "goel2016"
+      ]
+    },
+    "threads.exchange_turns_median": {
+      "_def": "median turns in reply exchanges between two personas (2 = A->B->A)",
+      "min": 2,
+      "max": 4,
+      "target": 2,
+      "min_n": 5,
+      "severity": "warn",
+      "confidence": "low (product choice: 2-4 turn exchanges)",
+      "sources": []
+    },
+    "threads.third_party_join_share": {
+      "_def": "share of exchanges where a third persona joins",
+      "min": 0.05,
+      "max": 0.9,
+      "target": 0.4,
+      "min_n": 5,
+      "severity": "warn",
+      "confidence": "low (product choice)",
+      "sources": []
     },
     "authors.posts_gini": {
       "min": 0.2,
@@ -850,9 +961,9 @@
     },
     "graph.reply_reciprocity": {
       "_def": "share of directed author->author reply edges that are reciprocated",
-      "min": 0.2,
-      "max": 0.8,
-      "target": 0.45,
+      "min": 0.3,
+      "max": 0.85,
+      "target": 0.55,
       "min_n": 15,
       "severity": "warn",
       "confidence": "low (follow graph is 22%; reply graphs are more reciprocal)",
@@ -1117,7 +1228,8 @@
       "activity.quote_share",
       "length.median_chars",
       "length.short_share",
-      "media.original.visual_share"
+      "media.original.visual_share",
+      "threads.back_and_forth_share"
     ],
     "relative_slack": 0.15,
     "min_media_items": 1,

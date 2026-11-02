@@ -6,7 +6,8 @@
 import { BudgetError, parseJsonArray } from './llm.mjs';
 import { batchMessages, batchRepair } from './prompts.mjs';
 import { lintBatch } from './house-style.mjs';
-import { validateItem } from './turn.mjs';
+import { fingerprint } from './ideas.mjs';
+import { NOVELTY_ATTEMPTS, validateItem } from './turn.mjs';
 
 export const BATCH_MIN = 2;
 export const BATCH_MAX = 6;
@@ -46,6 +47,13 @@ export async function runBatch({ client, items, byId, kind = 'replies', policyCt
     for (const it of items) results.set(it.id, { ok: false, error: 'llm', detail: String(e.message).slice(0, 160) });
     return { results, calls: client.calls - start, repaired, capped: Boolean(e.capped) };
   }
+  // Same-persona items in one batch must not repeat each other either (the run notes them only after the batch).
+  const batchSeen = new Map();
+  const noveltyIn = (ctx) => {
+    const n = ctx?.novelty;
+    if (!n || !batchSeen.get(n)?.length) return ctx ?? {};
+    return { ...ctx, novelty: { ...n, prev: [...n.prev, ...batchSeen.get(n)] } };
+  };
   for (let round = 0; ; round++) {
     const outs = matchOutputs(pending, parseJsonArray(content));
     const failures = [];
@@ -56,11 +64,14 @@ export async function runBatch({ client, items, byId, kind = 'replies', policyCt
         failures.push({ id: it.id, problem: 'missing from your array; write it', kind: 'missing' });
         continue;
       }
-      const v = await validateItem(out, { task: it.task, persona: it.persona, passages: it.passages ?? new Map(), policyCtx, ctx: it.ctx ?? {}, tracker, rand, giphy, attempt: round });
+      const v = await validateItem(out, { task: it.task, persona: it.persona, passages: it.passages ?? new Map(), policyCtx, ctx: noveltyIn(it.ctx), tracker, rand, giphy, attempt: round >= maxRepairRounds ? NOVELTY_ATTEMPTS : round });
       if (v.problem) failures.push({ id: it.id, problem: v.problem.slice(0, 300), kind: v.kind, violations: v.violations });
       else {
         results.set(it.id, { ok: true, fields: v.fields });
         okTexts.push([it.id, v.fields.text]);
+        const n = it.ctx?.novelty;
+        const fp = n ? fingerprint(v.fields.text, n.cfg) : null;
+        if (fp) (batchSeen.get(n) ?? batchSeen.set(n, []).get(n)).push({ id: `batch:${it.id}`, text: v.fields.text, fp });
       }
     }
     for (const [i, probs] of lintBatch(okTexts.map(([, t]) => t))) {

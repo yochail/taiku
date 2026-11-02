@@ -20,6 +20,9 @@
 // simulated days so the authored mix matches realism/spec.json (sampling.activity) and persona
 // likes/retaik ≈ 1 / sampling.engagement.reposts_per_like.median. Reply/quote need an LLM call and
 // are capped per day; when the cap is hit they downgrade to a like (logged as capped).
+// Back-and-forth (spec.sampling.conversation): the persona being replied to answers back with
+// p ≥ continue_probability × continue_decay^(turn−1) × relation_boost (A↔B chains up to max_turns),
+// and from turn 2 a third persona from either side's clash/ally graph may join (third_party_join).
 // Every reaction logs its terms, score, p, draw and action — debug only, never in post objects.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,6 +31,7 @@ import { behaviorOf } from './behavior.mjs';
 import { createSampler } from './realism.mjs';
 import { cosine } from './topics.mjs';
 import { clamp, round3, seededRng, sha256, shuffle, weightedPick } from './pipeline-util.mjs';
+import { continueProbability, conversationOf, turnOf } from './conversation.mjs';
 
 export const LIKE_BOOST = 6;
 export const MAX_DEPTH = 9;
@@ -91,6 +95,7 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
   const followMemo = new Map();
   const reactors = personas.filter((p) => !isNews(p));
   const reactions = [];
+  const conv = conversationOf(spec);
   let llmUsed = 0;
   const { k, qTilt, rTilt } = { ...DEFAULT_CALIBRATION, ...calibration };
 
@@ -136,6 +141,48 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
     return weightedPick(rand, ACTIONS.map((a) => [a, w[a]])) ?? 'like';
   }
 
+  /** Apply one reaction: cap/horizon downgrade to a like, fatigue, counters, log; returns nothing. */
+  function emit(post, persona, action0, at, rel, horizon, out, info = {}) {
+    let action = action0;
+    let capped = false;
+    // Reply form (emoji-only, few words, GIF-only, … short, full): cheap forms come from pools and
+    // don't count toward the LLM cap.
+    let form = null;
+    if ((action === 'reply' || action === 'quote') && formFn && !(at > horizon || post.noReply)) form = formFn(persona, action, post, rel);
+    const cheap = Boolean(form?.cheap);
+    if ((action === 'reply' || action === 'quote') && ((!cheap && llmUsed >= llmCap) || at > horizon || post.noReply)) {
+      capped = true;
+      action = 'like';
+    }
+    used.set(persona.id, used.get(persona.id) + 1);
+    if (action === 'like') post.likes.push(persona.id);
+    else if (action === 'repost') post.reposts.push(persona.id);
+    else {
+      if (!cheap) llmUsed++;
+      if (action === 'reply') post.replies = (post.replies ?? 0) + 1;
+      else post.quotes = (post.quotes ?? 0) + 1;
+      out.push({ personaId: persona.id, action, at, rel, ...(form ? { form: form.form, cheap } : {}), ...(info.exchange ? { exchange: info.exchange } : {}), ...(info.joined ? { joined: true } : {}) });
+    }
+    if (log) {
+      const tm = info.terms;
+      reactions.push({
+        postId: post.id,
+        personaId: persona.id,
+        action,
+        ...(capped ? { capped: true } : {}),
+        ...(form && action !== 'like' && action !== 'repost' ? { form: form.form } : {}),
+        ...(info.exchange ? { exchange: info.exchange } : {}),
+        ...(info.joined ? { joined: true } : {}),
+        ...(tm ? { terms: Object.fromEntries(Object.entries(tm).filter(([key]) => key !== 'rel').map(([key, v]) => [key, round3(v)])) } : {}),
+        rel,
+        ...(info.delayMin != null ? { delayMin: info.delayMin } : {}),
+        ...(info.score != null ? { score: round3(info.score) } : {}),
+        // Unrounded so the log always shows draw < p (rounding could make them equal).
+        ...(info.p != null ? { p: info.p, draw: info.draw } : {}),
+      });
+    }
+  }
+
   /**
    * Evaluate every candidate for one post. Mutates post.likes/reposts and fatigue; returns new
    * reply/quote events [{ personaId, action, at }]. `post`: { id, authorId, createdAt(ms), vector,
@@ -149,45 +196,33 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
       const tm = terms(persona, post, delayMin);
       const score = tm.reactivity * tm.affinity * tm.relation * tm.popularity * tm.recency * tm.depth * tm.fatigue * tm.mention;
       const notified = tm.mention > 1 ? clap(persona) * (0.4 + 0.12 * clamp(persona.temperament?.heat ?? 3, 1, 5)) * 0.85 ** (post.depth ?? 0) * tm.fatigue : 0;
-      const p = Math.max(1 - Math.exp(-k * score), notified);
+      const turn = post.role === 'reply' && post.pairAuthor === persona.id && (post.depth ?? 0) < MAX_DEPTH ? post.turn ?? 1 : 0;
+      const cont = turn && tm.fatigue > 0 ? continueProbability(conv, turn, tm.rel) * Math.max(0.35, tm.fatigue) : 0;
+      const p = Math.max(1 - Math.exp(-k * score), notified, cont);
       const draw = rand();
       if (!(draw < p)) continue;
-      let action = chooseAction(persona, tm.rel, tm.mention > 1, post.depth ?? 0);
-      let capped = false;
+      // An answer-back drawn under the continuation probability is always a reply.
+      const action = draw < cont ? 'reply' : chooseAction(persona, tm.rel, tm.mention > 1, post.depth ?? 0);
       const at = post.createdAt + delayMin * 60000 + Math.floor(rand() * 60000);
-      // Reply form (emoji-only, few words, GIF-only, … short, full): cheap forms come from pools and
-      // don't count toward the LLM cap.
-      let form = null;
-      if ((action === 'reply' || action === 'quote') && formFn && !(at > horizon || post.noReply)) form = formFn(persona, action, post, tm.rel);
-      const cheap = Boolean(form?.cheap);
-      if ((action === 'reply' || action === 'quote') && ((!cheap && llmUsed >= llmCap) || at > horizon || post.noReply)) {
-        capped = true;
-        action = 'like';
-      }
-      used.set(persona.id, used.get(persona.id) + 1);
-      if (action === 'like') post.likes.push(persona.id);
-      else if (action === 'repost') post.reposts.push(persona.id);
-      else {
-        if (!cheap) llmUsed++;
-        if (action === 'reply') post.replies = (post.replies ?? 0) + 1;
-        else post.quotes = (post.quotes ?? 0) + 1;
-        out.push({ personaId: persona.id, action, at, rel: tm.rel, ...(form ? { form: form.form, cheap } : {}) });
-      }
-      if (log) {
-        reactions.push({
-          postId: post.id,
-          personaId: persona.id,
-          action,
-          ...(capped ? { capped: true } : {}),
-          ...(form && action !== 'like' && action !== 'repost' ? { form: form.form } : {}),
-          terms: Object.fromEntries(Object.entries(tm).filter(([key]) => key !== 'rel').map(([key, v]) => [key, round3(v)])),
-          rel: tm.rel,
-          delayMin,
-          score: round3(score),
-          // Unrounded so the log always shows draw < p (rounding could make them equal).
-          p,
-          draw,
-        });
+      emit(post, persona, action, at, tm.rel, horizon, out, { terms: tm, delayMin, score, p, draw, ...(draw < cont ? { exchange: turn + 1 } : {}) });
+    }
+    // Third persona jumping into a running A↔B exchange (clash/ally graph of either side).
+    const joinDraw = post.role === 'reply' && (post.turn ?? 1) >= 2 && (post.depth ?? 0) < MAX_DEPTH ? rand() : 1;
+    if (joinDraw < conv.third_party_join) {
+      const sides = [byId.get(post.authorId), byId.get(post.pairAuthor)].filter(Boolean);
+      const taken = new Set([post.authorId, post.pairAuthor, ...exclude, ...out.map((e) => e.personaId)]);
+      const rw = conv.third_party_relation_weight ?? {};
+      const cands = reactors.filter((c) => !taken.has(c.id)).map((c) => {
+        const w = Math.max(0, ...sides.map((x) => rw[relationOf(c, x)] ?? 0));
+        return [c, w * Math.max(0, 1 - used.get(c.id) / budget.get(c.id))];
+      }).filter(([, w]) => w > 0);
+      const pid = weightedPick(rand, cands.map(([c, w]) => [c.id, w]));
+      if (pid) {
+        const persona = byId.get(pid);
+        const delayMin = sampler.replyDelayMinutes();
+        const tm = terms(persona, post, delayMin);
+        const at = post.createdAt + delayMin * 60000 + Math.floor(rand() * 60000);
+        emit(post, persona, 'reply', at, relationOf(persona, byId.get(post.authorId)) ?? relationOf(persona, byId.get(post.pairAuthor)), horizon, out, { joined: true, terms: tm, delayMin, p: conv.third_party_join, draw: joinDraw });
       }
     }
     return out;
@@ -231,7 +266,9 @@ export function cascade(reactor, originals, { horizon = Infinity, personas = [] 
         createdAt: ev.at,
         vector: post.vector,
         topicId: post.topicId ?? null,
-        depth: ev.action === 'reply' ? (post.depth ?? 0) + 1 : (post.depth ?? 0) + 1,
+        depth: (post.depth ?? 0) + 1,
+        ...(ev.action === 'reply' ? { pairAuthor: post.authorId, turn: turnOf(post, ev.personaId) } : {}),
+        ...(ev.joined ? { joined: true } : {}),
         role: ev.action,
         parent: ev.action === 'reply' ? post.id : null,
         quoteOf: ev.action === 'quote' ? post.id : null,
@@ -323,8 +360,8 @@ const calCache = new Map();
  * by coordinate-wise bisection over simulated days with the real personas. Deterministic (fixed
  * seed); cached in memory per persona set and day size, and recorded in the run manifest.
  */
-export function calibrate({ personas, spec, originalsPerDay = 25, days = 8, rounds = 2, cacheFile = null, writeCache = true }) {
-  const key = sha256(JSON.stringify([personas.map((p) => [p.id, p.reactivity, p.popularity, p.topic_affinity, p.x_behavior, p.kind, (p.rivals ?? []).length]), originalsPerDay, days, spec.sampling.activity, spec.sampling.engagement.reposts_per_like]));
+export function calibrate({ personas, spec, originalsPerDay = 25, days = 8, rounds = 2, cacheFile = null, writeCache = true, forced = null }) {
+  const key = sha256(JSON.stringify([personas.map((p) => [p.id, p.reactivity, p.popularity, p.topic_affinity, p.x_behavior, p.kind, (p.rivals ?? []).length]), originalsPerDay, days, spec.sampling.activity, spec.sampling.engagement.reposts_per_like, conversationOf(spec), forced]));
   if (calCache.has(key)) return calCache.get(key);
   const disk = cacheFile && fs.existsSync(cacheFile) ? (() => { try { return JSON.parse(fs.readFileSync(cacheFile, 'utf8')); } catch { return null; } })() : null;
   if (disk?.entries?.[key]) {
@@ -334,8 +371,14 @@ export function calibrate({ personas, spec, originalsPerDay = 25, days = 8, roun
   const t = calibrationTargets(spec);
   const cal = { ...DEFAULT_CALIBRATION };
   const run = (c) => simulate({ personas, spec, calibration: c, days, originalsPerDay, seed: 'calibration' });
-  const authoredRatio = (t.replyShare + t.quoteShare) / (1 - t.replyShare - t.quoteShare);
-  const quoteRatio = t.quoteShare / t.replyShare;
+  // Items the plan adds outside the cascade (topic openers, wire posts) count toward the day's mix:
+  // the cascade only has to make up the rest. forced = { original, reply, quote } per day.
+  const O = originalsPerDay + (forced?.original ?? 0);
+  const perOrig = (share) => (share / (1 - t.replyShare - t.quoteShare)) * O;
+  const needR = Math.max(0.1 * perOrig(t.replyShare), perOrig(t.replyShare) - (forced?.reply ?? 0));
+  const needQ = Math.max(0.1 * perOrig(t.quoteShare), perOrig(t.quoteShare) - (forced?.quote ?? 0));
+  const authoredRatio = (needR + needQ) / originalsPerDay;
+  const quoteRatio = needQ / needR;
   // 1) bisection for k on short simulations (monotone in k), 2) multiplicative fixed-point
   // refinement of all three on longer simulations (ratios are ~proportional to the tilts).
   cal.k = bisect((k) => {
