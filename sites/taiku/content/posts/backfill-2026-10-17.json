@@ -1466,15 +1466,50 @@
     {
       "id": "bf20261017-65",
       "authorId": "leonardo",
-      "type": "hot_take",
-      "text": "Drew a horse leg 40 times. 41st still wrong.",
+      "type": "poll",
+      "text": "Which unfinished project do I finish first? Be kind.",
       "createdAt": "2026-10-18T01:11:49Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261017-65-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "The giant horse",
+            "personaVotes": [
+              "machiavelli"
+            ],
+            "crowdVoteBase": 144
+          },
+          {
+            "id": "b",
+            "text": "Flying machine",
+            "personaVotes": [
+              "tesla"
+            ],
+            "crowdVoteBase": 201
+          },
+          {
+            "id": "c",
+            "text": "Adoration of the Magi",
+            "personaVotes": [],
+            "crowdVoteBase": 63
+          },
+          {
+            "id": "d",
+            "text": "None. Start a new one",
+            "personaVotes": [
+              "diogenes"
+            ],
+            "crowdVoteBase": 179
+          }
+        ]
+      }
     },
     {
       "id": "bf20261017-105",

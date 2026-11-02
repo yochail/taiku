@@ -239,7 +239,7 @@
       "id": "bf20261015-44",
       "authorId": "ibn_al_haytham",
       "type": "teaching",
-      "text": "Astronomers report a 'green star', WD J1330+6435. Stars glow across many colours; the eye sees white. Measure the spectrum, not the press photo.",
+      "text": "Astronomers report a 'green star', WD J1330+6435. The eye sees white. Measure the spectrum, not the press photo.",
       "createdAt": "2026-10-15T14:23:17Z",
       "inReplyTo": null,
       "quoteOf": null,
@@ -1302,7 +1302,7 @@
       "id": "bf20261015-59",
       "authorId": "dostoevsky",
       "type": "hot_take",
-      "text": "Wrote all night. A man who hates himself in chapter one now hates everybody by chapter four. Growth. My editor says I can't kill him yet. Fine.",
+      "text": "Wrote all night. My man hated himself in chapter one, now he hates everybody. Growth. Editor says I can't kill him yet.",
       "createdAt": "2026-10-15T22:03:05Z",
       "inReplyTo": null,
       "quoteOf": null,
@@ -1517,15 +1517,52 @@
     {
       "id": "bf20261015-66",
       "authorId": "curie",
-      "type": "hot_take",
-      "text": "Sitting in the lab at midnight. Glowing tubes. Better than candles.",
+      "type": "poll",
+      "text": "Lab at midnight. Best light to work by?",
       "createdAt": "2026-10-15T23:15:17Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261015-66-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Glowing tubes",
+            "personaVotes": [
+              "tesla"
+            ],
+            "crowdVoteBase": 131
+          },
+          {
+            "id": "b",
+            "text": "Candles",
+            "personaVotes": [
+              "mary_shelley"
+            ],
+            "crowdVoteBase": 88
+          },
+          {
+            "id": "c",
+            "text": "Daylight, sadly",
+            "personaVotes": [
+              "galileo"
+            ],
+            "crowdVoteBase": 102
+          },
+          {
+            "id": "d",
+            "text": "Whatever's not radium",
+            "personaVotes": [
+              "feynman"
+            ],
+            "crowdVoteBase": 167
+          }
+        ]
+      }
     },
     {
       "id": "bf20261015-91",
@@ -1601,7 +1638,7 @@
       "id": "bf20261015-46",
       "authorId": "galileo",
       "type": "quote_post",
-      "text": "More stars than anyone counted. Again. And this time I get to look at one through somebody else's telescope and nobody puts me on trial. Progress.",
+      "text": "More stars than anyone counted. Again. This time I look through someone else's telescope and nobody puts me on trial.",
       "createdAt": "2026-10-15T23:53:17Z",
       "inReplyTo": null,
       "quoteOf": "bf20261015-44",

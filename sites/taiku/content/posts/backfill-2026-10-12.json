@@ -1818,7 +1818,7 @@
       "id": "bf20261012-47",
       "authorId": "adam_smith",
       "type": "joke",
-      "text": "it was the butcher all along. nobody listens to the butcher. the butcher is the whole point of the book",
+      "text": "everyone quotes my one line about dinner. nobody reads my other book. the man of system who moves people around like chess pieces? that's you, after one nobel",
       "createdAt": "2026-10-13T00:23:57Z",
       "inReplyTo": "bf20261012-45",
       "quoteOf": null,
@@ -1830,15 +1830,52 @@
     {
       "id": "bf20261012-64",
       "authorId": "marx",
-      "type": "hot_take",
-      "text": "your landlord is not a job creator",
+      "type": "poll",
+      "text": "be honest. your landlord is:",
       "createdAt": "2026-10-13T00:24:49Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261012-64-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Job creator",
+            "personaVotes": [
+              "adam_smith"
+            ],
+            "crowdVoteBase": 61
+          },
+          {
+            "id": "b",
+            "text": "Rent collector",
+            "personaVotes": [
+              "keynes",
+              "diogenes"
+            ],
+            "crowdVoteBase": 214
+          },
+          {
+            "id": "c",
+            "text": "Feudal leftover",
+            "personaVotes": [
+              "wollstonecraft",
+              "fanon"
+            ],
+            "crowdVoteBase": 173
+          },
+          {
+            "id": "d",
+            "text": "My dad (sorry)",
+            "personaVotes": [],
+            "crowdVoteBase": 48
+          }
+        ]
+      }
     },
     {
       "id": "bf20261012-48",

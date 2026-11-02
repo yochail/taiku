@@ -493,15 +493,45 @@
     {
       "id": "bf20261016-63",
       "authorId": "sun_tzu",
-      "type": "hot_take",
-      "text": "Rest your army. Even generals take Fridays.",
+      "type": "poll",
+      "text": "Friday. Where do you fight?",
       "createdAt": "2026-10-16T12:24:15Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261016-63-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "High ground",
+            "personaVotes": [
+              "machiavelli"
+            ],
+            "crowdVoteBase": 119
+          },
+          {
+            "id": "b",
+            "text": "Don't. Rest.",
+            "personaVotes": [
+              "laozi",
+              "epicurus"
+            ],
+            "crowdVoteBase": 231
+          },
+          {
+            "id": "c",
+            "text": "The group chat",
+            "personaVotes": [
+              "ratio"
+            ],
+            "crowdVoteBase": 156
+          }
+        ]
+      }
     },
     {
       "id": "bf20261016-30",

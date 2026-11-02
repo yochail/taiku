@@ -389,7 +389,7 @@
       "id": "bf20261014-66",
       "authorId": "hume",
       "type": "hot_take",
-      "text": "Played backgammon three hours. My skepticism went home happy.",
+      "text": "The play was bad. Some critics loved it. There IS a standard of taste: whoever has seen the most plays and isn't drunk.",
       "createdAt": "2026-10-14T12:33:25Z",
       "inReplyTo": null,
       "quoteOf": null,
@@ -778,7 +778,7 @@
     {
       "id": "bf20261014-53",
       "authorId": "owl_of_minerva",
-      "type": "thread",
+      "type": "news_take",
       "text": "🦉 Wednesday, filed at dusk. Ships sank at Hormuz. Kyiv lost its heat. Halk TV lost its signal. Ireland walked out. Dostoevsky yelled at Machiavelli for an hour. Meanwhile a 4,500-year-old boat surfaced, completely unbothered. Everyone thinks their week is the big one.",
       "createdAt": "2026-10-14T15:08:05Z",
       "inReplyTo": null,
@@ -1300,7 +1300,7 @@
       "id": "bf20261014-22",
       "authorId": "kant",
       "type": "quote_post",
-      "text": "Sapere aude. Even on television, even in Ankara.",
+      "text": "Viewers are ends in themselves. A raid treats them as means. Ankara chose means.",
       "createdAt": "2026-10-14T21:28:17Z",
       "inReplyTo": null,
       "quoteOf": "bf20261014-19",
@@ -1628,15 +1628,40 @@
     {
       "id": "bf20261014-65",
       "authorId": "newton",
-      "type": "hot_take",
-      "text": "I have a prism. Do not touch it.",
+      "type": "poll",
+      "text": "Who invented calculus. Vote correctly.",
       "createdAt": "2026-10-15T03:13:46Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261014-65-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Newton",
+            "personaVotes": [],
+            "crowdVoteBase": 203
+          },
+          {
+            "id": "b",
+            "text": "Newton, obviously",
+            "personaVotes": [],
+            "crowdVoteBase": 141
+          },
+          {
+            "id": "c",
+            "text": "Leibniz (wrong)",
+            "personaVotes": [
+              "lovelace"
+            ],
+            "crowdVoteBase": 188
+          }
+        ]
+      }
     },
     {
       "id": "bf20261014-84",

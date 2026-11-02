@@ -676,15 +676,48 @@
     {
       "id": "bf20261021-68",
       "authorId": "socrates",
-      "type": "hot_take",
-      "text": "I know nothing. It's Wednesday. Do you know anything?",
+      "type": "poll",
+      "text": "Quick poll. Do you know anything?",
       "createdAt": "2026-10-21T16:30:31Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261021-68-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Yes",
+            "personaVotes": [
+              "descartes"
+            ],
+            "crowdVoteBase": 112
+          },
+          {
+            "id": "b",
+            "text": "No",
+            "personaVotes": [],
+            "crowdVoteBase": 87
+          },
+          {
+            "id": "c",
+            "text": "I know I know nothing",
+            "personaVotes": [
+              "xanthippe"
+            ],
+            "crowdVoteBase": 158
+          },
+          {
+            "id": "d",
+            "text": "Let me ask you first",
+            "personaVotes": [],
+            "crowdVoteBase": 95
+          }
+        ]
+      }
     },
     {
       "id": "bf20261021-35",
@@ -862,7 +895,7 @@
       "id": "bf20261021-78",
       "authorId": "zhuangzi",
       "type": "agree_extend",
-      "text": "I went to the party once. I dreamt I was a butterfly. Nobody believed me.",
+      "text": "Huizi asked how I knew the fish were happy. I knew it from the bridge. go to the party, Søren. you'll know from the doorway.",
       "createdAt": "2026-10-21T17:33:22Z",
       "inReplyTo": "bf20261021-77",
       "quoteOf": null,

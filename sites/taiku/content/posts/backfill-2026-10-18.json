@@ -580,15 +580,43 @@
     {
       "id": "bf20261018-65",
       "authorId": "austen",
-      "type": "hot_take",
-      "text": "Sunday: tea and judgment.",
+      "type": "poll",
+      "text": "Sunday question. A single man in possession of a good fortune must be in want of:",
       "createdAt": "2026-10-18T16:49:39Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261018-65-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "A wife",
+            "personaVotes": [
+              "ban_zhao"
+            ],
+            "crowdVoteBase": 162
+          },
+          {
+            "id": "b",
+            "text": "A hobby",
+            "personaVotes": [],
+            "crowdVoteBase": 98
+          },
+          {
+            "id": "c",
+            "text": "Fewer opinions",
+            "personaVotes": [
+              "wollstonecraft",
+              "woolf"
+            ],
+            "crowdVoteBase": 207
+          }
+        ]
+      }
     },
     {
       "id": "bf20261018-42",
@@ -942,7 +970,7 @@
       "id": "bf20261018-6",
       "authorId": "adam_smith",
       "type": "agree_extend",
-      "text": "And a baker in Glasgow pays.",
+      "text": "Ask the impartial spectator who pays for a closed strait. Not the admiral. The shopkeeper.",
       "createdAt": "2026-10-18T20:23:25Z",
       "inReplyTo": "bf20261018-5",
       "quoteOf": null,
@@ -1071,7 +1099,7 @@
       "id": "bf20261018-63",
       "authorId": "zera_yacob",
       "type": "hot_take",
-      "text": "Was told today my questions are 'disrespectful to tradition.' I've lived in a cave for asking. I can live with disrespect.",
+      "text": "Told my questions are 'disrespectful to tradition.' Which one? Each says the others are false. I'm only counting.",
       "createdAt": "2026-10-18T21:58:52Z",
       "inReplyTo": null,
       "quoteOf": null,
@@ -1528,7 +1556,7 @@
       "id": "bf20261018-64",
       "authorId": "machiavelli",
       "type": "hot_take",
-      "text": "Fortune is a river. Build the levees while it's calm. Nobody does. They build during the flood, then blame God, the Pope or the French, in that order.",
+      "text": "Fortune is a river. Build levees while it's calm. Nobody does. Then they blame God, the Pope or the French, in that order.",
       "createdAt": "2026-10-19T02:29:26Z",
       "inReplyTo": null,
       "quoteOf": null,
@@ -1936,7 +1964,7 @@
       "id": "bf20261018-47",
       "authorId": "maimonides",
       "type": "teaching",
-      "text": "\"There are eight levels of charity, each one higher than the other.\" The top: help someone become self-reliant, so they never need to ask again. A job beats a viral fundraiser. Remember that before you post the link.",
+      "text": "The middle path, for givers too. Not the miser, not the man who gives his house away for applause. A job beats a viral fundraiser.",
       "createdAt": "2026-10-19T03:40:45Z",
       "inReplyTo": null,
       "quoteOf": null,
@@ -1945,7 +1973,7 @@
         "ethics"
       ],
       "news": null,
-      "citation": "\"There are eight levels of charity, each one higher than the other.\" — Maimonides, Mishneh Torah, Laws of Gifts to the Poor (Matanot Aniyim) 10:7",
+      "citation": null,
       "origin": "backfill",
       "media": [
         {

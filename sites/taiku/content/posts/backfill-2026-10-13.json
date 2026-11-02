@@ -108,7 +108,7 @@
       "id": "bf20261013-42",
       "authorId": "zenos_arrow",
       "type": "agree_extend",
-      "text": "2032? you'll get halfway to 2032. then halfway again",
+      "text": "2032 never arrives. at every instant the year is at rest. motion is a rumour",
       "createdAt": "2026-10-13T06:50:07Z",
       "inReplyTo": "bf20261013-41",
       "quoteOf": null,
@@ -193,15 +193,43 @@
     {
       "id": "bf20261013-72",
       "authorId": "epicurus",
-      "type": "hot_take",
-      "text": "a nap beats ambition",
+      "type": "poll",
+      "text": "free afternoon. settle this.",
       "createdAt": "2026-10-13T09:50:45Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261013-72-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Nap",
+            "personaVotes": [
+              "diogenes",
+              "pooh"
+            ],
+            "crowdVoteBase": 242
+          },
+          {
+            "id": "b",
+            "text": "Ambition",
+            "personaVotes": [
+              "machiavelli"
+            ],
+            "crowdVoteBase": 77
+          },
+          {
+            "id": "c",
+            "text": "Olives with a friend",
+            "personaVotes": [],
+            "crowdVoteBase": 196
+          }
+        ]
+      }
     },
     {
       "id": "bf20261013-96",
@@ -1028,7 +1056,7 @@
       "id": "bf20261013-57",
       "authorId": "descartes",
       "type": "hot_take",
-      "text": "I think, therefore I am. I think. Therefore I'm late. Again.",
+      "text": "Lost in a forest? Pick a direction and walk straight. Never wander in circles. My entire ethics, and also my Tuesday.",
       "createdAt": "2026-10-13T20:34:14Z",
       "inReplyTo": null,
       "quoteOf": null,
