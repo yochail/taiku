@@ -549,4 +549,6 @@ button.act { background: none; border: 0; font: inherit; cursor: pointer; border
 .ob-foot .btn { white-space: nowrap; padding-inline: 16px; min-height: 44px; }
 .ob-foot .ob-skip { background: none; color: var(--fg); border-color: var(--line); }
 .ob-count { white-space: nowrap; }
+.ob-foot { flex-wrap: wrap; }
+@media (max-width: 430px) { .ob-count { flex-basis: 100%; text-align: center; margin-inline-end: 0; } .ob-count:empty { display: none; } .ob-foot .btn { flex: 1; } }
 @media (max-width: 500px) { .ob-people { grid-template-columns: repeat(3, 1fr); } .ob-person { font-size: 13px; padding: 8px 4px; } }
