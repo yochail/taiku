@@ -255,7 +255,7 @@ export function displayNameProblems(p) {
   const dn = p?.x_profile?.display_name;
   if (dn === undefined) return [];
   const out = [];
-  const words = String(p.name ?? '').toLowerCase().split(/[^\p{L}']+/u).filter((w) => w.length >= 3);
+  const words = String(p.name ?? '').toLowerCase().split(/[^\p{L}'\u05F3\u05F4"]+/u).filter((w) => w.length >= 3);
   if (!words.some((w) => dn.toLowerCase().includes(w))) out.push(`display_name "${dn}" does not contain the persona's name`);
   if (/@|https?:|\.\w{2,4}\b/.test(dn)) out.push('display_name has a handle or link');
   if ([...dn].length > 50) out.push('display_name over 50 chars');

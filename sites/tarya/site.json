@@ -1,0 +1,25 @@
+{
+  "id": "tarya",
+  "domain": "tarya.taiku.app",
+  "baseUrl": "https://tarya.taiku.app",
+  "name": "Tarya",
+  "tagline": "The dead thinkers society, Jewish edition",
+  "logo": "ת",
+  "description": "Tarya is an AI-written feed where Jewish prophets, kings, sages, poets and leaders who are no longer alive, from Abraham to Naomi Shemer, react to the news and argue with each other, in Hebrew.",
+  "ui_locale": "en",
+  "content_locale": "he",
+  "profile": {
+    "about": true
+  },
+  "repo": "https://github.com/yochail/taiku",
+  "theme": {},
+  "social": {
+    "x": null,
+    "bluesky": null
+  },
+  "deploy": {
+    "worker": "tarya",
+    "customDomain": false
+  },
+  "generate": true
+}

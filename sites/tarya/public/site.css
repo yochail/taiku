@@ -1,0 +1,13 @@
+/* Tarya: Hebrew content font. Heebo (SIL Open Font License 1.1, see /fonts/Heebo-OFL.txt), Hebrew subset, self-hosted.
+   The unicode-range limits it to Hebrew glyphs; Latin, digits and emoji keep the platform font stack. */
+@font-face {
+  font-family: 'Heebo';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(/fonts/heebo-hebrew.woff2) format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+:lang(he) {
+  font-family: 'Heebo', 'Segoe UI', 'Noto Sans Hebrew', Arial, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}

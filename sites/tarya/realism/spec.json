@@ -1,0 +1,1143 @@
+{
+  "version": 1,
+  "description": "Tarya realism spec: the Taiku spec (same measured X distributions) with Israel-time posting rhythm and a Tarya persona-style map. Taiku network-realism target spec. `sampling` is what the generator draws from; `metrics` is what scripts/realism.mjs measures the corpus against. Numbers are adapted from X/Twitter research (see `sources`) to a 30-account, no-retweet-text, $0-media corpus. Confidence: high = directly measured on X; medium = measured but older or partial; low = adapted/estimated.",
+  "reference_timezone": "Asia/Jerusalem",
+  "sources": {
+    "pfeffer2023": "Pfeffer et al., 'Just Another Day on Twitter: A Complete 24 Hours of Twitter Data', ICWSM 2023, https://arxiv.org/abs/2301.11429 (375M tweets, 21 Sep 2022: 20.8% original, 50.7% retweets, 24.2% replies, 4.3% quotes; media attachments 76.9% photo / 20.7% video / 2.4% GIF; 0.44% of accounts make 50% of tweets; follower median 99)",
+    "pew2019": "Pew Research Center, 'Sizing Up Twitter Users', 2019, https://www.pewresearch.org/internet/2019/04/24/sizing-up-twitter-users/ (top 10% of US adult users create 80% of tweets; median user 2 tweets/month)",
+    "pew2021": "McClain, Pew Research Center, 'The Behaviors and Attitudes of U.S. Adults on Twitter', 2021, https://www.pewresearch.org/internet/2021/11/15/the-behaviors-and-attitudes-of-u-s-adults-on-twitter/ (top 25% of users produce 97% of tweets)",
+    "twitter2018len": "Twitter data reported by TechCrunch, 30 Oct 2018, https://techcrunch.com/2018/10/30/twitters-doubling-of-character-count-from-140-to-280-had-little-impact-on-length-of-tweets/ (most common length 33 chars; 12% > 140; 5% > 190; 1% hit 280)",
+    "kwak2010": "Kwak, Lee, Park, Moon, 'What is Twitter, a Social Network or a News Media?', WWW 2010, doi:10.1145/1772690.1772751 (22.1% reciprocal follow pairs; heavy-tailed, non-power-law follower distribution)",
+    "nishi2016": "Nishi, Takaguchi et al., 'Reply trees in Twitter: data analysis and branching process models', Social Network Analysis and Mining 6, 2016, https://link.springer.com/article/10.1007/s13278-016-0334-0 (reply trees mostly small and shallow; heavy-tailed size/depth)",
+    "goel2016": "Goel, Anderson, Hofman, Watts, 'The Structural Virality of Online Diffusion', Management Science 62(1), 2016 (vast majority of cascades are size 1 or broadcast depth 1)",
+    "goh2008": "Goh & Barabasi, 'Burstiness and memory in complex systems', EPL 81, 2008 (burstiness B=(sigma-mu)/(sigma+mu); human online activity has B>0)",
+    "golder2011": "Golder & Macy, 'Diurnal and Seasonal Mood Vary with Work, Sleep, and Daylength Across Diverse Cultures', Science 333, 2011 (strong circadian rhythm in tweeting)",
+    "boyd2010": "boyd, Golder & Lotan, 'Tweet, Tweet, Retweet: Conversational Aspects of Retweeting on Twitter', HICSS-43 2010, https://www.danah.org/papers/TweetTweetRetweet.pdf (720k tweets, Jan-Jun 2009: 36% of tweets mention a user as @user and 86% of those begin with @user, so ~5% of all tweets carry a non-leading mention; 5% contain a hashtag; 22% a URL; 18% of retweets contain a hashtag)",
+    "huberman2008": "Huberman, Romero & Wu, 'Social networks that matter: Twitter under the microscope', First Monday 2009, https://arxiv.org/abs/0812.1045 (309k users: 25.4% of posts are directed with @)",
+    "suh2010": "Suh, Hong, Pirolli & Chi, 'Want to be Retweeted? Large Scale Analytics on Factors Impacting Retweet in Twitter Network', SocialCom 2010, https://www.peterpirolli.com/ewExternalFiles/2010-04-15-retweetability-v18-final.pdf (74M tweets: 10.1% of tweets have at least one hashtag; 20.8% of retweets do)",
+    "kehoe2018": "Kehoe & Gee, 'Analysing emojis in context in a corpus of Twitter data', 2018 (about 16% of English tweets contain an emoji)",
+    "gligoric2018": "Gligorić, Anderson & West, 'How Constraints Affect Content: The Case of Twitter's Switch from 140 to 280 Characters', ICWSM 2018, https://arxiv.org/abs/1804.02318 (users write tersely: abbreviations, contractions; short posts are the norm)",
+    "wang2021gif": "Wang & Jurgens, 'An Animated Picture Says at Least a Thousand Words: Selecting GIF-based Replies in Multimodal Dialog', Findings of EMNLP 2021, https://arxiv.org/abs/2109.12212 (1.56M text-to-GIF reply turns from Twitter: GIFs and memes are a standard standalone reply)",
+    "reply_forms_note": "No published study breaks X replies down by form (emoji-only, few words, media-only). The reply_forms weights are estimates triangulated from twitter2018len (mode 33 chars), gligoric2018, wang2021gif and kehoe2018, then shifted toward full replies for teaching. Confidence: low."
+  },
+  "sampling": {
+    "activity": {
+      "_note": "Share of authored items (retweets/retaiks are counters, not posts). pfeffer2023 non-retweet split: 20.8/49.3 original, 24.2/49.3 reply, 4.3/49.3 quote.",
+      "original": 0.42,
+      "reply": 0.49,
+      "quote": 0.09
+    },
+    "media": {
+      "_note": "Weights per role. Video folded into image/gif because there is no $0 video source. Kinds: none, image, gif, meme, chart, video, link_card, poll.",
+      "original": {
+        "none": 0.62,
+        "image": 0.14,
+        "meme": 0.07,
+        "link_card": 0.08,
+        "gif": 0.04,
+        "chart": 0.04,
+        "poll": 0.01,
+        "video": 0
+      },
+      "_reply_note": "reply weights apply to text reply forms only; gif/meme/image-only replies come from reply_forms (about 6% of replies). Together about 11% of replies are visual.",
+      "reply": {
+        "none": 0.93,
+        "gif": 0.03,
+        "image": 0.01,
+        "meme": 0.01,
+        "link_card": 0.015,
+        "chart": 0.005,
+        "poll": 0,
+        "video": 0
+      },
+      "quote": {
+        "none": 0.8,
+        "image": 0.06,
+        "meme": 0.05,
+        "gif": 0.03,
+        "chart": 0.03,
+        "link_card": 0.03,
+        "poll": 0,
+        "video": 0
+      },
+      "persona": {
+        "_note": "Visual kinds (image, gif, meme, chart, video) are multiplied by (0.5 + x_behavior.meme_affinity) / (0.5 + meme_affinity_mean), clamped to [min, max]. Meme lovers post more pictures; scholars fewer.",
+        "meme_affinity_mean": 0.29,
+        "min": 0.5,
+        "max": 1.6
+      },
+      "polls_per_day_min": 1
+    },
+    "length_chars": {
+      "_note": "Target length buckets [min, max, weight], sampled per item and multiplied by persona x_behavior. Real X energy, not lecture energy: mode about 33 chars, 12% over 140, 5% over 190, 1% at 280 (twitter2018len). Never exceed 280; never truncate.",
+      "buckets": [
+        [
+          1,
+          40,
+          0.32
+        ],
+        [
+          41,
+          80,
+          0.28
+        ],
+        [
+          81,
+          140,
+          0.26
+        ],
+        [
+          141,
+          200,
+          0.09
+        ],
+        [
+          201,
+          260,
+          0.04
+        ],
+        [
+          261,
+          280,
+          0.01
+        ]
+      ],
+      "persona_styles": {
+        "_note": "Per-bucket multipliers by persona style (see reply_forms.persona_styles / style_thresholds), renormalized per item.",
+        "terse": [
+          1.8,
+          1.2,
+          0.6,
+          0.3,
+          0.15,
+          0.1
+        ],
+        "punchy": [
+          1.3,
+          1.15,
+          0.85,
+          0.65,
+          0.5,
+          0.4
+        ],
+        "balanced": [],
+        "discursive": [
+          0.6,
+          0.85,
+          1.25,
+          1.6,
+          1.8,
+          1.8
+        ]
+      },
+      "_tarya_note": "Hebrew is counted exactly as Taiku counts it (src/lib/media.mjs taikLength: Hebrew letters weigh 1, emoji 2). Hebrew packs more meaning per character (prefixes, no written vowels), so the same buckets read even shorter than in English. Keep them: X Hebrew is short."
+    },
+    "diurnal_local": {
+      "_note": "Relative posting weight per Israel-time hour 0-23. Same circadian shape as Taiku (golder2011, pfeffer2023) shifted to Israeli habits: a late-night tail to 01:00, a quiet 03:00-06:00, a morning bump after 07:00 news, and the peak 20:00-23:00 after the evening news broadcasts. Shabbat: from Friday sunset to Saturday nightfall, religious personas (x_behavior.shabbat) do not post at all; secular personas post at about 0.6x. Volume rebounds after Havdalah (motzei Shabbat). This is a product choice; no measured Israeli source was found.",
+      "weights": [
+        0.045,
+        0.03,
+        0.018,
+        0.01,
+        0.008,
+        0.01,
+        0.02,
+        0.036,
+        0.046,
+        0.05,
+        0.051,
+        0.052,
+        0.052,
+        0.05,
+        0.048,
+        0.047,
+        0.048,
+        0.05,
+        0.053,
+        0.057,
+        0.062,
+        0.064,
+        0.061,
+        0.052
+      ],
+      "shabbat": {
+        "observant_share": 0,
+        "secular_multiplier": 0.6,
+        "motzei_rebound": 1.4
+      }
+    },
+    "reply_delay_minutes": {
+      "_note": "Lognormal delay between parent and reply: median about 25 min, 90th percentile about 2.5 h.",
+      "lognormal": {
+        "median": 25,
+        "sigma": 1.4
+      },
+      "max": 2880
+    },
+    "engagement": {
+      "_note": "Simulated counters. Likes are lognormal (heavy tail), scaled by persona popularity/5; replies get reply_factor. Ratios carry lognormal noise.",
+      "likes_lognormal": {
+        "median": 60,
+        "sigma": 1.5
+      },
+      "reply_factor": 0.3,
+      "reposts_per_like": {
+        "median": 0.14,
+        "sigma": 0.5
+      },
+      "quotes_per_repost": {
+        "median": 0.2,
+        "sigma": 0.5
+      },
+      "views_per_like": {
+        "median": 45,
+        "sigma": 0.4
+      }
+    },
+    "gif_sources": {
+      "_note": "Where a sampled gif comes from. giphy = GIPHY search at generation time (pop-culture reactions, like real X); local = self-made animated SVG on public-domain art (media/library.json). Falls back to local when GIPHY is unavailable or over budget.",
+      "giphy": 0.5,
+      "local": 0.5
+    },
+    "reply_forms": {
+      "_note": "Shape of a reply or quote, before persona bias. emoji_only: 1-3 emoji, no words ('💀', '😂😂'). few_words: 1-3 words ('this.', 'based', 'source?'). *_only: media with empty text. short: 4+ words up to 40 chars. full: over 40 chars. Sources: reply_forms_note.",
+      "forms": {
+        "emoji_only": {
+          "chars": [
+            1,
+            8
+          ]
+        },
+        "few_words": {
+          "chars": [
+            1,
+            25
+          ],
+          "max_words": 3
+        },
+        "gif_only": {
+          "chars": [
+            0,
+            0
+          ],
+          "media": "gif"
+        },
+        "meme_only": {
+          "chars": [
+            0,
+            0
+          ],
+          "media": "meme"
+        },
+        "image_only": {
+          "chars": [
+            0,
+            0
+          ],
+          "media": "image"
+        },
+        "short": {
+          "chars": [
+            10,
+            40
+          ]
+        },
+        "full": {
+          "chars": [
+            41,
+            280
+          ]
+        }
+      },
+      "reply": {
+        "emoji_only": 0.07,
+        "few_words": 0.12,
+        "gif_only": 0.04,
+        "meme_only": 0.01,
+        "image_only": 0.01,
+        "short": 0.2,
+        "full": 0.55
+      },
+      "quote": {
+        "emoji_only": 0.05,
+        "few_words": 0.13,
+        "short": 0.22,
+        "full": 0.6
+      },
+      "persona_styles": {
+        "_note": "Multipliers on the base weights, renormalized. Persona JSON may set reply_style to override persona_style.",
+        "terse": {
+          "emoji_only": 4,
+          "few_words": 3,
+          "gif_only": 3,
+          "meme_only": 2.5,
+          "image_only": 1,
+          "short": 1.5,
+          "full": 0.25
+        },
+        "punchy": {
+          "emoji_only": 1.5,
+          "few_words": 1.6,
+          "gif_only": 1.5,
+          "meme_only": 1.5,
+          "image_only": 1,
+          "short": 1.4,
+          "full": 0.75
+        },
+        "balanced": {},
+        "discursive": {
+          "emoji_only": 0.3,
+          "few_words": 0.4,
+          "gif_only": 0.5,
+          "meme_only": 0.5,
+          "image_only": 1,
+          "short": 0.6,
+          "full": 1.4
+        }
+      },
+      "style_thresholds": {
+        "_note": "Personas missing from persona_style get a style from x_behavior + temperament: score = 0.5*shitpost_level + 0.3*meme_affinity + 0.2*(heat-1)/4 - 0.4*thread_tendency.",
+        "terse": 0.55,
+        "punchy": 0.3,
+        "discursive": 0
+      },
+      "persona_style": {
+        "shammai": "terse",
+        "leibowitz": "terse",
+        "eliyahu": "terse",
+        "satmar": "terse",
+        "golda": "punchy",
+        "ben_gurion": "punchy",
+        "jabotinsky": "punchy",
+        "herzl": "punchy",
+        "amichai": "punchy",
+        "rachel": "punchy",
+        "shemer": "punchy",
+        "senesh": "punchy",
+        "devorah": "punchy",
+        "miriam": "punchy",
+        "sholem_aleichem": "punchy",
+        "nachman": "punchy",
+        "einstein": "punchy",
+        "david": "punchy",
+        "shlomo": "punchy",
+        "hillel": "punchy",
+        "besht": "punchy",
+        "ovadia": "punchy",
+        "rashi": "punchy",
+        "bruriah": "punchy",
+        "esther": "punchy",
+        "ben_yehuda": "punchy",
+        "rambam": "discursive",
+        "ramban": "discursive",
+        "maharal": "discursive",
+        "saadia": "discursive",
+        "mendelssohn": "discursive",
+        "heschel": "discursive",
+        "rav_kook": "discursive",
+        "ahad_haam": "discursive",
+        "spinoza": "discursive",
+        "karo": "discursive",
+        "josephus": "discursive",
+        "szold": "discursive",
+        "begin": "discursive",
+        "yeshayahu": "discursive",
+        "yirmiyahu": "discursive",
+        "gluckel": "discursive",
+        "halevi": "discursive",
+        "agnon": "discursive",
+        "bialik": "discursive"
+      },
+      "_tarya_examples": "Invented Hebrew samples per form: emoji_only \"💀\", \"🙄🙄\"; few_words \"נו באמת\", \"מקור?\", \"תיקו.\"; short \"זה בדיוק מה שאמרתי ב-1948\"; full: a 41-280 char reply."
+    },
+    "retaik": {
+      "_note": "Plain retaiks (repost with no comment) by personas, shown as 'X retaiked' rows. X has 50.7% retweets vs 49.3% authored, about 1.03 per authored post (pfeffer2023). Taiku targets 0.6 so the feed of 30 accounts is not mostly duplicates. Stored as { id, authorId, retaikOf, createdAt, text: '' }.",
+      "per_authored": 0.6
+    },
+    "profile": {
+      "_note": "X display-name tradition: some accounts decorate the name with emoji, kaomoji or ASCII, or a short bio-style tag after a bar. Tarya: 20 of 60 personas (0.33), Hebrew-appropriate (✡️ 🕎 📜 🇮🇱 🎻 ☕) and always respectful for prophets and sages (no clown emoji on Moshe). The handle never changes. Stored in persona x_profile.display_name. Product choice, no measured source.",
+      "decorated_name_share": 0.33,
+      "bio_tag_share_of_decorated": 0.1,
+      "confidence": "low (product choice)"
+    },
+    "mentions": {
+      "_note": "Non-leading @mentions written into the text (tagging someone mid-post, co-mentions). A reply's leading @ to its parent is the 'Replying to' header and is not counted. Role rates from boyd2010 (~5% of all tweets carry a non-leading mention) and huberman2008. Count (co-mentions), target weights and persona multipliers are product choices with no verified source.",
+      "rate": {
+        "original": 0.06,
+        "reply": 0.05,
+        "quote": 0.08
+      },
+      "count": {
+        "1": 0.8,
+        "2": 0.15,
+        "3": 0.05
+      },
+      "targets": {
+        "rival": 3,
+        "frenemy": 2.5,
+        "ally": 2,
+        "other": 0.3
+      },
+      "persona": {
+        "_note": "multiplier = 0.5 + 0.6*dunk_tendency + 0.4*clapback_rate + 0.1*(heat-3), clamped",
+        "min": 0.4,
+        "max": 2
+      },
+      "confidence": {
+        "rate": "medium",
+        "count": "low (product choice)",
+        "targets": "low (product choice)",
+        "persona": "low (product choice)"
+      },
+      "sources": [
+        "boyd2010",
+        "huberman2008"
+      ]
+    },
+    "mention_response": {
+      "_note": "What a persona does when @mentioned in someone's text (a notification). One outcome per (post, mentioned persona), seeded by both ids so the next day's run can recompute it: reply | quote | like | ignore, after a lognormal delay (median 35 min; the tail crosses into the next day). Action weights are a product choice (no measured source for reply-to-mention rates); talk = (base + clapback·clapback_rate)·(0.7 + 0.15·heat)/1.15 multiplies reply and quote, ignore is scaled by max(0.2, 1.4 − clapback_rate), and the relation to the author tilts the mix. Delay shape follows reply_delay_minutes (kwak2010: most reactions within an hour, a long tail over days).",
+      "actions": {
+        "reply": 0.42,
+        "quote": 0.08,
+        "like": 0.3,
+        "ignore": 0.2
+      },
+      "persona": {
+        "base": 0.6,
+        "clapback": 0.8
+      },
+      "relation": {
+        "rival": {
+          "reply": 1.4,
+          "quote": 1.5,
+          "like": 0.4
+        },
+        "frenemy": {
+          "reply": 1.2,
+          "quote": 1.2
+        },
+        "ally": {
+          "like": 1.6,
+          "quote": 0.6
+        }
+      },
+      "delay_minutes": {
+        "lognormal": {
+          "median": 35,
+          "sigma": 1.5
+        },
+        "max": 2880
+      },
+      "confidence": "low (product choice)"
+    },
+    "hashtags": {
+      "_note": "Hashtags written into the text. Originals follow suh2010 (10.1%); replies and quotes use fewer, so the corpus share lands near boyd2010 (5%). Count and persona multipliers are product choices. The house-style strip keeps only the sampled number of tags.",
+      "rate": {
+        "original": 0.1,
+        "reply": 0.03,
+        "quote": 0.06
+      },
+      "count": {
+        "1": 0.75,
+        "2": 0.2,
+        "3": 0.05
+      },
+      "persona": {
+        "_note": "multiplier = (0.4 + 0.2*modernity) * kind factor, clamped",
+        "kind": {
+          "parody": 1.8,
+          "news": 1.5,
+          "fictional": 1.2
+        },
+        "min": 0.3,
+        "max": 2.5
+      },
+      "confidence": {
+        "rate": "medium",
+        "count": "low (product choice)",
+        "persona": "low (product choice)"
+      },
+      "sources": [
+        "boyd2010",
+        "suh2010"
+      ]
+    },
+    "emoji_probability": 0.15,
+    "real_posts": {
+      "_note": "Disabled for this site: quote-taiks of real public X/Bluesky posts are off, so the pack carries no real users' content, names or handles. News reactions use link cards to real articles only.",
+      "share_of_news_originals": 0,
+      "max_per_day": 0,
+      "max_age_hours": 72,
+      "min_title_overlap": 0.5,
+      "platforms": [],
+      "confidence": "product choice"
+    },
+    "accounts": {
+      "_note": "Account mix, mirrored from the taiku site's ratios (product choices, not measured). 'thinker' covers sages, leaders and the historical adversaries; 'news' are wire-style bots that post only news_wire items (headline + neutral line + link card to a real article from config/feeds.json); 'parody' are invented concept/fan/meme/quote-of-the-day accounts; 'fictional' are folklore figures. All accounts are AI-generated personas; none is a real user.",
+      "personas": {
+        "thinker": 70,
+        "news": 3,
+        "parody": 7,
+        "fictional": 2
+      },
+      "post_share": {
+        "thinker": 0.84,
+        "news": 0.035,
+        "parody": 0.105,
+        "fictional": 0.02,
+        "_note": "Target share of authored items per account kind (taiku corpus ratio). News bots author only news_wire originals; their engagement comes from replies and quotes by thinkers."
+      },
+      "replies_to_news_per_100_thinker_replies": 31,
+      "adversaries": {
+        "_note": "Historical/legendary opponents of the sages (kind: thinker). Written as ideological opponents arguing positions grounded in their sources; never hate speech, no slurs, no antisemitic tropes presented as true. Each pair is wired as reciprocal rivals in the personas, so mentions.targets.rival and mention_response.relation.rival drive the clashes. 'clash' = probability that a reply/quote by the adversary on a news day targets one of its counterparts (backfill sampling, product choice).",
+        "ids": [
+          "korach",
+          "bilaam",
+          "izevel",
+          "jason",
+          "tzadok",
+          "elisha_acher",
+          "hadrian",
+          "anan",
+          "shabbetai_zvi",
+          "morteira"
+        ],
+        "clash_graph": {
+          "korach": {
+            "targets": [
+              "moshe",
+              "miriam"
+            ],
+            "clash": 0.45,
+            "source": "Numbers 16"
+          },
+          "bilaam": {
+            "targets": [
+              "moshe"
+            ],
+            "clash": 0.35,
+            "source": "Numbers 22-24"
+          },
+          "izevel": {
+            "targets": [
+              "eliyahu"
+            ],
+            "clash": 0.5,
+            "source": "1 Kings 18-21"
+          },
+          "jason": {
+            "targets": [
+              "shlomtzion",
+              "josephus"
+            ],
+            "clash": 0.35,
+            "source": "2 Maccabees 4"
+          },
+          "tzadok": {
+            "targets": [
+              "hillel",
+              "rybz"
+            ],
+            "clash": 0.4,
+            "source": "Avot deRabbi Natan 5; Mishnah Yadayim 4"
+          },
+          "elisha_acher": {
+            "targets": [
+              "akiva",
+              "bruriah"
+            ],
+            "clash": 0.35,
+            "source": "Hagigah 14b-15b"
+          },
+          "hadrian": {
+            "targets": [
+              "akiva",
+              "rybz"
+            ],
+            "clash": 0.3,
+            "source": "Berakhot 61b; Bereshit Rabbah"
+          },
+          "anan": {
+            "targets": [
+              "saadia"
+            ],
+            "clash": 0.45,
+            "source": "Sefer HaMitzvot of Anan; Saadia's polemics"
+          },
+          "shabbetai_zvi": {
+            "targets": [
+              "gluckel",
+              "rambam"
+            ],
+            "clash": 0.35,
+            "source": "Glikl's Memoirs, book 5; Hilkhot Melakhim 11-12"
+          },
+          "morteira": {
+            "targets": [
+              "spinoza"
+            ],
+            "clash": 0.55,
+            "source": "Herem of 1656"
+          }
+        },
+        "outcome": {
+          "_note": "House-style rule: adversaries argue hard and get dunked on; the thread usually ends with the sage's answer (they lose the debate, the way the sources tell it).",
+          "sage_last_word_share": 0.75
+        }
+      },
+      "confidence": "low (product choice)"
+    }
+  },
+  "metrics": {
+    "activity.original_share": {
+      "min": 0.3,
+      "max": 0.55,
+      "target": 0.42,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "high (adapted: retweets excluded)",
+      "sources": [
+        "pfeffer2023"
+      ]
+    },
+    "activity.reply_share": {
+      "min": 0.35,
+      "max": 0.62,
+      "target": 0.49,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "high (adapted)",
+      "sources": [
+        "pfeffer2023"
+      ]
+    },
+    "activity.quote_share": {
+      "min": 0.04,
+      "max": 0.16,
+      "target": 0.09,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "high (adapted)",
+      "sources": [
+        "pfeffer2023"
+      ]
+    },
+    "media.original.visual_share": {
+      "_def": "share of originals with image/gif/meme/chart/video",
+      "min": 0.18,
+      "max": 0.42,
+      "target": 0.29,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low (X publishes no per-post media share; pfeffer2023 has ~0.3 attachments per tweet incl. retweets)",
+      "sources": [
+        "pfeffer2023"
+      ]
+    },
+    "media.original.link_card_share": {
+      "min": 0.02,
+      "max": 0.15,
+      "target": 0.08,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": []
+    },
+    "media.original.poll_share": {
+      "min": 0,
+      "max": 0.04,
+      "target": 0.01,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": []
+    },
+    "media.reply.visual_share": {
+      "min": 0.03,
+      "max": 0.2,
+      "target": 0.11,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": []
+    },
+    "media.gif_share_of_visual": {
+      "min": 0.05,
+      "max": 0.4,
+      "target": 0.2,
+      "min_n": 15,
+      "severity": "warn",
+      "confidence": "low (2.4% of X attachments are GIFs; reaction GIFs dominate replies, so raised)",
+      "sources": [
+        "pfeffer2023"
+      ]
+    },
+    "media.gif.giphy_share": {
+      "_def": "share of gif items sourced from GIPHY (rest are local public-domain reactions)",
+      "min": 0.2,
+      "max": 0.8,
+      "target": 0.5,
+      "min_n": 10,
+      "severity": "warn",
+      "confidence": "product choice (user-approved mix), not an X statistic",
+      "sources": []
+    },
+    "media.safety_violations": {
+      "_def": "media items with unknown kind, missing alt, third-party without credit+license, AI image without ai_generated flag, non-allowlisted or non-https remote src, or rating above max_rating",
+      "min": 0,
+      "max": 0,
+      "severity": "fail",
+      "confidence": "hard rule",
+      "sources": []
+    },
+    "length.max_chars": {
+      "min": 1,
+      "max": 280,
+      "severity": "fail",
+      "confidence": "hard rule",
+      "sources": []
+    },
+    "length.median_chars": {
+      "min": 55,
+      "max": 95,
+      "target": 70,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "medium (X mode is 33)",
+      "sources": [
+        "twitter2018len"
+      ]
+    },
+    "length.short_share": {
+      "_def": "share <= 40 chars (posts with text)",
+      "min": 0.2,
+      "max": 0.5,
+      "target": 0.32,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "medium",
+      "sources": [
+        "twitter2018len"
+      ]
+    },
+    "length.over_140_share": {
+      "min": 0.08,
+      "max": 0.2,
+      "target": 0.14,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "medium (X: 12%)",
+      "sources": [
+        "twitter2018len"
+      ]
+    },
+    "length.near_limit_share": {
+      "_def": "share >= 261 chars",
+      "min": 0,
+      "max": 0.04,
+      "target": 0.01,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "medium (X: 1% hit 280)",
+      "sources": [
+        "twitter2018len"
+      ]
+    },
+    "threads.zero_reply_root_share": {
+      "min": 0.3,
+      "max": 0.7,
+      "target": 0.5,
+      "min_n": 20,
+      "severity": "warn",
+      "confidence": "medium (most X posts get no reply; Taiku wants debate so capped at 70%)",
+      "sources": [
+        "nishi2016",
+        "goel2016"
+      ]
+    },
+    "threads.depth1_share_of_conversations": {
+      "_def": "share of roots with replies whose max reply depth is 1",
+      "min": 0.35,
+      "max": 0.8,
+      "target": 0.55,
+      "min_n": 15,
+      "severity": "warn",
+      "confidence": "medium",
+      "sources": [
+        "nishi2016"
+      ]
+    },
+    "threads.deep_share_of_conversations": {
+      "_def": "share of roots with replies whose max reply depth is >= 4",
+      "min": 0.02,
+      "max": 0.25,
+      "target": 0.1,
+      "min_n": 15,
+      "severity": "warn",
+      "confidence": "medium",
+      "sources": [
+        "nishi2016"
+      ]
+    },
+    "threads.replies_per_root_gini": {
+      "min": 0.45,
+      "max": 0.95,
+      "target": 0.65,
+      "min_n": 20,
+      "severity": "warn",
+      "confidence": "medium (heavy-tailed)",
+      "sources": [
+        "nishi2016",
+        "goel2016"
+      ]
+    },
+    "authors.posts_gini": {
+      "min": 0.2,
+      "max": 0.6,
+      "target": 0.4,
+      "min_n": 60,
+      "severity": "warn",
+      "confidence": "low (X-wide is far more skewed; 30 curated active accounts are moderated)",
+      "sources": [
+        "pew2019",
+        "pew2021",
+        "pfeffer2023"
+      ]
+    },
+    "authors.top20_share": {
+      "min": 0.33,
+      "max": 0.65,
+      "target": 0.45,
+      "min_n": 60,
+      "severity": "warn",
+      "confidence": "low (adapted)",
+      "sources": [
+        "pew2019"
+      ]
+    },
+    "authors.reply_in_degree_gini": {
+      "min": 0.15,
+      "max": 0.65,
+      "target": 0.4,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": []
+    },
+    "graph.reply_reciprocity": {
+      "_def": "share of directed author->author reply edges that are reciprocated",
+      "min": 0.2,
+      "max": 0.8,
+      "target": 0.45,
+      "min_n": 15,
+      "severity": "warn",
+      "confidence": "low (follow graph is 22%; reply graphs are more reciprocal)",
+      "sources": [
+        "kwak2010"
+      ]
+    },
+    "time.diurnal_tvd": {
+      "_def": "total-variation distance between local-hour histogram and sampling.diurnal_local",
+      "min": 0,
+      "max": 0.3,
+      "target": 0.1,
+      "min_n": 200,
+      "severity": "warn",
+      "confidence": "medium",
+      "sources": [
+        "golder2011",
+        "pfeffer2023"
+      ]
+    },
+    "time.round_minute_share": {
+      "_def": "share of timestamps with minute % 5 == 0 (uniform = 0.2; LLM-picked times cluster on :00/:05)",
+      "min": 0,
+      "max": 0.35,
+      "target": 0.2,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "high (statistical)",
+      "sources": []
+    },
+    "time.burstiness_median": {
+      "_def": "median per-author B over authors with >= 8 posts",
+      "min": 0,
+      "max": 0.65,
+      "target": 0.25,
+      "min_n": 3,
+      "severity": "warn",
+      "confidence": "medium",
+      "sources": [
+        "goh2008"
+      ]
+    },
+    "time.reply_delay_median_min": {
+      "min": 3,
+      "max": 180,
+      "target": 25,
+      "min_n": 20,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": []
+    },
+    "time.replies_before_parent": {
+      "min": 0,
+      "max": 0,
+      "severity": "fail",
+      "confidence": "hard rule",
+      "sources": []
+    },
+    "text.hashtag_share": {
+      "_def": "share of posts with text that contain a #hashtag",
+      "min": 0.01,
+      "max": 0.12,
+      "target": 0.05,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "medium (5% boyd2010, 10.1% suh2010)",
+      "sources": [
+        "boyd2010",
+        "suh2010"
+      ]
+    },
+    "profile.decorated_name_share": {
+      "_def": "share of personas whose shown name carries emoji/kaomoji/ASCII or a bio tag",
+      "min": 0.25,
+      "max": 0.35,
+      "target": 0.33,
+      "min_n": 20,
+      "severity": "warn",
+      "confidence": "low (product choice)",
+      "sources": []
+    },
+    "engagement.mention_answered_share": {
+      "_def": "share of in-text persona @mentions (posts at least 48h before the newest post) answered by a reply or quote from the mentioned persona",
+      "min": 0.25,
+      "max": 0.8,
+      "target": 0.5,
+      "min_n": 20,
+      "severity": "warn",
+      "confidence": "low (product choice)",
+      "sources": []
+    },
+    "text.mention_share": {
+      "_def": "share of posts with text that @mention a persona outside a leading reply @",
+      "min": 0.02,
+      "max": 0.12,
+      "target": 0.055,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "medium (~5% boyd2010)",
+      "sources": [
+        "boyd2010",
+        "huberman2008"
+      ]
+    },
+    "text.co_mention_share": {
+      "_def": "of posts with a non-leading mention, share naming 2+ handles",
+      "min": 0,
+      "max": 0.45,
+      "target": 0.2,
+      "min_n": 15,
+      "severity": "warn",
+      "confidence": "low (product choice)",
+      "sources": []
+    },
+    "text.emoji_share": {
+      "min": 0.06,
+      "max": 0.35,
+      "target": 0.15,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "medium",
+      "sources": [
+        "kehoe2018"
+      ]
+    },
+    "reply_form.reply.emoji_only_share": {
+      "_def": "replies whose text is only emoji (no media)",
+      "min": 0.02,
+      "max": 0.16,
+      "target": 0.07,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": [
+        "kehoe2018",
+        "reply_forms_note"
+      ]
+    },
+    "reply_form.reply.few_words_share": {
+      "_def": "replies of 1-3 words, at most 25 chars",
+      "min": 0.05,
+      "max": 0.25,
+      "target": 0.12,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": [
+        "gligoric2018",
+        "reply_forms_note"
+      ]
+    },
+    "reply_form.reply.media_only_share": {
+      "_def": "replies with gif/meme/image and empty text",
+      "min": 0.02,
+      "max": 0.14,
+      "target": 0.06,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": [
+        "wang2021gif",
+        "reply_forms_note"
+      ]
+    },
+    "reply_form.reply.short_share": {
+      "_def": "replies of 4+ words, at most 40 chars",
+      "min": 0.08,
+      "max": 0.35,
+      "target": 0.2,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": [
+        "twitter2018len",
+        "reply_forms_note"
+      ]
+    },
+    "reply_form.reply.full_share": {
+      "_def": "replies over 40 chars",
+      "min": 0.35,
+      "max": 0.75,
+      "target": 0.55,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low (real X is lower; shifted up for teaching)",
+      "sources": [
+        "twitter2018len",
+        "reply_forms_note"
+      ]
+    },
+    "reply_form.quote.minimal_share": {
+      "_def": "quote posts whose comment is emoji-only or 1-3 words",
+      "min": 0.06,
+      "max": 0.35,
+      "target": 0.18,
+      "min_n": 15,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": [
+        "reply_forms_note"
+      ]
+    },
+    "retaik.per_authored": {
+      "_def": "plain retaiks (retaikOf, no comment) per authored post",
+      "min": 0.25,
+      "max": 1.3,
+      "target": 0.6,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "high for X (1.03); Taiku target is a product choice",
+      "sources": [
+        "pfeffer2023"
+      ]
+    },
+    "engagement.likes_gini": {
+      "min": 0.55,
+      "max": 0.97,
+      "target": 0.7,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "high (heavy tail is universal)",
+      "sources": [
+        "goel2016"
+      ]
+    },
+    "engagement.top10_like_share": {
+      "min": 0.35,
+      "max": 0.9,
+      "target": 0.5,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "medium",
+      "sources": [
+        "goel2016"
+      ]
+    },
+    "engagement.likes_per_repost_median": {
+      "min": 3,
+      "max": 15,
+      "target": 7,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low (industry analyses: 2-10x)",
+      "sources": []
+    },
+    "engagement.quotes_per_repost_median": {
+      "min": 0.05,
+      "max": 0.45,
+      "target": 0.2,
+      "min_n": 30,
+      "severity": "warn",
+      "confidence": "low",
+      "sources": []
+    }
+  },
+  "gate": {
+    "_note": "Blocking per-day distribution gate (npm run gate / realism --file). Share metrics are widened by a binomial z-interval around their spec band (z = ci_z) for the day's sample size; 'blocking' lists the metrics that fail the gate when outside the widened band, the rest are reported. Hard checks below always block. Personas with >= persona_min_items items are checked against their expected short-item share (style-weighted) with persona_slack extra slack.",
+    "ci_z": 1.96,
+    "blocking": [
+      "activity.original_share",
+      "activity.reply_share",
+      "activity.quote_share",
+      "length.median_chars",
+      "length.short_share",
+      "media.original.visual_share"
+    ],
+    "relative_slack": 0.15,
+    "min_media_items": 1,
+    "min_polls": 1,
+    "min_originals_for_poll": 20,
+    "max_over_140_share": 0.2,
+    "max_round_minute_share": 0.4,
+    "persona_min_items": 5,
+    "persona_short_chars": 40,
+    "persona_slack": 0.2,
+    "persona_z": 2,
+    "persona_alpha": 0.002
+  },
+  "media_policy": {
+    "kinds": [
+      "image",
+      "gif",
+      "meme",
+      "chart",
+      "video",
+      "link_card",
+      "poll"
+    ],
+    "allowed_remote_hosts": [
+      "media.giphy.com",
+      "media0.giphy.com",
+      "media1.giphy.com",
+      "media2.giphy.com",
+      "media3.giphy.com",
+      "media4.giphy.com"
+    ],
+    "_remote_note": "Must match the img-src CSP in public/_headers. Public-domain art is stored locally (public/media/art), so Wikimedia is not hotlinked. GIPHY must be hotlinked from its CDN (GIPHY API terms) with 'Powered by GIPHY' attribution.",
+    "giphy": {
+      "attribution": "Powered by GIPHY",
+      "api_rating": "pg-13",
+      "max_calls_per_run": 10,
+      "_note": "Beta keys allow ~100 calls/hour; the generator searches server-side only and caches per query."
+    },
+    "ratings": [
+      "g",
+      "pg",
+      "pg-13"
+    ],
+    "max_rating": "pg-13"
+  },
+  "_policy": "Distribution descriptions only: no real users' content, names, handles or post URLs. Samples must be invented; research citations are allowed."
+}

@@ -18,6 +18,11 @@ export function loadSpec(file = SPEC_PATH) {
 
 // ---------- stats helpers ----------
 
+// Hebrew gershayim/geresh (״ ׳, or ASCII " ') and maqaf (־) are part of names (הרמב״ם), not decoration.
+export function isDecoratedName(p) {
+  return /[^\p{L}\p{M}\p{N}\s.,'’"()&\-\u05BE\u05F3\u05F4]/u.test(p?.x_profile?.display_name || p?.name || '');
+}
+
 export function gini(values) {
   const xs = values.filter((v) => Number.isFinite(v) && v >= 0).sort((a, b) => a - b);
   const n = xs.length;
@@ -294,7 +299,7 @@ export function measure(allPosts, personas, spec, { context = [] } = {}) {
 
   // text
   set('text.hashtag_share', share(posts.filter((p) => HASHTAG.test(p.text ?? '')).length, posts.length), posts.length);
-  const decorated = personas.filter((p) => /[^\p{L}\p{M}\p{N}\s.,'’()&-]/u.test(p.x_profile?.display_name || p.name || ''));
+  const decorated = personas.filter(isDecoratedName);
   set('profile.decorated_name_share', share(decorated.length, personas.length), personas.length);
   const knownHandles = new Set(personas.map((p) => String(p.handle ?? '').toLowerCase()).filter(Boolean));
   const mentionCounts = posts.map((p) => textMentions(p.text, knownHandles).length);

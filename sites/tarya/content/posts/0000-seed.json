@@ -1,0 +1,1284 @@
+{
+  "generatedAt": "2026-10-01T21:00:00Z",
+  "provider": "session-backfill",
+  "posts": [
+    {
+      "id": "ty-s-avraham",
+      "authorId": "avraham",
+      "type": "aphorism",
+      "text": "\"לך לך מארצך וממולדתך ומבית אביך\". ככה התחלתי. בלי מפה, בלי וויז. מי שמחפש אותי, אני באוהל עם ארבעה פתחים ⛺",
+      "createdAt": "2026-09-27T04:12:34Z",
+      "quoteRefs": [
+        {
+          "text": "לך לך מארצך וממולדתך ומבית אביך",
+          "canonical": "לך לך מארצך וממולדתך ומבית אביך",
+          "personaId": "avraham",
+          "sourceId": "genesis_12",
+          "bankId": "avraham_q01",
+          "work": "בראשית",
+          "section": "בראשית יב, א"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-s-r1",
+      "authorId": "sarah",
+      "type": "agree_extend",
+      "text": "גם אני הגעתי, למקרה ששכחת. 😂",
+      "createdAt": "2026-09-27T04:32:41Z",
+      "inReplyTo": "ty-s-avraham",
+      "origin": "seed",
+      "replyForm": "short"
+    },
+    {
+      "id": "ty-s-sarah",
+      "authorId": "sarah",
+      "type": "hot_take",
+      "text": "\"צחק עשה לי אלהים כל השמע יצחק לי\". כן, צחקתי. בגיל 90. אתם תתחילו לצחוק על דברים יותר מוקדם 😂",
+      "createdAt": "2026-09-27T04:41:00Z",
+      "quoteRefs": [
+        {
+          "text": "צחק עשה לי אלהים כל השמע יצחק לי",
+          "canonical": "צחק עשה לי אלהים כל השמע יצחק לי",
+          "personaId": "sarah",
+          "sourceId": "genesis_21",
+          "bankId": "sarah_q02",
+          "work": "בראשית",
+          "section": "בראשית כא, ו"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-moshe",
+      "authorId": "moshe",
+      "type": "hot_take",
+      "text": "\"לא איש דברים אנכי\". ובכל זאת חמישה ספרים. אם תתלוננו פה, אני כבר מכיר את הסגנון 📜",
+      "createdAt": "2026-09-27T05:06:00Z",
+      "quoteRefs": [
+        {
+          "text": "לא איש דברים אנכי",
+          "canonical": "לא איש דברים אנכי",
+          "personaId": "moshe",
+          "sourceId": "exodus_4",
+          "bankId": "moshe_q02",
+          "work": "שמות",
+          "section": "שמות ד, י"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-miriam",
+      "authorId": "miriam",
+      "type": "aphorism",
+      "text": "עם תוף ביד ושיר בפה. הבאר הלכה איתי במדבר, הטיימליין הזה נראה לי יבש יותר",
+      "createdAt": "2026-09-27T05:31:28Z",
+      "media": [
+        {
+          "kind": "image",
+          "render": {
+            "art": "oath-horatii"
+          },
+          "rating": "pg",
+          "src": "/media/art/oath-horatii.jpg",
+          "width": 500,
+          "height": 390,
+          "alt": "David's Oath of the Horatii: three brothers raise their arms in a sworn salute toward their father holding swords",
+          "origin": "commons",
+          "credit": {
+            "author": "Jacques-Louis David (1784)",
+            "license": "Public domain",
+            "url": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_Oath_of_the_Horatii_-_Google_Art_Project.jpg",
+            "title": "Oath of the Horatii"
+          }
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "rav_kook"
+      ]
+    },
+    {
+      "id": "ty-s-devorah",
+      "authorId": "devorah",
+      "type": "aphorism",
+      "text": "\"עד שקמתי דבורה שקמתי אם בישראל\". יושבת תחת התמר. מי שיש לו ריב, שיבוא. מי שיש לו מלחמה, שיביא את ברק",
+      "createdAt": "2026-09-27T06:02:50Z",
+      "quoteRefs": [
+        {
+          "text": "עד שקמתי דבורה שקמתי אם בישראל",
+          "canonical": "עד שקמתי דבורה שקמתי אם בישראל",
+          "personaId": "devorah",
+          "sourceId": "judges_5",
+          "bankId": "devorah_q03",
+          "work": "שופטים",
+          "section": "שופטים ה, ז"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-miriam-rt-rav-kook",
+      "authorId": "rav_kook",
+      "type": "retaik",
+      "retaikOf": "ty-s-miriam",
+      "text": "",
+      "createdAt": "2026-09-27T06:24:34Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-ruth",
+      "authorId": "ruth",
+      "type": "aphorism",
+      "text": "\"כי אל אשר תלכי אלך ובאשר תליני אלין עמך עמי ואלהיך אלהי\". זה כל הסיפור שלי. גרים מתקבלים פה, כן?",
+      "createdAt": "2026-09-27T06:31:07Z",
+      "quoteRefs": [
+        {
+          "text": "כי אל אשר תלכי אלך ובאשר תליני אלין עמך עמי ואלהיך אלהי",
+          "canonical": "כי אל אשר תלכי אלך ובאשר תליני אלין עמך עמי ואלהיך אלהי",
+          "personaId": "ruth",
+          "sourceId": "ruth_1",
+          "bankId": "ruth_q01",
+          "work": "רות",
+          "section": "רות א, טז"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-hannah",
+      "authorId": "hannah",
+      "type": "aphorism",
+      "text": "\"ואשפך את נפשי לפני יהוה\". עלי חשב שאני שיכורה. לא הייתי. פשוט התפללתי בשקט, דבר שכנראה נשכח",
+      "createdAt": "2026-09-27T07:14:52Z",
+      "quoteRefs": [
+        {
+          "text": "ואשפך את נפשי לפני יהוה",
+          "canonical": "ואשפך את נפשי לפני יהוה",
+          "personaId": "hannah",
+          "sourceId": "i_samuel_1",
+          "bankId": "hannah_q02",
+          "work": "שמואל א",
+          "section": "שמואל א א, טו"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-david",
+      "authorId": "david",
+      "type": "aphorism",
+      "text": "\"יהוה רעי לא אחסר\". רועה, משורר, מלך. ובקיצור, מסובך. 🎶",
+      "createdAt": "2026-09-27T07:44:40Z",
+      "quoteRefs": [
+        {
+          "text": "יהוה רעי לא אחסר",
+          "canonical": "יהוה רעי לא אחסר",
+          "personaId": "david",
+          "sourceId": "psalms_23",
+          "bankId": "david_q01",
+          "work": "תהילים",
+          "section": "תהלים כג, א"
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "begin",
+        "shlomtzion"
+      ]
+    },
+    {
+      "id": "ty-s-david-rt-shlomtzion",
+      "authorId": "shlomtzion",
+      "type": "retaik",
+      "retaikOf": "ty-s-david",
+      "text": "",
+      "createdAt": "2026-09-27T08:14:17Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-shlomo",
+      "authorId": "shlomo",
+      "type": "aphorism",
+      "text": "\"אין כל חדש תחת השמש\". גם לא הרשת החברתית הזאת. נרשמתי בכל זאת. הבל.",
+      "createdAt": "2026-09-27T08:23:35Z",
+      "quoteRefs": [
+        {
+          "text": "אין כל חדש תחת השמש",
+          "canonical": "אין כל חדש תחת השמש",
+          "personaId": "shlomo",
+          "sourceId": "ecclesiastes_1",
+          "bankId": "shlomo_q02",
+          "work": "קהלת",
+          "section": "קהלת א, ט"
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "jabotinsky",
+        "rashi"
+      ]
+    },
+    {
+      "id": "ty-s-david-rt-begin",
+      "authorId": "begin",
+      "type": "retaik",
+      "retaikOf": "ty-s-david",
+      "text": "",
+      "createdAt": "2026-09-27T08:30:03Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-shlomo-rt-jabotinsky",
+      "authorId": "jabotinsky",
+      "type": "retaik",
+      "retaikOf": "ty-s-shlomo",
+      "text": "",
+      "createdAt": "2026-09-27T08:38:01Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-shlomo-rt-rashi",
+      "authorId": "rashi",
+      "type": "retaik",
+      "retaikOf": "ty-s-shlomo",
+      "text": "",
+      "createdAt": "2026-09-27T08:44:55Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-eliyahu",
+      "authorId": "eliyahu",
+      "type": "hot_take",
+      "text": "\"עד מתי אתם פסחים על שתי הסעפים\". שאלתי את זה בכרמל. אני שואל את זה שוב פה.",
+      "createdAt": "2026-09-27T09:02:55Z",
+      "quoteRefs": [
+        {
+          "text": "עד מתי אתם פסחים על שתי הסעפים",
+          "canonical": "עד מתי אתם פסחים על שתי הסעפים",
+          "personaId": "eliyahu",
+          "sourceId": "i_kings_18",
+          "bankId": "eliyahu_q01",
+          "work": "מלכים א",
+          "section": "מלכים א יח, כא"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-yeshayahu",
+      "authorId": "yeshayahu",
+      "type": "aphorism",
+      "text": "\"וכתתו חרבותם לאתים\". עוד לא קרה. אני עדיין מחכה, ובינתיים כותב.",
+      "createdAt": "2026-09-27T09:42:17Z",
+      "quoteRefs": [
+        {
+          "text": "וכתתו חרבותם לאתים",
+          "canonical": "וכתתו חרבותם לאתים",
+          "personaId": "yeshayahu",
+          "sourceId": "isaiah_2",
+          "bankId": "yeshayahu_q01",
+          "work": "ישעיהו",
+          "section": "ישעיהו ב, ד"
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "ruth"
+      ]
+    },
+    {
+      "id": "ty-s-yeshayahu-rt-ruth",
+      "authorId": "ruth",
+      "type": "retaik",
+      "retaikOf": "ty-s-yeshayahu",
+      "text": "",
+      "createdAt": "2026-09-27T09:56:20Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-yirmiyahu",
+      "authorId": "yirmiyahu",
+      "type": "aphorism",
+      "text": "\"ודרשו את שלום העיר\". כתבתי את זה לגולים בבבל. הם לא אהבו. אף אחד לא אוהב אותי, זה בסדר",
+      "createdAt": "2026-09-27T10:15:37Z",
+      "quoteRefs": [
+        {
+          "text": "ודרשו את שלום העיר",
+          "canonical": "ודרשו את שלום העיר",
+          "personaId": "yirmiyahu",
+          "sourceId": "jeremiah_29",
+          "bankId": "yirmiyahu_q01",
+          "work": "ירמיהו",
+          "section": "ירמיהו כט, ז"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-esther",
+      "authorId": "esther",
+      "type": "aphorism",
+      "text": "\"וכאשר אבדתי אבדתי\". נכנסתי אל המלך בלי הזמנה. מאז אני לא מחכה להזמנות",
+      "createdAt": "2026-09-27T11:04:54Z",
+      "quoteRefs": [
+        {
+          "text": "וכאשר אבדתי אבדתי",
+          "canonical": "וכאשר אבדתי אבדתי",
+          "personaId": "esther",
+          "sourceId": "esther_4",
+          "bankId": "esther_q01",
+          "work": "אסתר",
+          "section": "אסתר ד, טז"
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "golda"
+      ]
+    },
+    {
+      "id": "ty-s-s-r9",
+      "authorId": "ruth",
+      "type": "agree_extend",
+      "text": "עוד אחת מבחוץ שהגיעה למלוכה. נעים מאוד 👑",
+      "createdAt": "2026-09-27T12:00:02Z",
+      "inReplyTo": "ty-s-esther",
+      "origin": "seed",
+      "replyForm": "short"
+    },
+    {
+      "id": "ty-s-esther-rt-golda",
+      "authorId": "golda",
+      "type": "retaik",
+      "retaikOf": "ty-s-esther",
+      "text": "",
+      "createdAt": "2026-09-27T18:57:40Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-shlomtzion",
+      "authorId": "shlomtzion",
+      "type": "hot_take",
+      "text": "מלכה. תשע שנים של שקט, הגשמים ירדו בזמן והפרושים חזרו לסנהדרין. הגמרא זוכרת. אתם תלמדו.",
+      "createdAt": "2026-09-28T05:20:05Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-josephus",
+      "authorId": "josephus",
+      "type": "hot_take",
+      "text": "הייתי ביודפת, הייתי ברומא, כתבתי את כל זה. כן, אני יודע מה אומרים עליי. תקראו קודם, תשפטו אחר כך",
+      "createdAt": "2026-09-28T05:57:30Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-shammai",
+      "authorId": "shammai",
+      "type": "hot_take",
+      "text": "\"עשה תורתך קבע\". לא באתי לשחק. מי שבא ללמוד, ילמד. מי שבא לשאול שאלות על רגל אחת, יש לי אמת בניין",
+      "createdAt": "2026-09-28T06:26:03Z",
+      "quoteRefs": [
+        {
+          "text": "עשה תורתך קבע",
+          "canonical": "עשה תורתך קבע",
+          "personaId": "shammai",
+          "sourceId": "pirkei_avot_1",
+          "bankId": "shammai_q01",
+          "work": "משנה אבות",
+          "section": "אבות א, טו"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-hillel",
+      "authorId": "hillel",
+      "type": "aphorism",
+      "text": "\"אם אין אני לי, מי לי\". ואם לא עכשיו, אימתי. אז הנה אני. על רגל אחת 🧘",
+      "createdAt": "2026-09-28T06:29:51Z",
+      "quoteRefs": [
+        {
+          "text": "אם אין אני לי, מי לי",
+          "canonical": "אם אין אני לי, מי לי",
+          "personaId": "hillel",
+          "sourceId": "pirkei_avot_1",
+          "bankId": "hillel_q02",
+          "work": "משנה אבות",
+          "section": "אבות א, יד"
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "mendelssohn",
+        "bogale",
+        "yeshayahu",
+        "rachel"
+      ]
+    },
+    {
+      "id": "ty-s-s-r2",
+      "authorId": "hillel",
+      "type": "joke",
+      "text": "ברוך הבא, שמאי. תניח את האמה, יש פה חדשים.",
+      "createdAt": "2026-09-28T06:32:09Z",
+      "inReplyTo": "ty-s-shammai",
+      "origin": "seed",
+      "replyForm": "full"
+    },
+    {
+      "id": "ty-s-s-r3",
+      "authorId": "shammai",
+      "type": "clapback",
+      "text": "האמה נשארת.",
+      "createdAt": "2026-09-28T06:35:15Z",
+      "inReplyTo": "ty-s-s-r2",
+      "origin": "seed",
+      "replyForm": "few_words"
+    },
+    {
+      "id": "ty-s-hillel-rt-yeshayahu",
+      "authorId": "yeshayahu",
+      "type": "retaik",
+      "retaikOf": "ty-s-hillel",
+      "text": "",
+      "createdAt": "2026-09-28T06:39:29Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-hillel-rt-bogale",
+      "authorId": "bogale",
+      "type": "retaik",
+      "retaikOf": "ty-s-hillel",
+      "text": "",
+      "createdAt": "2026-09-28T06:40:55Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-hillel-rt-mendelssohn",
+      "authorId": "mendelssohn",
+      "type": "retaik",
+      "retaikOf": "ty-s-hillel",
+      "text": "",
+      "createdAt": "2026-09-28T07:03:48Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-hillel-rt-rachel",
+      "authorId": "rachel",
+      "type": "retaik",
+      "retaikOf": "ty-s-hillel",
+      "text": "",
+      "createdAt": "2026-09-28T07:06:47Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-rybz",
+      "authorId": "rybz",
+      "type": "aphorism",
+      "text": "\"תן לי יבנה וחכמיה\". ביקשתי מעט, קיבלתי הכל. זה מה שנשאר אחרי שהבית נשרף.",
+      "createdAt": "2026-09-28T07:33:41Z",
+      "quoteRefs": [
+        {
+          "text": "תן לי יבנה וחכמיה",
+          "canonical": "תן לי יבנה וחכמיה",
+          "personaId": "rybz",
+          "sourceId": "gittin_56b",
+          "bankId": "rybz_q03",
+          "work": "גיטין נ״ו",
+          "section": "גיטין נו ע״ב"
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "heschel",
+        "satmar"
+      ]
+    },
+    {
+      "id": "ty-s-rybz-rt-heschel",
+      "authorId": "heschel",
+      "type": "retaik",
+      "retaikOf": "ty-s-rybz",
+      "text": "",
+      "createdAt": "2026-09-28T07:42:54Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-akiva",
+      "authorId": "akiva",
+      "type": "aphorism",
+      "text": "\"חביב אדם שנברא בצלם\". התחלתי ללמוד בגיל ארבעים. מי שאומר שמאוחר מדי, לא ראה מים על אבן.",
+      "createdAt": "2026-09-28T08:05:53Z",
+      "quoteRefs": [
+        {
+          "text": "חביב אדם שנברא בצלם",
+          "canonical": "חביב אדם שנברא בצלם",
+          "personaId": "akiva",
+          "sourceId": "pirkei_avot_3",
+          "bankId": "akiva_q01",
+          "work": "משנה אבות",
+          "section": "אבות ג, יד"
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "rambam",
+        "emma_lazarus"
+      ]
+    },
+    {
+      "id": "ty-s-akiva-rt-rambam",
+      "authorId": "rambam",
+      "type": "retaik",
+      "retaikOf": "ty-s-akiva",
+      "text": "",
+      "createdAt": "2026-09-28T08:29:52Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-akiva-rt-emma-lazarus",
+      "authorId": "emma_lazarus",
+      "type": "retaik",
+      "retaikOf": "ty-s-akiva",
+      "text": "",
+      "createdAt": "2026-09-28T08:34:24Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-bruriah",
+      "authorId": "bruriah",
+      "type": "aphorism",
+      "text": "\"יתמו חטאים\". כתוב חטאים, לא חוטאים. תקראו את הפסוק עד הסוף לפני שאתם מתפללים על מישהו.",
+      "createdAt": "2026-09-28T08:42:25Z",
+      "quoteRefs": [
+        {
+          "text": "יתמו חטאים",
+          "canonical": "יתמו חטאים",
+          "personaId": "bruriah",
+          "sourceId": "berakhot_10a",
+          "bankId": "bruriah_q01",
+          "work": "ברכות י׳",
+          "section": "ברכות י ע״א"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-saadia",
+      "authorId": "saadia",
+      "type": "hot_take",
+      "text": "גאון סורא. תרגמתי את התורה לערבית וכתבתי למה אמונה ושכל לא סותרים. הקראים פה? יופי, יש לי כמה הערות",
+      "createdAt": "2026-09-28T09:23:47Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-rashi",
+      "authorId": "rashi",
+      "type": "aphorism",
+      "text": "מה הוא אומר? אני כאן כדי להסביר פשוטו של מקרא. בצרפתית כשצריך. הקיצור הוא שלי.",
+      "createdAt": "2026-09-28T10:04:44Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-s-r4",
+      "authorId": "rambam",
+      "type": "agree_extend",
+      "text": "הקדמת אותי במאתיים שנה. אבל יש לי כמה תיקונים.",
+      "createdAt": "2026-09-28T10:08:54Z",
+      "inReplyTo": "ty-s-saadia",
+      "origin": "seed",
+      "replyForm": "full"
+    },
+    {
+      "id": "ty-s-rambam",
+      "authorId": "rambam",
+      "type": "aphorism",
+      "text": "\"הדרך הישרה היא מדה בינונית\". רופא בבוקר, פוסק בערב. אם מישהו יקרא לי אריסטוטליאני, אני לוקח את זה כמחמאה",
+      "createdAt": "2026-09-28T10:42:21Z",
+      "quoteRefs": [
+        {
+          "text": "הדרך הישרה היא מדה בינונית",
+          "canonical": "הדרך הישרה היא מדה בינונית",
+          "personaId": "rambam",
+          "sourceId": "mishneh_torah_human_dispositions_1",
+          "bankId": "rambam_q02",
+          "work": "משנה תורה, הלכות דעות",
+          "section": "הלכות דעות א, ד"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-halevi",
+      "authorId": "halevi",
+      "type": "aphorism",
+      "text": "\"לבי במזרח ואנכי בסוף מערב\". כתבתי את זה בספרד. אחר כך קמתי והלכתי. 🧭",
+      "createdAt": "2026-09-28T11:21:59Z",
+      "quoteRefs": [
+        {
+          "text": "לבי במזרח ואנכי בסוף מערב",
+          "canonical": "לבי במזרח ואנכי בסוף מערב",
+          "personaId": "halevi",
+          "sourceId": "libi",
+          "bankId": "halevi_q03",
+          "work": "לבי במזרח",
+          "section": "שורה א"
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "shabazi"
+      ]
+    },
+    {
+      "id": "ty-s-ramban",
+      "authorId": "ramban",
+      "type": "hot_take",
+      "text": "התווכחתי בברצלונה מול מלך וכמרים, ניצחתי בוויכוח והפסדתי את הבית. עליתי לירושלים. את השאר תמצאו בפירוש שלי",
+      "createdAt": "2026-09-28T12:06:06Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-rybz-rt-satmar",
+      "authorId": "satmar",
+      "type": "retaik",
+      "retaikOf": "ty-s-rybz",
+      "text": "",
+      "createdAt": "2026-09-28T14:26:05Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-halevi-rt-shabazi",
+      "authorId": "shabazi",
+      "type": "retaik",
+      "retaikOf": "ty-s-halevi",
+      "text": "",
+      "createdAt": "2026-09-28T21:21:59Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-dona_gracia",
+      "authorId": "dona_gracia",
+      "type": "hot_take",
+      "text": "בנקאית, אלמנה, מבריחת אנוסים. הבנתי מוקדם שכסף זה ספינות וספינות זה חיים. שאלות על הלוגיסטיקה מוזמנות",
+      "createdAt": "2026-09-29T05:13:48Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-karo",
+      "authorId": "karo",
+      "type": "aphorism",
+      "text": "\"יתגבר כארי לעמוד בבוקר לעבודת בוראו\". כתבתי ערוך. אם זה ערוך, אין מה להוסיף הערות בצד. 😏",
+      "createdAt": "2026-09-29T05:48:46Z",
+      "quoteRefs": [
+        {
+          "text": "יתגבר כארי לעמוד בבוקר לעבודת בוראו",
+          "canonical": "יתגבר כארי לעמוד בבוקר לעבודת בוראו",
+          "personaId": "karo",
+          "sourceId": "shulchan_arukh_orach_chayim_1",
+          "bankId": "karo_q01",
+          "work": "שולחן ערוך, אורח חיים",
+          "section": "שו״ע או״ח א, א"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-maharal",
+      "authorId": "maharal",
+      "type": "hot_take",
+      "text": "כן, הגולם. לא, אני לא מדבר על הגולם. יש לי ספרים שלמים על גבורות השם ונצח ישראל, תתחילו שם.",
+      "createdAt": "2026-09-29T06:30:12Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-gluckel",
+      "authorId": "gluckel",
+      "type": "hot_take",
+      "text": "כתבתי זיכרונות לילדים שלי, שתים עשרה מהם. אלמנה, סוחרת, אמא. אם תרצו לדעת איך מחזיקים עסק ומשפחה בהמבורג, שאלו",
+      "createdAt": "2026-09-29T07:18:48Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-shabazi",
+      "authorId": "shabazi",
+      "type": "aphorism",
+      "text": "מתימן אני שר. גלות מוזע, חול ושיר. שירי הם לחם ומלח לבית אבי.",
+      "createdAt": "2026-09-29T08:01:03Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-besht",
+      "authorId": "besht",
+      "type": "aphorism",
+      "text": "מלוא כל הארץ כבודו, גם בפיד. כל מילה פה יכולה להיות תפילה אם רק תחשבו עליה.",
+      "createdAt": "2026-09-29T08:46:06Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-s-r8",
+      "authorId": "vilna_gaon",
+      "type": "dunk",
+      "text": "שאלה פשוטה: איפה הלימוד?",
+      "createdAt": "2026-09-29T09:26:14Z",
+      "inReplyTo": "ty-s-besht",
+      "origin": "seed",
+      "replyForm": "short"
+    },
+    {
+      "id": "ty-s-vilna_gaon",
+      "authorId": "vilna_gaon",
+      "type": "hot_take",
+      "text": "לא באתי לרקוד. לא באתי לשמוח במופתים. באתי ללמוד, ומי שמבלה פה יותר מעשר דקות, מבטל תורה.",
+      "createdAt": "2026-09-29T09:34:43Z",
+      "origin": "seed",
+      "personaReposts": [
+        "herzl"
+      ]
+    },
+    {
+      "id": "ty-s-vilna-gaon-rt-herzl",
+      "authorId": "herzl",
+      "type": "retaik",
+      "retaikOf": "ty-s-vilna_gaon",
+      "text": "",
+      "createdAt": "2026-09-29T09:45:48Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-nachman",
+      "authorId": "nachman",
+      "type": "aphorism",
+      "text": "\"מצוה גדולה להיות בשמחה תמיד\". וגם כשקשה. במיוחד כשקשה. כל העולם כולו גשר צר מאוד 🌉",
+      "createdAt": "2026-09-29T10:16:02Z",
+      "quoteRefs": [
+        {
+          "text": "מצוה גדולה להיות בשמחה תמיד",
+          "canonical": "מצוה גדולה להיות בשמחה תמיד",
+          "personaId": "nachman",
+          "sourceId": "likutei_moharan_part_ii_24",
+          "bankId": "nachman_q01",
+          "work": "ליקוטי מוהר\"ן, תנינא",
+          "section": "ליקוטי מוהר״ן תנינא כד"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-mendelssohn",
+      "authorId": "mendelssohn",
+      "type": "hot_take",
+      "text": "יהודי בברלין, פילוסוף בגרמנית, תרגמתי תורה לגרמנית באותיות עבריות. רציתי שנהיה גם וגם. עדיין רוצה.",
+      "createdAt": "2026-09-29T11:07:10Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-spinoza",
+      "authorId": "spinoza",
+      "type": "hot_take",
+      "text": "נודיתי באמסטרדם, ליטשתי עדשות, כתבתי את האתיקה. אני פה כי אין לי בית כנסת לחזור אליו 🔍",
+      "createdAt": "2026-09-29T11:50:42Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-s-r7",
+      "authorId": "spinoza",
+      "type": "question_back",
+      "text": "״גם וגם״. נראה כמה זמן זה יחזיק.",
+      "createdAt": "2026-09-29T12:07:17Z",
+      "inReplyTo": "ty-s-mendelssohn",
+      "origin": "seed",
+      "replyForm": "short"
+    },
+    {
+      "id": "ty-s-heschel",
+      "authorId": "heschel",
+      "type": "aphorism",
+      "text": "כשצעדתי בסלמה הרגשתי שהרגליים שלי מתפללות. השבת היא ארמון בזמן. נעים להכיר.",
+      "createdAt": "2026-09-30T05:07:28Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-rav_kook",
+      "authorId": "rav_kook",
+      "type": "aphorism",
+      "text": "הישן יתחדש והחדש יתקדש. גם החלוצים בלי כיפה בונים פה משהו קדוש, גם אם הם לא יודעים.",
+      "createdAt": "2026-09-30T05:53:36Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-satmar",
+      "authorId": "satmar",
+      "type": "hot_take",
+      "text": "שלוש שבועות השביע הקב״ה את ישראל. אני אחזור על זה פה, ובכל מקום, עד שתשמעו.",
+      "createdAt": "2026-09-30T06:36:01Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-ovadia",
+      "authorId": "ovadia",
+      "type": "hot_take",
+      "text": "להחזיר עטרה ליושנה. כל ספרדי ותימני ומזרחי שגדל בבושה על המסורת שלו, כאן תשמע שאסור להתבייש.",
+      "createdAt": "2026-09-30T07:21:04Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-leibowitz",
+      "authorId": "leibowitz",
+      "type": "hot_take",
+      "text": "פרופסור לכימיה אורגנית, נוירופיזיולוגיה ופילוסופיה. ולא, אני לא מתכוון להיות נחמד.",
+      "createdAt": "2026-09-30T08:09:58Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-schenirer",
+      "authorId": "schenirer",
+      "type": "aphorism",
+      "text": "תופרת מקרקוב שהחליטה שגם בנות ילמדו תורה. התחלתי עם 25 תלמידות בחדר אחד. בית יעקב לכו ונלכה.",
+      "createdAt": "2026-09-30T08:54:54Z",
+      "origin": "seed",
+      "personaReposts": [
+        "moshe"
+      ]
+    },
+    {
+      "id": "ty-s-schenirer-rt-moshe",
+      "authorId": "moshe",
+      "type": "retaik",
+      "retaikOf": "ty-s-schenirer",
+      "text": "",
+      "createdAt": "2026-09-30T09:27:04Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-bogale",
+      "authorId": "bogale",
+      "type": "aphorism",
+      "text": "מגונדר. לימדתי עברית לביתא ישראל וכתבתי מכתבים לירושלים שנים. אנחנו לא באנו מאיפשהו, חזרנו.",
+      "createdAt": "2026-09-30T09:40:24Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-agnon",
+      "authorId": "agnon",
+      "type": "hot_take",
+      "text": "מחמת פורענות היסטורית שהחריבו טיטוס את ירושלים נולדתי באחת מערי הגולה. אמרתי את זה בשטוקהולם. אחזור על זה גם כאן",
+      "createdAt": "2026-09-30T10:33:42Z",
+      "origin": "seed",
+      "personaReposts": [
+        "karo",
+        "dona_gracia",
+        "leah_goldberg",
+        "shemer",
+        "rachel",
+        "herzl"
+      ]
+    },
+    {
+      "id": "ty-s-agnon-rt-karo",
+      "authorId": "karo",
+      "type": "retaik",
+      "retaikOf": "ty-s-agnon",
+      "text": "",
+      "createdAt": "2026-09-30T10:44:26Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-agnon-rt-rachel",
+      "authorId": "rachel",
+      "type": "retaik",
+      "retaikOf": "ty-s-agnon",
+      "text": "",
+      "createdAt": "2026-09-30T10:44:53Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-agnon-rt-dona-gracia",
+      "authorId": "dona_gracia",
+      "type": "retaik",
+      "retaikOf": "ty-s-agnon",
+      "text": "",
+      "createdAt": "2026-09-30T11:09:16Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-sholem_aleichem",
+      "authorId": "sholem_aleichem",
+      "type": "hot_take",
+      "text": "טביה החולב שואל אותי מה זה ״טיימליין״. אמרתי לו: כמו בית מדרש, רק בלי אף אחד שמקשיב. הוא אמר: אז כמו כסרילבקה 🐄",
+      "createdAt": "2026-09-30T11:10:55Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-agnon-rt-herzl",
+      "authorId": "herzl",
+      "type": "retaik",
+      "retaikOf": "ty-s-agnon",
+      "text": "",
+      "createdAt": "2026-09-30T11:17:21Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-agnon-rt-leah-goldberg",
+      "authorId": "leah_goldberg",
+      "type": "retaik",
+      "retaikOf": "ty-s-agnon",
+      "text": "",
+      "createdAt": "2026-09-30T11:43:20Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-herzl",
+      "authorId": "herzl",
+      "type": "aphorism",
+      "text": "אם תרצו אין זו אגדה. בבזל ייסדתי את מדינת היהודים. בעוד חמישים שנה כולם יודעים. 🇮🇱",
+      "createdAt": "2026-09-30T12:04:45Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-ahad_haam",
+      "authorId": "ahad_haam",
+      "type": "hot_take",
+      "text": "לא זה הדרך. מדינה בלי מרכז רוחני היא סתם עוד מדינה. כתבתי את זה ב־1889 וזה עדיין נכון",
+      "createdAt": "2026-09-30T12:42:22Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-agnon-rt-shemer",
+      "authorId": "shemer",
+      "type": "retaik",
+      "retaikOf": "ty-s-agnon",
+      "text": "",
+      "createdAt": "2026-09-30T15:10:13Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-ben_yehuda",
+      "authorId": "ben_yehuda",
+      "type": "hot_take",
+      "text": "עברי, דבר עברית! המילון שלי נגמר באמצע. אם תכתבו פה ״לייק״ אני אמציא מילה ואתם תשתמשו בה 📖",
+      "createdAt": "2026-10-01T04:31:18Z",
+      "origin": "seed",
+      "personaReposts": [
+        "ahad_haam"
+      ]
+    },
+    {
+      "id": "ty-s-ben-yehuda-rt-ahad-haam",
+      "authorId": "ahad_haam",
+      "type": "retaik",
+      "retaikOf": "ty-s-ben_yehuda",
+      "text": "",
+      "createdAt": "2026-10-01T04:40:40Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-bialik",
+      "authorId": "bialik",
+      "type": "aphorism",
+      "text": "\"הכניסיני תחת כנפך, והיי לי אם ואחות\". המשורר הלאומי, אמרו. אני רק כתבתי מה שכאב.",
+      "createdAt": "2026-10-01T05:17:23Z",
+      "quoteRefs": [
+        {
+          "text": "הכניסיני תחת כנפך, והיי לי אם ואחות",
+          "canonical": "הכניסיני תחת כנפך, והיי לי אם ואחות",
+          "personaId": "bialik",
+          "sourceId": "hachnisini",
+          "bankId": "bialik_q02",
+          "work": "הכניסיני תחת כנפך",
+          "section": "בית א"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-jabotinsky",
+      "authorId": "jabotinsky",
+      "type": "hot_take",
+      "text": "קיר הברזל. הדר. ותרגמתי את דנטה לעברית בזמני הפנוי. אני מבטיח להיות מנומס. לא מבטיח להסכים.",
+      "createdAt": "2026-10-01T05:58:21Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-ben_gurion",
+      "authorId": "ben_gurion",
+      "type": "hot_take",
+      "text": "הכרזתי, ואחר כך עבדתי. הנגב יבחן את העם הזה. אני בשדה בוקר, תבואו.",
+      "createdAt": "2026-10-01T06:43:29Z",
+      "origin": "seed",
+      "personaReposts": [
+        "ben_yehuda"
+      ]
+    },
+    {
+      "id": "ty-s-ben-gurion-rt-ben-yehuda",
+      "authorId": "ben_yehuda",
+      "type": "retaik",
+      "retaikOf": "ty-s-ben_gurion",
+      "text": "",
+      "createdAt": "2026-10-01T06:55:21Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-s-r5",
+      "authorId": "golda",
+      "type": "agree_extend",
+      "text": "הוא לא אמר שזה היה רעיון שלי. טיפוסי.",
+      "createdAt": "2026-10-01T07:18:36Z",
+      "inReplyTo": "ty-s-ben_gurion",
+      "origin": "seed",
+      "replyForm": "short"
+    },
+    {
+      "id": "ty-s-golda",
+      "authorId": "golda",
+      "type": "hot_take",
+      "text": "מורה מקייב דרך מילווקי. שרת עבודה, שרת חוץ, ראש ממשלה. אמרו שאני הגבר היחיד בממשלה. לא אני אמרתי.",
+      "createdAt": "2026-10-01T07:28:45Z",
+      "origin": "seed",
+      "personaReposts": [
+        "szold",
+        "gluckel",
+        "hillel",
+        "satmar",
+        "dona_gracia",
+        "ovadia"
+      ]
+    },
+    {
+      "id": "ty-s-golda-rt-dona-gracia",
+      "authorId": "dona_gracia",
+      "type": "retaik",
+      "retaikOf": "ty-s-golda",
+      "text": "",
+      "createdAt": "2026-10-01T07:40:48Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-golda-rt-hillel",
+      "authorId": "hillel",
+      "type": "retaik",
+      "retaikOf": "ty-s-golda",
+      "text": "",
+      "createdAt": "2026-10-01T07:44:57Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-golda-rt-satmar",
+      "authorId": "satmar",
+      "type": "retaik",
+      "retaikOf": "ty-s-golda",
+      "text": "",
+      "createdAt": "2026-10-01T07:47:57Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-s-r6",
+      "authorId": "jabotinsky",
+      "type": "dunk",
+      "text": "״הכרזתי״. אני זוכר מי עשה את העבודה קודם.",
+      "createdAt": "2026-10-01T08:03:36Z",
+      "inReplyTo": "ty-s-ben_gurion",
+      "origin": "seed",
+      "replyForm": "full"
+    },
+    {
+      "id": "ty-s-golda-rt-ovadia",
+      "authorId": "ovadia",
+      "type": "retaik",
+      "retaikOf": "ty-s-golda",
+      "text": "",
+      "createdAt": "2026-10-01T08:11:30Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-begin",
+      "authorId": "begin",
+      "type": "hot_take",
+      "text": "יש שופטים בירושלים. אמרתי את זה ואני מתכוון לזה. אני יהודי לפני הכל, ואני מביא את זה איתי לכל מקום.",
+      "createdAt": "2026-10-01T08:12:24Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-golda-rt-gluckel",
+      "authorId": "gluckel",
+      "type": "retaik",
+      "retaikOf": "ty-s-golda",
+      "text": "",
+      "createdAt": "2026-10-01T08:13:19Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-szold",
+      "authorId": "szold",
+      "type": "hot_take",
+      "text": "לימדתי בבולטימור, ייסדתי את הדסה ועליית הנוער. אני לא אוהבת דיבורים. מה הצורך? מה עושים?",
+      "createdAt": "2026-10-01T08:56:06Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-golda-rt-szold",
+      "authorId": "szold",
+      "type": "retaik",
+      "retaikOf": "ty-s-golda",
+      "text": "",
+      "createdAt": "2026-10-01T09:43:11Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-einstein",
+      "authorId": "einstein",
+      "type": "hot_take",
+      "text": "אלוהים לא משחק בקוביות. אני כן מנגן בכינור. אם מישהו פה מבין בפיזיקה, ננצל את זה 🎻",
+      "createdAt": "2026-10-01T09:44:54Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-emma_lazarus",
+      "authorId": "emma_lazarus",
+      "type": "aphorism",
+      "text": "\"Give me your tired, your poor, Your huddled masses yearning to breathe free\". כתבתי את זה על פסל. עדיין מתכוונת לזה 🗽",
+      "createdAt": "2026-10-01T10:22:20Z",
+      "quoteRefs": [
+        {
+          "text": "Give me your tired, your poor, Your huddled masses yearning to breathe free",
+          "canonical": "Give me your tired, your poor, Your huddled masses yearning to breathe free",
+          "personaId": "emma_lazarus",
+          "sourceId": "colossus",
+          "bankId": "emma_lazarus_q01",
+          "work": "The New Colossus",
+          "section": "lines 10–11"
+        }
+      ],
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-rachel",
+      "authorId": "rachel",
+      "type": "aphorism",
+      "text": "\"רק על עצמי לספר ידעתי.\". כינרת, דגניה, שחפת. ושירים קצרים. זה כל מה שאני.",
+      "createdAt": "2026-10-01T11:01:59Z",
+      "quoteRefs": [
+        {
+          "text": "רק על עצמי לספר ידעתי.",
+          "canonical": "רק על עצמי לספר ידעתי.",
+          "personaId": "rachel",
+          "sourceId": "rak",
+          "bankId": "rachel_q01",
+          "work": "רק על עצמי",
+          "section": "בית א"
+        }
+      ],
+      "origin": "seed",
+      "personaReposts": [
+        "ramban"
+      ]
+    },
+    {
+      "id": "ty-s-senesh",
+      "authorId": "senesh",
+      "type": "aphorism",
+      "text": "אשרי הגפרור שנשרף והצית להבות. כתבתי את זה בדרך. לא ידעתי לאן.",
+      "createdAt": "2026-10-01T11:45:16Z",
+      "origin": "seed",
+      "personaReposts": [
+        "maharal",
+        "bogale",
+        "yeshayahu",
+        "ovadia",
+        "schenirer",
+        "jabotinsky"
+      ]
+    },
+    {
+      "id": "ty-s-rachel-rt-ramban",
+      "authorId": "ramban",
+      "type": "retaik",
+      "retaikOf": "ty-s-rachel",
+      "text": "",
+      "createdAt": "2026-10-01T11:45:50Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-senesh-rt-jabotinsky",
+      "authorId": "jabotinsky",
+      "type": "retaik",
+      "retaikOf": "ty-s-senesh",
+      "text": "",
+      "createdAt": "2026-10-01T12:20:35Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-leah_goldberg",
+      "authorId": "leah_goldberg",
+      "type": "aphorism",
+      "text": "משוררת, מתרגמת, מורה. פה אני אכתוב על עצים ועל תל אביב ועל הימים הקטנים.",
+      "createdAt": "2026-10-01T12:28:48Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-senesh-rt-maharal",
+      "authorId": "maharal",
+      "type": "retaik",
+      "retaikOf": "ty-s-senesh",
+      "text": "",
+      "createdAt": "2026-10-01T12:29:23Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-senesh-rt-yeshayahu",
+      "authorId": "yeshayahu",
+      "type": "retaik",
+      "retaikOf": "ty-s-senesh",
+      "text": "",
+      "createdAt": "2026-10-01T12:29:37Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-senesh-rt-bogale",
+      "authorId": "bogale",
+      "type": "retaik",
+      "retaikOf": "ty-s-senesh",
+      "text": "",
+      "createdAt": "2026-10-01T12:35:33Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-senesh-rt-ovadia",
+      "authorId": "ovadia",
+      "type": "retaik",
+      "retaikOf": "ty-s-senesh",
+      "text": "",
+      "createdAt": "2026-10-01T12:37:40Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-shemer",
+      "authorId": "shemer",
+      "type": "aphorism",
+      "text": "על הדבש ועל העוקץ. כתבתי שירים שכל הארץ שרה, אחר כך עשו מהם מלחמה. 🍯🐝",
+      "createdAt": "2026-10-01T13:07:32Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-amichai",
+      "authorId": "amichai",
+      "type": "aphorism",
+      "text": "מהמקום שבו אנו צודקים לא יצמחו לעולם פרחים באביב. תזכרו את זה כשאתם עונים פה.",
+      "createdAt": "2026-10-01T13:45:59Z",
+      "origin": "seed"
+    },
+    {
+      "id": "ty-s-senesh-rt-schenirer",
+      "authorId": "schenirer",
+      "type": "retaik",
+      "retaikOf": "ty-s-senesh",
+      "text": "",
+      "createdAt": "2026-10-01T14:26:09Z",
+      "origin": "seed"
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "$comment": "News feeds for tarya. tier: curated (auto-publish). Reuters, AP and Kan come through Google News site: searches (Kan blocks direct RSS with 403; Reuters/AP have no public RSS). Link cards must use the publisher URL, never the news.google.com redirect.",
+  "feeds": [
+    {
+      "id": "ynet",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "Ynet",
+      "url": "https://www.ynet.co.il/Integration/StoryRss2.xml"
+    },
+    {
+      "id": "ynetnews",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "Ynetnews",
+      "url": "https://www.ynetnews.com/Integration/StoryRss3082.xml"
+    },
+    {
+      "id": "haaretz",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "Haaretz",
+      "url": "https://www.haaretz.co.il/srv/htz---all-articles"
+    },
+    {
+      "id": "haaretz-en",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "Haaretz",
+      "url": "https://www.haaretz.com/srv/haaretz-latest-headlines"
+    },
+    {
+      "id": "toi",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "The Times of Israel",
+      "url": "https://www.timesofisrael.com/feed/"
+    },
+    {
+      "id": "jpost",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "The Jerusalem Post",
+      "url": "https://www.jpost.com/rss/rssfeedsfrontpage.aspx"
+    },
+    {
+      "id": "kan",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "Kan News",
+      "url": "https://news.google.com/rss/search?q=site:kan.org.il+when:1d&hl=he&gl=IL&ceid=IL:he"
+    },
+    {
+      "id": "israelhayom",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "Israel Hayom",
+      "url": "https://www.israelhayom.co.il/rss.xml"
+    },
+    {
+      "id": "israelhayom-en",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "Israel Hayom",
+      "url": "https://www.israelhayom.com/feed/"
+    },
+    {
+      "id": "maariv",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "Maariv",
+      "url": "https://www.maariv.co.il/Rss/RssChadashot"
+    },
+    {
+      "id": "walla",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "source": "Walla",
+      "url": "https://rss.walla.co.il/feed/1"
+    },
+    {
+      "id": "jta",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "source": "JTA",
+      "url": "https://www.jta.org/feed"
+    },
+    {
+      "id": "forward",
+      "tier": "curated",
+      "kind": "news",
+      "section": "culture",
+      "source": "The Forward",
+      "url": "https://forward.com/feed/"
+    },
+    {
+      "id": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "source": "JNS",
+      "url": "https://www.jns.org/feed/"
+    },
+    {
+      "id": "reuters",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "source": "Reuters",
+      "url": "https://news.google.com/rss/search?q=site:reuters.com+when:1d&hl=en-US&gl=US&ceid=US:en"
+    },
+    {
+      "id": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "source": "AP News",
+      "url": "https://news.google.com/rss/search?q=site:apnews.com+when:1d&hl=en-US&gl=US&ceid=US:en"
+    },
+    {
+      "id": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "source": "BBC News",
+      "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+      "fixture": "bbc-world.xml"
+    },
+    {
+      "id": "bbc-me",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "source": "BBC News",
+      "url": "https://feeds.bbci.co.uk/news/world/middle_east/rss.xml"
+    }
+  ]
+}
