@@ -305,6 +305,12 @@
           "domain": "apnews.com",
           "title": "Czech opposition sweeps Senate runoffs in blow to Babiš government",
           "site_name": "AP",
+          "image": {
+            "url": "/media/news/politics.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://apnews.com/favicon.ico"
         }
       ],
@@ -524,7 +530,7 @@
       "tags": [],
       "news": {
         "title": "Panthers make NHL history with natural hat tricks in three straight games",
-        "url": "https://www.nytimes.com/athletic/7699587/2026/10/17/panthers-nhl-natural-hat-tricks-verhaeghe-history/",
+        "url": "https://sports.yahoo.com/articles/natural-hat-tricks-keep-coming-102430697.html",
         "source": "The Athletic"
       },
       "citation": null,
@@ -532,11 +538,17 @@
       "media": [
         {
           "kind": "link_card",
-          "url": "https://www.nytimes.com/athletic/7699587/2026/10/17/panthers-nhl-natural-hat-tricks-verhaeghe-history/",
-          "domain": "nytimes.com",
-          "title": "Panthers make NHL history with natural hat tricks in three straight games",
-          "site_name": "The Athletic",
-          "icon": "https://www.nytimes.com/favicon.ico"
+          "url": "https://sports.yahoo.com/articles/natural-hat-tricks-keep-coming-102430697.html",
+          "domain": "sports.yahoo.com",
+          "title": "Natural Hat Tricks Keep Coming: Panthers Make NHL History",
+          "description": "Hat trick of natural hat tricks: Florida Panthers set an unprecedented NHL Record. They became the first team in NHL history to have multiple players in three consecutive games with “natural” hat tricks. Brady Tkachuk had a hat trick on Tuesday night in Columbus and also in Vancouver at home. With…",
+          "site_name": "Yahoo Sports",
+          "image": {
+            "url": "https://s.yimg.com/lo/mysterio/api/c5c445835ba94465209fca671553affc84f376cc48805607b78a8d7c3f0961f9/lightyear_networkapi/resizefill_w1200_h675%3Bquality_80%3Bformat_webp/https%3A%2F%2Fmedia.zenfs.com%2Fen%2Fstadium_rant_681%2Fd75545d6eb2665fd55d2c55d1451dde8.jpg",
+            "width": 1200,
+            "height": 675
+          },
+          "icon": "https://s.yimg.com/cv/apiv2/default/icons/favicon_y24_48x48.svg"
         }
       ]
     },
@@ -698,7 +710,7 @@
       "tags": [],
       "news": {
         "title": "Crush at religious festival kills at least 17 and injures dozens in India",
-        "url": "https://news.sky.com/story/crush-at-religious-festival-kills-at-least-17-and-injures-dozens-in-india-13600451",
+        "url": "https://www.yahoo.com/news/world/articles/least-17-dead-stampede-hindu-191950931.html",
         "source": "Sky News"
       },
       "citation": null,
@@ -706,11 +718,17 @@
       "media": [
         {
           "kind": "link_card",
-          "url": "https://news.sky.com/story/crush-at-religious-festival-kills-at-least-17-and-injures-dozens-in-india-13600451",
-          "domain": "news.sky.com",
-          "title": "Crush at religious festival kills at least 17 and injures dozens in India",
-          "site_name": "Sky News",
-          "icon": "https://news.sky.com/favicon.ico"
+          "url": "https://www.yahoo.com/news/world/articles/least-17-dead-stampede-hindu-191950931.html",
+          "domain": "yahoo.com",
+          "title": "At least 17 dead in crush at Hindu festival event in India",
+          "description": "Many more have been injured at an event in the Indian city of Kolkata to mark a Hindu festival.",
+          "site_name": "Yahoo News",
+          "image": {
+            "url": "https://s.yimg.com/lo/mysterio/api/21cfd7054958a796aa3fe2ffa955be75c0857a3c01fc5756eff8ee3e8abd6022/lightyear_networkapi/resizefill_w1200%3Bquality_80%3Bformat_jpg/https%3A%2F%2Fmedia.zenfs.com%2Fen%2Fbbc_us_articles_995%2F9fae799d1ed2fb0f11a261e3640beb57.jpg",
+            "width": 1200,
+            "height": 676
+          },
+          "icon": "https://www.yahoo.com/favicon.ico?b0867f93a36b360e"
         }
       ]
     },
@@ -849,7 +867,7 @@
       "topic": {
         "id": "fatalities-and-injuries-reported-after-incident-at-alberta-m",
         "title": "Fatalities and injuries reported after incident at Alberta military base",
-        "url": "https://www.cbc.ca/news/canada/edmonton/cfb-wainwright-fire-strong-winds-9.7385505",
+        "url": "https://www.foxnews.com/video/6407043906112",
         "source": "CBC News",
         "kind": "news",
         "tier": "curated"
@@ -857,11 +875,17 @@
       "media": [
         {
           "kind": "link_card",
-          "url": "https://www.cbc.ca/news/canada/edmonton/cfb-wainwright-fire-strong-winds-9.7385505",
-          "domain": "cbc.ca",
-          "title": "Fatalities and injuries reported after incident at Alberta military base",
-          "site_name": "CBC News",
-          "icon": "https://www.cbc.ca/favicon.ico"
+          "url": "https://www.foxnews.com/video/6407043906112",
+          "domain": "foxnews.com",
+          "title": "Fatalities, injuries reported after fire at Canadian military base | Fox News Video",
+          "description": "Fatalities and injuries were reported after a serious incident sparked a major fire at Canadian Forces Base Wainwright in Alberta.",
+          "site_name": "Fox News",
+          "image": {
+            "url": "https://a57.foxnews.com/cf-images.us-east-1.prod.boltdns.net/v1/static/694940094001/2a08777f-7c0a-4ba0-8713-0e6dcbd97b09/ab6950a0-352b-4b7f-8e56-330f00a8e00a/1280x720/match/1024/512/image.jpg?ve=1&tl=1",
+            "width": 1200,
+            "height": 630
+          },
+          "icon": "https://assets.foxnews.com/images/fox-news/favicons/favicon.ico"
         }
       ]
     },
@@ -892,6 +916,12 @@
           "domain": "leparisien.fr",
           "title": "Limoges town hall destroyed by flames after protest against the cost of living",
           "site_name": "Le Parisien",
+          "image": {
+            "url": "/media/news/politics.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://www.leparisien.fr/favicon.ico"
         }
       ]
@@ -938,6 +968,12 @@
           "domain": "leparisien.fr",
           "title": "Limoges town hall destroyed by flames after protest against the cost of living",
           "site_name": "Le Parisien",
+          "image": {
+            "url": "/media/news/politics.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://www.leparisien.fr/favicon.ico"
         }
       ]
@@ -979,6 +1015,12 @@
           "domain": "usatoday.com",
           "title": "Nationwide No Kings protests shift focus to early voting push",
           "site_name": "USA Today",
+          "image": {
+            "url": "/media/news/politics.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://www.usatoday.com/favicon.ico"
         }
       ]
@@ -1755,6 +1797,12 @@
           "domain": "usatoday.com",
           "title": "Nationwide No Kings protests shift focus to early voting push",
           "site_name": "USA Today",
+          "image": {
+            "url": "/media/news/politics.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://www.usatoday.com/favicon.ico"
         }
       ]

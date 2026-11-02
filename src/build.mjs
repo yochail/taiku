@@ -7,6 +7,7 @@ import { displayName, publicFile, ROOT, SITE_DIR, loadPersonas, loadPosts, valid
 import { sanitizeUntrusted } from './lib/news.mjs';
 import { SITE, esc, hash, shortDate, longDate, truncate, compactNumber, renderText, slugify } from './lib/util.mjs';
 import { writeMediaFiles } from './lib/media.mjs';
+import { fallbackImage } from './lib/unfurl.mjs';
 import { PostPack } from './lib/postpack.mjs';
 import { OUT_DIR, SITE_CONFIG } from './lib/site.mjs';
 import { t, fmtNumber, clientStrings, DIR, CA, HTML_CA, cw, CONTENT_LOCALE, STRINGS } from './lib/i18n.mjs';
@@ -326,6 +327,9 @@ function postCard(post, opts = {}) {
     parts.push(linkCard({ url: post.news.url, title: post.news.title, domain: (post.news.url ? hostOf(post.news.url) : '') || post.news.source }));
   } else if (post.topic?.url && post.topic.title && !hasCard) {
     parts.push(linkCard({ url: post.topic.url, title: post.topic.title, domain: hostOf(post.topic.url) || post.topic.source }));
+  } else if (post.news?.title && !post.news.url && post.news.source && !/\btheme\b/i.test(post.news.source) && !(mediaByPost.get(post.id) ?? []).length) {
+    // The article URL couldn't be recovered: a non-link card with the headline over the topic art.
+    parts.push(linkCard({ title: post.news.title, domain: sanitizeUntrusted(post.news.source, 80), image: fallbackImage(post.news.title) }));
   }
   if (post.quoteOf) parts.push(quoteEmbed(post.quoteOf));
   if (threadLink) {

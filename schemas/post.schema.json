@@ -424,16 +424,21 @@
             "properties": {
               "url": {
                 "type": "string",
-                "format": "https-uri"
+                "pattern": "^(https://|/media/news/[a-z]+\\.svg$)",
+                "description": "https og:image (hotlinked), or a site-absolute /media/news/<topic>.svg fallback"
               },
               "width": {
                 "type": "integer"
               },
               "height": {
                 "type": "integer"
+              },
+              "fallback": {
+                "type": "boolean",
+                "description": "true: no article image was available; url is the topic fallback art (src/lib/unfurl.mjs fallbackImage)."
               }
             },
-            "description": "link_card preview: hotlinked og:image/twitter:image of the article."
+            "description": "link_card preview: hotlinked og:image/twitter:image/image_src or first large article image; else a topic fallback (fallback: true)."
           },
           "icon": {
             "type": "string",

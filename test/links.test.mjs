@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseMeta, linkCardFrom, unfurl } from '../src/lib/unfurl.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { parseMeta, linkCardFrom, unfurl, articleImage, fallbackImage, FALLBACK_TOPICS, genericTitle } from '../src/lib/unfurl.mjs';
+import { cardsMissingImages, loadImageAllowlist } from '../scripts/check-links.mjs';
 import { parseOembed, realPostKind, allowedAccount, titleOverlap, fetchBskyPost } from '../src/lib/realposts.mjs';
-import { cardProblems, cachedUrls } from '../src/lib/data.mjs';
+import { cardProblems, cachedUrls, loadPosts, ROOT } from '../src/lib/data.mjs';
 import { loadSpec } from '../src/lib/realism.mjs';
 import { isBlockedIp, checkUrl, safeFetch, MAX_BYTES } from '../src/lib/safe-fetch.mjs';
 
@@ -49,9 +52,64 @@ test('unfurl: blocked page falls back to feed data + favicon; cache hit avoids r
   const card = linkCardFrom('https://www.reuters.com/a/b', e, { title: 'Headline', source: 'Reuters' });
   assert.equal(card.title, 'Headline');
   assert.equal(card.site_name, 'Reuters');
-  assert.equal(card.image, undefined);
+  assert.deepEqual(card.image, { url: '/media/news/world.svg', width: 1200, height: 630, fallback: true });
   assert.equal(card.icon, 'https://www.reuters.com/favicon.ico');
   assert.equal(await unfurl('javascript:alert(1)', { cache, fetchImpl }), null);
+});
+
+test('unfurl: no og:image falls back to twitter:image, image_src, then the first large article img', () => {
+  const base = 'https://news.example.org/a/story';
+  assert.equal(parseMeta('<head><meta name="twitter:image" content="/t.jpg"></head>', base).image.url, 'https://news.example.org/t.jpg');
+  assert.equal(parseMeta('<head><link rel="image_src" href="https://cdn.example.org/s.png"></head>', base).image.url, 'https://cdn.example.org/s.png');
+  const body = `<body><header><img src="/logo.png" width="600" height="200"></header><article>
+    <img src="/icons/share.svg"><img src="/tiny.jpg" width="40" height="40"><img src="/spacer.gif">
+    <img data-x="1" src="/photos/hero.jpg" width="1024" height="576"></article></body>`;
+  assert.deepEqual(articleImage(body, base), { url: 'https://news.example.org/photos/hero.jpg', width: 1024, height: 576 });
+  assert.equal(articleImage('<main><img src="/p/undimensioned.webp"></main>', base).url, 'https://news.example.org/p/undimensioned.webp');
+  assert.equal(articleImage('<body><img src="/p/outside.webp"></body>', base), null);
+  assert.equal(parseMeta(`<head><title>T</title></head>${body}`, base).image.url, 'https://news.example.org/photos/hero.jpg');
+});
+
+test('unfurl: refresh refetches an imageless entry without downgrading a good one', async () => {
+  const page = (img) => new Response(`<html><head><title>Story</title>${img ? `<meta property="og:image" content="${img}">` : ''}</head><body></body></html>`, { status: 200, headers: { 'content-type': 'text/html' } });
+  const cache = { items: {} };
+  let img = null;
+  let fails = false;
+  const fetchImpl = async () => (fails ? new Response('no', { status: 403, headers: { 'content-type': 'text/html' } }) : page(img));
+  const url = 'https://www.example.com/story';
+  assert.equal((await unfurl(url, { cache, fetchImpl, lookup: PUBLIC })).meta.image, null);
+  img = 'https://www.example.com/i.jpg';
+  assert.equal((await unfurl(url, { cache, fetchImpl, lookup: PUBLIC })).meta.image, null, 'cached without refresh');
+  assert.equal((await unfurl(url, { cache, fetchImpl, lookup: PUBLIC, refresh: true })).meta.image.url, img);
+  fails = true;
+  const kept = await unfurl(url, { cache, fetchImpl, lookup: PUBLIC, refresh: true });
+  assert.equal(kept.ok, true);
+  assert.equal(kept.meta.image.url, img);
+});
+
+test('link cards: topic fallback art when the page has no image; generic page titles yield to the feed headline', () => {
+  assert.equal(fallbackImage('Magnitude 7 earthquake strikes off Japan').url, '/media/news/disaster.svg');
+  assert.equal(fallbackImage('Kentucky shocks LSU for 2nd straight OT win').url, '/media/news/sports.svg');
+  assert.equal(fallbackImage('Show HN: a tiny Rust database').url, '/media/news/tech.svg');
+  assert.equal(fallbackImage('Something happened somewhere').url, '/media/news/world.svg');
+  for (const t of FALLBACK_TOPICS) assert.ok(fs.existsSync(path.join(ROOT, 'public', 'media', 'news', `${t}.svg`)), `${t}.svg`);
+  const card = linkCardFrom('https://www.msn.com/en-us/news/x/ar-1', { ok: true, meta: { title: 'MSN', image: null } }, { title: 'Ebola outbreak spreads in Congo', source: 'AP' });
+  assert.equal(card.title, 'Ebola outbreak spreads in Congo');
+  assert.equal(card.image.url, '/media/news/health.svg');
+  assert.ok(genericTitle('Just a moment...', 'https://a.com/x') && genericTitle('Reuters', 'https://www.reuters.com/x'));
+  assert.equal(genericTitle('Reuters investigation finds X', 'https://www.reuters.com/x'), false);
+});
+
+test('links:check: cards without a preview image fail unless allowlisted; the committed corpus has none', () => {
+  const posts = [
+    { id: 'a', media: [{ kind: 'link_card', url: 'https://ok.com/1', image: { url: 'https://ok.com/i.jpg' } }] },
+    { id: 'b', media: [{ kind: 'link_card', url: 'https://bare.com/2' }, { kind: 'image', src: 'x' }] },
+    { id: 'c', media: [{ kind: 'link_card', url: 'https://sub.allowed.org/3' }, { kind: 'link_card', url: 'https://one.net/4' }] },
+    { id: 'd', media: [{ kind: 'link_card', url: 'https://www.ok.com/5', image: { url: '/media/news/world.svg', fallback: true } }] },
+  ];
+  assert.deepEqual(cardsMissingImages(posts).map((r) => r.id), ['b', 'c', 'c']);
+  assert.deepEqual(cardsMissingImages(posts, { domains: ['allowed.org'], urls: ['https://one.net/4'] }).map((r) => r.url), ['https://bare.com/2']);
+  assert.deepEqual(cardsMissingImages(loadPosts(), loadImageAllowlist()), []);
 });
 
 test('real posts: oEmbed parse keeps the exact text; kinds, allowlist, overlap', () => {

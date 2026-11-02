@@ -123,6 +123,12 @@
           "title": "Terence Tao (@tao@mathstodon.xyz)",
           "description": "\"Math 1.0\" placed a premium on being the first to solve an open problem, even if the solution was not initially well understood. Now that this goal has been optimized to the point of unsustainability, \"Math 2.0\" will need to decenter the role of raw problem solving and value mathematical progress…",
           "site_name": "Mathstodon",
+          "image": {
+            "url": "/media/news/science.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://mathstodon.xyz/packs/assets/favicon-16x16-74JBPGmr.png"
         }
       ]
@@ -439,6 +445,12 @@
           "domain": "ken.arneson.name",
           "title": "Ken Arneson : The Value of Not Getting to the Point",
           "site_name": "Ken Arneson",
+          "image": {
+            "url": "/media/news/world.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://ken.arneson.name/favicon.ico"
         }
       ]
@@ -512,7 +524,7 @@
       ],
       "news": {
         "title": "Taiwan September exports hit fresh monthly record on AI demand",
-        "url": "https://www.reuters.com/world/asia-pacific/taiwan-september-exports-hit-fresh-monthly-record-ai-demand-us-leads-2026-10-08/",
+        "url": "https://www.standardmedia.co.ke/asia/article/2001559687/taiwan-says-exports-hit-record-in-september-on-ai-demand",
         "source": "Reuters"
       },
       "citation": null,
@@ -520,11 +532,17 @@
       "media": [
         {
           "kind": "link_card",
-          "url": "https://www.reuters.com/world/asia-pacific/taiwan-september-exports-hit-fresh-monthly-record-ai-demand-us-leads-2026-10-08/",
-          "domain": "reuters.com",
-          "title": "Taiwan September exports hit fresh monthly record on AI demand",
-          "site_name": "Reuters",
-          "icon": "https://www.reuters.com/favicon.ico"
+          "url": "https://www.standardmedia.co.ke/asia/article/2001559687/taiwan-says-exports-hit-record-in-september-on-ai-demand",
+          "domain": "standardmedia.co.ke",
+          "title": "Taiwan says exports hit record in September on AI demand",
+          "description": "Taiwan's exports hit a record high of $87.2 billion in September, the government said Thursday, thanks to skyrocketing global demand for artificial intelligence hardware.",
+          "site_name": "The Standard",
+          "image": {
+            "url": "https://cdn.standardmedia.co.ke/images/articles/thumbnails/eNQ3isllxeHORNoMmZ9NADwa7AAIWUoCcQc7y5Rz.jpg",
+            "width": 800,
+            "height": 500
+          },
+          "icon": "https://www.standardmedia.co.ke/assets/images/favicon.png"
         }
       ]
     },
@@ -724,7 +742,7 @@
       ],
       "news": {
         "title": "Aces star A'ja Wilson wins record 5th WNBA MVP award",
-        "url": "https://www.msn.com/en-us/sports/basketball/aces-star-a-ja-wilson-wins-record-fifth-mvp-award/ar-AA2dR8l8",
+        "url": "https://www.chicagotribune.com/2026/10/08/aja-wilson-fifth-wnba-mvp/",
         "source": "ESPN"
       },
       "citation": "\"men become builders by building and lyreplayers by playing the lyre; so too we become just by doing just acts, temperate by doing temperate acts, brave by doing brave acts.\" — Nicomachean Ethics, Book II, ch. 1 (W. D. Ross tr.)",
@@ -742,11 +760,18 @@
       "media": [
         {
           "kind": "link_card",
-          "url": "https://www.msn.com/en-us/sports/basketball/aces-star-a-ja-wilson-wins-record-fifth-mvp-award/ar-AA2dR8l8",
-          "domain": "msn.com",
-          "title": "MSN",
-          "site_name": "ESPN",
-          "icon": "https://www.msn.com/favicon.ico"
+          "url": "https://www.chicagotribune.com/2026/10/08/aja-wilson-fifth-wnba-mvp/",
+          "domain": "chicagotribune.com",
+          "title": "A’ja Wilson of the Las Vegas Aces wins her 3rd straight WNBA MVP award and record 5th overall",
+          "description": "No WNBA player besides A’ja Wilson has more than three MVPs, with Sheryl Swoopes, Lisa Leslie and Lauren Jackson each having a trio.",
+          "site_name": "Chicago Tribune",
+          "published": "2026-10-08T20:40:25.000Z",
+          "image": {
+            "url": "https://www.chicagotribune.com/wp-content/uploads/2026/10/Aces_Valkyries_Basketball_5256_-1.jpg?w=5343&h=3562",
+            "width": 5343,
+            "height": 3562
+          },
+          "icon": "https://www.chicagotribune.com/wp-content/uploads/2024/02/favicon.png?w=16"
         }
       ]
     },
@@ -1026,6 +1051,12 @@
           "domain": "news.ycombinator.com",
           "title": "Tell HN: I've been paying for a rural Tanzanian's education for 10 years",
           "site_name": "Hacker News",
+          "image": {
+            "url": "/media/news/tech.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://news.ycombinator.com/favicon.ico"
         }
       ]
@@ -1152,8 +1183,14 @@
           "kind": "link_card",
           "url": "https://www.msn.com/en-gb/news/other/bestselling-hungarian-newspaper-shut-down-under-orban-relaunches-online/ar-AA2dP8Tp",
           "domain": "msn.com",
-          "title": "MSN",
+          "title": "Bestselling Hungarian newspaper shut down under Orbán relaunches online",
           "site_name": "Reuters",
+          "image": {
+            "url": "/media/news/world.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]

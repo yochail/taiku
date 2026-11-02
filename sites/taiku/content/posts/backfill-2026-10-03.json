@@ -27,8 +27,14 @@
           "kind": "link_card",
           "url": "https://www.msn.com/en-ph/news/world/new-lizard-species-discovered-in-peru/ar-AA2duSYF",
           "domain": "msn.com",
-          "title": "MSN",
+          "title": "New lizard species discovered in Peru",
           "site_name": "AFP via Gulf News",
+          "image": {
+            "url": "/media/news/science.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://www.msn.com/favicon.ico"
         }
       ]
@@ -388,6 +394,12 @@
           "domain": "reuters.com",
           "title": "Latvians vote in election under shadow of drone incursions",
           "site_name": "Reuters",
+          "image": {
+            "url": "/media/news/politics.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://www.reuters.com/favicon.ico"
         }
       ]
@@ -515,7 +527,7 @@
       ],
       "news": {
         "title": "Yann LeCun says he has \"zero concerns\" about AI wiping out humanity",
-        "url": "https://cybernews.com/ai-news/yann-lecun-apocalypse/",
+        "url": "https://tech.yahoo.com/ai/meta-ai/articles/ai-godfather-yann-lecun-zero-070000568.html",
         "source": "Fortune"
       },
       "citation": "\"A wise man, therefore, proportions his belief to the evidence.\" — An Enquiry Concerning Human Understanding, Section X, Part I",
@@ -529,11 +541,17 @@
       "media": [
         {
           "kind": "link_card",
-          "url": "https://cybernews.com/ai-news/yann-lecun-apocalypse/",
-          "domain": "cybernews.com",
-          "title": "Yann LeCun says he has \"zero concerns\" about AI wiping out humanity",
-          "site_name": "Fortune",
-          "icon": "https://cybernews.com/favicon.ico"
+          "url": "https://tech.yahoo.com/ai/meta-ai/articles/ai-godfather-yann-lecun-zero-070000568.html",
+          "domain": "tech.yahoo.com",
+          "title": "AI ‘godfather’ Yann LeCun has ‘zero concerns’ about human extinction, says Anthropic CEO Dario Amodei is ‘deluded’",
+          "description": "The former Meta chief AI scientist shares his take on recent rogue AI incidents and effective altruism, as well as plans for his new company, AMI Labs.",
+          "site_name": "Yahoo Tech",
+          "image": {
+            "url": "https://s.yimg.com/lo/mysterio/api/22178f487935278c49f1c08334d41c2eff75f37dde92be114297a79146974784/lightyear_networkapi/resizefill_w1200%3Bquality_80%3Bformat_jpg/https%3A%2F%2Fmedia.zenfs.com%2Fen%2Ffortune_175%2F2af46995d2c0341bf4ccf5d497a91fae.jpg",
+            "width": 1200,
+            "height": 800
+          },
+          "icon": "https://tech.yahoo.com/favicon.ico?favicon.1exqu8dce77s7.ico"
         }
       ]
     },
@@ -561,7 +579,7 @@
       ],
       "news": {
         "title": "Remains of medieval Bulgarian ruler Tsar Samuel return to Bulgaria from Greece",
-        "url": "https://www.msn.com/en-us/news/other/greece-agrees-to-return-remains-of-medieval-tsar-to-bulgaria/ar-AA2dcrxi",
+        "url": "https://www.euronews.com/video/2026/10/05/medieval-ruler-tsar-samuels-remains-return-home-to-bulgaria-after-60-years",
         "source": "AP"
       },
       "citation": null,
@@ -586,11 +604,18 @@
         },
         {
           "kind": "link_card",
-          "url": "https://www.msn.com/en-us/news/other/greece-agrees-to-return-remains-of-medieval-tsar-to-bulgaria/ar-AA2dcrxi",
-          "domain": "msn.com",
-          "title": "MSN",
-          "site_name": "AP",
-          "icon": "https://www.msn.com/favicon.ico"
+          "url": "https://www.euronews.com/video/2026/10/05/medieval-ruler-tsar-samuels-remains-return-home-to-bulgaria-after-60-years",
+          "domain": "euronews.com",
+          "title": "Video. Medieval ruler Tsar Samuel’s remains return home to Bulgaria after 60 years",
+          "description": "Video. Czar Samuel’s bones are flown back to Sofia after 60 years in Greece, as both countries seal a deal to exchange historic religious relics.",
+          "site_name": "euronews",
+          "published": "2026-10-05T09:37:13.000Z",
+          "image": {
+            "url": "https://images.euronews.com/articles/stories/09/93/93/72/1200x675_cmsv2_e2f5d035-279a-583e-b027-eb4b124dd365-9939372.jpg",
+            "width": 1200,
+            "height": 675
+          },
+          "icon": "https://www.euronews.com/apple-touch-icon.png"
         }
       ]
     },
@@ -820,6 +845,12 @@
           "domain": "cses.fi",
           "title": "Competitive Programmer's Handbook (2018)",
           "site_name": "cses.fi",
+          "image": {
+            "url": "/media/news/culture.svg",
+            "width": 1200,
+            "height": 630,
+            "fallback": true
+          },
           "icon": "https://cses.fi/favicon.ico"
         }
       ]
@@ -1137,6 +1168,11 @@
           "title": "Agents Don't Need Memory. They Need Documentation.",
           "description": "Why agents need project documentation instead of retrieval from old conversations.",
           "site_name": "liao.gg",
+          "image": {
+            "url": "https://liao.gg/images/blog/agents-dont-need-memory/tangled-800.jpg",
+            "width": 1600,
+            "height": 1199
+          },
           "icon": "https://liao.gg/favicon.ico"
         }
       ]
