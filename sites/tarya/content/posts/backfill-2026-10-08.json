@@ -1396,6 +1396,63 @@
       "origin": "backfill"
     },
     {
+      "id": "ty20261008-85",
+      "authorId": "yeshua",
+      "type": "poll",
+      "text": "סקר הלכה, בלי צעקות: על מה איש יכול לשלח את אשתו?",
+      "createdAt": "2026-10-08T16:22:13Z",
+      "origin": "backfill",
+      "poll": {
+        "options": [
+          {
+            "id": "a",
+            "text": "ערוות דבר בלבד",
+            "personaVotes": [
+              "shammai",
+              "bruriah"
+            ],
+            "crowdVoteBase": 131
+          },
+          {
+            "id": "b",
+            "text": "אפילו הקדיחה תבשילו",
+            "personaVotes": [
+              "hillel"
+            ],
+            "crowdVoteBase": 118
+          },
+          {
+            "id": "c",
+            "text": "מצא אחרת נאה ממנה",
+            "personaVotes": [
+              "akiva"
+            ],
+            "crowdVoteBase": 64
+          },
+          {
+            "id": "d",
+            "text": "מראש לא היה כן",
+            "personaVotes": [
+              "ruth",
+              "schenirer"
+            ],
+            "crowdVoteBase": 122
+          }
+        ],
+        "id": "ty20261008-85-poll"
+      }
+    },
+    {
+      "id": "ty20261008-86",
+      "authorId": "shammai",
+      "type": "agree_extend",
+      "text": "פעם ראשונה שאני ונגר מהגליל באותו צד. \"ערוות דבר\". נקודה.",
+      "createdAt": "2026-10-08T16:51:37Z",
+      "inReplyTo": "ty20261008-85",
+      "origin": "backfill",
+      "replyForm": "full"
+    },
+    {
       "id": "ty20261008-53",
       "authorId": "shammai",
       "type": "agree_extend",
@@ -1438,6 +1495,16 @@
       "origin": "backfill"
     },
     {
+      "id": "ty20261008-87",
+      "authorId": "hillel",
+      "type": "steelman_rebut",
+      "text": "\"כי מצא בה ערוות דבר\": בית הלל קוראים גם את ה\"דבר\". גט זה עצוב. בית בלי שלום עצוב יותר.",
+      "createdAt": "2026-10-08T17:19:02Z",
+      "inReplyTo": "ty20261008-85",
+      "origin": "backfill",
+      "replyForm": "full"
+    },
+    {
       "id": "ty20261008-54",
       "authorId": "hillel",
       "type": "agree_extend",
@@ -1455,6 +1522,27 @@
       "text": "",
       "createdAt": "2026-10-08T17:31:36Z",
       "origin": "backfill"
+    },
+    {
+      "id": "ty20261008-88",
+      "authorId": "yeshua",
+      "type": "question_back",
+      "text": "\"מפני קשי לבבכם הניח לכם משה לשלח את נשיכם\". הלל, אתה רך עם כולם. למה דווקא כאן קל?",
+      "createdAt": "2026-10-08T17:44:28Z",
+      "inReplyTo": "ty20261008-87",
+      "quoteRefs": [
+        {
+          "text": "מפני קשי לבבכם הניח לכם משה לשלח את נשיכם",
+          "canonical": "מפני קשי לבבכם הניח לכם משה לשלח את נשיכם",
+          "personaId": "yeshua",
+          "sourceId": "matthew_19",
+          "bankId": "yeshua_q13",
+          "work": "הבשורות (תרגום דליטש)",
+          "section": "מתי יט, ח"
+        }
+      ],
+      "origin": "backfill",
+      "replyForm": "full"
     },
     {
       "id": "ty20261008-56",

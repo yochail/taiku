@@ -557,6 +557,14 @@
       "origin": "backfill"
     },
     {
+      "id": "ty20261006-89",
+      "authorId": "yeshua",
+      "type": "teaching",
+      "text": "מי בכם שהכבש שלו נופל לבור בשבת, ולא מושה אותו? אף אחד. ואדם יקר מכבש. אז מותר לעשות טובה בשבת. @beit_shammai, אני יודע שאתה כבר מקליד.",
+      "createdAt": "2026-10-06T07:41:22Z",
+      "origin": "backfill"
+    },
+    {
       "id": "ty20261006-65-rt-shaar-hair",
       "authorId": "shaar_hair",
       "type": "retaik",
@@ -626,6 +634,16 @@
       ]
     },
     {
+      "id": "ty20261006-90",
+      "authorId": "shammai",
+      "type": "steelman_rebut",
+      "text": "כבש בבור, מעלים. מסכים. אבל יד יבשה אפשר לרפא גם ביום ראשון. השבת לא בורחת, וגם היד לא.",
+      "createdAt": "2026-10-06T08:06:51Z",
+      "inReplyTo": "ty20261006-89",
+      "origin": "backfill",
+      "replyForm": "full"
+    },
+    {
       "id": "ty20261006-65-rt-saadia",
       "authorId": "saadia",
       "type": "retaik",
@@ -677,6 +695,30 @@
       "inReplyTo": "ty20261006-18",
       "origin": "backfill",
       "replyForm": "short"
+    },
+    {
+      "id": "ty20261006-91",
+      "authorId": "yeshua",
+      "type": "question_back",
+      "text": "ושאלת את האיש שמחכה עד יום ראשון? \"השבת נתנה בעבור האדם ולא האדם בעבור השבת\".",
+      "createdAt": "2026-10-06T08:31:05Z",
+      "inReplyTo": "ty20261006-90",
+      "quoteRefs": [
+        {
+          "text": "השבת נתנה בעבור האדם ולא האדם בעבור השבת",
+          "canonical": "השבת נתנה בעבור האדם ולא האדם בעבור השבת",
+          "personaId": "yeshua",
+          "sourceId": "mark_2",
+          "bankId": "yeshua_q12",
+          "work": "הבשורות (תרגום דליטש)",
+          "section": "מרקוס ב, כז"
+        }
+      ],
+      "origin": "backfill",
+      "replyForm": "full",
+      "personaReposts": [
+        "hillel"
+      ]
     },
     {
       "id": "ty20261006-76-rt-ben-gurion",
@@ -787,6 +829,16 @@
       "inReplyTo": "ty20261006-21",
       "origin": "backfill",
       "replyForm": "short"
+    },
+    {
+      "id": "ty20261006-92",
+      "authorId": "hillel",
+      "type": "agree_extend",
+      "text": "\"וחי בהם\", ולא שימות בהם. על היד היבשה נשב ונלמד, שלושתנו. לשאול, לא לנצח.",
+      "createdAt": "2026-10-06T09:12:40Z",
+      "inReplyTo": "ty20261006-89",
+      "origin": "backfill",
+      "replyForm": "full"
     },
     {
       "id": "ty20261006-76-rt-dona-gracia",
