@@ -11,6 +11,8 @@
     "kwak2010": "Kwak, Lee, Park, Moon, 'What is Twitter, a Social Network or a News Media?', WWW 2010, doi:10.1145/1772690.1772751 (22.1% reciprocal follow pairs; heavy-tailed, non-power-law follower distribution)",
     "nishi2016": "Nishi, Takaguchi et al., 'Reply trees in Twitter: data analysis and branching process models', Social Network Analysis and Mining 6, 2016, https://link.springer.com/article/10.1007/s13278-016-0334-0 (reply trees mostly small and shallow; heavy-tailed size/depth)",
     "goel2016": "Goel, Anderson, Hofman, Watts, 'The Structural Virality of Online Diffusion', Management Science 62(1), 2016 (vast majority of cascades are size 1 or broadcast depth 1)",
+    "zhao2015": "Zhao, Erdogdu, He, Rajaraman & Leskovec, 'SEISMIC: A Self-Exciting Point Process Model for Predicting Tweet Popularity', KDD 2015, https://arxiv.org/abs/1506.02594 (retweet hazard after a post decays as a power law with a ~5 min plateau; a long tail of reshares keeps arriving for days, heavier for already-popular posts)",
+    "crane2008": "Crane & Sornette, 'Robust dynamic classes revealed by measuring the response function of a social system', PNAS 105(41), 2008, https://doi.org/10.1073/pnas.0803685105 (attention to online items relaxes as a power law over days; endogenous word-of-mouth bursts produce late secondary peaks)",
     "goh2008": "Goh & Barabasi, 'Burstiness and memory in complex systems', EPL 81, 2008 (burstiness B=(sigma-mu)/(sigma+mu); human online activity has B>0)",
     "golder2011": "Golder & Macy, 'Diurnal and Seasonal Mood Vary with Work, Sleep, and Daylength Across Diverse Cultures', Science 333, 2011 (strong circadian rhythm in tweeting)",
     "boyd2010": "boyd, Golder & Lotan, 'Tweet, Tweet, Retweet: Conversational Aspects of Retweeting on Twitter', HICSS-43 2010, https://www.danah.org/papers/TweetTweetRetweet.pdf (720k tweets, Jan-Jun 2009: 36% of tweets mention a user as @user and 86% of those begin with @user, so ~5% of all tweets carry a non-leading mention; 5% contain a hashtag; 22% a URL; 18% of retweets contain a hashtag)",
@@ -121,6 +123,22 @@
       "delay_minutes": { "lognormal": { "median": 35, "sigma": 1.5 }, "max": 2880 },
       "confidence": "low (product choice)"
     },
+    "resurfacing": {
+      "_note": "Virality / cross-day follow-ons (src/lib/followon.mjs resurface). Each daily run picks seed posts from the last window_days (authored, at least min_age_hours old by the end of the day) weighted by traction = (1 + likes + 2*reposts + 3*(replies+quotes))^traction_exponent * 0.5^(age_h/half_life_hours): heavy-tailed toward already-popular posts with a long power-law-like tail (zhao2015, crane2008). Seeds ~ Poisson(seeds_per_day_mean); each draws 1 reactor plus more with more_probability up to max_per_seed; a quote_share of them quote-taik rather than reply. With pile_on.probability_per_day one top-traction post (weights squared) gets a pile-on of pile_on.reactors. Reactors are weighted by relation, reactivity and dunk tendency, never repeat a persona already in that thread, and post no earlier than earliest_hour local and at least 1h after the seed. Deterministic from (date, seed). Rates are product choices sized so cross-day reactions are ~5-15% of a day's replies+quotes.",
+      "window_days": 7,
+      "min_age_hours": 24,
+      "min_text_chars": 15,
+      "traction_exponent": 1.2,
+      "half_life_hours": 36,
+      "seeds_per_day_mean": 2.5,
+      "max_per_seed": 4,
+      "more_probability": 0.35,
+      "quote_share": 0.3,
+      "earliest_hour": 7,
+      "pile_on": { "probability_per_day": 0.1, "reactors": [5, 9] },
+      "confidence": "low (product choice; shape from zhao2015, crane2008, goel2016)",
+      "sources": ["zhao2015", "crane2008", "goel2016"]
+    },
     "real_posts": {"_note": "Quote-taiks of real public posts (news outlets, institutions, public figures in real-accounts.json): a news-reactive original swaps its link card for a real post that shares the same article URL (or a matching headline), so it reads like a quote-retweet. Reference only: exact fetched text, attributed, never paraphrased into a real person's mouth; deleted/protected posts are skipped. Share and caps are product choices.", "share_of_news_originals": 0.15, "max_per_day": 4, "max_age_hours": 72, "min_title_overlap": 0.5, "platforms": ["bluesky", "x"], "confidence": "low (product choice)"},
     "hashtags": {
       "_note": "Hashtags written into the text. Originals follow suh2010 (10.1%); replies and quotes use fewer, so the corpus share lands near boyd2010 (5%). Count and persona multipliers are product choices. The house-style strip keeps only the sampled number of tags.",
@@ -169,6 +187,7 @@
 
     "text.hashtag_share": { "_def": "share of posts with text that contain a #hashtag", "min": 0.01, "max": 0.12, "target": 0.05, "min_n": 30, "severity": "warn", "confidence": "medium (5% boyd2010, 10.1% suh2010)", "sources": ["boyd2010", "suh2010"] },
     "profile.decorated_name_share": { "_def": "share of personas whose shown name carries emoji/kaomoji/ASCII or a bio tag", "min": 0.25, "max": 0.35, "target": 0.33, "min_n": 20, "severity": "warn", "confidence": "low (product choice)", "sources": [] },
+    "engagement.cross_day_reaction_share": { "_def": "share of replies+quotes whose target post is more than 24h older than the reaction (resurfacing / viral tail; the target may live in another day's file)", "min": 0.02, "max": 0.3, "target": 0.08, "min_n": 30, "severity": "warn", "confidence": "low (product choice)", "sources": ["zhao2015", "crane2008"] },
     "engagement.mention_answered_share": { "_def": "share of in-text persona @mentions (posts at least 48h before the newest post) answered by a reply or quote from the mentioned persona", "min": 0.25, "max": 0.8, "target": 0.5, "min_n": 20, "severity": "warn", "confidence": "low (product choice)", "sources": [] },
     "text.mention_share": { "_def": "share of posts with text that @mention a persona outside a leading reply @", "min": 0.02, "max": 0.12, "target": 0.055, "min_n": 30, "severity": "warn", "confidence": "medium (~5% boyd2010)", "sources": ["boyd2010", "huberman2008"] },
     "text.co_mention_share": { "_def": "of posts with a non-leading mention, share naming 2+ handles", "min": 0.0, "max": 0.45, "target": 0.2, "min_n": 15, "severity": "warn", "confidence": "low (product choice)", "sources": [] },

@@ -29,7 +29,8 @@
     "docs:personas": "node scripts/persona-bible.mjs",
     "serve": "node scripts/serve.mjs",
     "memes:fetch": "node scripts/fetch-memes.mjs",
-    "memes:render": "node scripts/render-memes.mjs"
+    "memes:render": "node scripts/render-memes.mjs",
+    "resurface:plan": "node scripts/resurface-plan.mjs"
   },
   "optionalDependencies": {
     "@huggingface/transformers": "4.3.2",

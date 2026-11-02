@@ -98,6 +98,7 @@ export function userMessage(task, ctx) {
     ...(task.stance ? { stance: `your stance toward the post: ${task.stance}` } : {}),
     ...(task.form ? { form: FORM_HINT[task.form] ?? task.form } : {}),
     ...(ctx.relation ? { relationship: `${ctx.relation.kind} — ${ctx.relation.why ?? ''}`.slice(0, 160) } : {}),
+    ...(task.followOn ? { timing: task.followOn === 'pile-on' ? 'the post is from an earlier day and is blowing up today; everyone is piling in, so add your own angle' : 'the post is from an earlier day and is circulating again; react as someone who just came across it' } : {}),
     ...(task.mention ? { mention: `you may address @${task.mention}` } : {}),
     handles: 'when you speak to or dunk on another account, use its @handle (from the profiles/thread); third-person talk may use the name. Never invent handles.',
   };

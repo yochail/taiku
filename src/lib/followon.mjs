@@ -9,6 +9,7 @@
 //    traction = (1 + likes + 2·reposts + 3·(replies + quotes))^exponent × 0.5^(age_h / half_life_h)
 //    and gives them follow-on replies/quotes today; with a small chance one of them gets a pile-on.
 import { behaviorOf } from './behavior.mjs';
+import { crowdFor } from './crowd.mjs';
 import { relationOf, RELATION_WEIGHT } from './react.mjs';
 import { textMentions } from './realism.mjs';
 import { clamp, seededRng, weightedPick } from './pipeline-util.mjs';
@@ -79,10 +80,14 @@ export function mentionDebts({ past, personas, spec, start, end }) {
   return out.sort((a, b) => a.at - b.at);
 }
 
-/** Traction of a past post at time `now` (engagement × recency decay). */
-export function traction(post, counts, now, cfg) {
-  const likes = (post.crowdLikeBase ?? 0) + (post.personaLikes?.length ?? 0);
-  const reposts = (post.crowdRepostBase ?? 0) + (post.personaReposts?.length ?? 0);
+/**
+ * Traction of a past post at time `now` (engagement × recency decay). Engagement is what readers
+ * see: stored crowd bases, else the seeded crowd (crowdFor) when `spec` is given, plus persona engagement.
+ */
+export function traction(post, counts, now, cfg, author = null, spec = null) {
+  const crowd = spec && (post.crowdLikeBase == null || post.crowdRepostBase == null) ? crowdFor(post, author, spec) : null;
+  const likes = (post.crowdLikeBase ?? crowd?.likes ?? 0) + (post.personaLikes?.length ?? 0);
+  const reposts = (post.crowdRepostBase ?? crowd?.reposts ?? 0) + (post.personaReposts?.length ?? 0);
   const c = counts.get(post.id) ?? 0;
   const ageH = Math.max(0, (now - Date.parse(post.createdAt)) / HOUR);
   return (1 + likes + 2 * reposts + 3 * c) ** (cfg.traction_exponent ?? 1) * 0.5 ** (ageH / (cfg.half_life_hours ?? 36));
@@ -97,9 +102,10 @@ const poisson = (rand, mean) => {
 
 /**
  * Follow-on reactions to past posts for the day [start, end): [{ post, personaId, action, at, reason }].
- * `atFn(minHour)` returns a timestamp inside the day (the planner's diurnal sampler).
+ * `online(personaId)` weights reactors (people already online today see resurfacing posts first).
+ * `atFn(minHour, personaId)` returns a timestamp inside the day (the planner's diurnal / sitting sampler).
  */
-export function resurface({ past, personas, spec, start, end, seed, atFn, skip = [] }) {
+export function resurface({ past, personas, spec, start, end, seed, atFn, skip = [], online = () => 1 }) {
   const cfg = spec.sampling.resurfacing;
   if (!cfg || !past.length) return [];
   const rand = seededRng('resurface', seed, start);
@@ -113,7 +119,7 @@ export function resurface({ past, personas, spec, start, end, seed, atFn, skip =
     return !p.retaikOf && byId.has(p.authorId) && t < start - minAge + 12 * HOUR && t >= start - cfg.window_days * 24 * HOUR && String(p.text ?? '').trim().length >= (cfg.min_text_chars ?? 15);
   });
   if (!cands.length) return [];
-  const weights = cands.map((p) => [p, traction(p, counts, start, cfg)]);
+  const weights = cands.map((p) => [p, traction(p, counts, start, cfg, byId.get(p.authorId), spec)]);
   const taken = new Set(skip.map((s) => `${s.post.id}:${s.personaId}`));
   const reactors = personas.filter((p) => !isNews(p));
   const out = [];
@@ -123,14 +129,14 @@ export function resurface({ past, personas, spec, start, end, seed, atFn, skip =
       .filter((p) => p.id !== post.authorId && !taken.has(`${post.id}:${p.id}`) && !reacted.get(post.id)?.has(p.id))
       .map((p) => {
         const rel = relationOf(p, author);
-        return [p.id, (rel ? RELATION_WEIGHT[rel] : 1) * clamp(p.reactivity ?? 3, 1, 5) / 3 * (0.3 + clamp(behaviorOf(p).dunk_tendency ?? 0.3, 0, 1))];
+        return [p.id, (rel ? RELATION_WEIGHT[rel] : 1) * clamp(p.reactivity ?? 3, 1, 5) / 3 * (0.3 + clamp(behaviorOf(p).dunk_tendency ?? 0.3, 0, 1)) * online(p.id)];
       });
     for (let i = 0; i < n && pool.length; i++) {
       const pid = weightedPick(rand, pool);
       pool.splice(pool.findIndex(([id]) => id === pid), 1);
       taken.add(`${post.id}:${pid}`);
       const action = rand() < (cfg.quote_share ?? 0.3) ? 'quote' : 'reply';
-      const at = Math.min(end - 60000, Math.max(atFn(cfg.earliest_hour ?? 7), Date.parse(post.createdAt) + HOUR));
+      const at = Math.min(end - 60000, Math.max(atFn(cfg.earliest_hour ?? 7, pid), Date.parse(post.createdAt) + HOUR));
       out.push({ post, personaId: pid, action, at, reason });
     }
   };

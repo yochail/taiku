@@ -317,6 +317,18 @@ export function measure(allPosts, personas, spec, { context = [] } = {}) {
     }
   }
   set('engagement.mention_answered_share', owed ? paid / owed : null, owed);
+  // Cross-day follow-ons: replies/quotes aimed at a post more than 24h older (resurfacing, viral tail).
+  const scopeById = new Map(scope.map((p) => [p.id, p]));
+  let reacting = 0;
+  let late = 0;
+  for (const p of [...replies, ...quotes]) {
+    const target = scopeById.get(p.inReplyTo ?? p.quoteOf);
+    const d = target && Date.parse(p.createdAt) - Date.parse(target.createdAt);
+    if (!Number.isFinite(d)) continue;
+    reacting++;
+    if (d > 24 * 3.6e6) late++;
+  }
+  set('engagement.cross_day_reaction_share', share(late, reacting), reacting);
   set('text.co_mention_share', share(mentioning.filter((n) => n >= 2).length, mentioning.length), mentioning.length);
   set('text.emoji_share', share(posts.filter((p) => EMOJI.test(p.text ?? '')).length, posts.length), posts.length);
 

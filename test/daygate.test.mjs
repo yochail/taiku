@@ -93,7 +93,7 @@ test('role mix outside its band fails (everything posted as originals)', () => {
 });
 
 test('per persona: Diogenes writing essays and Kant grunting both fail; other personas unaffected', () => {
-  const day = clone([...days.values()][2]);
+  const day = clone([...days.values()][2]).filter((p) => p.authorId !== 'diogenes' && p.authorId !== 'kant');
   const t0 = Date.parse(day[0].createdAt);
   const at = (i) => new Date(t0 + (i * 37 + 3) * 60_000 + 17_000).toISOString();
   const long = 'Let me set out, in order, why the city is mistaken about virtue, wealth and the proper use of a barrel, beginning with the definitions and proceeding to the objections, each answered in turn with care.';

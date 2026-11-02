@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { loadPersonas } from '../src/lib/data.mjs';
-import { mentionDebts, mentionDecision } from '../src/lib/followon.mjs';
+import { mentionDebts, mentionDecision, resurface, traction } from '../src/lib/followon.mjs';
 import { loadSpec, measure } from '../src/lib/realism.mjs';
 import { planDay } from '../src/lib/run.mjs';
 import { editorialDay } from '../src/lib/pipeline-util.mjs';
@@ -68,3 +68,52 @@ test('mention_answered_share metric counts answers from other files via context'
   assert.equal(m['engagement.mention_answered_share']?.value ?? m.get?.('engagement.mention_answered_share')?.value, 1);
 });
 
+
+const pastDays = (date, n = 30) => {
+  const day = editorialDay(date, 'UTC');
+  const authors = ['kant', 'hume', 'nietzsche', 'diogenes', 'camus', 'spinoza'];
+  return Array.from({ length: n }, (_, i) => ({ id: `p${i}`, authorId: authors[i % authors.length], text: `a past taik number ${i} with enough words`, createdAt: new Date(day.start - (30 + i * 4) * 3.6e6).toISOString(), crowdLikeBase: i === 3 ? 900 : 5, crowdRepostBase: 1 }));
+};
+
+test('resurface: deterministic, heavy-tailed toward traction, past posts only, respects timing', () => {
+  const s = structuredClone(spec);
+  s.sampling.resurfacing.seeds_per_day_mean = 6;
+  const day = editorialDay('2026-12-05', 'UTC');
+  const past = pastDays('2026-12-05');
+  const atFn = (h = 0) => day.start + Math.max(h, 12) * 3.6e6;
+  const run = (seed) => resurface({ past, personas, spec: s, start: day.start, end: day.end, seed, atFn });
+  assert.deepEqual(run('a'), run('a'));
+  let hot = 0;
+  let total = 0;
+  for (let i = 0; i < 60; i++) for (const e of run(`s${i}`)) {
+    total++;
+    if (e.post.id === 'p3') hot++;
+    assert.notEqual(e.personaId, e.post.authorId);
+    assert.ok(e.at >= day.start && e.at < day.end && e.at >= Date.parse(e.post.createdAt) + 3.6e6);
+    assert.ok(Date.parse(e.post.createdAt) >= day.start - s.sampling.resurfacing.window_days * 864e5);
+    assert.ok(['reply', 'quote'].includes(e.action));
+  }
+  assert.ok(total > 100);
+  assert.ok(hot / total > 0.3, `high-traction post dominates (${hot}/${total})`);
+  assert.ok(traction(past[3], new Map(), day.start, s.sampling.resurfacing) > traction(past[4], new Map(), day.start, s.sampling.resurfacing));
+});
+
+test('resurface: planDay adds cross-day follow-ons as external reactions; metric counts them', () => {
+  const s = structuredClone(spec);
+  s.sampling.resurfacing.seeds_per_day_mean = 5;
+  const past = pastDays('2026-12-05');
+  const plan = planDay({ personas, spec: s, topics: [], date: '2026-12-05', seed: 'r', nonce: 'n', tz: 'UTC', content: { originals: 6 }, past });
+  const follow = plan.nodes.filter((n) => n.followOn === 'resurface' || n.followOn === 'pile-on');
+  assert.ok(follow.length > 0);
+  for (const n of follow) assert.ok(plan.nodes.some((x) => x.kind === 'external' && x.id === (n.parent ?? n.quoteOf)));
+  const again = planDay({ personas, spec: s, topics: [], date: '2026-12-05', seed: 'r', nonce: 'n', tz: 'UTC', content: { originals: 6 }, past });
+  assert.deepEqual(again.nodes.filter((n) => n.followOn === 'resurface' || n.followOn === 'pile-on').map((n) => [n.id, n.createdAt]), follow.map((n) => [n.id, n.createdAt]));
+
+  const t0 = Date.parse('2026-12-01T10:00:00Z');
+  const context = [{ id: 'old', authorId: 'kant', text: 'duty first', createdAt: new Date(t0).toISOString() }];
+  const day = [
+    { id: 'r1', authorId: 'hume', inReplyTo: 'old', text: 'late but no', createdAt: new Date(t0 + 2 * 864e5).toISOString() },
+    { id: 'r2', authorId: 'camus', inReplyTo: 'old', text: 'same day', createdAt: new Date(t0 + 3.6e6).toISOString() },
+  ];
+  assert.equal(measure(day, personas, spec, { context })['engagement.cross_day_reaction_share'].value, 0.5);
+});

@@ -22,7 +22,7 @@ import { createSampler, replyFormOf } from './realism.mjs';
 import { planMedia } from './media.mjs';
 import { createGiphyClient } from './giphy.mjs';
 import { MAX_DEPTH, calibrate, cascade, createReactor, relationOf } from './react.mjs';
-import { mentionDebts, mentionDecision } from './followon.mjs';
+import { mentionDebts, mentionDecision, resurface } from './followon.mjs';
 import { mentionTargets } from './tags.mjs';
 import { FEEDS, domainOf, fetchPool, fixtureFetch, sanitizeUntrusted } from './news.mjs';
 import { selectTopics, topicCount } from './topics.mjs';
@@ -261,8 +261,22 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
     return n;
   };
   // Mention reactions owed by earlier days (stateless: same seeded draw as on the day of the post).
-  const carried = mentionDebts({ past, personas, spec, start: day.start, end: day.end }).map((e) => reactionNode(extNode(e.post), e.personaId, e.action, e.at, e.reason));
-  const all = cascade(reactor, [...nodes, ...carried], { horizon, personas });
+  const debts = mentionDebts({ past, personas, spec, start: day.start, end: day.end });
+  const carried = debts.map((e) => reactionNode(extNode(e.post), e.personaId, e.action, e.at, e.reason));
+  // Virality: past posts with traction get follow-on replies/quotes (and sometimes a pile-on) today.
+  // Own seeded sampler so it is deterministic from (date, seed) and does not shift the rest of the plan.
+  const rsamp = createSampler(spec, `resurface:${date}:${seed}`);
+  const rrand = seededRng('resurface-at', date, seed);
+  // Late reactions land in the reactor's existing sitting when it has one (keeps posting bursty).
+  const rAt = (minHour = 0, pid = null) => {
+    const base = day.start + Math.max(minHour, rsamp.localHour()) * 3.6e6 + rsamp.minute() * 6e4 + Math.floor(rrand() * 6e4);
+    const c = sittings.get(pid);
+    const t = c?.length ? c[Math.floor(rrand() * c.length)] + Math.floor(rrand() * 40 * 6e4) : null;
+    return t != null && t >= day.start + minHour * 3.6e6 ? t : base;
+  };
+  const resurfaced = resurface({ past, personas, spec, start: day.start, end: day.end, seed: `${date}:${seed}`, atFn: rAt, skip: debts, online: (pid) => (sittings.has(pid) ? 1 : 0.25) })
+    .map((e) => reactionNode(extNode(e.post), e.personaId, e.action, e.at, e.reason));
+  const all = cascade(reactor, [...nodes, ...carried, ...resurfaced], { horizon, personas });
   for (const n of all) {
     if (n.exec) continue;
     n.exec = n.cheap ? 'pool' : n.form === 'short' ? 'short' : 'full';
@@ -546,6 +560,7 @@ export async function runDaily(opts = {}) {
     const persona = byId.get(n.authorId);
     const spec1 = taskSpec({ node: n, persona, topic: topicById.get(n.topicId), sampler: plan.sampler, rand: plan.rand, postId: postIdOf(n.id), hasPassages: hasPassages(persona), giphy });
     if (n.role === 'reply' && n.exec !== 'pool' && plan.rand() < 0.3) spec1.mention = byId.get(nodeById.get(n.parent)?.authorId)?.handle ?? null;
+    if (n.followOn === 'resurface' || n.followOn === 'pile-on') spec1.followOn = n.followOn;
     if (n.textMentions?.length) spec1.mentions = n.textMentions.map((id) => byId.get(id)?.handle).filter(Boolean);
     if (n.kind !== 'wire' && !isNews(persona)) spec1.handleStyle = { ...handleRates(spec), targetId: nodeById.get(n.parent ?? n.quoteOf)?.authorId ?? null, seed: spec1.postId };
     const t = { taskId: n.id, kind: n.kind ?? n.role, role: spec1.role, exec: n.exec, form: n.form ?? null, level: n.kind === 'thread-part' ? 0 : n.depth ?? 0, personaId: n.authorId, postId: spec1.postId, parentTaskId: n.parent ?? n.quoteOf ?? null, topicId: n.topicId, at: iso(n.createdAt), archetype: spec1.archetype, media: spec1.media, status: 'pending', spec: spec1 };
