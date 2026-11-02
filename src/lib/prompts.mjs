@@ -48,7 +48,13 @@ export function compactProfile(persona, byId = new Map()) {
     lifespan: persona.lifespan,
     school: persona.school,
     core_ideas: pick(persona.core_ideas, 5),
-    voice: { style: v.style, tone: v.tone, formatting: v.formatting, tics: pick(v.tics, 4), do: pick(v.do, 4), dont: pick(v.dont, 4) },
+    voice: {
+      style: v.style, tone: v.tone, formatting: v.formatting, tics: pick(v.tics, 4), do: pick(v.do, 4), dont: pick(v.dont, 4),
+      // Optional per-persona register/idiolect (e.g. Hebrew site packs): weighted above the period register.
+      ...(v.idiolect ? { idiolect: { signature_words: pick(v.idiolect.signature_words, 6), sentence_shapes: pick(v.idiolect.sentence_shapes, 3), rhetorical_habits: pick(v.idiolect.rhetorical_habits, 3) } } : {}),
+      ...(v.register ? { register: v.register } : {}),
+      ...(v.sample_phrases?.length ? { sample_phrases: pick(v.sample_phrases, 5) } : {}),
+    },
     signature_moves: pick(persona.signature_moves, 4),
     modernity: MODERNITY[persona.modernity ?? 3],
     ...(persona.temperament ? { temperament: { heat: `/5`, baseline: persona.temperament.baseline, triggers: pick(persona.temperament.triggers, 5), when_triggered: persona.temperament.when_triggered, when_losing: persona.temperament.when_losing, emotional_range: persona.temperament.emotional_range } } : {}),

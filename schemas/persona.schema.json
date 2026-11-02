@@ -220,6 +220,25 @@
         "humor": {
           "type": "string"
         },
+        "register": {
+          "type": "string",
+          "description": "Language register / period flavor (e.g. Biblical, Mishnaic, Haskalah Hebrew)."
+        },
+        "idiolect": {
+          "type": "object",
+          "description": "The person's own linguistic fingerprint mined from their texts; weighted above the register.",
+          "properties": {
+            "signature_words": { "type": "array", "items": { "type": "string" } },
+            "sentence_shapes": { "type": "array", "items": { "type": "string" } },
+            "rhetorical_habits": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "sample_phrases": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 5,
+          "items": { "type": "string" }
+        },
         "formatting": {
           "type": "string"
         },
