@@ -33,7 +33,7 @@ import { OPENERS_PER_BATCH, ORIGINALS_PER_BATCH, REPLIES_PER_BATCH, SHORTS_PER_B
 import { cosineVec, createEmbedder, personaVectors, stanceAnchors, stanceHint, tokens } from './embed.mjs';
 import { MICRO_REFILL_MAX, MICRO_REFILL_PERSONAS, MICRO_REPLIES, runMicro } from './micro.mjs';
 import { chooseStance, createPoolPicker, entryMedia, loadPools, loadReactionUsage, reactionId, saveReactionUsage, usageFile } from './pools.mjs';
-import { defaultFill, materializeFor, planFor, schemaAllowsGiphy } from './gen-media.mjs';
+import { defaultFill, enforceUniqueVisuals, materializeFor, planFor, schemaAllowsGiphy } from './gen-media.mjs';
 import { handleRates } from './handles.mjs';
 import { runBatch } from './gen-batch.mjs';
 import { createStyleTracker } from './house-style.mjs';
@@ -945,7 +945,10 @@ export async function runDaily(opts = {}) {
   }
   const origin = mock ? 'mock' : 'cloudflare';
   const done = tasks.filter((t) => t.status === 'done');
-  const posts = done.map((t) => assemblePost({ t, node: nodeById.get(t.taskId), taskById, byId, topic: topicById.get(t.topicId), runId, origin, rand: seededRng('votes', t.taskId, nonce) }));
+  const built = done.map((t) => assemblePost({ t, node: nodeById.get(t.taskId), taskById, byId, topic: topicById.get(t.topicId), runId, origin, rand: seededRng('votes', t.taskId, nonce) }));
+  // One image/meme/chart per corpus, one reaction GIF per day and conversation (deterministic order).
+  const uniq = enforceUniqueVisuals(built, others);
+  const posts = built.filter((p) => !uniq.drop.has(p.id));
   const retaiks = retaikRows({ posts, byId, sampler: createSampler(spec, `retaik:${seed}:${nonce}`), pairSampler: (k) => createSampler(spec, `retaik:${seed}:${nonce}:${k}`), key: `${seed}:${nonce}`, prefix, date, runId, origin });
   const allPosts = [...posts, ...retaiks];
 
@@ -998,6 +1001,7 @@ export async function runDaily(opts = {}) {
     personaLikes: posts.reduce((s, p) => s + (p.personaLikes?.length ?? 0), 0),
     personaReposts: posts.reduce((s, p) => s + (p.personaReposts?.length ?? 0), 0),
     likeConversions: tasks.filter((t) => t.status === 'liked').length,
+    visualSwaps: uniq.changes.length,
   };
   items.total = allPosts.length;
   items.nonLlm = items.pool + items.library + items.wire + items.retaikRows + items.personaLikes + items.personaReposts;

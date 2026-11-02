@@ -4,7 +4,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { planMedia, materializeMedia } from './media.mjs';
+import { planMedia, materializeMedia, resolveMedia, similarReactions } from './media.mjs';
+import { claimArt } from './art-select.mjs';
+import { gifIdentity, mediaOf, threadRoot, visualKeys } from './visual-dupes.mjs';
 import { buildPoll } from './turn.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -116,4 +118,59 @@ export async function materializeFor(plan, fill, { giphy = null, rand = Math.ran
     } catch { /* try the default fill */ }
   }
   return {};
+}
+
+/**
+ * Generator rule for visual uniqueness (visual-dupes.mjs keys): every image, meme (template + captions)
+ * and chart appears on at most one post corpus-wide; a reaction GIF at most once per day and per
+ * conversation. Visits `posts` (this run's new posts) in (createdAt, id) order against `prior` (the
+ * rest of the corpus), so the outcome is deterministic. A repeated GIF swaps to the closest free reaction,
+ * a repeated picture to a free piece of art; anything else repeated loses its media (a media-only post
+ * with no replies is dropped). Mutates posts; returns { changes: [string], drop: Set<postId> }.
+ */
+export function enforceUniqueVisuals(posts, prior = []) {
+  const byId = new Map([...prior, ...posts].map((p) => [p.id, p]));
+  const used = new Set();
+  for (const p of prior) for (const m of mediaOf(p)) for (const k of visualKeys(p, m, threadRoot(p, byId))) used.add(k.key);
+  const hasChild = new Set(posts.flatMap((p) => [p.inReplyTo, p.quoteOf, p.retaikOf]).filter(Boolean));
+  const changes = [];
+  const drop = new Set();
+  const order = [...posts].sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)) || String(a.id).localeCompare(String(b.id)));
+  // Keys any post (kept or not yet visited) already carries: a swap avoids them so it never forces a later swap.
+  const reserved = new Set([...prior, ...posts].flatMap((p) => mediaOf(p).flatMap((m) => visualKeys(p, m, threadRoot(p, byId)).map((k) => k.key))));
+  const free = (p, m, root, strict = false) => !visualKeys(p, m, root).some((k) => used.has(k.key) || (strict && reserved.has(k.key)));
+  const swap = (m, render) => {
+    const { svg: _s, raster: _r, ...item } = resolveMedia({ kind: m.kind, render, rating: m.rating });
+    return toSchemaMedia(item);
+  };
+  for (const p of order) {
+    const root = threadRoot(p, byId);
+    const media = mediaOf(p);
+    const keep = [];
+    for (const m of media) {
+      let item = m;
+      if (!free(p, item, root)) {
+        let alt = null;
+        if (m.kind === 'gif' && m.render?.reaction) {
+          // Same feeling first (unreserved, then merely unused); any free reaction only as a last resort.
+          const near = similarReactions(m.render.reaction, { minScore: 1 }).map((r) => swap(m, { ...m.render, reaction: r.id }));
+          const any = similarReactions(m.render.reaction).map((r) => swap(m, { ...m.render, reaction: r.id }));
+          alt = near.find((c) => free(p, c, root, true)) ?? near.find((c) => free(p, c, root)) ?? any.find((c) => free(p, c, root, true)) ?? any.find((c) => free(p, c, root)) ?? null;
+        } else if (m.kind === 'image' && m.render?.art) {
+          const cand = swap(m, { art: claimArt(m.render.art, { ctx: { text: p.text, alt: m.alt } }) });
+          if (free(p, cand, root)) alt = cand;
+        }
+        changes.push(`${p.id}: ${m.kind} ${gifIdentity(m) ?? m.src} ${alt ? `-> ${gifIdentity(alt) ?? alt.src}` : 'dropped (already used)'}`);
+        item = alt;
+      }
+      if (!item) continue;
+      for (const k of visualKeys(p, item, root)) used.add(k.key);
+      keep.push(item);
+    }
+    if (keep.length === media.length && keep.every((m, i) => m === media[i])) continue;
+    if (keep.length) p.media = keep;
+    else delete p.media;
+    if (!keep.length && !String(p.text ?? '').trim() && !p.poll && !hasChild.has(p.id)) drop.add(p.id);
+  }
+  return { changes, drop };
 }

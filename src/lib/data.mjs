@@ -3,6 +3,7 @@ import path from 'node:path';
 import { POST_ARCHETYPES, REPLY_ARCHETYPES, ALL_TYPES } from './archetypes.mjs';
 import { validateSchema, loadSchema } from './schema.mjs';
 import { findTells } from './tells.mjs';
+import { duplicateVisuals } from './visual-dupes.mjs';
 import { ROOT, SITE_DIR, sitePath } from './site.mjs';
 
 export { ROOT, SITE_DIR };
@@ -514,6 +515,8 @@ export function validate(personas, posts, { knownUrls = cachedUrls() } = {}) {
     if (depth > MAX_REPLY_DEPTH) errors.push(`${where}: reply depth > ${MAX_REPLY_DEPTH}`);
     if (post.type === 'thread' && threadParts > MAX_THREAD_PARTS) errors.push(`${where}: thread longer than ${MAX_THREAD_PARTS} parts`);
   }
+  // One image/meme/chart per corpus; a reaction GIF at most once per day and per conversation.
+  for (const g of duplicateVisuals(posts)) errors.push(`media ${g.kind} ${g.src} reused (${g.scope}): ${g.posts.join(', ')}`);
   return errors;
 }
 

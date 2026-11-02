@@ -8,9 +8,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { sitePath } from '../src/lib/site.mjs';
-import { loadLibrary, resolveMedia } from '../src/lib/media.mjs';
+import { loadLibrary, resolveMedia, similarReactions } from '../src/lib/media.mjs';
 import { artLibrary, shortlistArt, rerankArt } from '../src/lib/art-select.mjs';
-import { duplicateVisuals } from '../src/lib/visual-dupes.mjs';
+import { duplicateVisuals, gifIdentity, threadRoot } from '../src/lib/visual-dupes.mjs';
 
 const dry = process.argv.includes('--dry-run');
 const dir = sitePath('content', 'posts');
@@ -63,11 +63,15 @@ for (const p of order) {
 }
 
 // ---- local reaction gifs: unique per day and per conversation
-const rootOf = (p) => {
-  let cur = p;
-  for (let k = 0; k < 50 && cur?.inReplyTo && byId.has(cur.inReplyTo); k++) cur = byId.get(cur.inReplyTo);
-  return cur?.id ?? p.id;
-};
+// The same reaction animation counts as the same GIF whatever its caption (visual-dupes gifIdentity).
+const rootOf = (p) => threadRoot(p, byId);
+const allDay = new Map();
+const allThread = new Map();
+const setFor0 = (map, k) => map.get(k) ?? map.set(k, new Set()).get(k);
+for (const p of order) for (const m of items(p)) if (m?.kind === 'gif') {
+  setFor0(allDay, String(p.createdAt).slice(0, 10)).add(gifIdentity(m));
+  setFor0(allThread, rootOf(p)).add(gifIdentity(m));
+}
 const seenDay = new Map();
 const seenThread = new Map();
 const setFor = (map, k) => map.get(k) ?? map.set(k, new Set()).get(k);
@@ -77,15 +81,17 @@ for (const p of order) {
     const day = setFor(seenDay, String(p.createdAt).slice(0, 10));
     const thread = setFor(seenThread, rootOf(p));
     const taken = (src) => day.has(src) || thread.has(src);
-    if (taken(m.src) && m.render?.reaction) {
-      const cur = lib.reactions.get(m.render.reaction);
-      const alts = [...lib.reactions.values()].filter((r) => r.id !== cur?.id)
-        .map((r) => ({ r, s: r.moods.filter((x) => cur?.moods.includes(x)).length }))
-        .sort((x, y) => y.s - x.s);
+    // Prefer reactions nobody uses that day / in that conversation, so a swap never forces a later one.
+    const reservedDay = setFor(allDay, String(p.createdAt).slice(0, 10));
+    const reservedThread = setFor(allThread, rootOf(p));
+    if (taken(gifIdentity(m)) && m.render?.reaction) {
       let done = false;
-      for (const { r } of alts) {
+      const near = similarReactions(m.render.reaction, { minScore: 1 });
+      const sims = similarReactions(m.render.reaction);
+      const unreserved = (xs) => xs.filter((x) => !reservedDay.has(x.id) && !reservedThread.has(x.id));
+      for (const r of [...unreserved(near), ...near, ...unreserved(sims), ...sims]) {
         const { svg: _s, raster: _r, ...item } = resolveMedia({ kind: 'gif', render: { ...m.render, reaction: r.id }, rating: m.rating });
-        if (taken(item.src)) continue;
+        if (taken(r.id)) continue;
         p.media[i] = item;
         changes.push(`${p.id}: gif ${m.render.reaction} -> ${r.id}`);
         done = true;
@@ -93,8 +99,8 @@ for (const p of order) {
       }
       if (!done) throw new Error(`no free reaction for ${p.id}`);
     }
-    day.add(p.media[i].src);
-    thread.add(p.media[i].src);
+    day.add(gifIdentity(p.media[i]));
+    thread.add(gifIdentity(p.media[i]));
   }
 }
 

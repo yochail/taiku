@@ -255,6 +255,31 @@ export function resolveMedia(item) {
   return { ...base, src: genSrc(svgText), ...svgSize(svgText), alt: item.alt || `${c.type} chart, "${c.title}": ${data}. Source: ${c.source || 'illustrative'}`, origin: 'local-render', svg: svgText };
 }
 
+// Mood families: when a reaction GIF must be swapped (already used today / in this conversation),
+// the replacement should carry the same feeling, not just any free animation.
+const MOOD_FAMILY = [
+  ['thinking', 'hmm', 'calm', 'contemplative', 'above it all', 'unbothered', 'searching', 'looking for an honest take', 'skeptical', 'awe', 'vibes'],
+  ['shocked', 'panic', 'dread', 'disbelief', 'wait what', 'surprised', 'gasp', 'mind blown', 'chaos'],
+  ['laughing', 'lol', 'irony', 'delighted', 'mocking', 'ratio'],
+  ['disapprove', 'thumbs down', 'verdict', 'facepalm', 'despair', 'sigh', 'mocking'],
+  ['agree', 'solidarity', 'hype', 'this', 'mic drop', 'dramatic', 'principle'],
+  ['sad', 'crying', 'weeping', 'despair', 'sigh'],
+  ['bored', 'sleepy', 'tl;dr', 'unbothered', 'sigh'],
+];
+/** Other reactions ordered by closeness of feeling (shared moods, then shared mood families; ties by id). minScore 1 = same feeling only. */
+export function similarReactions(id, { minScore = 0 } = {}) {
+  const lib = loadLibrary();
+  const cur = lib.reactions.get(id);
+  const fam = (moods) => new Set(MOOD_FAMILY.flatMap((f, i) => (moods.some((m) => f.includes(m)) ? [i] : [])));
+  const mine = fam(cur?.moods ?? []);
+  return [...lib.reactions.values()]
+    .filter((r) => r.id !== id)
+    .map((r) => ({ r, s: 2 * r.moods.filter((m) => cur?.moods.includes(m)).length + [...fam(r.moods)].filter((f) => mine.has(f)).length }))
+    .filter(({ s }) => s >= minScore)
+    .sort((a, b) => b.s - a.s || a.r.id.localeCompare(b.r.id))
+    .map(({ r }) => r);
+}
+
 function svgSize(s) {
   const m = s.match(/viewBox="0 0 (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)"/);
   return { width: Math.round(Number(m[1])), height: Math.round(Number(m[2])) };
