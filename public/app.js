@@ -522,14 +522,14 @@
   };
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     document.addEventListener('mouseover', (e) => {
-      const a = e.target.closest('.post .avatar-link, .post-head .name, .wtf-link');
+      const a = e.target.closest('.post .avatar-link, .post-head .name, .wtf-link, a.mention');
       if (!a || a === anchor) { if (a) clearTimeout(hideT); return; }
       clearTimeout(hideT); clearTimeout(showT);
       anchor = a;
       showT = setTimeout(() => showCard(a), 450);
     });
     document.addEventListener('mouseout', (e) => {
-      const a = e.target.closest('.post .avatar-link, .post-head .name, .wtf-link');
+      const a = e.target.closest('.post .avatar-link, .post-head .name, .wtf-link, a.mention');
       if (a && !a.contains(e.relatedTarget)) hideCard();
     });
   }

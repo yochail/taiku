@@ -20,7 +20,7 @@ const posts = [
   { id: 'uit-chart', authorId: 'kant', type: 'hot_take', origin: 'seed', text: 'My day, as data.', createdAt: ago(47), media: [{ kind: 'chart', render: { chart: { type: 'bar', title: 'Time spent', labels: ['Walking', 'Thinking'], values: [1, 23], unit: 'h' } } }] },
   { id: 'uit-link', authorId: 'socrates', type: 'news_take', origin: 'seed', text: 'Ask them what "smart" means.', createdAt: ago(46), media: [{ kind: 'link_card', url: 'https://www.example.com/news/ai-smart', title: 'AI is now smarter than us, says study', description: 'A new paper claims...' }] },
   { id: 'uit-poll-closed', authorId: 'socrates', type: 'poll', origin: 'seed', text: 'Is the unexamined life worth living?', createdAt: ago(45), poll: { id: 'uit-poll-closed', options: [{ id: 'a', text: 'Yes' }, { id: 'b', text: 'No' }, { id: 'c', text: 'Ask Socrates', crowdVoteBase: 500, personaVotes: ['kant'] }] } },
-  { id: 'uit-reply', authorId: 'kant', type: 'hot_take', inReplyTo: 'uit-art', origin: 'seed', text: 'Duty, not hemlock. #uitfixturetag', createdAt: ago(10) },
+  { id: 'uit-reply', authorId: 'kant', type: 'hot_take', inReplyTo: 'uit-art', origin: 'seed', text: 'Duty, not hemlock. Ask @kant_stop_wont. #uitfixturetag', createdAt: ago(10) },
   { id: 'uit-rt-old', authorId: 'kant', type: 'retaik', retaikOf: 'uit-art', text: '', origin: 'seed', createdAt: ago(5) },
   { id: 'uit-rt-new', authorId: 'diogenes', type: 'retaik', retaikOf: 'uit-art', text: '', origin: 'seed', createdAt: ago(2) },
   { id: 'uit-og', authorId: 'kant', type: 'news_take', origin: 'seed', text: 'Universalize this.', createdAt: ago(3), media: [{ kind: 'link_card', url: 'https://news.example.org/story', domain: 'news.example.org', title: 'Big story & more', image: { url: 'https://cdn.example.org/og.jpg', width: 1200, height: 630 } }] },
@@ -263,4 +263,11 @@ test('X-style link cards and real-post quotes: whole card links out, hotlinked i
   assert.match(xp, /<span class="rp-net" title="X"><svg/);
   assert.doesNotMatch(xp, /platform\.twitter\.com|widgets\.js/);
   assert.match(read('_headers'), /img-src[^;]* https:/);
+});
+test('@mentions link to persona profiles (with hovercards), #tags link to tag pages', () => {
+  const html = read('p/uit-reply/index.html');
+  assert.match(html, /<a class="mention" href="\/thinkers\/kant\/">@kant_stop_wont<\/a>/);
+  assert.match(html, /<a class="hashtag" href="\/tags\/uitfixturetag\/">#uitfixturetag<\/a>/);
+  assert.ok(fs.existsSync(path.join(DIST, 'tags', 'uitfixturetag', 'index.html')));
+  assert.match(fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8'), /a\.mention'\)/);
 });
