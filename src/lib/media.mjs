@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { hash } from './util.mjs';
+import { hash, rng } from './util.mjs';
 import { loadTemplates, renderMeme, memeAlt, canRaster, rasterizeSvg } from './meme-render.mjs';
 import { shortlistTemplates, pickReaction } from './meme-select.mjs';
 import { artLibrary, shortlistArt, claimArt } from './art-select.mjs';
@@ -330,7 +330,7 @@ export function planMedia(sampler, role = 'original', ctx = {}) {
   }
   if (kind === 'image') {
     // Fitting pictures the corpus hasn't used yet (every image appears on at most one post).
-    const options = shortlistArt({ ...ctx, text: ctx.text ?? ctx.topic?.title }, { n: 5, rand }).map((a) => ({ id: a.id, title: a.title, artist: a.artist, tags: [...(a.tags?.themes ?? []), ...(a.tags?.mood ?? [])].slice(0, 8) }));
+    const options = shortlistArt({ ...ctx, text: ctx.text ?? ctx.topic?.title }, { n: 5, rand: rng(Math.floor(rand() * 2 ** 32)) }).map((a) => ({ id: a.id, title: a.title, artist: a.artist, tags: [...(a.tags?.themes ?? []), ...(a.tags?.mood ?? [])].slice(0, 8) }));
     if (!options.length) return null;
     return { kind, options, prompt: `Attach a painting as the post's picture. Pick the ONE that fits (or is wryly apt). Return "media": {"art": id}. Options: ${JSON.stringify(options)}` };
   }
