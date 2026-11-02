@@ -109,7 +109,8 @@
       "count": { "1": 0.8, "2": 0.15, "3": 0.05 },
       "targets": { "rival": 3, "frenemy": 2.5, "ally": 2, "other": 0.3 },
       "persona": { "_note": "multiplier = 0.5 + 0.6*dunk_tendency + 0.4*clapback_rate + 0.1*(heat-3), clamped", "min": 0.4, "max": 2 },
-      "confidence": { "rate": "medium", "count": "low (product choice)", "targets": "low (product choice)", "persona": "low (product choice)" },
+      "handle_vs_name": { "_note": "How another account is referred to in the text: as a clickable @handle or a plain name. Direct address and dunks (vocative, or aimed at the reply/quote target) mostly use the @handle; third-person talk about someone often keeps the name. The first reference per account is converted with these probabilities (src/lib/handles.mjs). Product choice from platform convention; no measured source.", "address": 0.75, "about": 0.35 },
+      "confidence": { "rate": "medium", "count": "low (product choice)", "targets": "low (product choice)", "persona": "low (product choice)", "handle_vs_name": "low (product choice)" },
       "sources": ["boyd2010", "huberman2008"]
     },
     "mention_response": {

@@ -14,7 +14,7 @@
 // atomically. Content is only published when completeness thresholds are met.
 import fs from 'node:fs';
 import path from 'node:path';
-import { SITE_DIR, loadPersonas, personaKind, safeUrl, validate } from './data.mjs';
+import { SITE_DIR, displayName, loadPersonas, personaKind, safeUrl, validate } from './data.mjs';
 import { POST_ARCHETYPES, REPLY_ARCHETYPES } from './archetypes.mjs';
 import { behaviorOf } from './behavior.mjs';
 import { crowdFor, loadDistribution } from './crowd.mjs';
@@ -34,6 +34,7 @@ import { cosineVec, createEmbedder, personaVectors, stanceAnchors, stanceHint, t
 import { MICRO_REFILL_MAX, MICRO_REFILL_PERSONAS, MICRO_REPLIES, runMicro } from './micro.mjs';
 import { chooseStance, createPoolPicker, entryMedia, loadPools, loadReactionUsage, reactionId, saveReactionUsage, usageFile } from './pools.mjs';
 import { defaultFill, materializeFor, planFor, schemaAllowsGiphy } from './gen-media.mjs';
+import { handleRates } from './handles.mjs';
 import { runBatch } from './gen-batch.mjs';
 import { createStyleTracker } from './house-style.mjs';
 import { createToolbox } from './tools.mjs';
@@ -306,7 +307,10 @@ function taskSpec({ node, persona, topic, sampler, rand, postId, hasPassages, gi
   let mediaPlan = null;
   if (role !== 'wire' && !cheap && !short) {
     const news = safeUrl(topic?.url ?? '') ? { url: topic.url, title: topic.title } : null;
-    mediaPlan = planFor(sampler, role === 'original' ? 'original' : role, { news, giphy, persona, topic });
+    // Quotes and replies aimed at someone else's taik may use the screenshot dunk; the quoted text is
+    // bound at turn time (bindDunkQuote) once the target has been written.
+    const aimed = (role === 'quote' || role === 'reply') && (node.quoteOf || node.parent);
+    mediaPlan = planFor(sampler, role === 'original' ? 'original' : role, { news, giphy, persona, topic, ...(aimed ? { quote: { pending: true, text: ' ' } } : {}) });
     // Topic roots re-draw so link cards keep their spec share despite URL-less standalones.
     if (role === 'original' && !mediaPlan && news) for (let i = 0; i < 2 && mediaPlan?.kind !== 'link_card'; i++) mediaPlan = planFor(sampler, 'original', { news, giphy, persona }) ?? mediaPlan;
     if (mediaPlan?.kind === 'poll' && (role !== 'original' || node.kind === 'thread' || node.kind === 'thread-part')) mediaPlan = null;
@@ -543,6 +547,7 @@ export async function runDaily(opts = {}) {
     const spec1 = taskSpec({ node: n, persona, topic: topicById.get(n.topicId), sampler: plan.sampler, rand: plan.rand, postId: postIdOf(n.id), hasPassages: hasPassages(persona), giphy });
     if (n.role === 'reply' && n.exec !== 'pool' && plan.rand() < 0.3) spec1.mention = byId.get(nodeById.get(n.parent)?.authorId)?.handle ?? null;
     if (n.textMentions?.length) spec1.mentions = n.textMentions.map((id) => byId.get(id)?.handle).filter(Boolean);
+    if (n.kind !== 'wire' && !isNews(persona)) spec1.handleStyle = { ...handleRates(spec), targetId: nodeById.get(n.parent ?? n.quoteOf)?.authorId ?? null, seed: spec1.postId };
     const t = { taskId: n.id, kind: n.kind ?? n.role, role: spec1.role, exec: n.exec, form: n.form ?? null, level: n.kind === 'thread-part' ? 0 : n.depth ?? 0, personaId: n.authorId, postId: spec1.postId, parentTaskId: n.parent ?? n.quoteOf ?? null, topicId: n.topicId, at: iso(n.createdAt), archetype: spec1.archetype, media: spec1.media, status: 'pending', spec: spec1 };
     t.sig = sig(t);
     return t;
@@ -693,6 +698,25 @@ export async function runDaily(opts = {}) {
     return true;
   };
 
+  // Screenshot-dunk memes: fill the quoted taik into the plan, or drop the dunk template if the target has no text.
+  const bindDunkQuote = (t) => {
+    const mp = t.spec.mediaPlan;
+    if (mp?.kind !== 'meme' || !mp.quote?.pending) return;
+    const parent = t.parentTaskId ? taskById.get(t.parentTaskId) : null;
+    const text = parent ? textOf.get(parent.taskId) : '';
+    const author = parent ? byId.get(parent.personaId) : null;
+    if (text && author && author.id !== t.personaId) {
+      mp.quote = { persona: author.id, name: displayName(author), handle: author.handle, text, color: author.avatar?.color, initials: author.avatar?.initials };
+      return;
+    }
+    const before = JSON.stringify(mp.options);
+    mp.options = mp.options.filter((o) => o.id !== 'tweet-dunk');
+    mp.prompt = mp.prompt.replace(before, JSON.stringify(mp.options));
+    delete mp.quote;
+    delete mp.reaction;
+    if (!mp.options.length) t.spec.mediaPlan = null;
+  };
+
   const runGroup = async (group, { role, kind }) => {
     if (!group.length) return;
     if (stopped() || checkClock()) return;
@@ -700,6 +724,7 @@ export async function runDaily(opts = {}) {
     for (const t of group) {
       t.stance = stanceFor(t);
       t.spec.stance = t.stance;
+      bindDunkQuote(t);
     }
     const items = group.map((t) => ({ id: t.taskId, persona: byId.get(t.personaId), task: t.spec, ctx: ctxFor(t), passages: passagesFor(t) }));
     let res;
@@ -730,6 +755,7 @@ export async function runDaily(opts = {}) {
     const persona = byId.get(t.personaId);
     t.stance = stanceFor(t);
     t.spec.stance = t.stance;
+    bindDunkQuote(t);
     const client = rotation.clientFor('voice', t.personaId, { needTools: true });
     let r;
     try {

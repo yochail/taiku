@@ -380,6 +380,7 @@ export function validate(personas, posts, { knownUrls = cachedUrls() } = {}) {
   const schema = loadSchema(ROOT, 'post');
   const byId = new Map();
   const pollIds = new Set();
+  const handles = new Set(personas.map((p) => String(p.handle ?? '').toLowerCase()));
   for (const post of posts) {
     if (!post.id) errors.push(`post without id in ${post._file}`);
     if (byId.has(post.id)) errors.push(`duplicate post id ${post.id}`);
@@ -394,6 +395,10 @@ export function validate(personas, posts, { knownUrls = cachedUrls() } = {}) {
     if (post.original?.text && taikLength(post.original.text) > MAX_TAIK_CHARS) errors.push(`${where}: original text too long`);
     if (!ALL_TYPES[post.type]) errors.push(`${where}: unknown type ${post.type}`);
     for (const e of cardProblems(post, { knownUrls })) errors.push(`${where}: ${e}`);
+    // Every @handle in the text must be a persona (a real account is referenced only via an x_post/bsky_post card).
+    const realHandles = new Set((post.media ?? []).filter((m) => m.kind === 'x_post' || m.kind === 'bsky_post').map((m) => String(m.handle ?? '').toLowerCase()));
+    for (const m of String(post.text ?? '').matchAll(/(^|[^\w/&.])@([A-Za-z0-9_]{2,30})\b/g))
+      if (!handles.has(m[2].toLowerCase()) && !realHandles.has(m[2].toLowerCase())) errors.push(`${where}: @${m[2]} is not a persona handle`);
     const mediaOnly = Array.isArray(post.media) && post.media.length > 0;
     if (post.text === '' && !mediaOnly && post.type !== 'retaik') errors.push(`${where}: empty text (allowed only for media-only replies and plain retaiks)`);
     if ((post.type === 'retaik') !== Boolean(post.retaikOf)) errors.push(`${where}: retaik type and retaikOf go together`);

@@ -2,8 +2,12 @@
 // (search_sources/get_quote mainly), a final round with tool_choice "none", then validation with
 // targeted repair prompts: length (never truncate), quote verification against THIS turn's tool
 // log (canonical comes from the log, never the model), and the policy gate.
-import { MAX_TAIK_CHARS, normalizeQuoteText, quoteMatches, quotedSpans, safeUrl, taikLength } from './data.mjs';
+import { MAX_TAIK_CHARS, loadPersonas, normalizeQuoteText, quoteMatches, quotedSpans, safeUrl, taikLength } from './data.mjs';
 import { materializeFor } from './gen-media.mjs';
+import { applyHandleStyle, seededDecide, unlinkUnknown } from './handles.mjs';
+
+let known = null;
+const knownHandles = () => (known ??= new Set(loadPersonas().map((p) => String(p.handle).toLowerCase())));
 import { houseStyleRepair, lintTaik, stripTells } from './house-style.mjs';
 import { BudgetError, parseJsonLoose } from './llm.mjs';
 import { checkPost, repairHint } from './policy.mjs';
@@ -88,6 +92,12 @@ export async function validateItem(out, { task, persona, passages, policyCtx, ct
   const text = stripped && task.mentions?.length ? ensureMentions(stripped, task.mentions, task.length && task.role !== 'wire' ? Math.min(MAX_TAIK_CHARS, targetCeiling(task.length)) : MAX_TAIK_CHARS) : stripped;
   if (!text) return { problem: formatRepair(), kind: 'format' };
   const len = taikLength(text);
+  if (task.handleStyle && len <= MAX_TAIK_CHARS) {
+    const max = task.length && task.role !== 'wire' ? Math.min(MAX_TAIK_CHARS, targetCeiling(task.length)) : MAX_TAIK_CHARS;
+    const hs = task.handleStyle;
+    const styled = unlinkUnknown(applyHandleStyle(text, { authorId: persona?.id, targetId: hs.targetId, decide: seededDecide(hs, hs.seed), maxChars: max }).text, knownHandles());
+    if (styled !== text) return validateItem({ ...out, text: styled }, { task: { ...task, handleStyle: null }, persona, passages, policyCtx, ctx, tracker, rand, giphy });
+  }
   if (len > MAX_TAIK_CHARS) return { problem: shortenRepair(len, task.length.min, Math.min(task.length.max, MAX_TAIK_CHARS)), kind: 'length' };
   if (task.length && task.role !== 'wire' && len > targetCeiling(task.length)) return { problem: targetRepair(len, task.length.min, task.length.max), kind: 'length' };
   const style = [...lintTaik(text, persona), ...(tracker ? tracker.check(text) : [])];
