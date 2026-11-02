@@ -34,8 +34,8 @@ import { OPENERS_PER_BATCH, ORIGINALS_PER_BATCH, REPLIES_PER_BATCH, SHORTS_PER_B
 import { cosineVec, createEmbedder, personaVectors, stanceAnchors, stanceHint, tokens } from './embed.mjs';
 import { MICRO_REFILL_MAX, MICRO_REFILL_PERSONAS, MICRO_REPLIES, runMicro } from './micro.mjs';
 import { chooseStance, createPoolPicker, entryMedia, loadPools, loadReactionUsage, reactionId, saveReactionUsage, usageFile } from './pools.mjs';
-import { createRotation as createFormatRotation, formatOfTask } from './formats.mjs';
-import { acceptNovelty, fingerprint, ideaUsage, ledgerItems, noveltyConfig, noveltyContext, pickIdea } from './ideas.mjs';
+import { createRotation as createFormatRotation, formatOfTask, rotationDebt } from './formats.mjs';
+import { acceptNovelty, checkNovelty, fingerprint, ideaUsage, ledgerItems, noveltyConfig, noveltyContext, pickIdea } from './ideas.mjs';
 import { defaultFill, enforceUniqueVisuals, materializeFor, planFor, schemaAllowsGiphy } from './gen-media.mjs';
 import { handleRates } from './handles.mjs';
 import { runBatch } from './gen-batch.mjs';
@@ -166,8 +166,19 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
   const sampler = createSampler(spec, `plan:${seed}:${nonce}`);
   const active = personas.filter((p) => !isNews(p));
   const news = personas.filter(isNews);
+  // Hours of the day's sittings are low-discrepancy draws from sampling.diurnal_local (golden-ratio
+  // sequence through the inverse CDF, seeded offset): same distribution as i.i.d. draws, but ~40
+  // originals cover the curve instead of clumping, so cascades don't pile into one part of the day.
+  const hourW = spec.sampling.diurnal_local.weights;
+  const hourCdf = hourW.map(((s) => (w) => (s += w))(0)).map((c, _, a) => c / a[a.length - 1]);
+  let hourU = rand();
+  const nextHour = () => {
+    hourU = (hourU + 0.6180339887498949) % 1;
+    const h = hourCdf.findIndex((c) => hourU < c);
+    return h < 0 ? hourW.length - 1 : h;
+  };
   const at = (minHour = 0) => {
-    const h = Math.max(minHour, sampler.localHour());
+    const h = Math.max(minHour, nextHour());
     return day.start + h * 3.6e6 + sampler.minute() * 6e4 + Math.floor(rand() * 6e4);
   };
   // People post in sessions: each author gets 1-2 sittings a day and their originals cluster there (bursty, B > 0).
@@ -216,8 +227,22 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
   const nStandalone = Math.max(2, (content.originals ?? 20) - topicRoots);
   const singles = Math.max(0, (content.singleTurns ?? 0) - topicRoots);
   const threadAt = content.selfThreads ? singles + 1 : -1;
+  // Repeat authorship is damped (1/(1+originals so far today)) so more personas post and can be
+  // replied to: reply in-degree is spread over more authors instead of a few prolific ones.
+  const authoredToday = new Map();
+  for (const n of nodes) if (n.role === 'original') authoredToday.set(n.authorId, (authoredToday.get(n.authorId) ?? 0) + 1);
+  // Rotation debt: a persona whose last week is one format (entropy below the gate's floor) gets
+  // enough of today's standalone slots to break it; archetype rotation then picks other formats.
+  const debt = rotationDebt({ past, personas: active, spec, dayStart: day.start });
+  let debtSlots = Math.floor(nStandalone / 3);
   for (let i = 1; i <= nStandalone; i++) {
-    const pid = weightedPick(rand, active.map((p) => [p.id, (behaviorOf(p).activity ?? 0.5) * (p.popularity ?? 5)]));
+    const owed = debtSlots > 0 ? debt.find((d) => d.k > 0) : null;
+    if (owed) {
+      owed.k--;
+      debtSlots--;
+    }
+    const pid = owed ? owed.personaId : weightedPick(rand, active.map((p) => [p.id, ((behaviorOf(p).activity ?? 0.5) * (p.popularity ?? 5)) / (1 + (authoredToday.get(p.id) ?? 0))]));
+    authoredToday.set(pid, (authoredToday.get(pid) ?? 0) + 1);
     const p = personas.find((x) => x.id === pid);
     const key = weightedPick(rand, Object.entries(p.topic_affinity ?? { philosophy: 1 }).map(([k, v]) => [k, Number(v) || 0.01]));
     const exec = i <= singles ? 'single' : i === threadAt ? 'thread' : 'originals';
@@ -835,9 +860,16 @@ export async function runDaily(opts = {}) {
     }
     let ok = 0;
     const share = Math.round((res.calls / group.length) * 100) / 100;
+    // One batch call can't see its own items, so two by the same persona may repeat each other;
+    // results join the novelty context in order and a repeat is redone alone with that context.
+    const redo = [];
     for (const t of group) {
       const r = res.results.get(t.taskId) ?? { ok: false, error: 'invalid', detail: 'no result' };
       t.calls = share;
+      if (r.ok && kind !== 'thread' && checkNovelty(r.fields?.text ?? '', noveltyFor(t, byId.get(t.personaId)))) {
+        redo.push(t);
+        continue;
+      }
       if (r.ok) {
         markDone(t, { fields: r.fields, model: client.model ?? 'unknown', source: 'llm' });
         ok++;
@@ -845,6 +877,7 @@ export async function runDaily(opts = {}) {
       } else markFailed(t, r);
     }
     client.noteItems(ok);
+    for (const t of redo) await runSingle(t);
   };
 
   const runSingle = async (t) => {

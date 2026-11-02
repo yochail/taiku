@@ -103,3 +103,20 @@ test('LLM cap downgrades replies/quotes to likes', () => {
   assert.equal(nodes.filter((n) => n.role !== 'original').length, 3);
   assert.ok(r.reactions.some((x) => x.capped));
 });
+
+test('conversation.target_saturation spreads replies over more authors (lower in-degree concentration)', () => {
+  const top3 = (sat) => {
+    const s2 = { ...spec, sampling: { ...spec.sampling, conversation: { ...(spec.sampling.conversation ?? {}), target_saturation: sat } } };
+    let share = 0;
+    for (const seed of ['s1', 's2', 's3', 's4']) {
+      const { nodes } = simulate({ personas, spec: s2, days: 1, originalsPerDay: 40, seed });
+      const byId = new Map(nodes.map((n) => [n.id, n]));
+      const inD = new Map();
+      for (const n of nodes) if (n.role === 'reply' && byId.get(n.parent) && byId.get(n.parent).authorId !== n.authorId) inD.set(byId.get(n.parent).authorId, (inD.get(byId.get(n.parent).authorId) ?? 0) + 1);
+      const v = [...inD.values()].sort((a, b) => b - a);
+      share += v.slice(0, 3).reduce((a, b) => a + b, 0) / Math.max(1, v.reduce((a, b) => a + b, 0));
+    }
+    return share / 4;
+  };
+  assert.ok(top3(1.5) < top3(0), `top-3 share of replies: ${top3(1.5).toFixed(3)} vs ${top3(0).toFixed(3)} without saturation`);
+});

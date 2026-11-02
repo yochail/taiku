@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRotation, entropy, formatOf, formatOfTask, maxRun, rotateMediaWeights, rotationStats } from '../src/lib/formats.mjs';
+import { createRotation, entropy, formatOf, formatOfTask, maxRun, rotateMediaWeights, rotationDebt, rotationStats } from '../src/lib/formats.mjs';
 import { createSampler, loadSpec } from '../src/lib/realism.mjs';
 import { gateDay } from '../src/lib/daygate.mjs';
 import { loadPersonas } from '../src/lib/data.mjs';
@@ -78,4 +78,17 @@ test('day gate: a same-format run of 5 ending today fails persona.format_run; ea
   assert.match(c.detail[0], /kant: 5× hot_take/);
   const ok = gateDay({ posts: [p('d1', 'kant', at(5, 9), { type: 'aphorism' }), p('d2', 'kant', at(5, 11), { media: [{ kind: 'chart' }] })], context: [...context, p('c0', 'kant', at(4, 8))], personas, spec });
   assert.equal(ok.checks.find((x) => x.id === 'persona.format_run').status, 'pass');
+});
+
+test('rotationDebt: a one-format week owes enough fresh-format originals to reach the entropy floor', () => {
+  const spec = { gate: { format_window_days: 7, min_format_entropy_bits: 1, format_min_items: 5 } };
+  const personas = [{ id: 'kant' }, { id: 'hume' }];
+  const past = [...[1, 2, 3, 4, 5, 6, 7].map((d) => p(`k${d}`, 'kant', at(d, 9))), p('h1', 'hume', at(6, 9)), p('h2', 'hume', at(7, 9), { type: 'aphorism' })];
+  const debt = rotationDebt({ past, personas, spec, dayStart: Date.parse('2026-11-08T00:00:00Z') });
+  assert.deepEqual(debt.map((d) => d.personaId), ['kant']);
+  const k = debt[0].k;
+  const fresh = Array.from({ length: k }, (_, i) => `f${i}`);
+  assert.ok(entropy([...Array(debt[0].n).fill('hot_take'), ...fresh]) >= 1);
+  assert.ok(k === 1 || entropy([...Array(debt[0].n).fill('hot_take'), ...fresh.slice(1)]) < 1, 'k is the fewest');
+  assert.deepEqual(rotationDebt({ past, personas, spec, dayStart: Date.parse('2026-11-20T00:00:00Z') }), [], 'outside the window nothing is owed');
 });

@@ -169,6 +169,12 @@ export function enforceUniqueVisuals(posts, prior = []) {
       keep.push(item);
     }
     if (keep.length === media.length && keep.every((m, i) => m === media[i])) continue;
+    if (!keep.length && media.length && !String(p.text ?? '').trim() && !p.poll && hasChild.has(p.id)) {
+      // A media-only post with replies can't vanish (orphans) or stay empty: it becomes the emoji reply its type already says.
+      const EMOJI = ['💀', '😂', '🙄', '😭', '👀', '🫠'];
+      p.text = EMOJI[[...String(p.id)].reduce((h, c) => (h * 31 + c.codePointAt(0)) >>> 0, 7) % EMOJI.length];
+      changes.push(`${p.id}: media-only post with replies lost its ${media[0].kind}; text -> ${p.text}`);
+    }
     if (keep.length) p.media = keep;
     else delete p.media;
     if (!keep.length && !String(p.text ?? '').trim() && !p.poll && !hasChild.has(p.id)) drop.add(p.id);

@@ -85,6 +85,29 @@ export function rotateMediaWeights(entries, rot, pid, prefix = '') {
   return scaled.map(([k, w]) => (isMedia([k, w]) ? [k, (w * before) / after] : [k, w]));
 }
 
+/**
+ * Rotation debt before a day: personas whose window (the gate's format_window_days, today included)
+ * already holds enough rotating items to be checked and whose format entropy is below
+ * gate.min_format_entropy_bits. k = fewest new originals, each in a different fresh format, that lift
+ * it to the floor (max 3). Sorted by k descending. News accounts are the caller's to exclude.
+ */
+export function rotationDebt({ past = [], personas = [], spec = {}, dayStart }) {
+  const gate = spec.gate ?? {};
+  const winDays = gate.format_window_days ?? 7;
+  const minH = gate.min_format_entropy_bits ?? 1;
+  const minN = Math.max(gate.format_min_items ?? 5, 6);
+  const ids = new Set(personas.map((p) => p.id));
+  const window = past.filter((p) => ids.has(p?.authorId) && Date.parse(p.createdAt) < dayStart && Date.parse(p.createdAt) >= dayStart - (winDays - 1) * 864e5);
+  const out = [];
+  for (const r of rotationStats(window)) {
+    if (r.n + 1 < minN || entropy(r.formats) >= minH) continue;
+    let k = 1;
+    while (k < 3 && entropy([...r.formats, ...Array.from({ length: k }, (_, i) => `fresh${i}`)]) < minH) k++;
+    out.push({ personaId: r.personaId, k, entropy: r.entropy, n: r.n });
+  }
+  return out.sort((a, b) => b.k - a.k || a.personaId.localeCompare(b.personaId));
+}
+
 /** Longest run of one format in a sequence. */
 export function maxRun(formats) {
   let best = 0;

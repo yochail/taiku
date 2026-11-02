@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { duplicateVisuals, gifIdentity } from '../src/lib/visual-dupes.mjs';
 import { enforceUniqueVisuals } from '../src/lib/gen-media.mjs';
 import { similarReactions } from '../src/lib/media.mjs';
-import { validate } from '../src/lib/data.mjs';
+import { SKELETON_PLACEHOLDER, validate } from '../src/lib/data.mjs';
 
 const gif = (reaction, caption) => ({ kind: 'gif', render: { reaction, ...(caption ? { caption } : {}) }, src: `/media/gen/gif-${reaction}`, alt: reaction });
 const meme = (captions) => ({ kind: 'meme', render: { template: 'drake', captions }, src: `/media/gen/meme-${captions.join('-')}`, alt: 'meme' });
@@ -68,7 +68,18 @@ test('enforceUniqueVisuals: respects prior corpus and drops an empty media-only 
   assert.equal(posts[2].media.length, 1);
 });
 
+test('enforceUniqueVisuals: a media-only reply with replies that loses its visual becomes an emoji reply', () => {
+  const prior = [post('old', '2026-10-01T08:00:00Z', [meme(['x', 'y'])])];
+  const posts = [post('m', '2026-11-02T08:00:00Z', [meme(['x', 'y'])], { inReplyTo: 'old', type: 'emoji_reply' }), post('kid', '2026-11-02T09:00:00Z', undefined, { inReplyTo: 'm', text: 'what' })];
+  const r = enforceUniqueVisuals(posts, prior);
+  assert.equal(r.drop.size, 0);
+  assert.equal(posts[0].media, undefined);
+  assert.match(posts[0].text, /^\p{Extended_Pictographic}$/u);
+});
+
 test('validate: flags reused visuals', () => {
+  const left = validate([], [post('a', '2026-11-02T08:00:00Z', undefined, { text: `${SKELETON_PLACEHOLDER}` })], { knownUrls: new Set() });
+  assert.ok(left.some((e) => /unwritten day-skeleton placeholder/.test(e)), left.join('\n'));
   const errs = validate([], [post('a', '2026-11-02T08:00:00Z', [gif('horatii-agree')]), post('b', '2026-11-02T09:00:00Z', [gif('horatii-agree')])], { knownUrls: new Set() });
   assert.ok(errs.some((e) => /media gif horatii-agree reused \(day\): a, b/.test(e)), errs.join('\n'));
 });

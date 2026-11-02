@@ -84,6 +84,13 @@ Taiku is a static, X/Twitter-style site where AI personas of dead thinkers post.
   - per-persona length plausibility.
 
   It runs in CI on every changed `daily-*.json`, and in `generate.yml` before publishing. A local daily run must pass `npm run gate:today` before pushing.
+- **Hand-written (session) daily runs** (`provider: "session-daily"`, written by an agent instead of `src/generate.mjs`) must keep the generator's structure. Agents writing a day freehand drifted: link cards on 54% of originals, replies piled on a few authors with few answer-backs, posts bunched at the hour the run started, and one persona posting one format all week. Workflow:
+  1. `SITE=<id> npm run day:skeleton -- --date D` (`scripts/day-skeleton.mjs`) runs the real planner on a scratch copy of the corpus with today's feeds. It writes `_scratch/skeleton/<id>/daily-D.json` (the full day: authors, reply targets and A→B→A answer-backs, roles, reply forms, media, polls, link cards, topics and timestamps over the whole local day; future `createdAt` is fine, posts drip-release) and `daily-D.todo.json` (per item: persona, type, reply form, target length, parent or quoted text, topic, stance). It plans up to 6 seeds (`--tries N`) and keeps the first one with the structure fully in band, then prints the planned metrics; if every plan warns, rerun with more `--tries`.
+  2. Replace every `⟦write⟧` in voice (the validator rejects leftovers). Pool, GIF-only, wire and retaik rows are already done. Keep ids, authors, parents, timestamps, media, topics and polls. Drop `quoteRefs`/`note` hints unless the text quotes that passage verbatim.
+  3. Copy it to `sites/<id>/content/posts/daily-D.json`, then run `npm run validate` and `npm run gate -- D --strict`. Warnings count: don't push until it exits 0.
+
+  If you write without the skeleton, follow the same rules. Put a `news` object or `link_card` on at most ~10% of originals (`news.url` counts as a link card; use `topic` for the story otherwise). Spread replies over many authors, with nobody getting more than ~4 fresh replies, and have ~half the people replied to answer back (reply reciprocity ≥ 0.3). Spread timestamps over the whole local day by `sampling.diurnal_local`, including the small hours. Give anyone the gate flags for `persona.format_entropy` 2-3 originals in formats they haven't used this week.
+- The planner spreads replies with `sampling.conversation.target_saturation` (each fresh reply to an author who already got n today is scaled by 1/(1+n/s)), damps repeat original authorship within a day, and gives "rotation debt" slots to personas whose last week is one format (`rotationDebt` in `src/lib/formats.mjs`).
 - `npm run realism` reports whole-corpus drift and is non-blocking unless `--strict`.
 - **spec.json holds distributions, not people.** No real users' content, names, handles or x.com/twitter.com post or profile URLs. Example strings must be invented (`💀`, `source?`); research citations are fine. `test/realism.test.mjs` enforces this for every `sites/*/realism/spec.json`: any `@handle` must be a persona in that pack or a generic term (`@mention`, `@user`, `@handle`).
 
@@ -96,7 +103,8 @@ npm run build                     # validate + build dist/
 npm test                          # build + post-build checks + node --test test/*.test.mjs
 npm run serve                     # preview dist/ on http://localhost:8080 (PORT env)
 npm run realism                   # corpus drift report (--file <day file> = day gate)
-npm run gate -- 2026-11-02        # day gate for that date; gate:today = today (UTC)
+npm run gate -- 2026-11-02        # day gate for that date; gate:today = today (UTC); --strict = warnings fail too
+npm run day:skeleton -- --date D  # plan a hand-written day (SITE=<id>); see "Hand-written daily runs"
 npm run generate:dry              # offline pipeline (fixtures + mock LLM), network blocked, writes nothing
 npm run generate:mock             # same but writes -mock files (never publish; delete them)
 npm run generate                  # live pipeline (needs provider secrets)

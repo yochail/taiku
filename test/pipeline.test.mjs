@@ -225,7 +225,9 @@ test('pool reactions: picks store reactionId + stance and land in the usage stat
   const empty = base.map((p) => ({ ...p, reaction_pool: [] }));
   const r2 = await run({ root: freshRoot(), personas: empty });
   assert.equal(r2.status, 'complete');
-  assert.ok(!r2.published.some((p) => p.reactionId), 'nothing to pick');
+  // Only entries the micro call refilled earlier in the run can be picked.
+  const refilled = new Set((r2.manifest.micro?.added ?? []).map((a) => a.personaId));
+  assert.ok(r2.published.filter((p) => p.reactionId).every((p) => refilled.has(p.authorId)), 'nothing to pick');
   const fb = r2.manifest.tasks.filter((t) => /pool exhausted/.test(t.fallback ?? ''));
   assert.ok(fb.length > 0, 'cheap forms fell back');
   assert.ok(fb.some((t) => t.status === 'done'), 'some fallbacks were written by the LLM (batched short replies)');

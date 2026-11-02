@@ -10,6 +10,7 @@
 //   node scripts/realism.mjs --date D        (gates daily-D.json and daily-D-cf.json when present)
 //   node scripts/realism.mjs --date today    (today in UTC; what the local daily automation runs)
 //   --allow-missing  exit 0 when --date finds no file
+//   --strict         also exit 1 when any non-blocking check warns (the bar for a hand-written day)
 //   exit 1 when any gated file fails; the markdown scorecard goes to stdout and $GITHUB_STEP_SUMMARY.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -53,13 +54,16 @@ if (gateFiles.length) {
     const ids = new Set(posts.map((p) => p.id));
     const g = gateDay({ posts, context: everything.filter((p) => !ids.has(p.id)), personas, spec, label: path.basename(file) });
     if (!g.ok) failed++;
+    const warns = g.checks.filter((c) => c.status === 'warn');
+    if (strict && g.ok && warns.length) failed++;
     console.log(g.scorecard + '\n');
+    for (const c of warns) console.log(`warn ${c.id} = ${typeof c.value === 'number' ? c.value.toFixed(3) : c.value}${Array.isArray(c.detail) && c.detail.length ? `: ${c.detail.slice(0, 6).join('; ')}` : ''}`);
     if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, g.scorecard + '\n\n');
     reports.push({ file: path.relative(process.cwd(), file).replace(/\\/g, '/'), ok: g.ok, failures: g.failures.map(({ id, value, min, max, detail }) => ({ id, value, min, max, detail })), personas: g.personas, offenders: g.offenders });
   }
   const out = opt('--json');
   if (out) fs.writeFileSync(out, JSON.stringify({ generatedAt: new Date().toISOString(), reports }, null, 2));
-  console.log(failed ? `day gate FAILED for ${failed} file(s)` : 'day gate passed');
+  console.log(failed ? `day gate FAILED for ${failed} file(s)${strict ? ' (--strict: warnings count)' : ''}` : 'day gate passed');
   process.exit(failed ? 1 : 0);
 }
 const posts = loadPosts(postsDir);

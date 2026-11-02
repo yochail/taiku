@@ -9,6 +9,9 @@ export const DEFAULT_CONVERSATION = {
   max_turns: 4,
   relation_boost: { rival: 1.3, frenemy: 1.25, ally: 1, follows: 0.85, none: 0.7 },
   third_party_join: 0.18,
+  // Spread replies across authors: a fresh reply to someone who already got n today is scaled by
+  // 1/(1+n/target_saturation) (answer-backs and @mention pull are exempt). Keeps reply in-degree Gini in band.
+  target_saturation: 1.5,
   third_party_relation_weight: { rival: 3, frenemy: 2.5, ally: 2 },
   moves: { rebuttal: 0.26, disagree: 0.13, concede_pivot: 0.14, sharp_question: 0.17, example: 0.15, extend: 0.09, joke: 0.06 },
   relation_moves: {

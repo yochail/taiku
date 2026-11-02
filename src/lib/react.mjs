@@ -1,7 +1,7 @@
 // react.mjs — cheap, non-LLM, non-deterministic-but-replayable reaction model.
 //
 // For every candidate persona × post:
-//   score = reactivity × affinity × relation × popularity × recency × depth × fatigue × mention
+//   score = reactivity × affinity × relation × popularity × recency × depth × fatigue × mention × spread
 //     reactivity = persona.reactivity / 3                              (1-5 → 0.33-1.67)
 //     affinity   = max(0.15, cosine(persona.topic_affinity, post topic vector))
 //     relation   = rival 3 · frenemy 2.5 · ally 2 · follows-author 1.5 · else 1
@@ -11,6 +11,7 @@
 //     fatigue    = max(0, 1 − actions used today / daily budget), budget = round(4 + 36·x_behavior.activity)
 //     mention    = clapback if the post @mentions the persona (id/handle), quotes them, or replies to them:
 //                  (2 + 8·x_behavior.clapback_rate) × heat, heat = 0.7 + 0.15·temperament.heat (1-5)
+//     spread     = 1 / (1 + replies the post's author already got today / conversation.target_saturation)
 //   p = 1 − exp(−k·score), Bernoulli draw with a RNG seeded by (date, nonce). A persona who was
 //   replied to or quoted gets a notification: p ≥ clapback_rate × (0.4 + 0.12·heat) × 0.85^depth × fatigue,
 //   so hot-headed posters keep arguments going (deep threads, reciprocal reply edges).
@@ -88,6 +89,7 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
   const sampler = createSampler(spec, `react:${seed}:${nonce}`);
   const byId = new Map(personas.map((p) => [p.id, p]));
   const used = new Map(personas.map((p) => [p.id, 0]));
+  const inbound = new Map();
   const budget = new Map(personas.map((p) => [p.id, dailyBudget(p)]));
   const beh = new Map(personas.map((p) => [p.id, behaviorOf(p)]));
   const heat = (p) => 0.7 + 0.15 * clamp(p.temperament?.heat ?? 3, 1, 5);
@@ -125,6 +127,7 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
       depth: (mentioned ? 0.85 : 0.6) ** (post.depth ?? 0),
       fatigue: Math.max(0, 1 - used.get(persona.id) / budget.get(persona.id)),
       mention: mentioned ? (2 + 8 * clap(persona)) * heat(persona) : 1,
+      spread: conv.target_saturation > 0 ? 1 / (1 + (inbound.get(post.authorId) ?? 0) / conv.target_saturation) : 1,
       rel: rel ?? (relation > 1 ? 'follows' : null),
     };
   }
@@ -159,8 +162,10 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
     else if (action === 'repost') post.reposts.push(persona.id);
     else {
       if (!cheap) llmUsed++;
-      if (action === 'reply') post.replies = (post.replies ?? 0) + 1;
-      else post.quotes = (post.quotes ?? 0) + 1;
+      if (action === 'reply') {
+        post.replies = (post.replies ?? 0) + 1;
+        inbound.set(post.authorId, (inbound.get(post.authorId) ?? 0) + 1);
+      } else post.quotes = (post.quotes ?? 0) + 1;
       out.push({ personaId: persona.id, action, at, rel, ...(form ? { form: form.form, cheap } : {}), ...(info.exchange ? { exchange: info.exchange } : {}), ...(info.joined ? { joined: true } : {}) });
     }
     if (log) {
@@ -194,7 +199,7 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
       if (persona.id === post.authorId || exclude.has(persona.id)) continue;
       const delayMin = sampler.replyDelayMinutes();
       const tm = terms(persona, post, delayMin);
-      const score = tm.reactivity * tm.affinity * tm.relation * tm.popularity * tm.recency * tm.depth * tm.fatigue * tm.mention;
+      const score = tm.reactivity * tm.affinity * tm.relation * tm.popularity * tm.recency * tm.depth * tm.fatigue * tm.mention * tm.spread;
       const notified = tm.mention > 1 ? clap(persona) * (0.4 + 0.12 * clamp(persona.temperament?.heat ?? 3, 1, 5)) * 0.85 ** (post.depth ?? 0) * tm.fatigue : 0;
       const turn = post.role === 'reply' && post.pairAuthor === persona.id && (post.depth ?? 0) < MAX_DEPTH ? post.turn ?? 1 : 0;
       const cont = turn && tm.fatigue > 0 ? continueProbability(conv, turn, tm.rel) * Math.max(0.35, tm.fatigue) : 0;
@@ -233,7 +238,10 @@ export function createReactor({ personas, spec, seed, nonce = '', calibration = 
     used.set(personaId, used.get(personaId) + 1);
     if (action === 'reply' || action === 'quote') llmUsed++;
     if (action === 'quote') post.quotes = (post.quotes ?? 0) + 1;
-    if (action === 'reply') post.replies = (post.replies ?? 0) + 1;
+    if (action === 'reply') {
+      post.replies = (post.replies ?? 0) + 1;
+      inbound.set(post.authorId, (inbound.get(post.authorId) ?? 0) + 1);
+    }
     if (log) reactions.push({ postId: post.id, personaId, action, forced: reason, at: new Date(at).toISOString() });
   }
 

@@ -230,7 +230,7 @@ function compose(ctx, passages, rand, { repairing }) {
     let qtext = p.text;
     if (p.translated && rand() < 0.35) qtext = fuzzVariant(p.text, rand) ?? p.text;
     const lead = pick(['', 'me, years ago: ', 'said it then, saying it now: ', 'anyway. ', 'once again for the back row: '], rand);
-    text = `${lead}"${qtext}"`;
+    text = taikLength(`${lead}"${qtext}"`) <= max ? `${lead}"${qtext}"` : `"${qtext}"`;
     const need = min - taikLength(text) - 2;
     const tail = assemble(sentences(ctx, rand), Math.max(1, need), max - taikLength(text) - 2, rand);
     if (taikLength(`${text}\n\n${tail}`) <= max && (need > 0 || rand() < 0.7)) text = `${text}\n\n${tail}`;

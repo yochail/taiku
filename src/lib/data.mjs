@@ -9,6 +9,8 @@ import { ROOT, SITE_DIR, sitePath } from './site.mjs';
 export { ROOT, SITE_DIR };
 export const PERSONAS_DIR = sitePath('personas');
 export const POSTS_DIR = sitePath('content', 'posts');
+/** Text marker for items scripts/day-skeleton.mjs leaves for the writer; never valid in a published post. */
+export const SKELETON_PLACEHOLDER = '⟦write⟧';
 /** A public/ asset path: the site pack's public/ overlays the platform's. */
 export const publicFile = (p) => [sitePath('public', p), path.join(ROOT, 'public', p)].find((f) => fs.existsSync(f)) ?? path.join(ROOT, 'public', p);
 
@@ -412,6 +414,7 @@ export function validate(personas, posts, { knownUrls = cachedUrls() } = {}) {
     if (typeof post.text === 'string' && taikLength(post.text) > MAX_TAIK_CHARS)
       errors.push(`${where}: text too long (${taikLength(post.text)} > ${MAX_TAIK_CHARS} weighted chars)`);
     if (post.original?.text && taikLength(post.original.text) > MAX_TAIK_CHARS) errors.push(`${where}: original text too long`);
+    if (String(post.text ?? '').includes(SKELETON_PLACEHOLDER)) errors.push(`${where}: unwritten day-skeleton placeholder (write the text)`);
     if (!ALL_TYPES[post.type]) errors.push(`${where}: unknown type ${post.type}`);
     for (const e of cardProblems(post, { knownUrls })) errors.push(`${where}: ${e}`);
     // Every @handle in the text must be a persona (a real account is referenced only via an x_post/bsky_post card).
