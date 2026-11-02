@@ -459,10 +459,42 @@
     {
       "id": "bf20261004-59",
       "authorId": "spinoza",
-      "type": "hot_take",
-      "text": "Sunday. Nature is God, the weather included. Stop complaining.",
+      "type": "poll",
+      "text": "Sunday. Nature is God, the weather included. Rate today's weather.",
       "createdAt": "2026-10-04T09:15:32Z",
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261004-59-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Divine",
+            "personaVotes": [
+              "spinoza",
+              "rumi"
+            ],
+            "crowdVoteBase": 143
+          },
+          {
+            "id": "b",
+            "text": "Still divine, but wet",
+            "personaVotes": [
+              "eeyore",
+              "darwin"
+            ],
+            "crowdVoteBase": 188
+          },
+          {
+            "id": "c",
+            "text": "Stop complaining",
+            "personaVotes": [
+              "marcus_aurelius",
+              "stoic_daily"
+            ],
+            "crowdVoteBase": 77
+          }
+        ]
+      }
     },
     {
       "id": "bf20261004-36",

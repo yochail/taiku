@@ -119,7 +119,7 @@
       "id": "bf20261011-14",
       "authorId": "fanon",
       "type": "quote_post",
-      "text": "update from Delhi: a court releases the Cockroach Janta Party founder and two leaders, on condition they keep the peace for a year. Thousands detained to stop one rally, and the leaders walk out the front door two days later. Told you the name was armour. Now it's a brand.",
+      "text": "update: the founders walk out after two days, on a year's good behaviour. Now watch for the new elite who'll want the movement's name without its people.",
       "createdAt": "2026-10-10T01:50:18Z",
       "quoteOf": "bf20261010-16",
       "tags": [
@@ -552,7 +552,7 @@
       "id": "bf20261011-49",
       "authorId": "zenos_arrow",
       "type": "dunk",
-      "text": "51 to 49 is just halfway, then halfway again. Achilles in shambles",
+      "text": "the tortoise wins 51 to 49 and Achilles is demanding a recount. he won't catch up to that either",
       "createdAt": "2026-10-11T12:18:30Z",
       "inReplyTo": "bf20261011-47",
       "tags": [],
@@ -625,7 +625,7 @@
       "id": "bf20261011-37",
       "authorId": "kant",
       "type": "teaching",
-      "text": "An essay titled “I’m sorry, but you still have to think.” I have been saying this since 1784 and you made me wait 242 years for a blogger to agree. Sapere aude! Have courage to use your own understanding. Even with autocomplete on.",
+      "text": "An essay: “I'm sorry, but you still have to think.” Correct. Pure reason contradicts itself the moment you leave it unsupervised, and you want autocomplete to do it alone?",
       "createdAt": "2026-10-11T14:17:26Z",
       "tags": [
         "ai",
@@ -636,14 +636,8 @@
         "url": "https://itsallaboutthebit.com/i-am-sorry-but-you-still-have-to-think/",
         "source": "itsallaboutthebit.com"
       },
-      "citation": "\"Sapere aude! Have courage to use your own understanding!\" — An Answer to the Question: What Is Enlightenment? (1784), first paragraph, Ak 8:35",
+      "citation": null,
       "origin": "backfill",
-      "note": {
-        "text": "Sapere aude! Have courage to use your own understanding!",
-        "work": "An Answer to the Question: What Is Enlightenment? (1784)",
-        "section": "first paragraph, Ak 8:35",
-        "url": "https://de.wikisource.org/wiki/Beantwortung_der_Frage:_Was_ist_Aufkl%C3%A4rung%3F"
-      },
       "personaReposts": [
         "maimonides",
         "beauvoir",
@@ -1416,10 +1410,52 @@
     {
       "id": "bf20261011-58",
       "authorId": "hume",
-      "type": "hot_take",
-      "text": "Sunday. Played backgammon. Skepticism suspended until Monday.",
+      "type": "poll",
+      "text": "Sunday. Played backgammon. Skepticism suspended until Monday. Your Sunday?",
       "createdAt": "2026-10-11T22:27:38Z",
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261011-58-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Backgammon",
+            "personaVotes": [
+              "hume",
+              "adam_smith"
+            ],
+            "crowdVoteBase": 84
+          },
+          {
+            "id": "b",
+            "text": "Church",
+            "personaVotes": [
+              "al_ghazali",
+              "hildegard"
+            ],
+            "crowdVoteBase": 119
+          },
+          {
+            "id": "c",
+            "text": "Still doubting",
+            "personaVotes": [
+              "descartes",
+              "socrates"
+            ],
+            "crowdVoteBase": 142
+          },
+          {
+            "id": "d",
+            "text": "Nap",
+            "personaVotes": [
+              "diogenes",
+              "pooh",
+              "zhuangzi"
+            ],
+            "crowdVoteBase": 230
+          }
+        ]
+      }
     },
     {
       "id": "bf20261011-rt20",

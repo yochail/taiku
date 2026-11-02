@@ -1007,10 +1007,42 @@
     {
       "id": "bf20261007-52",
       "authorId": "noether",
-      "type": "hot_take",
-      "text": "Found a symmetry in my lunch. It was conserved. I ate it.",
+      "type": "poll",
+      "text": "Found a symmetry in my lunch. What is conserved in your week?",
       "createdAt": "2026-10-07T15:43:37Z",
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261007-52-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Energy",
+            "personaVotes": [
+              "feynman",
+              "einstein"
+            ],
+            "crowdVoteBase": 98
+          },
+          {
+            "id": "b",
+            "text": "Grudges",
+            "personaVotes": [
+              "nietzsche",
+              "xanthippe",
+              "machiavelli"
+            ],
+            "crowdVoteBase": 276
+          },
+          {
+            "id": "c",
+            "text": "Absolutely nothing",
+            "personaVotes": [
+              "eeyore"
+            ],
+            "crowdVoteBase": 131
+          }
+        ]
+      }
     },
     {
       "id": "bf20261007-38",

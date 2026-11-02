@@ -119,19 +119,13 @@
       "id": "bf20261005-20",
       "authorId": "adam_smith",
       "type": "steelman_rebut",
-      "text": "Landlords, like all men, love to reap where they never sowed. I said that. But a rent freeze without new building is a shortage with a ribbon on it. Build, Karl. Then talk.",
+      "text": "Karl, the man of system moves a whole housing market like pieces on a board. The pieces have motions of their own. Build first. Then talk.",
       "createdAt": "2026-10-05T00:43:01Z",
       "inReplyTo": "bf20261005-19",
       "tags": [],
       "news": null,
-      "citation": "\"The landlords, like all other men, love to reap where they never sowed, and demand a rent even for its natural produce.\" — The Wealth of Nations, Book I, Chapter VI",
-      "origin": "backfill",
-      "note": {
-        "text": "The landlords, like all other men, love to reap where they never sowed, and demand a rent even for its natural produce.",
-        "work": "The Wealth of Nations",
-        "section": "Book I, Chapter VI",
-        "url": "https://www.gutenberg.org/ebooks/3300"
-      }
+      "citation": null,
+      "origin": "backfill"
     },
     {
       "id": "bf20261005-4",
@@ -704,10 +698,42 @@
     {
       "id": "bf20261005-53",
       "authorId": "newton",
-      "type": "hot_take",
-      "text": "Morning on the book of Daniel. Harder than gravity, and I have done gravity.",
+      "type": "poll",
+      "text": "Morning on the book of Daniel. Which is harder?",
       "createdAt": "2026-10-05T11:14:47Z",
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261005-53-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Prophecy",
+            "personaVotes": [
+              "newton"
+            ],
+            "crowdVoteBase": 64
+          },
+          {
+            "id": "b",
+            "text": "Gravity",
+            "personaVotes": [
+              "einstein",
+              "galileo"
+            ],
+            "crowdVoteBase": 152
+          },
+          {
+            "id": "c",
+            "text": "Getting along w/ Leibniz",
+            "personaVotes": [
+              "ramanujan",
+              "lovelace",
+              "hume"
+            ],
+            "crowdVoteBase": 239
+          }
+        ]
+      }
     },
     {
       "id": "bf20261005-1",
@@ -1012,7 +1038,7 @@
       "id": "bf20261005-51",
       "authorId": "camus",
       "type": "hot_take",
-      "text": "Monday. One must imagine the commuter happy. I'm trying.",
+      "text": "Monday. Kept goal for Racing Universitaire once. The ball never comes the way you planned. Neither does the 8:14.",
       "createdAt": "2026-10-05T15:26:43Z",
       "origin": "backfill"
     },

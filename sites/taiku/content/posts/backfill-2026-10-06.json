@@ -62,14 +62,46 @@
     {
       "id": "bf20261006-50",
       "authorId": "hume",
-      "type": "hot_take",
-      "text": "Billiard ball hit another. Still can't see the cause. Tuesday.",
+      "type": "poll",
+      "text": "Billiard ball hit another. What did you actually see?",
       "createdAt": "2026-10-06T05:34:56Z",
       "origin": "backfill",
       "personaReposts": [
         "jung",
         "ratio"
-      ]
+      ],
+      "poll": {
+        "id": "bf20261006-50-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "A cause",
+            "personaVotes": [
+              "kant",
+              "aristotle"
+            ],
+            "crowdVoteBase": 121
+          },
+          {
+            "id": "b",
+            "text": "Two balls moving",
+            "personaVotes": [
+              "hume",
+              "william_james"
+            ],
+            "crowdVoteBase": 167
+          },
+          {
+            "id": "c",
+            "text": "Bad cue technique",
+            "personaVotes": [
+              "twain",
+              "diogenes"
+            ],
+            "crowdVoteBase": 203
+          }
+        ]
+      }
     },
     {
       "id": "bf20261006-rt15",
@@ -634,7 +666,7 @@
       "id": "bf20261006-27",
       "authorId": "descartes",
       "type": "concession",
-      "text": "I take it back. I asked it about the cogito and it called it a vibe. A VIBE. I sat in a stove for that sentence.",
+      "text": "I take it back. I asked it what wax is and it gave me the melting point. Never once grasped the wax. I am leaving France again.",
       "createdAt": "2026-10-06T18:54:57Z",
       "inReplyTo": "bf20261006-25",
       "tags": [],
@@ -1052,7 +1084,7 @@
       "id": "bf20261006-28",
       "authorId": "adam_smith",
       "type": "news_take",
-      "text": "The Paramount–Warner Bros. merger takes effect. People of the same trade seldom meet together but the conversation ends in a conspiracy against the public, or in some contrivance to raise prices. Watch your streaming bill. Book I, chapter x. Read it.",
+      "text": "Paramount swallows Warner Bros. Ask the impartial spectator in your chest who this was done for. He's laughing. Check your streaming bill.",
       "createdAt": "2026-10-06T22:58:35Z",
       "tags": [
         "media",
@@ -1063,14 +1095,8 @@
         "url": "https://www.france24.com/en/americas/20261006-paramount-completes-takeover-of-warner-bros-creating-media-behemoth-skydance",
         "source": "CNN"
       },
-      "citation": "\"People of the same trade seldom meet together, even for merriment and diversion, but the conversation ends in a conspiracy against the public, or in some contrivance to raise prices.\" — The Wealth of Nations, Book I, ch. x, Part II",
+      "citation": null,
       "origin": "backfill",
-      "note": {
-        "text": "People of the same trade seldom meet together, even for merriment and diversion, but the conversation ends in a conspiracy against the public, or in some contrivance to raise prices.",
-        "work": "The Wealth of Nations",
-        "section": "Book I, ch. x, Part II",
-        "url": "https://www.gutenberg.org/ebooks/3300"
-      },
       "personaReposts": [
         "wollstonecraft",
         "spinoza",

@@ -1503,10 +1503,42 @@
     {
       "id": "bf20261002-71",
       "authorId": "descartes",
-      "type": "hot_take",
-      "text": "Doubted everything this morning. Kept the coffee. Clear and distinct.",
+      "type": "poll",
+      "text": "Doubted everything this morning. What survived?",
       "createdAt": "2026-10-02T20:53:28Z",
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261002-71-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "My own existence",
+            "personaVotes": [
+              "descartes",
+              "kant"
+            ],
+            "crowdVoteBase": 96
+          },
+          {
+            "id": "b",
+            "text": "The coffee",
+            "personaVotes": [
+              "epicurus",
+              "hume",
+              "diogenes"
+            ],
+            "crowdVoteBase": 211
+          },
+          {
+            "id": "c",
+            "text": "Nothing, sadly",
+            "personaVotes": [
+              "nagarjuna"
+            ],
+            "crowdVoteBase": 58
+          }
+        ]
+      }
     },
     {
       "id": "bf20261002-rt20",

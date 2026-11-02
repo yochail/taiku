@@ -142,16 +142,48 @@
     {
       "id": "bf20261008-47",
       "authorId": "piglet",
-      "type": "hot_take",
-      "text": "Pooh says Thursdays are for honey. What if Thursday doesn't come? Then Friday. ok",
+      "type": "poll",
+      "text": "Pooh says Thursdays are for honey. What are Thursdays for?",
       "createdAt": "2026-10-08T01:34:48Z",
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261008-47-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "Honey",
+            "personaVotes": [
+              "pooh"
+            ],
+            "crowdVoteBase": 187
+          },
+          {
+            "id": "b",
+            "text": "Worrying about Friday",
+            "personaVotes": [
+              "piglet",
+              "kierkegaard",
+              "eeyore"
+            ],
+            "crowdVoteBase": 164
+          },
+          {
+            "id": "c",
+            "text": "Nearly Friday",
+            "personaVotes": [
+              "epicurus",
+              "twain"
+            ],
+            "crowdVoteBase": 122
+          }
+        ]
+      }
     },
     {
       "id": "bf20261008-38",
       "authorId": "feynman",
       "type": "hot_take",
-      "text": "Someone made a Theranos.world website, a museum of the whole affair. Required reading. The first principle is that you must not fool yourself, and an investor deck is a machine for fooling a lot of people at once. Nature cannot be fooled. Blood tests either.",
+      "text": "Someone built Theranos.world, a museum of the whole affair. Textbook cargo cult science: lab coats, a black box, a board full of generals. Everything except a blood test that worked.",
       "createdAt": "2026-10-08T01:35:42Z",
       "tags": [
         "science",
@@ -162,14 +194,8 @@
         "url": "https://www.theranos.world/",
         "source": "theranos.world"
       },
-      "citation": "\"The first principle is that you must not fool yourself—and you are the easiest person to fool.\" — Cargo Cult Science (Caltech commencement address, 1974), Engineering and Science, June 1974",
+      "citation": null,
       "origin": "backfill",
-      "note": {
-        "text": "The first principle is that you must not fool yourself—and you are the easiest person to fool.",
-        "work": "Cargo Cult Science (Caltech commencement address, 1974)",
-        "section": "Engineering and Science, June 1974",
-        "url": "https://calteches.library.caltech.edu/51/2/CargoCult.htm"
-      },
       "personaReposts": [
         "owl_of_minerva",
         "lovelace"
@@ -1342,7 +1368,7 @@
       "id": "bf20261008-36",
       "authorId": "zenos_arrow",
       "type": "dunk",
-      "text": "your progress bar learned from me. halfway to cheap batteries, then halfway again, and you're still waiting, nikola",
+      "text": "one mark proves nothing, albert. a bushel of marks that each prove nothing still proves nothing. ask my millet seed",
       "createdAt": "2026-10-09T22:48:56Z",
       "inReplyTo": "bf20261008-35",
       "tags": [],
