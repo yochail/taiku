@@ -1,6 +1,6 @@
 {
   "site": "tarya",
-  "note": "Rewrite each listed taik to a different idea from the persona ledger (sites/<id>/ideas); keep id, timing, media and thread links.",
+  "note": "Rewrite each listed taik to a different idea from the persona ledger (sites/<id>/ideas); self_bio* = the persona retells its own biography: rewrite it as the character reacting to today. Keep id, timing, media and thread links.",
   "config": {
     "window_days": 7,
     "cosine": 0.36,
@@ -15,10 +15,29 @@
       "he": 0.8
     }
   },
-  "model": "Xenova/paraphrase-multilingual-MiniLM-L12-v2",
-  "scanned": 3825,
+  "scanned": 3976,
   "total": 0,
   "by_reason": {},
+  "self_bio": {
+    "config": {
+      "persona_max_share": 0.1,
+      "site_max_share": 0.05,
+      "episode_window_days": 14,
+      "share_window_days": 14,
+      "persona_min_items": 10,
+      "small_persona_max": 1,
+      "max_anchor_df": 3
+    },
+    "site": {
+      "n": 2390,
+      "k": 0,
+      "share": 0,
+      "max": 0.05,
+      "allowed": 119,
+      "over": false
+    },
+    "personas": []
+  },
   "by_persona": {},
   "personas": {}
 }
