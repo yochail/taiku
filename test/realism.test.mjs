@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { loadPersonas, loadPosts } from '../src/lib/data.mjs';
 import {
   loadSpec, gini, burstiness, classify, mediaProblems, measure, evaluate, checkCorpus, createSampler, totalVariation,
-  replyFormOf, personaReplyStyle,
+  replyFormOf, personaReplyStyle, templateHits,
 } from '../src/lib/realism.mjs';
 
 const spec = loadSpec();
@@ -227,4 +227,20 @@ test('spec policy: every sites/*/realism/spec.json describes distributions only 
     assert.deepEqual([...new Set(bad)], [], `${id}: spec.json @handles must be persona handles in that pack (samples must be invented)`);
   }
   assert.ok(checked >= 1);
+});
+
+test('templateHits caps an overused text template corpus-wide and per persona', () => {
+  const t = { pattern: 'בימיי|בזמני(?! הפנוי)', per_persona_max: 0.05, min_posts: 4 };
+  const mk = (authorId, text, i) => ({ id: `${authorId}-${i}`, authorId, text });
+  const posts = [
+    ...['בימיי עשינו את זה אחרת', 'היום', 'עכשיו', 'מחר'].map((x, i) => mk('a', x, i)),
+    ...['בזמני הפנוי אני מתרגם', 'היום', 'עכשיו', 'מחר'].map((x, i) => mk('b', x, i)),
+  ];
+  const h = templateHits(posts, t);
+  assert.equal(h.total, 1);
+  assert.equal(h.n, 8);
+  assert.deepEqual(h.over, ['a: 1/4']);
+  const m = measure(posts, personas, { ...spec, text_templates: { nostalgia: t } });
+  assert.equal(m['text.template.nostalgia.share'].value, 1 / 8);
+  assert.equal(m['text.template.nostalgia.personas_over_cap'].value, 1);
 });

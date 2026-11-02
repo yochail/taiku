@@ -18,7 +18,8 @@
     "kehoe2018": "Kehoe & Gee, 'Analysing emojis in context in a corpus of Twitter data', 2018 (about 16% of English tweets contain an emoji)",
     "gligoric2018": "Gligorić, Anderson & West, 'How Constraints Affect Content: The Case of Twitter's Switch from 140 to 280 Characters', ICWSM 2018, https://arxiv.org/abs/1804.02318 (users write tersely: abbreviations, contractions; short posts are the norm)",
     "wang2021gif": "Wang & Jurgens, 'An Animated Picture Says at Least a Thousand Words: Selecting GIF-based Replies in Multimodal Dialog', Findings of EMNLP 2021, https://arxiv.org/abs/2109.12212 (1.56M text-to-GIF reply turns from Twitter: GIFs and memes are a standard standalone reply)",
-    "reply_forms_note": "No published study breaks X replies down by form (emoji-only, few words, media-only). The reply_forms weights are estimates triangulated from twitter2018len (mode 33 chars), gligoric2018, wang2021gif and kehoe2018, then shifted toward full replies for teaching. Confidence: low."
+    "reply_forms_note": "No published study breaks X replies down by form (emoji-only, few words, media-only). The reply_forms weights are estimates triangulated from twitter2018len (mode 33 chars), gligoric2018, wang2021gif and kehoe2018, then shifted toward full replies for teaching. Confidence: low.",
+    "house_style_nostalgia": "Editorial rule, not a study: tarya personas talk about today in the present tense; the \"in my day we did X\" template is capped at 5% of posts per persona and corpus-wide (prompts/house-style.md, NOSTALGIA CAP). Confidence: n/a (policy)."
   },
   "sampling": {
     "activity": {
@@ -1217,6 +1218,28 @@
       "severity": "warn",
       "confidence": "low",
       "sources": []
+    },
+    "text.template.nostalgia.share": {
+      "min": 0,
+      "max": 0.05,
+      "target": 0.02,
+      "min_n": 100,
+      "severity": "fail",
+      "confidence": "high",
+      "sources": [
+        "house_style_nostalgia"
+      ]
+    },
+    "text.template.nostalgia.personas_over_cap": {
+      "min": 0,
+      "max": 0,
+      "target": 0,
+      "min_n": 1,
+      "severity": "fail",
+      "confidence": "high",
+      "sources": [
+        "house_style_nostalgia"
+      ]
     }
   },
   "gate": {
@@ -1275,5 +1298,14 @@
     ],
     "max_rating": "pg-13"
   },
-  "_policy": "Distribution descriptions only: no real users' content, names, handles or post URLs. Samples must be invented; research citations are allowed."
+  "_policy": "Distribution descriptions only: no real users' content, names, handles or post URLs. Samples must be invented; research citations are allowed.",
+  "text_templates": {
+    "nostalgia": {
+      "description": "The \"בימיי / בזמני עשינו X\" nostalgia template: personas should live in the present tense. Capped at 5% corpus-wide and per persona (house-style NOSTALGIA CAP).",
+      "pattern": "בימיי|בימי שלי|בזמני(?! הפנוי)|בזמננו|בתקופתי|בדורי|בדור שלי|כשהייתי|כשאני הייתי|אצלנו ב|אצלי ב|פעם אצלנו|פעם הייתי|פעם היינו|(?:^|\\s)(?:גם )?אני הייתי|אנחנו (?:עשינו|היינו|בנינו)|היינו (?:עושים|אומרים|הולכים|יושבים|שרים|לומדים|קוראים)|עשינו את זה|(?:כתבתי|אמרתי|עשיתי|הייתי|ראיתי|בניתי|עזבתי)[^.!?\\n]{0,12}ב[־-]?1[0-9]{3}|ב[־-]?1[0-9]{3}[^.!?\\n]{0,12}(?:כתבתי|אמרתי|עשיתי|הייתי|ראיתי|בניתי|עזבתי)",
+      "flags": "u",
+      "per_persona_max": 0.05,
+      "min_posts": 15
+    }
+  }
 }

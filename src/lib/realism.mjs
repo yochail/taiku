@@ -168,6 +168,35 @@ export function mediaProblems(item, policy) {
 // ---------- measurement ----------
 
 /**
+ * Overused text templates (spec.text_templates): corpus share of posts matching `pattern`, and the
+ * personas (with at least `min_posts` texts) whose own share exceeds `per_persona_max`.
+ */
+export function templateHits(posts, t) {
+  const re = new RegExp(t.pattern, t.flags ?? 'u');
+  const byAuthor = new Map();
+  let total = 0;
+  let n = 0;
+  const examples = [];
+  for (const p of posts) {
+    if (!p.text) continue;
+    n += 1;
+    const a = byAuthor.get(p.authorId) ?? { n: 0, hits: 0 };
+    a.n += 1;
+    if (re.test(p.text)) {
+      a.hits += 1;
+      total += 1;
+      if (examples.length < 20) examples.push(p.id);
+    }
+    byAuthor.set(p.authorId, a);
+  }
+  const cap = t.per_persona_max ?? 1;
+  const minPosts = t.min_posts ?? 20;
+  const eligible = [...byAuthor].filter(([, a]) => a.n >= minPosts);
+  const over = eligible.filter(([, a]) => a.hits / a.n > cap).map(([id, a]) => `${id}: ${a.hits}/${a.n}`);
+  return { total, n, examples, over, personas: eligible.length };
+}
+
+/**
  * Compute every metric in the spec. Returns { metricId: { value, n, detail? } }.
  * Optional post fields used when present: media[], stats { likes, reposts, quotes, views }.
  */
@@ -369,6 +398,11 @@ export function measure(allPosts, personas, spec, { context = [] } = {}) {
   set('engagement.cross_day_reaction_share', share(late, reacting), reacting);
   set('text.co_mention_share', share(mentioning.filter((n) => n >= 2).length, mentioning.length), mentioning.length);
   set('text.emoji_share', share(posts.filter((p) => EMOJI.test(p.text ?? '')).length, posts.length), posts.length);
+  for (const [tid, t] of Object.entries(spec.text_templates ?? {})) {
+    const hits = templateHits(posts, t);
+    set(`text.template.${tid}.share`, share(hits.total, hits.n), hits.n, hits.examples);
+    set(`text.template.${tid}.personas_over_cap`, hits.over.length, hits.personas, hits.over);
+  }
 
   // reply forms
   const replyForms = replies.map(replyFormOf);
