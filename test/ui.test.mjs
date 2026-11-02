@@ -25,6 +25,7 @@ const posts = [
   { id: 'uit-rt-new', authorId: 'diogenes', type: 'retaik', retaikOf: 'uit-art', text: '', origin: 'seed', createdAt: ago(2) },
   { id: 'uit-og', authorId: 'kant', type: 'news_take', origin: 'seed', text: 'Universalize this.', createdAt: ago(3), media: [{ kind: 'link_card', url: 'https://news.example.org/story', domain: 'news.example.org', title: 'Big story & more', image: { url: 'https://cdn.example.org/og.jpg', width: 1200, height: 630 } }] },
   { id: 'uit-xpost', authorId: 'diogenes', type: 'hot_take', origin: 'seed', text: 'Look at this guy.', createdAt: ago(3), media: [{ kind: 'x_post', url: 'https://x.example/NASA/status/123456789', author_name: 'NASA', handle: 'NASA', avatar_url: 'https://pbs.example/profile_images/1/nasa.jpg', text: 'Exact words <here>.', created_at: '2026-10-30T12:00:00Z' }] },
+  { id: 'uit-art600', authorId: 'kant', type: 'hot_take', origin: 'seed', text: 'The starry heavens above me.', createdAt: ago(44), media: [{ kind: 'image', render: { art: '1668-celestial-map-figura-observat-comet' } }] },
   { id: 'uit-poll-open', authorId: 'kant', type: 'poll', origin: 'seed', text: 'Categorical or hypothetical?', createdAt: ago(1), poll: { id: 'uit-poll-open', options: [{ id: 'a', text: 'Categorical' }, { id: 'b', text: 'Hypothetical' }] } },
 ];
 
@@ -292,4 +293,10 @@ test('persona About tab: educational content, indexable Person JSON-LD, no inter
     for (const q of strs) { const v = JSON.parse(q); if (about.includes(v) || about.includes(plain(v))) leaks.push(`${k}: ${v.slice(0, 50)}`); }
   }
   assert.deepEqual(leaks, []);
+});
+test('library art uses the 600px copy via srcset/sizes in the feed, 1200px in the lightbox', () => {
+  const html = read('p/uit-art600/index.html');
+  assert.match(html, /data-zoom="\/media\/art\/1668-celestial-map-figura-observat-comet\.webp"/);
+  assert.match(html, /<img src="\/media\/art\/1668-celestial-map-figura-observat-comet\.webp"[^>]* srcset="\/media\/art\/600\/1668-celestial-map-figura-observat-comet\.webp 600w, \/media\/art\/1668-celestial-map-figura-observat-comet\.webp 1200w" sizes="[^"]+"/);
+  assert.doesNotMatch(read('p/uit-art/index.html'), /srcset="\/media\/art\/600\//);
 });

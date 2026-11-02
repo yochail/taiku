@@ -194,8 +194,21 @@ const BSKY_LOGO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="curre
 
 const VISUAL = new Set(['image', 'art', 'meme', 'gif', 'chart']);
 
+// Library art ships a 600px WebP next to the 1200px one: the feed picks by viewport, the lightbox keeps 1200px.
+const smallArt = new Map();
+function artSrcset(m) {
+  const name = /^\/media\/art\/([^/]+\.webp)$/.exec(m.src ?? '')?.[1];
+  if (!name) return '';
+  if (!smallArt.has(name)) smallArt.set(name, fs.existsSync(publicFile(`media/art/600/${name}`)) ? `/media/art/600/${name}` : null);
+  const small = smallArt.get(name);
+  if (!small) return '';
+  const w = m.width || 1200;
+  return ` srcset="${esc(small)} ${Math.round(w / 2)}w, ${esc(m.src)} ${w}w"`;
+}
+
 function visualHtml(m, multi) {
-  const size = m.width && m.height ? ` width="${m.width}" height="${m.height}"` : '';
+  const set = artSrcset(m);
+  const size = (m.width && m.height ? ` width="${m.width}" height="${m.height}"` : '') + (set ? `${set} sizes="${multi ? '(max-width: 600px) 45vw, 260px' : '(max-width: 600px) calc(100vw - 72px), 516px'}"` : '');
   const badge = m.kind === 'gif' ? '<span class="media-badge">GIF</span>' : '';
   const altBtn = m.alt ? `<button type="button" class="alt-badge" data-alt="${esc(m.alt)}" aria-label="${esc(STR.imageDescription)}">ALT</button>` : '';
   const ratio = !multi && m.width && m.height ? ` style="aspect-ratio:${m.width}/${m.height}"` : '';
