@@ -1,6 +1,6 @@
 {
   "site": "taiku",
-  "note": "Rewrite each listed taik to a different idea from the persona ledger (sites/<id>/ideas); keep id, timing, media and thread links.",
+  "note": "Rewrite each listed taik to a different idea from the persona ledger (sites/<id>/ideas); self_bio* = the persona retells its own biography: rewrite it as the character reacting to today. Keep id, timing, media and thread links.",
   "config": {
     "window_days": 7,
     "cosine": 0.36,
@@ -16,9 +16,430 @@
     },
     "_note": "Idea ledger + novelty guard (src/lib/ideas.mjs). Originals and quotes draw on one ledger item (core_ideas, key_works, quote_bank works, sites/<id>/ideas/<persona>.json deep_cuts), picked least-recently-used: weight 1 if the persona never used it, else ((days since last use)/lru_days)^2 clamped to [0.02, 1]. Catchphrases (ideas file) are capped at max uses per catchphrase_window_days. A new item is repetitive when its hashed-embedding cosine (dims) to any of the same persona's taiks in the last window_days is >= cosine with >= min_shared_tokens shared content tokens, or it shares a word ngram containing >= 2 content words; items under min_tokens content tokens are not judged. Calibrated on the Oct-Nov 2026 corpus (1,230 same-persona 7-day nearest-neighbour pairs: q50 0.13, q90 0.26, q95 0.32, q98 0.40; hand-checked repeats sat at 0.35-0.45). News/wire accounts are exempt. Product choice."
   },
-  "scanned": 4025,
+  "scanned": 4175,
   "total": 0,
   "by_reason": {},
+  "self_bio": {
+    "config": {
+      "persona_max_share": 0.1,
+      "site_max_share": 0.05,
+      "episode_window_days": 14,
+      "share_window_days": 14,
+      "persona_min_items": 10,
+      "small_persona_max": 1,
+      "max_anchor_df": 3
+    },
+    "site": {
+      "n": 2500,
+      "k": 71,
+      "share": 0.0284,
+      "max": 0.05,
+      "allowed": 125,
+      "over": false
+    },
+    "personas": [
+      {
+        "personaId": "eeyore",
+        "n": 9,
+        "k": 1,
+        "share": 0.111,
+        "allowed": 1,
+        "over": false
+      },
+      {
+        "personaId": "newton",
+        "n": 30,
+        "k": 3,
+        "share": 0.1,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "rosalind_franklin",
+        "n": 23,
+        "k": 2,
+        "share": 0.087,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "darwin",
+        "n": 35,
+        "k": 3,
+        "share": 0.086,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "descartes",
+        "n": 36,
+        "k": 3,
+        "share": 0.083,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "mary_shelley",
+        "n": 25,
+        "k": 2,
+        "share": 0.08,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "hildegard",
+        "n": 27,
+        "k": 2,
+        "share": 0.074,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "curie",
+        "n": 28,
+        "k": 2,
+        "share": 0.071,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "leonardo",
+        "n": 29,
+        "k": 2,
+        "share": 0.069,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "simone_weil",
+        "n": 29,
+        "k": 2,
+        "share": 0.069,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "kierkegaard",
+        "n": 33,
+        "k": 2,
+        "share": 0.061,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "ban_zhao",
+        "n": 17,
+        "k": 1,
+        "share": 0.059,
+        "allowed": 1,
+        "over": false
+      },
+      {
+        "personaId": "jung",
+        "n": 17,
+        "k": 1,
+        "share": 0.059,
+        "allowed": 1,
+        "over": false
+      },
+      {
+        "personaId": "ibn_rushd",
+        "n": 18,
+        "k": 1,
+        "share": 0.056,
+        "allowed": 1,
+        "over": false
+      },
+      {
+        "personaId": "zhuangzi",
+        "n": 37,
+        "k": 2,
+        "share": 0.054,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "einstein",
+        "n": 19,
+        "k": 1,
+        "share": 0.053,
+        "allowed": 1,
+        "over": false
+      },
+      {
+        "personaId": "ben_franklin",
+        "n": 41,
+        "k": 2,
+        "share": 0.049,
+        "allowed": 4,
+        "over": false
+      },
+      {
+        "personaId": "shakespeare",
+        "n": 21,
+        "k": 1,
+        "share": 0.048,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "zera_yacob",
+        "n": 21,
+        "k": 1,
+        "share": 0.048,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "xanthippe",
+        "n": 43,
+        "k": 2,
+        "share": 0.047,
+        "allowed": 4,
+        "over": false
+      },
+      {
+        "personaId": "ramanujan",
+        "n": 22,
+        "k": 1,
+        "share": 0.045,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "kant",
+        "n": 45,
+        "k": 2,
+        "share": 0.044,
+        "allowed": 4,
+        "over": false
+      },
+      {
+        "personaId": "turing",
+        "n": 45,
+        "k": 2,
+        "share": 0.044,
+        "allowed": 4,
+        "over": false
+      },
+      {
+        "personaId": "reply_guy",
+        "n": 46,
+        "k": 2,
+        "share": 0.043,
+        "allowed": 4,
+        "over": false
+      },
+      {
+        "personaId": "maimonides",
+        "n": 23,
+        "k": 1,
+        "share": 0.043,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "galileo",
+        "n": 24,
+        "k": 1,
+        "share": 0.042,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "tesla",
+        "n": 24,
+        "k": 1,
+        "share": 0.042,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "socrates",
+        "n": 50,
+        "k": 2,
+        "share": 0.04,
+        "allowed": 5,
+        "over": false
+      },
+      {
+        "personaId": "owl_of_minerva",
+        "n": 25,
+        "k": 1,
+        "share": 0.04,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "adam_smith",
+        "n": 52,
+        "k": 2,
+        "share": 0.038,
+        "allowed": 5,
+        "over": false
+      },
+      {
+        "personaId": "dickinson",
+        "n": 28,
+        "k": 1,
+        "share": 0.036,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "ibn_khaldun",
+        "n": 28,
+        "k": 1,
+        "share": 0.036,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "woolf",
+        "n": 29,
+        "k": 1,
+        "share": 0.034,
+        "allowed": 2,
+        "over": false
+      },
+      {
+        "personaId": "epicurus",
+        "n": 30,
+        "k": 1,
+        "share": 0.033,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "spinoza",
+        "n": 30,
+        "k": 1,
+        "share": 0.033,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "camus",
+        "n": 31,
+        "k": 1,
+        "share": 0.032,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "nightingale",
+        "n": 32,
+        "k": 1,
+        "share": 0.031,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "sojourner_truth",
+        "n": 32,
+        "k": 1,
+        "share": 0.031,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "aristotle",
+        "n": 33,
+        "k": 1,
+        "share": 0.03,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "confucius",
+        "n": 33,
+        "k": 1,
+        "share": 0.03,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "feynman",
+        "n": 35,
+        "k": 1,
+        "share": 0.029,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "douglass",
+        "n": 36,
+        "k": 1,
+        "share": 0.028,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "fanon",
+        "n": 36,
+        "k": 1,
+        "share": 0.028,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "lovelace",
+        "n": 36,
+        "k": 1,
+        "share": 0.028,
+        "allowed": 3,
+        "over": false
+      },
+      {
+        "personaId": "beauvoir",
+        "n": 42,
+        "k": 1,
+        "share": 0.024,
+        "allowed": 4,
+        "over": false
+      },
+      {
+        "personaId": "wollstonecraft",
+        "n": 44,
+        "k": 1,
+        "share": 0.023,
+        "allowed": 4,
+        "over": false
+      },
+      {
+        "personaId": "arendt",
+        "n": 49,
+        "k": 1,
+        "share": 0.02,
+        "allowed": 4,
+        "over": false
+      },
+      {
+        "personaId": "hume",
+        "n": 52,
+        "k": 1,
+        "share": 0.019,
+        "allowed": 5,
+        "over": false
+      },
+      {
+        "personaId": "nietzsche",
+        "n": 53,
+        "k": 1,
+        "share": 0.019,
+        "allowed": 5,
+        "over": false
+      },
+      {
+        "personaId": "marx",
+        "n": 76,
+        "k": 1,
+        "share": 0.013,
+        "allowed": 7,
+        "over": false
+      }
+    ]
+  },
   "by_persona": {},
   "personas": {}
 }
