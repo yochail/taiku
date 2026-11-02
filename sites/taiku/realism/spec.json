@@ -247,6 +247,7 @@
   "gate": {
     "_note": "Blocking per-day distribution gate (npm run gate / realism --file). Share metrics are widened by a binomial z-interval around their spec band (z = ci_z) for the day's sample size; 'blocking' lists the metrics that fail the gate when outside the widened band, the rest are reported. Hard checks below always block. Personas with >= persona_min_items items are checked against their expected short-item share (style-weighted) with persona_slack extra slack.",
     "ci_z": 1.96,
+    "self_bio_blocking": true,
     "blocking": ["activity.original_share", "activity.reply_share", "activity.quote_share", "length.median_chars", "length.short_share", "media.original.visual_share", "threads.back_and_forth_share"],
     "relative_slack": 0.15,
     "min_media_items": 1,

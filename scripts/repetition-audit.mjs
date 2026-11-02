@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 // Repetition audit over the existing corpus: per persona, the taiks that repeat one of their own recent
 // taiks (embedding cosine + shared n-gram, spec.sampling.novelty) or exceed a catchphrase cap
-// (sites/<id>/ideas/<persona>.json). Deterministic. Content is rewritten by the backfill agents, so this
+// (sites/<id>/ideas/<persona>.json), plus self-biography offenders (src/lib/selfbio.mjs: a persona retelling
+// its own famous deeds/works over the persona/site caps or the same episode twice in a window). Deterministic. Content is rewritten by the backfill agents, so this
 // only writes a list: staging/repetition-audit.json { generated_from, config, total, by_reason, personas }.
 // Language-aware (Hebrew niqqud/prefix folding, src/lib/textnorm.mjs). Run per site: SITE=<id>.
 // --model adds a semantic pass with the multilingual embedding model (reason "semantic") when it loads.
-//   node scripts/repetition-audit.mjs [--out staging/repetition-audit.json] [--model]
+// --strict exits 1 when there are offenders.
+//   node scripts/repetition-audit.mjs [--out staging/repetition-audit.json] [--model] [--strict]
 import fs from 'node:fs';
 import path from 'node:path';
 import { loadPersonas, loadPosts } from '../src/lib/data.mjs';
 import { noveltyConfig, scanRepetition, semanticRepetition } from '../src/lib/ideas.mjs';
 import { loadSpec } from '../src/lib/realism.mjs';
+import { scanSelfBio, selfBioConfig } from '../src/lib/selfbio.mjs';
 import { SITE, sitePath } from '../src/lib/site.mjs';
 
 const arg = (k, d) => {
@@ -18,7 +21,9 @@ const arg = (k, d) => {
   return i > 0 ? process.argv[i + 1] : d;
 };
 const out = sitePath(arg('--out', path.join('staging', 'repetition-audit.json')));
-const cfg = noveltyConfig(loadSpec());
+const spec = loadSpec();
+const cfg = noveltyConfig(spec);
+const sbcfg = selfBioConfig(spec);
 const personas = loadPersonas();
 const posts = loadPosts();
 const byId = new Map(posts.map((p) => [p.id, p]));
@@ -38,6 +43,9 @@ if (process.argv.includes('--model')) {
     model = MODEL_ID;
   } else console.error('repetition audit: embedding model unavailable, lexical pass only');
 }
+const selfBio = scanSelfBio(posts, { personas, cfg: sbcfg });
+const sbHit = new Map(selfBio.hits.map((h) => [h.postId, h]));
+for (const o of selfBio.offenders) hits.push({ ...o, cue: sbHit.get(o.postId)?.cue });
 const groups = {};
 const byReason = {};
 for (const h of hits) {
@@ -49,7 +57,7 @@ for (const h of hits) {
     id: h.postId,
     createdAt: p?.createdAt,
     reason: h.reason,
-    ...(h.reason === 'catchphrase' ? { label: h.label } : { otherId: h.otherId, otherFile: fileOf(o), score: h.score, ...(h.gram ? { gram: h.gram } : {}) }),
+    ...(h.reason.startsWith('self_bio') ? { episode: h.episode, cue: h.cue, ...(h.otherId ? { otherId: h.otherId } : {}) } : h.reason === 'catchphrase' ? { label: h.label } : { otherId: h.otherId, otherFile: fileOf(o), score: h.score, ...(h.gram ? { gram: h.gram } : {}) }),
     text: snip(p),
     ...(o ? { otherText: snip(o) } : {}),
   });
@@ -57,15 +65,22 @@ for (const h of hits) {
 const personasOut = Object.fromEntries(Object.keys(groups).sort().map((k) => [k, groups[k].sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)) || a.id.localeCompare(b.id))]));
 const doc = {
   site: SITE,
-  note: 'Rewrite each listed taik to a different idea from the persona ledger (sites/<id>/ideas); keep id, timing, media and thread links.',
+  note: 'Rewrite each listed taik to a different idea from the persona ledger (sites/<id>/ideas); self_bio* = the persona retells its own biography: rewrite it as the character reacting to today. Keep id, timing, media and thread links.',
   config: cfg,
   ...(model ? { model } : {}),
   scanned: posts.length,
   total: hits.length,
   by_reason: byReason,
+  self_bio: {
+    config: sbcfg,
+    site: selfBio.site,
+    personas: selfBio.personas.filter((r) => r.k).map(({ personaId, n, k, share, allowed, over }) => ({ personaId, n, k, share: Math.round(share * 1000) / 1000, allowed, over })),
+  },
   by_persona: Object.fromEntries(Object.entries(personasOut).map(([k, v]) => [k, v.length]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))),
   personas: personasOut,
 };
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, `${JSON.stringify(doc, null, 2)}\n`);
 console.log(`repetition audit: ${hits.length} offenders in ${posts.length} taiks (${JSON.stringify(byReason)}) -> ${path.relative(process.cwd(), out)}`);
+console.log(`self-bio: site ${selfBio.site.k}/${selfBio.site.n} = ${(selfBio.site.share * 100).toFixed(2)}% (cap ${sbcfg.site_max_share * 100}%), personas over cap: ${selfBio.personas.filter((r) => r.over).length}`);
+if (process.argv.includes('--strict') && hits.length) process.exit(1);

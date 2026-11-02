@@ -12,6 +12,7 @@
 import { withDisplayStats } from './crowd.mjs';
 import { rotationStats } from './formats.mjs';
 import { maxSimilarityByPersona, noveltyConfig, scanRepetition } from './ideas.mjs';
+import { scanSelfBio, selfBioConfig } from './selfbio.mjs';
 import { classify, evaluate, expectedReplyForms, lengthWeights, measure, mediaOf, personaReplyStyle } from './realism.mjs';
 
 const charLen = (text) => [...String(text ?? '')].length;
@@ -186,6 +187,15 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
   const topSim = [...sims].sort((a, b) => b[1] - a[1])[0];
   add({ id: 'persona.max_similarity', status: 'pass', value: topSim ? topSim[1] : null, n: sims.size, min: null, max: ncfg.cosine, blocking: false, detail: topSim ? [`${topSim[0]}`] : undefined });
 
+  // 3d) Self-biography: personas retelling their own famous deeds/works instead of living today.
+  // Caps: persona share and site share over the window, one telling of an episode per window.
+  const sbcfg = selfBioConfig(spec);
+  const sbWindow = Number.isFinite(dayStart) ? [...context.filter((p) => { const t = Date.parse(p.createdAt); return t < dayStart && t >= dayStart - Math.max(sbcfg.share_window_days, sbcfg.episode_window_days) * 864e5; }), ...day] : day;
+  const selfBio = scanSelfBio(sbWindow, { personas, cfg: sbcfg, isTarget: isToday });
+  const sbToday = selfBio.hits.filter((h) => h.target);
+  const sbBlocking = gate.self_bio_blocking === true;
+  add({ id: 'persona.self_bio', status: selfBio.offenders.length ? (sbBlocking ? 'fail' : 'warn') : 'pass', value: authored.length ? sbToday.length / authored.length : 0, n: authored.length, min: null, max: sbcfg.site_max_share, blocking: sbBlocking, detail: selfBio.offenders.map((o) => `${o.personaId}: ${o.postId} ${o.reason} "${String(o.episode).slice(0, 40)}"`) });
+
   // 4) Offenders the pipeline can regenerate (text items with a taskId; timing/role-mix are planner-level).
   const offenders = new Map();
   const flag = (p, reason, length) => {
@@ -223,6 +233,7 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
     list.slice(0, need).forEach((p) => flag(p, tooLong ? `persona_too_long:${r.personaId}` : `persona_too_short:${r.personaId}`, tooLong ? { min: 5, max: shortChars } : { min: 60, max: 140 }));
   }
 
+  if (failed('persona.self_bio')) for (const o of selfBio.offenders) flag(all.get(o.postId), `self_bio:${String(o.episode).slice(0, 40)}`);
   if (failed('persona.novelty')) for (const r of repeats) flag(all.get(r.postId), r.reason === 'catchphrase' ? `catchphrase:${r.label}` : `repetitive:${r.otherId}`);
 
   const failures = checks.filter((c) => c.status === 'fail');

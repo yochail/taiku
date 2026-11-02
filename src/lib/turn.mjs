@@ -11,6 +11,7 @@ const knownHandles = () => (known ??= new Set(loadPersonas().map((p) => String(p
 import { houseStyleRepair, lintTaik, stripTells } from './house-style.mjs';
 import { BudgetError, parseJsonLoose } from './llm.mjs';
 import { checkPost, repairHint } from './policy.mjs';
+import { selfBioHit, selfBioProfile, selfBioRepair } from './selfbio.mjs';
 import { formatRepair, quoteRepair, shortenRepair, systemMessage, targetCeiling, targetRepair, userMessage } from './prompts.mjs';
 import { createToolbox } from './tools.mjs';
 import { ensureMentions } from './tags.mjs';
@@ -82,6 +83,8 @@ export function buildNote(persona, { passage = null, rand = Math.random } = {}) 
 
 const tagsOf = (t) => [...new Set((Array.isArray(t) ? t : []).map((x) => String(x).toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40)).filter(Boolean))].slice(0, 3);
 
+const sbProfiles = new WeakMap();
+const selfBioProfileOf = (persona) => sbProfiles.get(persona) ?? sbProfiles.set(persona, selfBioProfile(persona)).get(persona);
 /**
  * Per-output validator shared by single turns and batches (gen-batch.mjs):
  * JSON shape → 280 weighted chars (reject, never truncate) → house-style lint (+ repetition across
@@ -107,6 +110,9 @@ export async function validateItem(out, { task, persona, passages, policyCtx, ct
   // Novelty is a soft check: NOVELTY_ATTEMPTS tries to say something new, then the day gate decides.
   const nv = attempt < NOVELTY_ATTEMPTS ? checkNovelty(text, ctx.novelty) : null;
   if (nv) return { problem: nv.problem, kind: 'style', style: [nv.reason] };
+  // Self-biography is soft too: retelling the persona's own famous deeds gets the same tries, then the gate decides.
+  const sb = attempt < NOVELTY_ATTEMPTS && persona && (persona.kind ?? 'thinker') !== 'news' ? selfBioHit(text, selfBioProfileOf(persona)) : null;
+  if (sb) return { problem: selfBioRepair(sb.episode), kind: 'style', style: ['self_bio'] };
   const { refs, bad } = resolveQuotes(text, out.quoteRefs, passages);
   if (bad.length) return { problem: quoteRepair(bad), kind: 'quote' };
   const fields = await assembleFields({ out, text, refs, task, persona, passages, rand, giphy });
