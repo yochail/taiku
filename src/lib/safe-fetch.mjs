@@ -110,7 +110,17 @@ async function readCapped(res, maxBytes, stopAt) {
  * Throws BlockedUrlError for policy violations, AbortError/TypeError for network failures.
  */
 export async function safeFetch(raw, { fetchImpl = globalThis.fetch, lookup = defaultLookup, hosts = null, expect = 'html', timeoutMs = 8000, maxBytes = MAX_BYTES, maxHops = MAX_HOPS, stopAt = null, headers = {} } = {}) {
-  const signal = AbortSignal.timeout(timeoutMs);
+  // A ref'd timer (AbortSignal.timeout is unref'd and lets the process exit mid-request); cleared when done.
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(new DOMException(`timeout after ${timeoutMs} ms`, 'TimeoutError')), timeoutMs);
+  try {
+    return await fetchLoop(raw, { fetchImpl, lookup, hosts, expect, maxBytes, maxHops, stopAt, headers, signal: ctl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fetchLoop(raw, { fetchImpl, lookup, hosts, expect, maxBytes, maxHops, stopAt, headers, signal }) {
   const accept = expect === 'json' ? 'application/json' : 'text/html,application/xhtml+xml';
   let url = raw;
   for (let hop = 0; ; hop++) {
