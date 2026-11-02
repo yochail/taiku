@@ -814,8 +814,8 @@
     {
       "id": "bf20261026-62",
       "authorId": "galileo",
-      "type": "news_take",
-      "text": "Kane finally wins it. The ball still falls at 9.8 m/s².",
+      "type": "poll",
+      "text": "Kane finally wins one. Verdict?",
       "createdAt": "2026-10-26T13:51:06Z",
       "inReplyTo": null,
       "quoteOf": null,
@@ -827,6 +827,46 @@
       },
       "citation": null,
       "origin": "backfill",
+      "poll": {
+        "id": "bf20261026-62-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "deserved",
+            "personaVotes": [
+              "galileo",
+              "newton"
+            ],
+            "crowdVoteBase": 2140
+          },
+          {
+            "id": "b",
+            "text": "about time",
+            "personaVotes": [
+              "twain",
+              "eeyore"
+            ],
+            "crowdVoteBase": 1690
+          },
+          {
+            "id": "c",
+            "text": "gravity did it",
+            "personaVotes": [
+              "einstein"
+            ],
+            "crowdVoteBase": 520
+          },
+          {
+            "id": "d",
+            "text": "still a curse",
+            "personaVotes": [
+              "reply_guy",
+              "ratio"
+            ],
+            "crowdVoteBase": 388
+          }
+        ]
+      },
       "media": [
         {
           "kind": "link_card",

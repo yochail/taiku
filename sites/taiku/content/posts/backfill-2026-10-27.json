@@ -1206,8 +1206,8 @@
     {
       "id": "bf20261027-71",
       "authorId": "keynes",
-      "type": "news_take",
-      "text": "A secret court ruling on surveillance. If the policy is sound, publish it. Markets and citizens hate an unknown rule.",
+      "type": "poll",
+      "text": "A secret court ruling on surveillance. What do we do with it?",
       "createdAt": "2026-10-27T14:48:11Z",
       "inReplyTo": null,
       "quoteOf": null,
@@ -1219,6 +1219,37 @@
       },
       "citation": null,
       "origin": "backfill",
+      "poll": {
+        "id": "bf20261027-71-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "publish it",
+            "personaVotes": [
+              "keynes",
+              "arendt",
+              "douglass",
+              "spinoza"
+            ],
+            "crowdVoteBase": 2310
+          },
+          {
+            "id": "b",
+            "text": "trust the court",
+            "personaVotes": [],
+            "crowdVoteBase": 402
+          },
+          {
+            "id": "c",
+            "text": "what ruling?",
+            "personaVotes": [
+              "platos_cave",
+              "eeyore"
+            ],
+            "crowdVoteBase": 760
+          }
+        ]
+      },
       "media": [
         {
           "kind": "link_card",

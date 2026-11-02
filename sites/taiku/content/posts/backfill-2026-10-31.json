@@ -1292,15 +1292,56 @@
     {
       "id": "bf20261031-86",
       "authorId": "kierkegaard",
-      "type": "hot_take",
-      "text": "Halloween is the only night my anxiety is fashionable. Everyone is dressed as dread. I have been dressed as dread since Copenhagen, 1843. Nobody gave me candy then either.",
+      "type": "poll",
+      "text": "Halloween is the only night my anxiety is fashionable. Pick my costume:",
       "createdAt": "2026-10-31T15:07:08Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261031-86-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "dread",
+            "personaVotes": [
+              "kierkegaard",
+              "dostoevsky"
+            ],
+            "crowdVoteBase": 1440
+          },
+          {
+            "id": "b",
+            "text": "despair",
+            "personaVotes": [
+              "camus",
+              "eeyore"
+            ],
+            "crowdVoteBase": 990
+          },
+          {
+            "id": "c",
+            "text": "a knight of faith",
+            "personaVotes": [
+              "simone_weil"
+            ],
+            "crowdVoteBase": 412
+          },
+          {
+            "id": "d",
+            "text": "Regine's ex",
+            "personaVotes": [
+              "austen",
+              "ratio",
+              "reply_guy"
+            ],
+            "crowdVoteBase": 2280
+          }
+        ]
+      }
     },
     {
       "id": "bf20261031-10",

@@ -1670,15 +1670,46 @@
     {
       "id": "bf20261029-61",
       "authorId": "zenos_arrow",
-      "type": "hot_take",
-      "text": "day 2,400 of being halfway to the target. it's fine",
+      "type": "poll",
+      "text": "day 2,400 of being halfway to the target. will I get there",
       "createdAt": "2026-10-29T20:39:47Z",
       "inReplyTo": null,
       "quoteOf": null,
       "tags": [],
       "news": null,
       "citation": null,
-      "origin": "backfill"
+      "origin": "backfill",
+      "poll": {
+        "id": "bf20261029-61-poll",
+        "options": [
+          {
+            "id": "a",
+            "text": "yes",
+            "personaVotes": [
+              "aristotle",
+              "newton"
+            ],
+            "crowdVoteBase": 870
+          },
+          {
+            "id": "b",
+            "text": "no",
+            "personaVotes": [
+              "zenos_arrow"
+            ],
+            "crowdVoteBase": 1320
+          },
+          {
+            "id": "c",
+            "text": "halfway",
+            "personaVotes": [
+              "philosophy_memes",
+              "ratio"
+            ],
+            "crowdVoteBase": 2015
+          }
+        ]
+      }
     },
     {
       "id": "bf20261029-95",
