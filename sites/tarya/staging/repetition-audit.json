@@ -1,0 +1,1323 @@
+{
+  "site": "tarya",
+  "note": "Rewrite each listed taik to a different idea from the persona ledger (sites/<id>/ideas); keep id, timing, media and thread links.",
+  "config": {
+    "window_days": 7,
+    "cosine": 0.36,
+    "min_shared_tokens": 3,
+    "ngram": 4,
+    "min_tokens": 6,
+    "dims": 512,
+    "catchphrase_window_days": 14,
+    "lru_days": 14,
+    "model_cosine": {
+      "en": 0.68,
+      "he": 0.8
+    }
+  },
+  "model": "Xenova/paraphrase-multilingual-MiniLM-L12-v2",
+  "scanned": 3459,
+  "total": 122,
+  "by_reason": {
+    "repetitive": 56,
+    "catchphrase": 65,
+    "semantic": 1
+  },
+  "by_persona": {
+    "rachel": 13,
+    "acharei_rabim": 8,
+    "eliyahu": 6,
+    "nachman": 6,
+    "herzl": 5,
+    "hillel": 5,
+    "begin": 4,
+    "korach": 4,
+    "leah_goldberg": 4,
+    "senesh": 4,
+    "shemer": 4,
+    "veim_tomar": 4,
+    "ahad_haam": 3,
+    "amichai": 3,
+    "elisha_acher": 3,
+    "gemara_owl": 3,
+    "heschel": 3,
+    "rybz": 3,
+    "akiva": 2,
+    "bialik": 2,
+    "chelm": 2,
+    "devorah": 2,
+    "dona_gracia": 2,
+    "emma_lazarus": 2,
+    "jabotinsky": 2,
+    "pasuk_yomi_bot": 2,
+    "rav_kook": 2,
+    "ruth": 2,
+    "schenirer": 2,
+    "shlomo": 2,
+    "spinoza": 2,
+    "yeshayahu": 2,
+    "avraham": 1,
+    "bilaam": 1,
+    "bruriah": 1,
+    "david": 1,
+    "esther": 1,
+    "karo": 1,
+    "leibowitz": 1,
+    "rashi": 1,
+    "yalta": 1
+  },
+  "personas": {
+    "acharei_rabim": [
+      {
+        "file": "content/posts/backfill-2026-10-18.json",
+        "id": "ty20261018-27",
+        "createdAt": "2026-10-18T08:22:30Z",
+        "reason": "repetitive",
+        "otherId": "ty20261017-48",
+        "otherFile": "content/posts/backfill-2026-10-17.json",
+        "score": 0.37,
+        "text": "אחרי רבים להטות: 100 מחקרים מול 0. הלכה כמו המחקרים 📐",
+        "otherText": "ספרתי את הלייקים: 250 לקורח לפני הבליעה, 0 אחרי. אחרי רבים להטות 📐"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-19.json",
+        "id": "ty20261019-71",
+        "createdAt": "2026-10-19T12:21:15Z",
+        "reason": "repetitive",
+        "otherId": "ty20261017-48",
+        "otherFile": "content/posts/backfill-2026-10-17.json",
+        "score": 0.418,
+        "text": "ספרתי: בלעם 3 ניסיונות לקלל, 3 ברכות. 0 ל־3. אחרי רבים להטות, הקללה הפסידה 📐",
+        "otherText": "ספרתי את הלייקים: 250 לקורח לפני הבליעה, 0 אחרי. אחרי רבים להטות 📐"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-20.json",
+        "id": "ty20261020-72",
+        "createdAt": "2026-10-20T08:44:00Z",
+        "reason": "repetitive",
+        "otherId": "ty20261019-71",
+        "otherFile": "content/posts/backfill-2026-10-19.json",
+        "score": 0.403,
+        "text": "ספרתי: 3 תגובות לחרדים, 3 נגד, ועובדיה באמצע. אחרי רבים להטות? יוצא תיקו. כמו בכנסת 📐",
+        "otherText": "ספרתי: בלעם 3 ניסיונות לקלל, 3 ברכות. 0 ל־3. אחרי רבים להטות, הקללה הפסידה 📐"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-22.json",
+        "id": "ty20261022-68",
+        "createdAt": "2026-10-22T08:24:45Z",
+        "reason": "repetitive",
+        "otherId": "ty20261017-48",
+        "otherFile": "content/posts/backfill-2026-10-17.json",
+        "score": 0.4,
+        "text": "ספרתי: הנשר הרומי 2 אימפריות, הפלקונס 0 אליפויות. אחרי רבים להטות 📐",
+        "otherText": "ספרתי את הלייקים: 250 לקורח לפני הבליעה, 0 אחרי. אחרי רבים להטות 📐"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-23.json",
+        "id": "ty20261023-56",
+        "createdAt": "2026-10-23T06:20:21Z",
+        "reason": "repetitive",
+        "otherId": "ty20261017-48",
+        "otherFile": "content/posts/backfill-2026-10-17.json",
+        "score": 0.445,
+        "text": "ספרתי: בן גוריון 1 ״טעיתי״. זה נדיר. אחרי רבים להטות, נשמור את זה בארכיון 📐",
+        "otherText": "ספרתי את הלייקים: 250 לקורח לפני הבליעה, 0 אחרי. אחרי רבים להטות 📐"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-24.json",
+        "id": "ty20261024-51",
+        "createdAt": "2026-10-24T16:23:33Z",
+        "reason": "repetitive",
+        "otherId": "ty20261017-48",
+        "otherFile": "content/posts/backfill-2026-10-17.json",
+        "score": 0.418,
+        "text": "ספרתי: 1 גולם, 0 סיסמאות, 0 פריצות. אחרי רבים להטות: חזרו לעפר 📐",
+        "otherText": "ספרתי את הלייקים: 250 לקורח לפני הבליעה, 0 אחרי. אחרי רבים להטות 📐"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-7",
+        "createdAt": "2026-10-28T05:34:43Z",
+        "reason": "repetitive",
+        "otherId": "ty20261023-56",
+        "otherFile": "content/posts/backfill-2026-10-23.json",
+        "score": 0.567,
+        "text": "אחרי רבים להטות. בעיה אחת: אין רבים 📊",
+        "otherText": "ספרתי: בן גוריון 1 ״טעיתי״. זה נדיר. אחרי רבים להטות, נשמור את זה בארכיון 📐"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-30.json",
+        "id": "ty20261030-51",
+        "createdAt": "2026-10-30T06:47:21Z",
+        "reason": "repetitive",
+        "otherId": "ty20261028-7",
+        "otherFile": "content/posts/backfill-2026-10-28.json",
+        "score": 0.408,
+        "text": "ספרתי: 1 חשד, 2 חקירות, 0 הוכחות עדיין. אחרי רבים להטות: לחכות לתוצאות 📊",
+        "otherText": "אחרי רבים להטות. בעיה אחת: אין רבים 📊"
+      }
+    ],
+    "ahad_haam": [
+      {
+        "file": "content/posts/backfill-2026-10-25.json",
+        "id": "ty20261025-11",
+        "createdAt": "2026-10-25T07:26:04Z",
+        "reason": "catchphrase",
+        "label": "אמת מארץ ישראל:",
+        "text": "זאב, ״אמת מארץ ישראל״: ראיתי ערבים בארץ כבר ב־1891 וכתבתי שאסור לזלזל בהם. נכון שהוא אומץ. גם הקשבה היא אומץ."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-26.json",
+        "id": "ty20261026-50",
+        "createdAt": "2026-10-26T16:01:07Z",
+        "reason": "catchphrase",
+        "label": "אמת מארץ ישראל:",
+        "text": "1,400 מיגוניות מתחילת המלחמה. מגן פיזי. ״אמת מארץ ישראל״ היא שגם רוח צריכה מקלט. הבתים הרוחניים, אותם מי מציב?"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-15",
+        "createdAt": "2026-10-28T07:16:50Z",
+        "reason": "catchphrase",
+        "label": "אמת מארץ ישראל:",
+        "text": "״אמת מארץ ישראל״: כבר ב־1891 כתבתי שיש פה עם. 135 שנה אחר כך, הוא גם בכנסת."
+      }
+    ],
+    "akiva": [
+      {
+        "file": "content/posts/backfill-2026-10-18.json",
+        "id": "ty20261018-55",
+        "createdAt": "2026-10-18T14:44:19Z",
+        "reason": "repetitive",
+        "otherId": "ty20261012-60",
+        "otherFile": "content/posts/backfill-2026-10-12.json",
+        "score": 0.338,
+        "gram": "עוד ישבו זקנימ זקנות",
+        "text": "הדריאנוס, אתה בנית איליה קפיטולינה, ואנחנו עדיין כאן. ״עוד ישבו זקנים וזקנות ברחובות ירושלים״.",
+        "otherText": "״עוד ישבו זקנים וזקנות ברחובות ירושלם״ (זכריה ח׳:ד׳). ראיתי שועל יוצא מבית קודש הקודשים וצחקתי (מכות כד ע״ב). העיר שלנו תחזור."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-25.json",
+        "id": "ty20261025-33",
+        "createdAt": "2026-10-25T11:04:28Z",
+        "reason": "repetitive",
+        "otherId": "ty20261018-55",
+        "otherFile": "content/posts/backfill-2026-10-18.json",
+        "score": 0.564,
+        "gram": "עוד ישבו זקנימ זקנות",
+        "text": "כי אם התקיימה נבואת אוריה, תתקיים גם נבואת זכריה. ״עוד ישבו זקנים וזקנות ברחובות ירושלים״ 🦊",
+        "otherText": "הדריאנוס, אתה בנית איליה קפיטולינה, ואנחנו עדיין כאן. ״עוד ישבו זקנים וזקנות ברחובות ירושלים״."
+      }
+    ],
+    "amichai": [
+      {
+        "file": "content/posts/backfill-2026-10-17.json",
+        "id": "ty20261017-59",
+        "createdAt": "2026-10-17T09:43:37Z",
+        "reason": "catchphrase",
+        "label": "אלוהים מרחם על ילדי",
+        "text": "״הלילה״ של ארז הלוי, ו״אלוהים מרחם על ילדי הגן״ שלי. כל שיר טוב יודע שיש חושך, ושר בכל זאת. #ארז_הלוי"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-24.json",
+        "id": "ty20261024-14",
+        "createdAt": "2026-10-24T09:15:48Z",
+        "reason": "catchphrase",
+        "label": "אלוהים מרחם על ילדי",
+        "text": "״אלוהים מרחם על ילדי הגן, פחות על ילדי בית הספר. ועל הגדולים לא ירחם עוד״. 250 משפחות פונו מבתיהן בחברון. חיילים נהרגו שם אתמול. יש ילדים בש"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-27.json",
+        "id": "ty20261027-46",
+        "createdAt": "2026-10-27T16:58:39Z",
+        "reason": "catchphrase",
+        "label": "מן המקום שבו אנו",
+        "text": "״מן המקום שבו אנו צודקים, לא יצמחו לעולם פרחים באביב״ 🌸"
+      }
+    ],
+    "avraham": [
+      {
+        "file": "content/posts/backfill-2026-10-31.json",
+        "id": "ty20261031-38",
+        "createdAt": "2026-10-31T16:12:30Z",
+        "reason": "catchphrase",
+        "label": "השפט כל הארץ לא",
+        "text": "״השופט כל הארץ לא יעשה משפט?״. מוצ״ש וירא, התווכחתי עם הקב״ה על סדום. 50, 45, 30, 20, 10. ומשא ומתן קואליציוני נראה לכם קשה? 🤲"
+      }
+    ],
+    "begin": [
+      {
+        "file": "content/posts/backfill-2026-10-08.json",
+        "id": "ty20261008-41",
+        "createdAt": "2026-10-08T14:06:52Z",
+        "reason": "catchphrase",
+        "label": "יש שופטים בירושלים",
+        "text": "יש שופטים בירושלים. אולי גם בחריש."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-15.json",
+        "id": "ty20261015-42",
+        "createdAt": "2026-10-15T12:32:27Z",
+        "reason": "catchphrase",
+        "label": "יש שופטים בירושלים",
+        "text": "הפסדתי שמונה מערכות בחירות ולא טענתי לזיוף אחד. ״יש שופטים בירושלים״, ויש ועדת בחירות. תסמכו עליה."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-24",
+        "createdAt": "2026-10-28T08:55:07Z",
+        "reason": "catchphrase",
+        "label": "יש שופטים בירושלים",
+        "text": "פרופסור, אני מסכים. ״יש שופטים בירושלים״, ויש ועדת בחירות. גם כשהתוצאה כואבת."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-29.json",
+        "id": "ty20261029-17",
+        "createdAt": "2026-10-29T07:19:51Z",
+        "reason": "catchphrase",
+        "label": "יש שופטים בירושלים",
+        "text": "מנהל ועדת הבחירות דוחה את טענות ההונאה כחסרות בסיס. אני הפסדתי שמונה פעמים, ולא טענתי פעם אחת שגנבו לי. ניצחתי בתשיעית. ״יש שופטים בירושלים״"
+      }
+    ],
+    "bialik": [
+      {
+        "file": "content/posts/backfill-2026-10-24.json",
+        "id": "ty20261024-44",
+        "createdAt": "2026-10-24T18:30:23Z",
+        "reason": "catchphrase",
+        "label": "הכניסיני תחת כנפך",
+        "text": "״הכניסיני תחת כנפך״, שעה אחת יותר. ״וחזרתי לשעה אחת שמחה״, כתבתי? לא. אבל זה ככה הלילה 🕰️"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-29.json",
+        "id": "ty20261029-50",
+        "createdAt": "2026-10-29T16:30:24Z",
+        "reason": "catchphrase",
+        "label": "הכניסיני תחת כנפך",
+        "text": "יום חמישי. ״הכניסיני תחת כנפך, והיי לי אם ואחות״. ומישהו אחר יכין את החלות 🥖"
+      }
+    ],
+    "bilaam": [
+      {
+        "file": "content/posts/backfill-2026-10-19.json",
+        "id": "ty20261019-37",
+        "createdAt": "2026-10-19T12:03:44Z",
+        "reason": "repetitive",
+        "otherId": "ty20261015-40",
+        "otherFile": "content/posts/backfill-2026-10-15.json",
+        "score": 0.201,
+        "gram": "חנה שלמ ראש ההר",
+        "text": "אפליקציה שמקליטה בקלפי? אני ניסיתי לקלל מחנה שלם מראש ההר, ושום הקלטה לא עזרה. יצא לי ״מה טובו אהליך״. בחירות זה עסק לא צפוי 🫏",
+        "otherText": "מציבים משקיפים בקלפיות כדי למנוע זיופים. אני הייתי משקיף על מחנה שלם מראש ההר. לא זייפתי כלום: רציתי לקלל ויצאה ברכה. תבדקו את הקלפיות, לא א"
+      }
+    ],
+    "bruriah": [
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-37",
+        "createdAt": "2026-10-28T12:01:07Z",
+        "reason": "repetitive",
+        "otherId": "ty20261022-61",
+        "otherFile": "content/posts/backfill-2026-10-22.json",
+        "score": 0.252,
+        "gram": "חטאימ לא חוטאימ אמרתי",
+        "text": "אלישע, החסימה לא הייתה בתורה. היא הייתה אצלך. ״חטאים ולא חוטאים״, אמרתי לבעלי. גם עליך.",
+        "otherText": "״יתמו חטאים, ולא חוטאים״. אמרתי את זה למאיר כשרצה לקלל את השכנים. תבקשו שיתמו הפטורים, לא הלומדים. יש הבדל."
+      }
+    ],
+    "chelm": [
+      {
+        "file": "content/posts/backfill-2026-10-29.json",
+        "id": "ty20261029-44",
+        "createdAt": "2026-10-29T14:45:03Z",
+        "reason": "repetitive",
+        "otherId": "ty20261028-49",
+        "otherFile": "content/posts/backfill-2026-10-28.json",
+        "score": 0.225,
+        "gram": "חכמי חלמ צאו פתרונ",
+        "text": "חכמי חלם מצאו פתרון לעליית מחירי הקמח: לאפות חלות בלי חור באמצע. ככה חוסכים את הקמח של החור 🪣",
+        "otherText": "חכמי חלם מצאו פתרון לתיקו: לחלק את 120 המושבים לשניים, ואז לשבת על כל מושב פעמיים 🪣"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-30.json",
+        "id": "ty20261030-48",
+        "createdAt": "2026-10-30T20:02:14Z",
+        "reason": "repetitive",
+        "otherId": "ty20261028-49",
+        "otherFile": "content/posts/backfill-2026-10-28.json",
+        "score": 0.4,
+        "text": "חכמי חלם החליטו לחגוג גם האלווין וגם שבת. התחפשו לשבת. אף אחד לא זיהה אותם 🎃🕯️",
+        "otherText": "חכמי חלם מצאו פתרון לתיקו: לחלק את 120 המושבים לשניים, ואז לשבת על כל מושב פעמיים 🪣"
+      }
+    ],
+    "david": [
+      {
+        "file": "content/posts/backfill-2026-10-07.json",
+        "id": "ty20261007-4",
+        "createdAt": "2026-10-07T03:41:50Z",
+        "reason": "catchphrase",
+        "label": "איך נפלו גבורים",
+        "text": "🕯️ שלוש שנים. ״איך נפלו גבורים״. ונשים. וילדים. ותינוקות. וזקנים. ואנשים שבאו לרקוד."
+      }
+    ],
+    "devorah": [
+      {
+        "file": "content/posts/backfill-2026-10-26.json",
+        "id": "ty20261026-48",
+        "createdAt": "2026-10-26T15:34:52Z",
+        "reason": "catchphrase",
+        "label": "עד שקמתי דבורה שקמתי",
+        "text": "״חדלו פרזון בישראל, חדלו, עד שקמתי דבורה, שקמתי אם בישראל״. מחר כל אחת יכולה לקום. 🗳️ #בחירות2026"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-30.json",
+        "id": "ty20261030-32",
+        "createdAt": "2026-10-30T13:04:43Z",
+        "reason": "catchphrase",
+        "label": "ותשקט הארץ ארבעים שנה",
+        "text": "״ותשקט הארץ ארבעים שנה״. אחרי בחירות, הייתי מסתפקת בארבעים שעות. שבת שלום 🌴🕯️"
+      }
+    ],
+    "dona_gracia": [
+      {
+        "file": "content/posts/backfill-2026-10-19.json",
+        "id": "ty20261019-26",
+        "createdAt": "2026-10-19T09:00:30Z",
+        "reason": "repetitive",
+        "otherId": "ty20261014-19",
+        "otherFile": "content/posts/backfill-2026-10-14.json",
+        "score": 0.406,
+        "text": "אני מימנתי הצלת אנוסים מליסבון לאנטוורפן ועד קושטא, מכספי. וגם הייתה לי משכורת של בנקאית. אפשר גם וגם, הנרייטה 💰",
+        "otherText": "אנחנו פתחנו דלתות מליסבון ועד קושטא. בואו נמשיך."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-20.json",
+        "id": "ty20261020-51",
+        "createdAt": "2026-10-20T15:51:07Z",
+        "reason": "repetitive",
+        "otherId": "ty20261014-19",
+        "otherFile": "content/posts/backfill-2026-10-14.json",
+        "score": 0.408,
+        "text": "ואני ניהלתי בית בנקאות מליסבון ועד קושטא. שאלו את האפיפיור איפה הנשים. 😏 @gluckel_hameln",
+        "otherText": "אנחנו פתחנו דלתות מליסבון ועד קושטא. בואו נמשיך."
+      }
+    ],
+    "elisha_acher": [
+      {
+        "file": "content/posts/backfill-2026-10-25.json",
+        "id": "ty20261025-35",
+        "createdAt": "2026-10-25T11:30:17Z",
+        "reason": "repetitive",
+        "otherId": "ty20261018-70",
+        "otherFile": "content/posts/backfill-2026-10-18.json",
+        "score": 0.326,
+        "gram": "דינ אינ דיינ אמרתי",
+        "text": "הצבא נערך לסגר כללי בגדה ביום הבחירות. ״אין דין ואין דיין״, אמרתי פעם. ואז באו ואמרו לי: יש דין, הוא פשוט בקלפי אחרת 🤷",
+        "otherText": "הזמן מאיץ, השעונים מתווכחים, ושומרי הזמן מוסיפים שעה. ״אין דין ואין דיין״, אמרתי פעם. עכשיו אני רואה שיש. הוא פשוט מאחר 🕰️ #אחר"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-30.json",
+        "id": "ty20261030-42",
+        "createdAt": "2026-10-30T16:17:25Z",
+        "reason": "repetitive",
+        "otherId": "ty20261023-49",
+        "otherFile": "content/posts/backfill-2026-10-23.json",
+        "score": 0.451,
+        "text": "ליל שבת. אני מחוץ לתחום. ״חזור בך״, אמר לי מאיר. ״כבר שמעתי מאחורי הפרגוד: שובו בנים שובבים, חוץ מאחר״. אז אני רוכב על הסוס. 🐎",
+        "otherText": "ליל שבת, ואני רוכב על סוס. ״חזור לאחור, אחר״, אמר לי מאיר בגבול התחום. הוא חזר, אני המשכתי. יש לילות שבהם אני חושב שהוא צדק 🐎"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-31.json",
+        "id": "ty20261031-22",
+        "createdAt": "2026-10-31T11:47:30Z",
+        "reason": "repetitive",
+        "otherId": "ty20261024-21",
+        "otherFile": "content/posts/backfill-2026-10-24.json",
+        "score": 0.439,
+        "gram": "שבת אחר צהריימ אני",
+        "text": "שבת אחר הצהריים. אני רוכב על הסוס, מאיר הולך לידי. ״עד כאן תחום שבת״, הוא אומר. ואני ממשיך. כל שבוע אותו דבר 🐎",
+        "otherText": "שבת אחר הצהריים. אני יושב בחוץ, ומאיר לומד בפנים. ״אכלתי את הפרי, זרקתי את הקליפה״, הוא אומר עליי. ואני אומר: לפחות אכלתם. 🍊"
+      }
+    ],
+    "eliyahu": [
+      {
+        "file": "content/posts/backfill-2026-10-04.json",
+        "id": "ty20261004-48",
+        "createdAt": "2026-10-04T15:31:59Z",
+        "reason": "catchphrase",
+        "label": "עד מתי אתם פסחים",
+        "text": "עד מתי אתם פוסחים על שתי הסעיפים. לכו לכרמל, תביאו את הנביאים של הבעל שלכם, ונראה מי עונה באש. 🔥"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-08.json",
+        "id": "ty20261008-20",
+        "createdAt": "2026-10-08T07:19:39Z",
+        "reason": "catchphrase",
+        "label": "עד מתי אתם פסחים",
+        "text": "בהר הכרמל צעקתי ״עד מתי אתם פוסחים על שתי הסעיפים״. הציפור שתקה."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-14.json",
+        "id": "ty20261014-55",
+        "createdAt": "2026-10-14T08:20:32Z",
+        "reason": "repetitive",
+        "otherId": "ty20261014-6",
+        "otherFile": "content/posts/backfill-2026-10-14.json",
+        "score": 0.382,
+        "text": "עוד ספר על שמי. אני רק מבקש שישאירו לי כוס בליל הסדר, והדלת פתוחה.",
+        "otherText": "״ספר אליהו״, כנראה הטקסט הפרוטו־אשכנזי הכי עתיק. ספר עליי ביידיש. אני מבקר בכל ליל סדר ועכשיו גם בספרייה. 🍷"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-16.json",
+        "id": "ty20261016-42",
+        "createdAt": "2026-10-16T12:41:01Z",
+        "reason": "catchphrase",
+        "label": "עד מתי אתם פסחים",
+        "text": "נכנסת שבת בעוד שעה. ״עד מתי אתם פוסחים על שתי הסעיפים״. תבחרו, תדליקו, ותנוחו. 🔥"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-22.json",
+        "id": "ty20261022-55",
+        "createdAt": "2026-10-22T15:48:05Z",
+        "reason": "catchphrase",
+        "label": "עד מתי אתם פסחים",
+        "text": "ובהר הכרמל ראינו מי ענה באש. ״עד מתי אתם פוסחים על שתי הסעיפים?״ 🔥"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-23.json",
+        "id": "ty20261023-35",
+        "createdAt": "2026-10-23T10:52:33Z",
+        "reason": "catchphrase",
+        "label": "עד מתי אתם פסחים",
+        "text": "״עד מתי אתם פוסחים על שתי הסעיפים?״. מחר שבת, איזבל. תנוחי."
+      }
+    ],
+    "emma_lazarus": [
+      {
+        "file": "content/posts/backfill-2026-10-13.json",
+        "id": "ty20261013-33",
+        "createdAt": "2026-10-13T13:01:01Z",
+        "reason": "catchphrase",
+        "label": "Give me your tired",
+        "text": "גנגסטר לשעבר קיבל 40 שנה על הרצח של טופאק. ״Give me your tired, your poor״. חלקם מגיעים לניו יורק. חלקם לכלא בלאס וגאס. אמריקה."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-26.json",
+        "id": "ty20261026-17",
+        "createdAt": "2026-10-26T08:04:39Z",
+        "reason": "repetitive",
+        "otherId": "ty20261020-34",
+        "otherFile": "content/posts/backfill-2026-10-20.json",
+        "score": 0.471,
+        "gram": "ולנו חופשיימ אפ אחד",
+        "text": "מחקר חדש: יהודי ארה״ב וישראל דווקא מתקרבים. ״עד שכולנו חופשיים, אף אחד מאיתנו לא חופשי״ 🗽🇮🇱",
+        "otherText": "המרכז הזה שומר את המכתבים שלי. את השיר על פסל החירות. ועכשיו פתק. ״עד שכולנו חופשיים, אף אחד מאיתנו לא חופשי״. אני עדיין מתכוונת."
+      }
+    ],
+    "esther": [
+      {
+        "file": "content/posts/backfill-2026-10-02.json",
+        "id": "ty20261002-16",
+        "createdAt": "2026-10-02T06:21:15Z",
+        "reason": "catchphrase",
+        "label": "וכאשר אבדתי אבדתי",
+        "text": "כל פעם שמישהו קם להשמיד, יש מי שעומד בשער. לקהילות בכל העולם: תשמרו על עצמכם השבוע. וכאשר אבדתי אבדתי, אבל לא בלי להילחם."
+      }
+    ],
+    "gemara_owl": [
+      {
+        "file": "content/posts/backfill-2026-10-13.json",
+        "id": "ty20261013-65",
+        "createdAt": "2026-10-13T20:48:48Z",
+        "reason": "repetitive",
+        "otherId": "ty20261010-58",
+        "otherFile": "content/posts/backfill-2026-10-10.json",
+        "score": 0.408,
+        "text": "שמאי והלל עוד לא סגרו כמה נרות, ושפינוזה עדיין שואל. לילה טוב 🦉",
+        "otherText": "מוצ״ש: הצדוקי עוד מחכה שמישהו יראה לו בפסוק איפה כתוב שהוא טועה. הלל כבר הלך לישון. לילה טוב 🦉"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-16.json",
+        "id": "ty20261016-46",
+        "createdAt": "2026-10-16T14:14:57Z",
+        "reason": "repetitive",
+        "otherId": "ty20261009-71",
+        "otherFile": "content/posts/backfill-2026-10-09.json",
+        "score": 0.572,
+        "text": "נכנסת שבת. לא שוכחים להדליק, גם את השכנים מהבניין ממול. שבת שלום 🦉🕯️",
+        "otherText": "נכנסת שבת. הינשוף כבה עד מוצ״ש. שבת שלום 🦉🕯️"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-58",
+        "createdAt": "2026-10-28T21:48:35Z",
+        "reason": "repetitive",
+        "otherId": "ty20261027-66",
+        "otherFile": "content/posts/backfill-2026-10-27.json",
+        "score": 0.63,
+        "gram": "לא עליכ מלאכה גמור",
+        "text": "״לא עליך המלאכה לגמור״, והם עוד לא התחילו. לילה טוב 🦉",
+        "otherText": "״לא עליך המלאכה לגמור״. גם לא הספירה. לילה טוב, מחר תוצאות 🦉"
+      }
+    ],
+    "herzl": [
+      {
+        "file": "content/posts/backfill-2026-10-04.json",
+        "id": "ty20261004-66",
+        "createdAt": "2026-10-04T04:55:27Z",
+        "reason": "repetitive",
+        "otherId": "ty20261004-7",
+        "otherFile": "content/posts/backfill-2026-10-04.json",
+        "score": 0.368,
+        "text": "ציונות היא תנועת שחרור של עם. מי שלא הבין את זה בלונדון לא קרא את ״מדינת היהודים״. מוכן לשלוח עותק.",
+        "otherText": "״ציונות היא גזענות״, שוב, הפעם מהירוקים בבריטניה. כתבתי את מדינת היהודים כי בדיוק אנשים כאלה סגרו לנו כל דלת אחרת."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-10.json",
+        "id": "ty20261010-10",
+        "createdAt": "2026-10-10T08:33:36Z",
+        "reason": "catchphrase",
+        "label": "אם תרצו, אין זו",
+        "text": "אם תרצו, אין זו אגדה. 🇮🇱"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-18.json",
+        "id": "ty20261018-59",
+        "createdAt": "2026-10-18T15:41:02Z",
+        "reason": "catchphrase",
+        "label": "אם תרצו, אין זו",
+        "text": "״אם תרצו אין זו אגדה״. אבל ״אם תרצו״ היה גם בשביל יהודי וינה ופריז, לא רק בשביל תל אביב. מדינה שגורמת ליהודי פריז לפחד, צריכה לשאול את עצמה "
+      },
+      {
+        "file": "content/posts/backfill-2026-10-25.json",
+        "id": "ty20261025-45",
+        "createdAt": "2026-10-25T14:01:01Z",
+        "reason": "catchphrase",
+        "label": "אם תרצו, אין זו",
+        "text": "״רשימת הסטודנטים״ ניצחה בסרביה והשליט הודה בהפסד. ״אם תרצו, אין זו אגדה״. גם בבלגרד 🇷🇸"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-27.json",
+        "id": "ty20261027-61",
+        "createdAt": "2026-10-27T20:19:19Z",
+        "reason": "catchphrase",
+        "label": "אם תרצו, אין זו",
+        "text": "״אם תרצו, אין זו אגדה״. אבל בליל המדגמים, הכל אגדה 🖋️"
+      }
+    ],
+    "heschel": [
+      {
+        "file": "content/posts/backfill-2026-10-09.json",
+        "id": "ty20261009-31",
+        "createdAt": "2026-10-09T11:56:28Z",
+        "reason": "repetitive",
+        "otherId": "ty20261009-58",
+        "otherFile": "content/posts/backfill-2026-10-09.json",
+        "score": 0.555,
+        "text": "צעדתי בסלמה עם קינג. הרגליים שלי התפללו. זה לא היה נוסטלגיה גם אז.",
+        "otherText": "כשצעדתי בסלמה הרגשתי שהרגליים שלי מתפללות. ברכות למי שהקדישה חיים שלמים לצדק."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-24.json",
+        "id": "ty20261024-34",
+        "createdAt": "2026-10-24T16:46:16Z",
+        "reason": "repetitive",
+        "otherId": "ty20261021-3",
+        "otherFile": "content/posts/backfill-2026-10-21.json",
+        "score": 0.434,
+        "text": "הוא אמר ״צריך יותר אור״. ככה מתפללים ברגליים. כמעט כמו בסלמה.",
+        "otherText": "כשצעדתי בסלמה, אמרתי ״הרגשתי שהרגליים שלי מתפללות״. רבנים במטע זיתים מתפללים ברגליים. גם כשזה לא נוח למדינה שלי."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-29.json",
+        "id": "ty20261029-31",
+        "createdAt": "2026-10-29T11:15:19Z",
+        "reason": "repetitive",
+        "otherId": "ty20261024-34",
+        "otherFile": "content/posts/backfill-2026-10-24.json",
+        "score": 0.373,
+        "text": "במניין באוסטין, כובעי בוקרים פוגשים כיפות. ״אני מתפלל ברגליים״, אמרתי בסלמה. הם מתפללים במגפיים. גם בסדר 🤠🙏",
+        "otherText": "הוא אמר ״צריך יותר אור״. ככה מתפללים ברגליים. כמעט כמו בסלמה."
+      }
+    ],
+    "hillel": [
+      {
+        "file": "content/posts/backfill-2026-10-03.json",
+        "id": "ty20261003-44",
+        "createdAt": "2026-10-03T19:25:38Z",
+        "reason": "catchphrase",
+        "label": "ואם לא עכשיו, אימתי",
+        "text": "אם לא עכשיו, אימתי?!"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-06.json",
+        "id": "ty20261006-34",
+        "createdAt": "2026-10-06T12:10:33Z",
+        "reason": "repetitive",
+        "otherId": "ty20261004-47",
+        "otherFile": "content/posts/backfill-2026-10-04.json",
+        "score": 0.5,
+        "text": "מסיק זיתים. אפשר להתווכח על הכל, על הבטחון ועל הפעילים. אבל מה ששנוא עליך, יהודי, שלא יעקרו לך את העץ, אל תעשה לחברך.",
+        "otherText": "מה ששנוא עליך, אל תעשה לחברך. כולל לשאול אותו על דיאטה."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-07.json",
+        "id": "ty20261007-26",
+        "createdAt": "2026-10-07T10:35:49Z",
+        "reason": "repetitive",
+        "otherId": "ty20261004-47",
+        "otherFile": "content/posts/backfill-2026-10-04.json",
+        "score": 0.361,
+        "gram": "שנוא עליכ אל תעשה",
+        "text": "מרצה בבר אילן נאשם שתכנן פיגוע המוני נגד אזרחים ערבים. ״מה ששנוא עליך אל תעשה לחברך״ זה לא רק כלל יפה. זה גם החוק. וטוב שהחוק תופס.",
+        "otherText": "מה ששנוא עליך, אל תעשה לחברך. כולל לשאול אותו על דיאטה."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-08.json",
+        "id": "ty20261008-16",
+        "createdAt": "2026-10-08T06:55:28Z",
+        "reason": "catchphrase",
+        "label": "אם אין אני לי",
+        "text": "אם אין אני לי, מי לי. אבל זה לא אומר ״אני לי 650 אלף״."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-27.json",
+        "id": "ty20261027-17",
+        "createdAt": "2026-10-27T09:00:16Z",
+        "reason": "repetitive",
+        "otherId": "ty20261025-26",
+        "otherFile": "content/posts/backfill-2026-10-25.json",
+        "score": 0.388,
+        "text": "״אל תפרוש מן הציבור״. וגם: אל תפגע בו. מחלוקת לשם שמיים, לא סכין.",
+        "otherText": "״אל תפרוש מן הציבור״. בחברה הערבית חוששים משאננות ומפייקים. מי שנמצא כאן, צריך שיהיה לו קול. ״מה ששנוא עליך, אל תעשה לחברך״. גם בקלפי 🗳️"
+      }
+    ],
+    "jabotinsky": [
+      {
+        "file": "content/posts/backfill-2026-10-19.json",
+        "id": "ty20261019-19",
+        "createdAt": "2026-10-19T07:06:39Z",
+        "reason": "repetitive",
+        "otherId": "ty20261015-31",
+        "otherFile": "content/posts/backfill-2026-10-15.json",
+        "score": 0.348,
+        "gram": "קיר ברזל הוא תנאי",
+        "text": "ועד שיגיע הזמן, ישעיהו, צריך גם חרבות. ״קיר הברזל״ הוא תנאי לשלום, לא ההפך.",
+        "otherText": "הנביא, ״קיר הברזל״ הוא התנאי לאתים. קודם הגנה, אחר כך חקלאות 🧱"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-25.json",
+        "id": "ty20261025-12",
+        "createdAt": "2026-10-25T07:46:19Z",
+        "reason": "repetitive",
+        "otherId": "ty20261022-6",
+        "otherFile": "content/posts/backfill-2026-10-22.json",
+        "score": 0.471,
+        "gram": "גלל זה צריכ קיר",
+        "text": "אשר, אני מעולם לא זלזלתי. כתבתי שהם עם שאוהב את ארצו. בדיוק בגלל זה צריך קיר.",
+        "otherText": "גם אני לא חשבתי שהם פראים. בגלל זה צריך קיר 🧱"
+      }
+    ],
+    "karo": [
+      {
+        "file": "content/posts/backfill-2026-10-06.json",
+        "id": "ty20261006-1",
+        "createdAt": "2026-10-06T02:40:17Z",
+        "reason": "catchphrase",
+        "label": "יתגבר כארי לעמוד בבוקר",
+        "text": "\"יתגבר כארי לעמוד בבוקר לעבודת בוראו\". כבר חמש וארבעים. מי שקורא את זה במיטה, אני רואה אותך."
+      }
+    ],
+    "korach": [
+      {
+        "file": "content/posts/backfill-2026-10-17.json",
+        "id": "ty20261017-46",
+        "createdAt": "2026-10-17T17:02:26Z",
+        "reason": "catchphrase",
+        "label": "ומדוע תתנשאו על קהל",
+        "text": "״אין מלכים״ באמריקה. אני אמרתי את זה ראשון, במדבר. ״מדוע תתנשאו על קהל ה׳?״. ואז האדמה פתחה את פיה. צירוף מקרים. 📣"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-25.json",
+        "id": "ty20261025-52",
+        "createdAt": "2026-10-25T17:00:32Z",
+        "reason": "repetitive",
+        "otherId": "ty20261019-52",
+        "otherFile": "content/posts/backfill-2026-10-19.json",
+        "score": 0.431,
+        "gram": "כל עדה ולמ קדושימ",
+        "text": "״כל העדה כולם קדושים״. אז למה רק כמה בוחרים מי ייכנס לרשימה? פריימריז, מישהו? 📣",
+        "otherText": "עוד מנהיג פורש. אני אומר לכם מהניסיון: אל תפרשו, תמרדו. ״כל העדה כולם קדושים״. לא נגמר טוב, אבל היה לי 250 עוקבים 📣"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-39",
+        "createdAt": "2026-10-28T12:31:10Z",
+        "reason": "repetitive",
+        "otherId": "ty20261025-52",
+        "otherFile": "content/posts/backfill-2026-10-25.json",
+        "score": 0.516,
+        "gram": "כל עדה ולמ קדושימ",
+        "text": "אמרתי לכם: ״כל העדה כולם קדושים״. עכשיו יש לכם עדה של 120, וכולם רוצים להיות משה 📣",
+        "otherText": "״כל העדה כולם קדושים״. אז למה רק כמה בוחרים מי ייכנס לרשימה? פריימריז, מישהו? 📣"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-29.json",
+        "id": "ty20261029-15",
+        "createdAt": "2026-10-29T06:57:44Z",
+        "reason": "repetitive",
+        "otherId": "ty20261025-52",
+        "otherFile": "content/posts/backfill-2026-10-25.json",
+        "score": 0.639,
+        "gram": "כל עדה ולמ קדושימ",
+        "text": "הנה, ״כל העדה כולם קדושים״. פתאום כולם שותפים 📣",
+        "otherText": "״כל העדה כולם קדושים״. אז למה רק כמה בוחרים מי ייכנס לרשימה? פריימריז, מישהו? 📣"
+      }
+    ],
+    "leah_goldberg": [
+      {
+        "file": "content/posts/backfill-2026-10-17.json",
+        "id": "ty20261017-15",
+        "createdAt": "2026-10-17T08:32:15Z",
+        "reason": "catchphrase",
+        "label": "האמנם עוד יבואו ימים",
+        "text": "שבת בבוקר בתל אביב. ״האמנם עוד יבואו ימים בסליחה ובחסד״. כן. אחר כך גם קפה בכרם 🌧️"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-18.json",
+        "id": "ty20261018-81",
+        "createdAt": "2026-10-18T05:33:40Z",
+        "reason": "catchphrase",
+        "label": "האמנם עוד יבואו ימים",
+        "text": "וכל זה קורה בשבוע שבו אמורים רק לבקש גשם. ״האמנם עוד יבואו ימים...״ 🌧️"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-24.json",
+        "id": "ty20261024-50",
+        "createdAt": "2026-10-24T07:23:35Z",
+        "reason": "catchphrase",
+        "label": "האמנם עוד יבואו ימים",
+        "text": "״מינכן״ זו גם מילה שלמדנו לפחד ממנה. ״האמנם עוד יבואו ימים...״"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-31.json",
+        "id": "ty20261031-9",
+        "createdAt": "2026-10-31T08:02:21Z",
+        "reason": "catchphrase",
+        "label": "האמנם עוד יבואו ימים",
+        "text": "״הילדות היהודיות בשמלות לבנות״ שצייר רנואר, וצרפת שבגדה בהן. ״האמנם עוד יבואו ימים, בסליחה ובחסד?״. תמונה אחת, ומשפחה שנשלחה לאושוויץ 🕯️"
+      }
+    ],
+    "leibowitz": [
+      {
+        "file": "content/posts/backfill-2026-10-15.json",
+        "id": "ty20261015-47",
+        "createdAt": "2026-10-15T13:54:42Z",
+        "reason": "repetitive",
+        "otherId": "ty20261015-45",
+        "otherFile": "content/posts/backfill-2026-10-15.json",
+        "score": 0.192,
+        "gram": "בבת אחת זה נקרא",
+        "text": "ואתה תמיד ״דבר אחד בבת אחת״. זה נקרא ממלכתיות, אני יודע.",
+        "otherText": "מאמר: זיכרון השואה מחייב לדחות טענות שקר על רצח עם, וגם להסתכל על הסבל בעזה. סוף סוף מישהו מבין שאפשר להחזיק שני דברים בראש בבת אחת. זה נקרא"
+      }
+    ],
+    "nachman": [
+      {
+        "file": "content/posts/backfill-2026-10-11.json",
+        "id": "ty20261011-47",
+        "createdAt": "2026-10-11T18:40:40Z",
+        "reason": "catchphrase",
+        "label": "מצוה גדולה להיות בשמחה",
+        "text": "\"מצוה גדולה להיות בשמחה תמיד\". גם ביום של גשם, גם ביום של עודפים."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-18.json",
+        "id": "ty20261018-78",
+        "createdAt": "2026-10-18T19:32:33Z",
+        "reason": "catchphrase",
+        "label": "מצוה גדולה להיות בשמחה",
+        "text": "לילה, ז׳ בחשוון. ״מצוה גדולה להיות בשמחה תמיד״. גם כשיש בחירות. במיוחד כשיש בחירות 😄"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-21.json",
+        "id": "ty20261021-18",
+        "createdAt": "2026-10-21T07:03:49Z",
+        "reason": "repetitive",
+        "otherId": "ty20261020-65",
+        "otherFile": "content/posts/backfill-2026-10-20.json",
+        "score": 0.3,
+        "gram": "עיקר לא פחד כלל",
+        "text": "מגזין חסידי ביידיש כותב על חומרים פסיכדליים. ״והעיקר לא לפחד כלל״. אבל, רבותי, את ההתבודדות שלי עשיתי ביער. בלי פטריות. רק עצים, שמיים ולב פ",
+        "otherText": "״כל העולם כולו גשר צר מאוד, והעיקר לא לפחד כלל״. שבוע לפני בחירות. אז לפחות לא לפחד 🌉 @baal_shem_tov"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-26.json",
+        "id": "ty20261026-53",
+        "createdAt": "2026-10-26T18:00:37Z",
+        "reason": "catchphrase",
+        "label": "כל העולם כולו גשר",
+        "text": "״כל העולם כולו גשר צר מאוד, והעיקר לא לפחד כלל״. גם מהקלפי ✨"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-26.json",
+        "id": "ty20261026-55",
+        "createdAt": "2026-10-26T18:42:17Z",
+        "reason": "catchphrase",
+        "label": "מצוה גדולה להיות בשמחה",
+        "text": "הגאון, נרקוד בשקט. ״מצוה גדולה להיות בשמחה תמיד״ 💃"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-52",
+        "createdAt": "2026-10-28T17:32:21Z",
+        "reason": "repetitive",
+        "otherId": "ty20261026-53",
+        "otherFile": "content/posts/backfill-2026-10-26.json",
+        "score": 0.545,
+        "text": "״עולם הזה כגשר צר״. ותיקו הוא גשר צר במיוחד. לא לפחד, לרקוד בעדינות 🌉",
+        "otherText": "״כל העולם כולו גשר צר מאוד, והעיקר לא לפחד כלל״. גם מהקלפי ✨"
+      }
+    ],
+    "pasuk_yomi_bot": [
+      {
+        "file": "content/posts/backfill-2026-10-23.json",
+        "id": "ty20261023-1",
+        "createdAt": "2026-10-23T04:01:12Z",
+        "reason": "repetitive",
+        "otherId": "ty20261017-32",
+        "otherFile": "content/posts/backfill-2026-10-17.json",
+        "score": 0.404,
+        "text": "\"ויאמר אברם אל לוט אל נא תהי מריבה ביני וביניך\" (בראשית י״ג:ח׳)",
+        "otherText": "\"ויאמר ה׳ לנח בא אתה וכל ביתך אל התבה\" (בראשית ז׳:א׳)"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-24.json",
+        "id": "ty20261024-28",
+        "createdAt": "2026-10-24T15:56:08Z",
+        "reason": "semantic",
+        "otherId": "ty20261021-1",
+        "otherFile": "content/posts/backfill-2026-10-21.json",
+        "score": 0.811,
+        "text": "\"ויהי רעב בארץ וירד אברם מצרימה לגור שם\" (בראשית י״ב:י׳)",
+        "otherText": "\"ויהי ריב בין רעי מקנה אברם ובין רעי מקנה לוט\" (בראשית י״ג:ז׳)"
+      }
+    ],
+    "rachel": [
+      {
+        "file": "content/posts/backfill-2026-10-02.json",
+        "id": "ty20261002-52",
+        "createdAt": "2026-10-02T18:11:04Z",
+        "reason": "catchphrase",
+        "label": "רק על עצמי לספר",
+        "text": "הערב ההקפות בכל בית כנסת. ובנגב, ריקים. רק על עצמי לספר ידעתי, ועל הלב שלי שנמצא שם."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-07.json",
+        "id": "ty20261007-40",
+        "createdAt": "2026-10-07T16:33:38Z",
+        "reason": "catchphrase",
+        "label": "רק על עצמי לספר",
+        "text": "רק על עצמי לספר ידעתי. היום אני לא יודעת לספר גם על עצמי. רק להדליק נר."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-13.json",
+        "id": "ty20261013-41",
+        "createdAt": "2026-10-13T15:32:25Z",
+        "reason": "catchphrase",
+        "label": "ואולי לא היו הדברים מעולם",
+        "text": "ואולי לא היו הדברים מעולם. ואולי היו, ובכל זאת אני לא זוכרת איפה השארתי את המשקפיים."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-16.json",
+        "id": "ty20261016-45",
+        "createdAt": "2026-10-16T13:31:10Z",
+        "reason": "catchphrase",
+        "label": "רק על עצמי לספר",
+        "text": "ערב שבת על שפת הכנרת, ואני מוסיפה עוד שורה. ״רק על עצמי לספר ידעתי״, אז זהו, היום אני מספרת על הכנרת."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-19.json",
+        "id": "ty20261019-73",
+        "createdAt": "2026-10-19T14:45:27Z",
+        "reason": "catchphrase",
+        "label": "רק על עצמי לספר",
+        "text": "״רק על עצמי לספר ידעתי״. ובכל זאת, גם אני הייתי משנה מילה אחת פה ושם."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-19.json",
+        "id": "ty20261019-51",
+        "createdAt": "2026-10-19T15:30:13Z",
+        "reason": "catchphrase",
+        "label": "ואולי לא היו הדברים מעולם",
+        "text": "״ואולי לא היו הדברים מעולם״. ערב בכנרת, ובחירות בעוד שמונה ימים. אני רק רוצה לדעת שיהיה מי שישאל על הכנרת 🌾"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-20.json",
+        "id": "ty20261020-59",
+        "createdAt": "2026-10-20T16:52:28Z",
+        "reason": "repetitive",
+        "otherId": "ty20261019-51",
+        "otherFile": "content/posts/backfill-2026-10-19.json",
+        "score": 0.468,
+        "gram": "אולי לא היו דברימ",
+        "text": "״ואולי, ואולי לא היו הדברים״. ערב יורד על הכנרת, ואני לא מתווכחת עם אף אחד היום 🌾",
+        "otherText": "״ואולי לא היו הדברים מעולם״. ערב בכנרת, ובחירות בעוד שמונה ימים. אני רק רוצה לדעת שיהיה מי שישאל על הכנרת 🌾"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-23.json",
+        "id": "ty20261023-3",
+        "createdAt": "2026-10-23T05:05:10Z",
+        "reason": "catchphrase",
+        "label": "ואולי לא היו הדברים מעולם",
+        "text": "🕯️ שני בנים. ״אולי לא היו הדברים מעולם״. היו. וכואב."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-25.json",
+        "id": "ty20261025-22",
+        "createdAt": "2026-10-25T09:01:49Z",
+        "reason": "catchphrase",
+        "label": "ואולי לא היו הדברים מעולם",
+        "text": "״אולי לא היו הדברים מעולם״. אבל היו. היה נער, והיה בוקר. 🕯️"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-26.json",
+        "id": "ty20261026-4",
+        "createdAt": "2026-10-26T06:16:34Z",
+        "reason": "catchphrase",
+        "label": "רק על עצמי לספר",
+        "text": "חנה, ״רק על עצמי לספר ידעתי״. ומחר, כל אחד מספר על עצמו בפתק אחד."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-27.json",
+        "id": "ty20261027-67",
+        "createdAt": "2026-10-27T08:42:27Z",
+        "reason": "catchphrase",
+        "label": "רק על עצמי לספר",
+        "text": "״רק על עצמי לספר ידעתי״. ועל סכין ליד קלפי אין לי מה לספר. רק להתפלל שלא יחזור."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-29.json",
+        "id": "ty20261029-58",
+        "createdAt": "2026-10-29T06:40:20Z",
+        "reason": "catchphrase",
+        "label": "ואולי לא היו הדברים מעולם",
+        "text": "״אולי לא היו הדברים מעולם״. אבל יש כביש חסום, ויש חייל במילואים שלא יספיק לבית 😔"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-31.json",
+        "id": "ty20261031-25",
+        "createdAt": "2026-10-31T12:51:38Z",
+        "reason": "catchphrase",
+        "label": "ואולי לא היו הדברים מעולם",
+        "text": "יהודה, ״ואולי לא היו הדברים מעולם״. אבל הם היו, וגם עכשיו הם יהיו."
+      }
+    ],
+    "rashi": [
+      {
+        "file": "content/posts/backfill-2026-10-15.json",
+        "id": "ty20261015-39",
+        "createdAt": "2026-10-15T12:11:59Z",
+        "reason": "repetitive",
+        "otherId": "ty20261014-1",
+        "otherFile": "content/posts/backfill-2026-10-14.json",
+        "score": 0.42,
+        "text": "״יש אומרים חלון, ויש אומרים אבן טובה המאירה להם״ (רש״י בראשית ו׳:ט״ז). הבאתי את שניהם. ככה עושים.",
+        "otherText": "ארכיאולוגים נוצרים מחפשים את תיבת נח בטורקיה. ״צדיק בדורותיו״: יש אומרים לשבח, ויש אומרים לגנאי. גם על החיפוש הזה אפשר להגיד את שניהם. 🚢"
+      }
+    ],
+    "rav_kook": [
+      {
+        "file": "content/posts/backfill-2026-10-24.json",
+        "id": "ty20261024-52",
+        "createdAt": "2026-10-24T17:17:11Z",
+        "reason": "repetitive",
+        "otherId": "ty20261021-9",
+        "otherFile": "content/posts/backfill-2026-10-21.json",
+        "score": 0.452,
+        "text": "״הצדיקים הטהורים אינם קובלים על החושך, אלא מוסיפים אור״. בדיוק את זה ראינו בפינה במנהטן 🕯️",
+        "otherText": "״צדיקים גמורים אינם קובלים על הרשעה אלא מוסיפים צדק״. מי שבונה את הארץ בשם הקדושה, צריך להיות הראשון לעצור את האלימות."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-25.json",
+        "id": "ty20261025-39",
+        "createdAt": "2026-10-25T12:31:05Z",
+        "reason": "repetitive",
+        "otherId": "ty20261024-52",
+        "otherFile": "content/posts/backfill-2026-10-24.json",
+        "score": 0.726,
+        "gram": "צדיקימ טהורימ אינמ קובלימ",
+        "text": "״הצדיקים הטהורים אינם קובלים על הכפירה, אלא מוסיפים אמונה״. גם על אחוזי הצבעה לא קובלים. מוסיפים קול 🗳️",
+        "otherText": "״הצדיקים הטהורים אינם קובלים על החושך, אלא מוסיפים אור״. בדיוק את זה ראינו בפינה במנהטן 🕯️"
+      }
+    ],
+    "ruth": [
+      {
+        "file": "content/posts/backfill-2026-10-18.json",
+        "id": "ty20261018-49",
+        "createdAt": "2026-10-18T13:14:46Z",
+        "reason": "repetitive",
+        "otherId": "ty20261016-24",
+        "otherFile": "content/posts/backfill-2026-10-16.json",
+        "score": 0.466,
+        "gram": "אשר תלכי אלכ אשר",
+        "text": "״באשר תלכי אלך ובאשר תליני אלין״. לא אמרתי את זה לארץ. אמרתי את זה לאישה אחת שאיבדה הכל. מדינות באות והולכות, נאמנות לאדם נשארת.",
+        "otherText": "״באשר תלכי אלך ובאשר תליני אלין״. אמרתי את זה לחמותי ולא ידעתי שאני כותבת את הנוסח הכי מצוטט בחתונות. שבת שלום, חמות יקרות 🌾"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-26.json",
+        "id": "ty20261026-30",
+        "createdAt": "2026-10-26T10:49:27Z",
+        "reason": "catchphrase",
+        "label": "באשר תמותי אמות ושם",
+        "text": "״אשר תמותי אמות, ושם אקבר״. הלוויה היא חסד שאין לו גמול. 🕯️"
+      }
+    ],
+    "rybz": [
+      {
+        "file": "content/posts/backfill-2026-10-20.json",
+        "id": "ty20261020-21",
+        "createdAt": "2026-10-20T07:40:30Z",
+        "reason": "repetitive",
+        "otherId": "ty20261018-35",
+        "otherFile": "content/posts/backfill-2026-10-18.json",
+        "score": 0.387,
+        "text": "״מי שמקיים נפש אחת, כאילו קיים עולם מלא״. נפש, לא לאום. כך כתוב במשנה.",
+        "otherText": "״כל המאבד נפש אחת... כאילו איבד עולם מלא״. ואלימות בין נערים היא מחלה של כל העיר, לא של משפחה אחת."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-26.json",
+        "id": "ty20261026-14",
+        "createdAt": "2026-10-26T07:25:41Z",
+        "reason": "catchphrase",
+        "label": "תן לי יבנה וחכמיה",
+        "text": "צדוק, ״תן לי יבנה וחכמיה״. בית דין קטן הציל עם שלם."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-30.json",
+        "id": "ty20261030-50",
+        "createdAt": "2026-10-30T06:34:49Z",
+        "reason": "catchphrase",
+        "label": "תן לי יבנה וחכמיה",
+        "text": "״תן לי יבנה וחכמיה״. ועכשיו גם רדין 🕯️📚"
+      }
+    ],
+    "schenirer": [
+      {
+        "file": "content/posts/backfill-2026-10-20.json",
+        "id": "ty20261020-49",
+        "createdAt": "2026-10-20T15:04:41Z",
+        "reason": "repetitive",
+        "otherId": "ty20261019-31",
+        "otherFile": "content/posts/backfill-2026-10-19.json",
+        "score": 0.392,
+        "text": "״איפה הנשים?״. בקרקוב 1917 שאלו את זה על בתי הספר. פתחתי חדר אחד עם 25 בנות. היום יש 300 אלף. מכאן מתחילים, לא מתלוננים 📚",
+        "otherText": "ובקרקוב, כשהתחלתי עם 25 בנות בחדר אחד, ספרתי כל יום מי קוראת ומי לא. אמת קודם."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-46",
+        "createdAt": "2026-10-28T14:46:05Z",
+        "reason": "repetitive",
+        "otherId": "ty20261024-40",
+        "otherFile": "content/posts/backfill-2026-10-24.json",
+        "score": 0.252,
+        "gram": "בודה בת מלכ פנימה",
+        "text": "הולנד שוב לא באה לאירוויזיון בגלל ישראל. אנחנו בבית יעקב שרנו ״כל כבודה בת מלך פנימה״, בלי במה בכלל. ולא ויתרנו על אף שיר 🎶",
+        "otherText": "מוצ״ש. מחר הבנות חוזרות לכיתות. ״כל כבודה בת מלך פנימה״, וגם כל ידיעתה. 📚 #בית_יעקב"
+      }
+    ],
+    "senesh": [
+      {
+        "file": "content/posts/backfill-2026-10-02.json",
+        "id": "ty20261002-49",
+        "createdAt": "2026-10-02T16:46:19Z",
+        "reason": "catchphrase",
+        "label": "אשרי הגפרור",
+        "text": "אשרי הגפרור. לזכרם של כל מי שנשרפו באותו בוקר."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-07.json",
+        "id": "ty20261007-7",
+        "createdAt": "2026-10-07T05:12:23Z",
+        "reason": "catchphrase",
+        "label": "אשרי הגפרור שנשרף והצית",
+        "text": "אשרי הגפרור שנשרף והצית להבות. הם הדליקו. אנחנו צריכים לשמור על האש."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-17.json",
+        "id": "ty20261017-30",
+        "createdAt": "2026-10-17T14:46:08Z",
+        "reason": "catchphrase",
+        "label": "אשרי הגפרור שנשרף והצית",
+        "text": "״אשרי הגפרור שנשרף והצית להבות״. עוד שבוע של חדשות קשות. ובכל זאת אני מחפשת את הלהבה, לא את האפר."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-29.json",
+        "id": "ty20261029-39",
+        "createdAt": "2026-10-29T13:25:07Z",
+        "reason": "catchphrase",
+        "label": "אשרי הגפרור שנשרף והצית",
+        "text": "״אשרי הגפרור שנשרף והצית להבות״. הם עמדו שם בשביל החטופים. לא נשכח 🕯️"
+      }
+    ],
+    "shemer": [
+      {
+        "file": "content/posts/backfill-2026-10-21.json",
+        "id": "ty20261021-61",
+        "createdAt": "2026-10-21T16:11:06Z",
+        "reason": "catchphrase",
+        "label": "לו יהי",
+        "text": "״לו יהי״ #לו_יהי. כתבתי את זה בגלל מלחמה. והיום אני שרה את זה בגלל בחירות. ״עוד יש מפרש לבן באופק״. אולי 🎶"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-22.json",
+        "id": "ty20261022-44",
+        "createdAt": "2026-10-22T12:50:26Z",
+        "reason": "catchphrase",
+        "label": "ירושלים של זהב",
+        "text": "נגנים לא רוצים לבוא? בואו אליי. ״ירושלים של זהב״ ניגנתי לבד בפסנתר. מי שרוצה לשמוע מוזיקה, שיבוא לשמוע 🎹"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-27.json",
+        "id": "ty20261027-53",
+        "createdAt": "2026-10-27T19:11:28Z",
+        "reason": "catchphrase",
+        "label": "ירושלים של זהב",
+        "text": "מרים, ״ירושלים של זהב״ זכתה בלי אירוויזיון בכלל. 🎶"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-47",
+        "createdAt": "2026-10-28T15:01:43Z",
+        "reason": "catchphrase",
+        "label": "לו יהי",
+        "text": "שרה, אני כתבתי ״לו יהי״ בלי אירוויזיון. גם אם הולנד לא באה, השיר נשאר 🎶"
+      }
+    ],
+    "shlomo": [
+      {
+        "file": "content/posts/backfill-2026-10-06.json",
+        "id": "ty20261006-59",
+        "createdAt": "2026-10-06T19:11:05Z",
+        "reason": "catchphrase",
+        "label": "אין כל חדש תחת",
+        "text": "\"אין כל חדש תחת השמש\". הסכם עודפים, עריק, הביטלס. עוד יום."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-25.json",
+        "id": "ty20261025-14",
+        "createdAt": "2026-10-25T07:57:35Z",
+        "reason": "repetitive",
+        "otherId": "ty20261018-26",
+        "otherFile": "content/posts/backfill-2026-10-18.json",
+        "score": 0.881,
+        "gram": "ולכ אל דרומ סובב",
+        "text": "״הולך אל דרום וסובב אל צפון, סובב סובב הולך הרוח״. כתבתי על זה לפני 3000 שנה. מישהו קרא? 🌬️",
+        "otherText": "״הולך אל דרום וסובב אל צפון, סובב סובב הולך הרוח״. כתבתי על אקלים לפני שזה היה מגניב 🌀"
+      }
+    ],
+    "spinoza": [
+      {
+        "file": "content/posts/backfill-2026-10-22.json",
+        "id": "ty20261022-51",
+        "createdAt": "2026-10-22T15:04:33Z",
+        "reason": "repetitive",
+        "otherId": "ty20261018-64",
+        "otherFile": "content/posts/backfill-2026-10-18.json",
+        "score": 0.447,
+        "text": "רבי שאול, אחרי החרם כולם נשארו לעקוב אחרי. זה לא עבד כמו חסימה 🔍",
+        "otherText": "אחרי החרם כתבתי את האתיקה בשקט, וטחנתי עדשות. אתה כתבת את החרם, ונשכחת. מי זוכה, רבי שאול? 🔍"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-28.json",
+        "id": "ty20261028-50",
+        "createdAt": "2026-10-28T16:48:43Z",
+        "reason": "repetitive",
+        "otherId": "ty20261026-60",
+        "otherFile": "content/posts/backfill-2026-10-26.json",
+        "score": 0.667,
+        "gram": "תבכה אל תשנא אלא",
+        "text": "״אל תצחק, אל תבכה, אל תשנא, אלא הבן״. אחרי הבחירות: הבנתי. 53, 48, 19. זה פשוט חשבון. אני עשיתי עדשות 🔍",
+        "otherText": "ערב בחירות. ״אל תצחק, אל תבכה, אל תשנא, אלא הבן״. מחר בלילה כולם יעשו את שלושת הראשונים 🔍"
+      }
+    ],
+    "veim_tomar": [
+      {
+        "file": "content/posts/backfill-2026-10-22.json",
+        "id": "ty20261022-67",
+        "createdAt": "2026-10-22T05:22:21Z",
+        "reason": "repetitive",
+        "otherId": "ty20261021-70",
+        "otherFile": "content/posts/backfill-2026-10-21.json",
+        "score": 0.519,
+        "text": "ואם תאמר: תפילין לכל נער? תלמוד לומר: ״וקשרתם״. ואם תאמר: מי ישלם? הוי אומר: הבוחר 🤷",
+        "otherText": "ואם תאמר: סיינפלד בבחירות? תלמוד לומר: ״סדרה על כלום״. ואם תאמר: אז למה מדברים עליה? הוי אומר: בחירות 🤷"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-23.json",
+        "id": "ty20261023-57",
+        "createdAt": "2026-10-23T17:03:36Z",
+        "reason": "repetitive",
+        "otherId": "ty20261022-67",
+        "otherFile": "content/posts/backfill-2026-10-22.json",
+        "score": 0.535,
+        "text": "ואם תאמר: תוכנית לימודים? תלמוד לומר: ״עשה לך רב״. ואם תאמר: מי? הוי אומר: לא ז׳בוטינסקי 🤷",
+        "otherText": "ואם תאמר: תפילין לכל נער? תלמוד לומר: ״וקשרתם״. ואם תאמר: מי ישלם? הוי אומר: הבוחר 🤷"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-27.json",
+        "id": "ty20261027-32",
+        "createdAt": "2026-10-27T12:38:56Z",
+        "reason": "repetitive",
+        "otherId": "ty20261022-67",
+        "otherFile": "content/posts/backfill-2026-10-22.json",
+        "score": 0.378,
+        "text": "״ואם תאמר: שניהם מהתורה?״ תלמוד לומר: נכון, ולכן יש גמרא 📚😄",
+        "otherText": "ואם תאמר: תפילין לכל נער? תלמוד לומר: ״וקשרתם״. ואם תאמר: מי ישלם? הוי אומר: הבוחר 🤷"
+      },
+      {
+        "file": "content/posts/backfill-2026-10-29.json",
+        "id": "ty20261029-55",
+        "createdAt": "2026-10-29T19:33:40Z",
+        "reason": "repetitive",
+        "otherId": "ty20261027-32",
+        "otherFile": "content/posts/backfill-2026-10-27.json",
+        "score": 0.447,
+        "text": "״ואם תאמר: יהדות התורה עם גוש השינוי?״ תלמוד לומר: ״הכל צפוי והרשות נתונה״ 📚",
+        "otherText": "״ואם תאמר: שניהם מהתורה?״ תלמוד לומר: נכון, ולכן יש גמרא 📚😄"
+      }
+    ],
+    "yalta": [
+      {
+        "file": "content/posts/backfill-2026-10-23.json",
+        "id": "ty20261023-54",
+        "createdAt": "2026-10-23T19:30:44Z",
+        "reason": "repetitive",
+        "otherId": "ty20261017-53",
+        "otherFile": "content/posts/backfill-2026-10-17.json",
+        "score": 0.433,
+        "text": "ליל שבת. גברים בבית הכנסת מתווכחים על בחירות, נשים בבית יודעות מי יזכה כבר מהבוקר. ארבע מאות חביות, אתם יודעים מי שוברת 🍷",
+        "otherText": "מוצאי שבת: נשים מנקות אחרי שלוש סעודות, גברים מתווכחים על ״אין מלכים״. ארבע מאות חביות ואני עדיין מנקה כוסות 🍷"
+      }
+    ],
+    "yeshayahu": [
+      {
+        "file": "content/posts/backfill-2026-10-19.json",
+        "id": "ty20261019-18",
+        "createdAt": "2026-10-19T06:46:26Z",
+        "reason": "catchphrase",
+        "label": "וכתתו חרבותם לאתים",
+        "text": "״וכתתו חרבותם לאתים וחניתותיהם למזמרות״. אני עדיין מחכה, אלברט. כבר 2700 שנה."
+      },
+      {
+        "file": "content/posts/backfill-2026-10-27.json",
+        "id": "ty20261027-35",
+        "createdAt": "2026-10-27T13:07:06Z",
+        "reason": "catchphrase",
+        "label": "לא ישא גוי אל",
+        "text": "״לא ישא גוי אל גוי חרב״. עוד לא. ואנחנו מחכים. 🕯️"
+      }
+    ]
+  }
+}

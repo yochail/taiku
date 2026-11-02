@@ -12,6 +12,7 @@ import { quoteMatches, taikLength, MAX_TAIK_CHARS } from './data.mjs';
 import { lintTaik } from './house-style.mjs';
 import { seededRng, sha256 } from './pipeline-util.mjs';
 import { compareNovelty, fingerprint } from './ideas.mjs';
+import { phraseMatcher } from './textnorm.mjs';
 
 const tagContent = (s, tag) => s.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`))?.[1] ?? null;
 const lastOf = (messages, role) => [...messages].reverse().find((m) => m.role === role);
@@ -189,10 +190,17 @@ function clipWords(text, max) {
 const repeatedSnippets = (msg) => [...String(msg ?? '').matchAll(/This repeats your recent taik \("([\s\S]*?)"\)\./g)].map((m) => fingerprint(m[1].replace(/…$/, ''), { ...NOVELTY_LOOSE })).filter(Boolean).map((fp) => ({ id: 'x', fp }));
 const NOVELTY_LOOSE = { window_days: 7, cosine: 0.36, min_shared_tokens: 3, ngram: 4, min_tokens: 3, dims: 512 };
 const repeats = (text, avoid) => avoid?.length && compareNovelty(fingerprint(text, NOVELTY_LOOSE), avoid, NOVELTY_LOOSE).repetitive;
+// Catchphrase repairs name the capped phrases: a compliant model drops them (and the famous quote).
+const cappedSnippets = (msg) => {
+  const m = String(msg ?? '').match(/you already used (.+?) recently; don't use it/);
+  return m ? [...m[1].matchAll(/"([^"]+)"/g)].map((x) => phraseMatcher(x[1])).filter(Boolean) : [];
+};
 function composeOk(ctx0, passages, rand, opts) {
-  const ctx = opts.avoid?.length ? { ...ctx0, fresh: true } : ctx0;
+  const banned = opts.banned ?? [];
+  const ctx = opts.avoid?.length ? { ...ctx0, fresh: true } : banned.length ? { ...ctx0, noQuote: true } : ctx0;
+  const uses = (t) => banned.some((f) => f(t));
   let out = compose(ctx, passages, rand, opts);
-  for (let i = 0; opts.repairing && i < 12 && (lintTaik(out.text).length || taikLength(out.text) > ctx.max || repeats(out.text, opts.avoid)); i++) out = compose(ctx, passages, rand, opts);
+  for (let i = 0; opts.repairing && i < 12 && (lintTaik(out.text).length || taikLength(out.text) > ctx.max || repeats(out.text, opts.avoid) || uses(out.text)); i++) out = compose(ctx, passages, rand, opts);
   return out;
 }
 
@@ -204,7 +212,7 @@ function compose(ctx, passages, rand, { repairing }) {
   let text;
   let quoteRefs;
   const quotable = passages.filter((p) => taikLength(p.text) <= Math.min(200, max - 4) && !/"/.test(p.text));
-  if (spec.role !== 'wire' && !ctx.fresh && quotable.length && rand() < (spec.quote ? 0.75 : 0.3)) {
+  if (spec.role !== 'wire' && !ctx.fresh && !ctx.noQuote && quotable.length && rand() < (spec.quote ? 0.75 : 0.3)) {
     const p = pick(quotable, rand);
     let qtext = p.text;
     if (p.translated && rand() < 0.35) qtext = fuzzVariant(p.text, rand) ?? p.text;
@@ -256,7 +264,7 @@ function composeBatch(ctx, messages, rand) {
       targetHandle: thread.at(-1)?.match(/@([\w-]+)/)?.[1] ?? null,
       ...rangeOf(it.length),
     };
-    return { id: it.id, ...composeOk(sub, it.passages ?? [], rand, { repairing: Boolean(repairMsg), avoid: repeatedSnippets(repairMsg) }) };
+    return { id: it.id, ...composeOk(sub, it.passages ?? [], rand, { repairing: Boolean(repairMsg), avoid: repeatedSnippets(repairMsg), banned: cappedSnippets(repairMsg) }) };
   });
   if (!repairMsg && items.length > 2 && rand() < 0.08) items.pop(); // partial array → regenerated
   const body = JSON.stringify(items);
@@ -332,7 +340,7 @@ export function createMockClient({ maxCalls = 1000, tools = 'on', nonce = '', mo
         return reply({ content: null, tool_calls: [{ id: `call_${calls}`, type: 'function', function: { name: 'search_sources', arguments: JSON.stringify({ query }) } }] });
       }
       const repairing = /Too long:|not verbatim|not a valid JSON|content policy|House style:/.test(lastOf(messages, 'user')?.content ?? '');
-      return reply({ content: JSON.stringify(composeOk(ctx, returnedPassages(messages), rand, { repairing, avoid: repeatedSnippets(lastOf(messages, 'user')?.content) })) });
+      return reply({ content: JSON.stringify(composeOk(ctx, returnedPassages(messages), rand, { repairing, avoid: repeatedSnippets(lastOf(messages, 'user')?.content), banned: cappedSnippets(lastOf(messages, 'user')?.content) })) });
     },
   };
 }

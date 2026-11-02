@@ -3,11 +3,13 @@
 // taiks (embedding cosine + shared n-gram, spec.sampling.novelty) or exceed a catchphrase cap
 // (sites/<id>/ideas/<persona>.json). Deterministic. Content is rewritten by the backfill agents, so this
 // only writes a list: staging/repetition-audit.json { generated_from, config, total, by_reason, personas }.
-//   node scripts/repetition-audit.mjs [--out staging/repetition-audit.json]
+// Language-aware (Hebrew niqqud/prefix folding, src/lib/textnorm.mjs). Run per site: SITE=<id>.
+// --model adds a semantic pass with the multilingual embedding model (reason "semantic") when it loads.
+//   node scripts/repetition-audit.mjs [--out staging/repetition-audit.json] [--model]
 import fs from 'node:fs';
 import path from 'node:path';
 import { loadPersonas, loadPosts } from '../src/lib/data.mjs';
-import { noveltyConfig, scanRepetition } from '../src/lib/ideas.mjs';
+import { noveltyConfig, scanRepetition, semanticRepetition } from '../src/lib/ideas.mjs';
 import { loadSpec } from '../src/lib/realism.mjs';
 import { SITE, sitePath } from '../src/lib/site.mjs';
 
@@ -24,6 +26,18 @@ const fileOf = (p) => (p?._file ? `content/posts/${p._file}` : null);
 const snip = (p) => String(p?.text ?? '').replace(/\s+/g, ' ').slice(0, 140);
 
 const hits = scanRepetition(posts, { personas, cfg });
+let model = null;
+if (process.argv.includes('--model')) {
+  const { createEmbedder, MODEL_ID } = await import('../src/lib/embed.mjs');
+  const embedder = await createEmbedder({ mode: 'auto', log: console.error, cacheDir: path.join('.cache', 'models') });
+  if (embedder.kind === 'minilm') {
+    const texts = posts.filter((p) => p.text && !p.retaikOf);
+    const vecs = new Map();
+    for (let i = 0; i < texts.length; i += 64) (await embedder.embed(texts.slice(i, i + 64).map((p) => p.text))).forEach((v, k) => vecs.set(texts[i + k].id, v));
+    hits.push(...semanticRepetition(posts, { personas, cfg, vecOf: (p) => vecs.get(p.id) ?? null, skip: new Set(hits.map((h) => h.postId)) }));
+    model = MODEL_ID;
+  } else console.error('repetition audit: embedding model unavailable, lexical pass only');
+}
 const groups = {};
 const byReason = {};
 for (const h of hits) {
@@ -45,6 +59,7 @@ const doc = {
   site: SITE,
   note: 'Rewrite each listed taik to a different idea from the persona ledger (sites/<id>/ideas); keep id, timing, media and thread links.',
   config: cfg,
+  ...(model ? { model } : {}),
   scanned: posts.length,
   total: hits.length,
   by_reason: byReason,

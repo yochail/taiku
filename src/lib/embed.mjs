@@ -1,16 +1,18 @@
 // Embeddings for the generate step only (never imported by the site build).
-//   minilm  — @huggingface/transformers + Xenova/all-MiniLM-L6-v2 (quantized ONNX, CPU), an
-//             optionalDependency. Used live.
+//   minilm  — @huggingface/transformers + Xenova/paraphrase-multilingual-MiniLM-L12-v2 (quantized
+//             ONNX, CPU, 384 dims, 50+ languages incl. Hebrew), an optionalDependency. Used live.
+//             (The English-only all-MiniLM-L6-v2 scored unrelated Hebrew pairs at 0.5-0.6.)
 //   hash    — deterministic bag-of-words hashing (64 dims). Offline mock/dry runs and tests.
 //   none    — fallback when the model can't load: callers use tag overlap and the run is degraded.
 // Uses: react.mjs affinity (post vs persona interest vector), pool-entry ranking, stance hints.
 import fs from 'node:fs';
 import path from 'node:path';
 import { readJson, sha256, writeJsonAtomic } from './pipeline-util.mjs';
+import { tokens } from './textnorm.mjs';
 
-export const MODEL_ID = 'Xenova/all-MiniLM-L6-v2';
+export const MODEL_ID = 'Xenova/paraphrase-multilingual-MiniLM-L12-v2';
 // Pinned Hugging Face commit (supply chain: a moved `main` can't swap the weights). generate.yml keys its cache on it.
-export const MODEL_REVISION = '751bff37182d3f1213fa05d7196b954e230abad9';
+export const MODEL_REVISION = '2c4055b12046f11709e9df2c122e59ffbdc2f900';
 export const HASH_DIMS = 64;
 export const STANCE_ANCHORS = {
   agree: ['yes exactly, you are right', 'agreed, well said', 'this is correct'],
@@ -21,8 +23,8 @@ export const STANCE_ANCHORS = {
   hype: ["let's go! this is huge", 'so hyped, incredible news', 'massive W'],
 };
 
-const STOP = new Set('the a an and or of to in on for with is are was were be it this that at by as from but not no so if do does did i you he she we they me my your our their its'.split(' '));
-export const tokens = (s) => String(s ?? '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').split(/[^a-z0-9]+/).filter((w) => w.length > 2 && !STOP.has(w));
+// Language-aware (Latin + Hebrew niqqud/prefix folding); see textnorm.mjs.
+export { tokens } from './textnorm.mjs';
 
 const norm = (v) => {
   let n = 0;
@@ -170,8 +172,12 @@ export function stanceHint(vec, anchors) {
   return Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, Math.round((v - mean) * 1000) / 1000]));
 }
 
-/** Map a cosine to an affinity in [0,1] (MiniLM cosines for related texts sit around 0.2–0.6). */
-export const affinityFromCosine = (c, kind = 'minilm') => Math.max(0, Math.min(1, kind === 'hash' ? (c + 0.1) / 0.6 : (c - 0.05) / 0.45));
+/**
+ * Map a cosine to an affinity in [0,1]. Re-tuned for the multilingual model, which runs higher than
+ * all-MiniLM-L6-v2: on 150 taiku taiks x 40 personas, other-persona cosines q10/q50/q90 were
+ * 0.025/0.153/0.295 (L6: -0.028/0.077/0.200); a linear fit maps it back onto the old (c-0.05)/0.45.
+ */
+export const affinityFromCosine = (c, kind = 'minilm') => Math.max(0, Math.min(1, kind === 'hash' ? (c + 0.1) / 0.6 : (c - 0.12) / 0.53));
 
 /** Tag-overlap similarity (fallback ranking): Jaccard-ish on tokens. */
 export function tagOverlap(aTags, bTags) {

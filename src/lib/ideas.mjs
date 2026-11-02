@@ -8,9 +8,10 @@
 import fs from 'node:fs';
 import { sitePath } from './site.mjs';
 import { cosineVec, hashEmbed, tokens } from './embed.mjs';
+import { foldText, isHebrew, isKeyWord, isLongWord, phraseMatcher, words } from './textnorm.mjs';
 
 const DAY = 864e5;
-export const NOVELTY_DEFAULTS = { window_days: 7, cosine: 0.36, min_shared_tokens: 3, ngram: 4, min_tokens: 6, dims: 512, catchphrase_window_days: 14, lru_days: 14 };
+export const NOVELTY_DEFAULTS = { window_days: 7, cosine: 0.36, min_shared_tokens: 3, ngram: 4, min_tokens: 6, dims: 512, catchphrase_window_days: 14, lru_days: 14, model_cosine: { en: 0.68, he: 0.8 } };
 export const noveltyConfig = (spec) => ({ ...NOVELTY_DEFAULTS, ...(spec?.sampling?.novelty ?? {}) });
 
 const fileCache = new Map();
@@ -31,9 +32,8 @@ export function ideaFile(persona) {
   return fileCache.get(id);
 }
 
-const KEY_MIN = 5;
-const keysOf = (s) => [...new Set(tokens(s).filter((w) => w.length >= KEY_MIN))];
-const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48);
+const keysOf = (s) => [...new Set(tokens(s).filter(isKeyWord))];
+const slug = (s) => foldText(s).replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').slice(0, 48);
 
 /** Everything a persona can draw on: [{ id, label, work, keys }]. */
 export function ledgerItems(persona) {
@@ -83,17 +83,71 @@ export function pickIdea(rand, items, usage, now, lruDays = 14) {
   return items.at(-1);
 }
 
-/** Compiled catchphrases: [{ label, re, max }]. */
+// Songs and poems everyone in a Hebrew pack might quote (anthem lines, the canon): capped per persona too.
+const SHARED_PHRASES = {
+  he: ['עוד לא אבדה תקוותנו', 'להיות עם חופשי בארצנו', 'ירושלים של זהב', 'על כל אלה', 'רק על עצמי לספר ידעתי', 'ואולי לא היו הדברים מעולם', 'אם תרצו אין זו אגדה', 'אם אשכחך ירושלים'],
+};
+const SONGISH = /שיר|פזמון|המנון|פואמה|poem|song|hymn|anthem|ballad/i;
+const QUOTE_WORDS = 4;
+
+/** Opening words of a famous line (enough to identify it, ≥2 long words) as a catchphrase phrase. */
+function quotePhrase(text) {
+  const raw = String(text).replace(/[\u05BE]/g, ' ').split(/\s+/).filter((x) => words(x).length);
+  if (raw.length < 2) return null;
+  let k = Math.min(raw.length, QUOTE_WORDS);
+  const long = (n) => words(raw.slice(0, n).join(' ')).filter(isLongWord).length;
+  while (k < Math.min(raw.length, 7) && long(k) < 2) k++;
+  return long(k) >= 2 || (k === raw.length && k >= 2) ? raw.slice(0, k).join(' ').replace(/[\s,.;:!?״"“”—-]+$/u, '') : null;
+}
+
+/**
+ * Catchphrases derived from a persona's own profile, for every site and language: the famous lines
+ * (quotables, quote_bank), song/poem titles (key_works), quoted signature lines (signature_moves)
+ * and, for Hebrew personas, the shared canon (Hatikvah, "ירושלים של זהב"...). Plain phrases matched
+ * on normalized words, so niqqud, geresh/gershayim, final letters and ו/ה/ב/ל/מ/ש/כ prefixes don't hide them.
+ */
+export function derivedCatchphrases(persona) {
+  const out = [];
+  const add = (phrase, max) => {
+    if (!phrase) return;
+    const test = phraseMatcher(phrase);
+    if (test) out.push({ label: phrase.trim(), key: words(phrase).join(' '), test, max });
+  };
+  for (const q of [...(persona.quotables ?? []), ...(persona.quote_bank ?? [])]) add(quotePhrase(q.text ?? ''), 1);
+  for (const w of persona.key_works ?? []) if (w && typeof w === 'object' && SONGISH.test(w.note ?? '') && words(w.title).length >= 2) add(w.title, 1);
+  for (const s of persona.signature_moves ?? []) for (const m of String(s).matchAll(/["“״]([^"”״]{3,60})["”״]/g)) if (words(m[1]).length >= 3) add(m[1].replace(/[.,!?]+$/, ''), 2);
+  if (/[\u05D0-\u05EA]/.test(`${persona.name ?? ''}${persona.native_language ?? ''}`) || /hebrew|עברית/i.test(persona.native_language ?? '')) for (const s of SHARED_PHRASES.he) add(s, 1);
+  return out;
+}
+
+const listCache = new WeakMap();
+/** Compiled catchphrases: [{ label, test(raw, folded, words), max }] = ideas-file regexes + derived phrases. */
 export function catchphrases(persona) {
-  return (ideaFile(persona).catchphrases ?? []).flatMap((c) => {
+  if (persona && typeof persona === 'object' && listCache.has(persona)) return listCache.get(persona);
+  const own = (ideaFile(persona).catchphrases ?? []).flatMap((c) => {
     try {
-      return [{ label: c.label, re: new RegExp(c.pattern, 'i'), max: Math.max(1, c.max ?? 1) }];
+      const re = new RegExp(c.pattern, 'i');
+      return [{ label: c.label, re, test: (raw, folded) => re.test(raw) || re.test(folded), max: Math.max(1, c.max ?? 1) }];
     } catch {
       return [];
     }
   });
+  const seen = new Set();
+  const list = [...own];
+  for (const d of persona ? derivedCatchphrases(persona) : []) {
+    if (seen.has(d.key) || own.some((c) => c.re.test(d.label))) continue;
+    seen.add(d.key);
+    list.push(d);
+  }
+  if (persona && typeof persona === 'object') listCache.set(persona, list);
+  return list;
 }
-export const catchphraseHits = (text, list) => list.filter((c) => c.re.test(String(text ?? ''))).map((c) => c.label);
+export const catchphraseHits = (text, list) => {
+  if (!list.length) return [];
+  const raw = String(text ?? '');
+  const folded = foldText(raw);
+  return list.filter((c) => c.test(raw, folded)).map((c) => c.label);
+};
 
 /** Labels already at their cap within the window before `now` (counted over `posts` by this persona). */
 export function cappedPhrases(list, posts, now, windowDays = 14) {
@@ -107,8 +161,8 @@ export function cappedPhrases(list, posts, now, windowDays = 14) {
   return list.filter((c) => (counts.get(c.label) ?? 0) >= c.max).map((c) => c.label);
 }
 
-const cleanText = (t) => String(t ?? '').replace(/https?:\/\/\S+/g, ' ').replace(/[@#][\w-]+/g, ' ');
-const wordsOf = (t) => cleanText(t).toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').split(/[^a-z0-9']+/).filter(Boolean);
+const cleanText = (t) => String(t ?? '').replace(/https?:\/\/\S+/g, ' ').replace(/[@#][\p{L}\p{M}\p{N}_-]+/gu, ' ');
+const wordsOf = (t) => words(cleanText(t));
 
 /** Precomputed novelty fingerprint of a text (null when too short to judge). */
 export function fingerprint(text, cfg = NOVELTY_DEFAULTS) {
@@ -119,7 +173,7 @@ export function fingerprint(text, cfg = NOVELTY_DEFAULTS) {
   const grams = new Set();
   for (let i = 0; i + cfg.ngram <= w.length; i++) {
     const g = w.slice(i, i + cfg.ngram);
-    if (g.filter((x) => content.has(x) && x.length >= 4).length >= 3) grams.add(g.join(' '));
+    if (g.filter((x) => content.has(x) && isLongWord(x)).length >= 3) grams.add(g.join(' '));
   }
   return { vec: hashEmbed(cleanText(text), cfg.dims), tokens: content, grams };
 }
@@ -183,9 +237,9 @@ export function acceptNovelty(nctx, id, text) {
   if (!nctx) return;
   const fp = fingerprint(text, nctx.cfg);
   if (fp) nctx.prev.push({ id, text, fp });
-  for (const c of nctx.phrases) if (c.re.test(String(text ?? ''))) {
-    nctx.counts.set(c.label, (nctx.counts.get(c.label) ?? 0) + 1);
-    if (nctx.counts.get(c.label) >= c.max) nctx.capped.add(c.label);
+  for (const label of catchphraseHits(text, nctx.phrases)) {
+    nctx.counts.set(label, (nctx.counts.get(label) ?? 0) + 1);
+    if (nctx.counts.get(label) >= (nctx.phrases.find((c) => c.label === label)?.max ?? 1)) nctx.capped.add(label);
   }
 }
 
@@ -229,6 +283,45 @@ export function scanRepetition(posts, { personas, cfg = NOVELTY_DEFAULTS, isTarg
       }
       const cmp = compareNovelty(fps[i].fp, fps.slice(0, i).filter((o) => o.t >= t - cfg.window_days * DAY), cfg);
       if (cmp.repetitive) out.push({ postId: xs[i].id, personaId: pid, reason: 'repetitive', otherId: cmp.otherId, score: cmp.score, shared: cmp.shared, ...(cmp.gram ? { gram: cmp.gram } : {}) });
+    }
+  }
+  return out;
+}
+
+/** Model-cosine threshold for a text's language (cfg.model_cosine: number or { en, he }). */
+export function modelThreshold(text, cfg = NOVELTY_DEFAULTS) {
+  const m = cfg.model_cosine ?? NOVELTY_DEFAULTS.model_cosine;
+  if (typeof m === 'number') return m;
+  const lang = [...words(text)].filter(isHebrew).length * 2 >= words(text).length ? 'he' : 'en';
+  return m[lang] ?? m.en ?? 0.7;
+}
+
+/**
+ * Semantic pass (multilingual model vectors, optional): paraphrases the lexical guard misses. An item
+ * repeats when its model cosine to one of the same persona's taiks in the window is ≥ the language
+ * threshold AND they share ≥ cfg.min_shared_tokens content tokens (daily verse bots and the like sit
+ * high on cosine alone). `vecOf(post)` → vector or null; `skip` = post ids already flagged.
+ */
+export function semanticRepetition(posts, { personas, vecOf, cfg = NOVELTY_DEFAULTS, skip = new Set(), isTarget = () => true }) {
+  const { groups } = groupByPersona(posts, personas);
+  const out = [];
+  for (const [pid, xs] of groups) {
+    const rows = xs.map((p) => ({ p, t: Date.parse(p.createdAt), fp: fingerprint(p.text, cfg), v: vecOf(p) }));
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r.fp || !r.v || skip.has(r.p.id) || !isTarget(r.p)) continue;
+      const th = modelThreshold(r.p.text, cfg);
+      let best = null;
+      for (let j = 0; j < i; j++) {
+        const o = rows[j];
+        if (!o.fp || !o.v || o.t < r.t - cfg.window_days * DAY) continue;
+        const c = cosineVec(r.v, o.v);
+        if (c < th || (best && c <= best.score)) continue;
+        let shared = 0;
+        for (const tk of r.fp.tokens) if (o.fp.tokens.has(tk)) shared++;
+        if (shared >= cfg.min_shared_tokens) best = { otherId: o.p.id, score: Math.round(c * 1000) / 1000, shared };
+      }
+      if (best) out.push({ postId: r.p.id, personaId: pid, reason: 'semantic', ...best });
     }
   }
   return out;
