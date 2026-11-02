@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { after, before, test } from 'node:test';
+import { pinUsedArtCorpus } from '../src/lib/art-select.mjs';
 import { withDisplayStats } from '../src/lib/crowd.mjs';
 import { ROOT, loadPersonas } from '../src/lib/data.mjs';
 import { binomCdf, gateDay, widenBand } from '../src/lib/daygate.mjs';
@@ -20,6 +21,9 @@ const fileOf = (date) => outputPaths(SCRATCH, date, { mock: true }).posts;
 const clone = (x) => JSON.parse(JSON.stringify(x));
 
 before(async () => {
+  // The mock days' art picks depend on what the corpus already used; pin that to the seed + backfill
+  // so each new daily file landing on main doesn't reshuffle the fixture.
+  pinUsedArtCorpus({ include: (f) => f === '0000-seed.json' || f.startsWith('backfill-') });
   fs.rmSync(SCRATCH, { recursive: true, force: true });
   fs.mkdirSync(SCRATCH, { recursive: true });
   for (const [i, date] of DATES.entries()) {
@@ -28,7 +32,10 @@ before(async () => {
     days.set(date, JSON.parse(fs.readFileSync(fileOf(date), 'utf8')).posts);
   }
 });
-after(() => fs.rmSync(SCRATCH, { recursive: true, force: true }));
+after(() => {
+  fs.rmSync(SCRATCH, { recursive: true, force: true });
+  pinUsedArtCorpus();
+});
 
 const runCli = (...args) => spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'realism.mjs'), ...args], { encoding: 'utf8', env: { ...process.env, GITHUB_STEP_SUMMARY: '' } });
 

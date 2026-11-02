@@ -93,13 +93,19 @@ export function usedArtFromPosts(posts) {
 }
 
 let usedCache = null;
+let usedSource = { dir: null, include: () => true };
+/** Pin the corpus usedArt() reads (tests: a fixed file set, so new daily files don't change fixture picks). */
+export function pinUsedArtCorpus({ dir = null, include = () => true } = {}) {
+  usedSource = { dir, include };
+  usedCache = null;
+}
 /** Art used by the corpus on disk (snapshot taken on first call, so plans and their prompts stay stable within a run). */
 export function usedArt() {
   if (usedCache) return usedCache;
-  const dir = sitePath('content', 'posts');
+  const dir = usedSource.dir ?? sitePath('content', 'posts');
   const posts = [];
   if (fs.existsSync(dir)) {
-    for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json'))) {
+    for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json') && usedSource.include(x))) {
       try {
         const j = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
         posts.push(...(Array.isArray(j) ? j : j.posts ?? []));
