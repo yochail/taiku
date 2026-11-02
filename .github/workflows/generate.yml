@@ -66,6 +66,8 @@ jobs:
     needs: sites
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    # Secrets live in the `production` environment (restricted to main).
+    environment: production
     permissions:
       contents: read
     strategy:
@@ -84,9 +86,19 @@ jobs:
         id: local
         env:
           GEN_DATE: ${{ inputs.date }}
+          IN_NONCE: ${{ inputs.nonce }}
+          IN_TOPICS: ${{ inputs.topics }}
+          IN_MAX_CALLS: ${{ inputs.max_calls }}
           FORCE: ${{ inputs.force && '1' || '' }}
           MOCK: ${{ inputs.mock && '1' || '' }}
         run: |
+          # Free-text dispatch inputs: allowlist before anything uses them.
+          bad() { echo "::error::invalid input $1"; exit 1; }
+          [ -z "$GEN_DATE" ] || [[ "$GEN_DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || bad date
+          [ -z "$IN_NONCE" ] || [[ "$IN_NONCE" =~ ^[A-Za-z0-9_-]{1,64}$ ]] || bad nonce
+          [ -z "$IN_TOPICS" ] || [[ "$IN_TOPICS" =~ ^[0-9]{1,2}$ ]] || bad topics
+          [ -z "$IN_MAX_CALLS" ] || [[ "$IN_MAX_CALLS" =~ ^[0-9]{1,5}$ ]] || bad max_calls
+          [[ "$SITE" =~ ^[a-z0-9_-]+$ ]] || bad site
           day="${GEN_DATE:-$(date -u +%Y-%m-%d)}"
           echo "day=$day" >> "$GITHUB_OUTPUT"
           # The file this run owns: -mock in mock mode, -cf when --force runs next to a local file.
@@ -108,15 +120,21 @@ jobs:
 
       # The site build is zero-dependency. The generate step optionally uses MiniLM embeddings
       # (@huggingface/transformers, optionalDependency); a failed install just degrades to tag overlap.
+      # Supply chain: exact versions from package-lock.json, no install scripts (no secrets in this step either),
+      # and the model is pinned to a Hugging Face commit (MODEL_REVISION in src/lib/embed.mjs) that keys the cache.
+      - name: Model revision
+        id: hf
+        if: steps.local.outputs.skipped != 'true'
+        run: echo "rev=$(node -e "import('./src/lib/embed.mjs').then(m=>console.log(m.MODEL_REVISION))")" >> "$GITHUB_OUTPUT"
       - name: Cache embedding model
         if: steps.local.outputs.skipped != 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/taiku-hf
-          key: hf-minilm-l6-v2-${{ runner.os }}-v1
+          key: hf-minilm-l6-v2-${{ runner.os }}-${{ steps.hf.outputs.rev }}
       - name: Install optional embeddings
         if: steps.local.outputs.skipped != 'true'
-        run: npm install --no-save --no-audit --no-fund @huggingface/transformers || echo "embeddings unavailable; the run falls back to tag overlap (degraded)"
+        run: npm ci --ignore-scripts --no-audit --no-fund || echo "embeddings unavailable; the run falls back to tag overlap (degraded)"
 
       - name: Generate the daily run (Workers AI fallback)
         id: gen
@@ -151,7 +169,9 @@ jobs:
         id: gate
         if: steps.local.outputs.skipped != 'true'
         continue-on-error: true
-        run: npm run realism -- --file "${{ steps.local.outputs.dayfile }}" --json day-gate.json
+        env:
+          DAYFILE: ${{ steps.local.outputs.dayfile }}
+        run: npm run realism -- --file "$DAYFILE" --json day-gate.json
       - name: Repair once (regenerate the flagged items)
         if: steps.local.outputs.skipped != 'true' && steps.gate.outcome == 'failure'
         env:
@@ -181,7 +201,9 @@ jobs:
           if [ -n "$MOCK" ]; then npm run generate:mock -- "${args[@]}"; else npm run generate -- "${args[@]}"; fi
       - name: Day gate after repair (blocking; a failure means nothing is committed)
         if: steps.local.outputs.skipped != 'true' && steps.gate.outcome == 'failure'
-        run: npm run realism -- --file "${{ steps.local.outputs.dayfile }}" --json day-gate.json
+        env:
+          DAYFILE: ${{ steps.local.outputs.dayfile }}
+        run: npm run realism -- --file "$DAYFILE" --json day-gate.json
 
       - name: Validate content
         if: steps.local.outputs.skipped != 'true'
@@ -196,7 +218,9 @@ jobs:
 
       - name: Record the day file for publish
         if: steps.local.outputs.skipped != 'true'
-        run: mkdir -p gen-meta && echo "${{ steps.local.outputs.dayfile }}" > gen-meta/dayfile.txt
+        env:
+          DAYFILE: ${{ steps.local.outputs.dayfile }}
+        run: mkdir -p gen-meta && printf '%s\n' "$DAYFILE" > gen-meta/dayfile.txt
       - name: Upload generated content
         if: always() && steps.local.outputs.skipped != 'true'
         uses: actions/upload-artifact@v4
@@ -242,7 +266,9 @@ jobs:
       - name: Re-validate before publishing
         if: steps.dl.outcome == 'success'
         run: |
-          DAYFILE="$(cat gen-meta/dayfile.txt)"
+          DAYFILE="$(head -n1 gen-meta/dayfile.txt)"
+          # The artifact is untrusted input here: only this site's day file shape is accepted.
+          [[ "$DAYFILE" =~ ^sites/[a-z0-9_-]+/content/posts/daily-[0-9]{4}-[0-9]{2}-[0-9]{2}(-cf)?\.json$ ]] && [[ "$DAYFILE" == "sites/$SITE/"* ]] || { echo "::error::unexpected day file '$DAYFILE'"; exit 1; }
           npm run validate
           if [ "$SITE" = "taiku" ]; then SITE= npm test; else npm run build; fi
           npm run realism -- --file "$DAYFILE"

@@ -9,6 +9,8 @@ import path from 'node:path';
 import { readJson, sha256, writeJsonAtomic } from './pipeline-util.mjs';
 
 export const MODEL_ID = 'Xenova/all-MiniLM-L6-v2';
+// Pinned Hugging Face commit (supply chain: a moved `main` can't swap the weights). generate.yml keys its cache on it.
+export const MODEL_REVISION = '751bff37182d3f1213fa05d7196b954e230abad9';
 export const HASH_DIMS = 64;
 export const STANCE_ANCHORS = {
   agree: ['yes exactly, you are right', 'agreed, well said', 'this is correct'],
@@ -92,7 +94,7 @@ async function loadMiniLM({ cacheDir }) {
   const tf = await import(pkg);
   if (cacheDir) tf.env.cacheDir = cacheDir;
   tf.env.allowLocalModels = true;
-  const extractor = await tf.pipeline('feature-extraction', MODEL_ID, { dtype: 'q8', device: 'cpu' });
+  const extractor = await tf.pipeline('feature-extraction', MODEL_ID, { dtype: 'q8', device: 'cpu', revision: MODEL_REVISION });
   return async (texts) => {
     const t = await extractor(texts, { pooling: 'mean', normalize: true });
     return t.tolist();

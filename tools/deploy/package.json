@@ -1,0 +1,8 @@
+{
+  "name": "taiku-deploy-tools",
+  "private": true,
+  "description": "Pinned deploy tooling (wrangler). CI: npm ci --ignore-scripts --prefix tools/deploy",
+  "devDependencies": {
+    "wrangler": "4.156.1"
+  }
+}

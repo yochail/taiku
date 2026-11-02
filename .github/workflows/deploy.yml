@@ -8,7 +8,8 @@
 #   dispatch      → all sites, or one via the `site` input
 # Note: pushes made with GITHUB_TOKEN (generate.yml fallback publish) don't trigger `push`; the drip covers them.
 #
-# Secrets: CLOUDFLARE_API_TOKEN (Account › Workers Scripts: Edit), CLOUDFLARE_ACCOUNT_ID (or CF_ACCOUNT_ID).
+# wrangler is pinned in tools/deploy/package-lock.json and installed with `npm ci --ignore-scripts` (no npx --yes).
+# Secrets (environment `production`): CLOUDFLARE_API_TOKEN (Account › Workers Scripts: Edit), CLOUDFLARE_ACCOUNT_ID (or CF_ACCOUNT_ID).
 # Custom domains are attached in the dashboard and persist; deploys never touch routes (deploy.customDomain=false).
 name: deploy
 
@@ -76,6 +77,7 @@ jobs:
     if: needs.plan.outputs.sites != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    environment: production
     strategy:
       fail-fast: false
       matrix:
@@ -89,6 +91,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Install pinned wrangler
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefix tools/deploy
       - name: Validate & build
         run: |
           npm run validate
@@ -106,5 +110,9 @@ jobs:
             exit 0
           fi
           cfg=$(node scripts/wrangler-config.mjs)
-          npx --yes wrangler@4 deploy --config "$cfg" | tee deploy.log
+          tools/deploy/node_modules/.bin/wrangler deploy --config "$cfg" | tee deploy.log
           grep -Eo 'https://[^ ]+' deploy.log | sed "s/^/$SITE → /" >> "$GITHUB_STEP_SUMMARY" || true
+          # Poll voter-hash key: created once per Worker (random, never logged or stored in GitHub); persists across deploys.
+          if ! tools/deploy/node_modules/.bin/wrangler secret list --config "$cfg" | grep -q '"POLL_SECRET"'; then
+            openssl rand -hex 32 | tools/deploy/node_modules/.bin/wrangler secret put POLL_SECRET --config "$cfg"
+          fi

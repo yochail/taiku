@@ -13,7 +13,9 @@ const config = {
   name: deploy.worker || SITE,
   main: './src/worker/index.mjs',
   compatibility_date: '2025-01-01',
-  workers_dev: true,
+  // Only the custom domain serves the site (no *.workers.dev or preview URLs).
+  workers_dev: false,
+  preview_urls: false,
   assets: {
     directory: `./dist/${SITE}`,
     binding: 'ASSETS',
@@ -25,6 +27,12 @@ const config = {
   // Real poll votes: one SQLite-backed Durable Object per poll (Workers Free; created by the script upload, no extra token scope).
   durable_objects: { bindings: [{ name: 'POLLS', class_name: 'PollVotes' }] },
   migrations: [{ tag: 'v1', new_sqlite_classes: ['PollVotes'] }],
+  // Workers Rate Limiting (free, per Cloudflare location): votes and count reads per client.
+  ratelimits: [
+    { name: 'VOTE_RL', namespace_id: '1001', simple: { limit: 10, period: 60 } },
+    { name: 'READ_RL', namespace_id: '1002', simple: { limit: 120, period: 60 } },
+  ],
+  // POLL_SECRET (HMAC key for voter hashes) is a Worker secret; deploy.yml creates it once if missing.
   ...(deploy.customDomain && host ? { routes: [{ pattern: host, custom_domain: true }] } : {}),
 };
 const file = path.join(ROOT, `wrangler.${SITE}.json`);

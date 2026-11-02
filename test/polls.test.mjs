@@ -2,7 +2,7 @@
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import worker, { PollVotes } from '../src/worker/index.mjs';
-import { PER_IP } from '../src/worker/polls.mjs';
+import { PER_IP, MAX_VOTES, voterKeys } from '../src/worker/polls.mjs';
 
 const ORIGIN = 'https://taiku.example';
 const H = 3600e3;
@@ -26,6 +26,7 @@ beforeEach(() => {
   index = { open: [['0', '1', '2'], Date.now() + 5 * H], shut: [['a', 'b'], Date.now() - H] };
   objects = new Map();
   env = {
+    POLL_SECRET: 'test-secret',
     ASSETS: { fetch: async (req) => (new URL(req.url).pathname === '/_p/polls.json' ? Response.json(index) : new Response('nf', { status: 404 })) },
     POLLS: {
       idFromName: (name) => name,
@@ -39,8 +40,8 @@ beforeEach(() => {
 
 // The Worker caches polls.json per isolate; tests share one module, so all use the same index ids.
 const ctx = { waitUntil() {} };
-const vote = (id, opt, { ip = '1.1.1.1', ua = 'ua', origin = ORIGIN } = {}) =>
-  worker.fetch(new Request(`${ORIGIN}/api/poll/${id}`, { method: 'POST', body: JSON.stringify({ opt }), headers: { 'content-type': 'application/json', 'cf-connecting-ip': ip, 'user-agent': ua, ...(origin ? { origin } : {}) } }), env, ctx);
+const vote = (id, opt, { ip = '1.1.1.1', ua = 'ua', origin = ORIGIN, ct = 'application/json' } = {}) =>
+  worker.fetch(new Request(`${ORIGIN}/api/poll/${id}`, { method: 'POST', body: JSON.stringify({ opt }), headers: { 'content-type': ct, 'cf-connecting-ip': ip, 'user-agent': ua, ...(origin ? { origin } : {}) } }), env, ctx);
 const counts = async (ids) => (await worker.fetch(new Request(`${ORIGIN}/api/polls?ids=${ids}`), env, ctx)).json();
 
 test('vote counts once per voter, returns totals, and GET batches known polls only', async () => {
@@ -61,11 +62,36 @@ test('rejects closed, unknown, invalid options, cross-origin posts and oversized
   assert.equal((await vote('nope', '0')).status, 404);
   assert.equal((await vote('open', '9')).status, 400);
   assert.equal((await vote('open', '0', { origin: 'https://evil.example' })).status, 403);
-  const big = await worker.fetch(new Request(`${ORIGIN}/api/poll/open`, { method: 'POST', body: JSON.stringify({ opt: '0', pad: 'x'.repeat(400) }) }), env, ctx);
+  assert.equal((await vote('open', '0', { ct: 'text/plain' })).status, 415, 'JSON only (no simple cross-site form posts)');
+  const big = await worker.fetch(new Request(`${ORIGIN}/api/poll/open`, { method: 'POST', body: JSON.stringify({ opt: '0', pad: 'x'.repeat(400) }), headers: { 'content-type': 'application/json' } }), env, ctx);
   assert.equal(big.status, 400);
   for (let i = 0; i < PER_IP; i++) assert.equal((await vote('open', '0', { ip: '2.2.2.2', ua: `u${i}` })).status, 200);
   assert.equal((await vote('open', '0', { ip: '2.2.2.2', ua: 'one-more' })).status, 429);
   assert.equal((await counts('open')).open.c['0'], PER_IP);
+});
+
+test('rate-limit bindings and the global per-poll cap return 429; no secret means no voting', async () => {
+  const seen = [];
+  env.VOTE_RL = { limit: async ({ key }) => (seen.push(key), { success: seen.length < 2 }) };
+  assert.equal((await vote('open', '0', { ip: '3.3.3.3' })).status, 200);
+  assert.equal((await vote('open', '0', { ip: '3.3.3.3', ua: 'b' })).status, 429);
+  assert.ok(!seen[0].includes('3.3.3.3'), 'rate-limit key is hashed');
+  delete env.VOTE_RL;
+  env.READ_RL = { limit: async () => ({ success: false }) };
+  assert.equal((await worker.fetch(new Request(`${ORIGIN}/api/polls?ids=open`), env, ctx)).status, 429);
+  delete env.READ_RL;
+  await objects.get('open').s.put('c', { 1: MAX_VOTES });
+  assert.equal((await vote('open', '1', { ip: '4.4.4.4' })).status, 429);
+  delete env.POLL_SECRET;
+  assert.equal((await vote('open', '1', { ip: '5.5.5.5' })).status, 503);
+});
+
+test('voter keys are secret-keyed HMACs that rotate by poll day', async () => {
+  const a = await voterKeys('s1', 'p', Date.UTC(2026, 0, 1, 12), '1.2.3.4', 'ua');
+  assert.match(a.voter, /^v:[0-9a-f]{64}$/);
+  assert.notEqual(a.voter, (await voterKeys('s2', 'p', Date.UTC(2026, 0, 1, 12), '1.2.3.4', 'ua')).voter);
+  assert.notEqual(a.voter, (await voterKeys('s1', 'p', Date.UTC(2026, 0, 2, 12), '1.2.3.4', 'ua')).voter);
+  assert.equal(a.voter, (await voterKeys('s1', 'p', Date.UTC(2026, 0, 1, 20), '1.2.3.4', 'ua')).voter);
 });
 
 test('stores no raw IP/UA, and the alarm 30 days after close forgets voters but keeps totals', async () => {
