@@ -13,11 +13,12 @@ const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'media', 'library.json'),
 const lib = loadLibrary();
 
 test('library: every art piece is fetched, public domain/CC0 and credited; templates reference real art', () => {
-  assert.equal(lib.art.size, raw.art.length, 'every library art entry has credits (run npm run media:fetch)');
+  const big = JSON.parse(fs.readFileSync(path.join(ROOT, 'media', 'art-library.json'), 'utf8')).items;
+  assert.equal(lib.art.size, new Set([...raw.art, ...big].map((a) => a.id)).size, 'every library art entry has credits (run npm run media:fetch)');
   for (const a of lib.art.values()) {
     assert.ok(fs.existsSync(path.join(ROOT, 'public', a.src)), `${a.id} file missing`);
-    assert.ok(raw.allowed_licenses.includes(a.license), `${a.id} license ${a.license}`);
-    assert.match(a.url, /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
+    assert.ok(raw.allowed_licenses.some((l) => a.license.startsWith(l)) || a.license === 'PDM-owner', `${a.id} license ${a.license}`);
+    assert.match(a.url, /^https:\/\/(commons\.wikimedia\.org\/wiki\/File:|www\.artic\.edu\/artworks\/|www\.metmuseum\.org\/art\/collection\/)/);
     assert.ok(a.alt && a.width > 0 && a.height > 0);
   }
   const memeLib = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets', 'memes', 'templates.json'), 'utf8'));

@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { hash } from './util.mjs';
 import { loadTemplates, renderMeme, memeAlt, canRaster, rasterizeSvg } from './meme-render.mjs';
 import { shortlistTemplates, pickReaction } from './meme-select.mjs';
+import { artLibrary, shortlistArt, claimArt } from './art-select.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -18,6 +19,8 @@ export function loadLibrary() {
   const lib = readJson(path.join(ROOT, 'media', 'library.json'));
   const credits = readJson(path.join(ROOT, 'media', 'art-credits.json'));
   const art = new Map(lib.art.filter((a) => credits[a.id]).map((a) => [a.id, { ...a, ...credits[a.id] }]));
+  // The large art library (media/art-library.json, see src/lib/art-select.mjs).
+  for (const a of artLibrary()) if (!art.has(a.id)) art.set(a.id, { ...a, author: `${a.artist}${a.date ? ` (${a.date})` : ''}`, url: a.source_url });
   // Meme templates live in assets/memes/templates.json (real meme library + PD-art templates).
   const memes = loadTemplates().templates;
   const reactions = new Map(lib.reactions.filter((r) => art.has(r.art)).map((r) => [r.id, r]));
@@ -326,7 +329,9 @@ export function planMedia(sampler, role = 'original', ctx = {}) {
     return { kind, source: 'local', options, prompt: `Attach a reaction GIF. Pick the ONE whose mood fits your reply. Optional caption (max 40 chars, PG). Return "media": {"reaction": id, "caption"?: text}. Options: ${JSON.stringify(options)}` };
   }
   if (kind === 'image') {
-    const options = sample(rand, [...lib.art.values()], 5).map((a) => ({ id: a.id, title: a.title, artist: a.artist, tags: a.tags }));
+    // Fitting pictures the corpus hasn't used yet (every image appears on at most one post).
+    const options = shortlistArt({ ...ctx, text: ctx.text ?? ctx.topic?.title }, { n: 5, rand }).map((a) => ({ id: a.id, title: a.title, artist: a.artist, tags: [...(a.tags?.themes ?? []), ...(a.tags?.mood ?? [])].slice(0, 8) }));
+    if (!options.length) return null;
     return { kind, options, prompt: `Attach a painting as the post's picture. Pick the ONE that fits (or is wryly apt). Return "media": {"art": id}. Options: ${JSON.stringify(options)}` };
   }
   if (kind === 'chart') {
@@ -357,7 +362,7 @@ export async function materializeMedia(plan, fill = {}, { giphy = null, rand = M
   if (plan.options && !allowed.has(pickId)) throw new Error(`"${pickId}" is not one of the offered options`);
   const render = plan.kind === 'meme' ? { template: fill.template, captions: fill.captions ?? {}, ...(fill.template === 'tweet-dunk' ? { quote: plan.quote, reaction: fill.reaction ?? plan.reaction } : {}) }
     : plan.kind === 'gif' ? { reaction: fill.reaction, ...(fill.caption ? { caption: String(fill.caption) } : {}) }
-      : plan.kind === 'image' ? { art: fill.art }
+      : plan.kind === 'image' ? { art: claimArt(fill.art, { alternatives: (plan.options ?? []).map((o) => o.id) }) }
         : { chart: { type: fill.type, title: fill.title, labels: fill.labels, values: fill.values, ...(fill.unit ? { unit: fill.unit } : {}), ...(fill.source ? { source: fill.source } : {}) } };
   const { svg: _svg, raster: _raster, ...item } = resolveMedia({ kind: plan.kind, render });
   return item;

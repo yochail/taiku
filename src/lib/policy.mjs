@@ -12,6 +12,7 @@ function libraryCorpus() {
   const credits = readJson(path.join(ROOT, 'media', 'art-credits.json'), {}) ?? {};
   const out = [];
   for (const a of lib.art ?? []) out.push(a.title, a.artist, a.alt);
+  for (const a of readJson(path.join(ROOT, 'media', 'art-library.json'), {})?.items ?? []) out.push(a.title, a.artist, a.alt);
   for (const c of Object.values(credits)) out.push(c?.author, c?.commons_artist);
   for (const m of lib.memes ?? []) out.push(m.title, m.name);
   return out.filter((x) => typeof x === 'string');
