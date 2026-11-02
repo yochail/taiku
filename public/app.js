@@ -251,6 +251,9 @@
       else toast(u);
       return;
     }
+    // Comment icon opens the thread at its replies; on the thread page itself, jump there.
+    const rep = e.target.closest('a.act-reply');
+    if (rep && rep.pathname === location.pathname) { e.preventDefault(); goReplies(); history.replaceState(null, '', '#replies'); return; }
     const gate = e.target.closest('[data-gate]');
     if (gate) { openGate(gate.dataset.gate); return; }
     // Whole post card is clickable (except inner links/buttons), like X.
@@ -258,6 +261,14 @@
     const card = e.target.closest('.post[data-href]:not(.focal)');
     if (card && !window.getSelection().toString()) location.href = card.dataset.href;
   });
+
+  function goReplies() {
+    const r = document.getElementById('replies');
+    if (!r) return;
+    r.scrollIntoView({ block: 'start' });
+    r.focus({ preventScroll: true });
+  }
+  if (location.hash === '#replies') requestAnimationFrame(goReplies);
 
   // Relative timestamps for recent posts.
   const relTimes = (scope) => {

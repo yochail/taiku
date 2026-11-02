@@ -300,3 +300,15 @@ test('library art uses the 600px copy via srcset/sizes in the feed, 1200px in th
   assert.match(html, /<img src="\/media\/art\/1668-celestial-map-figura-observat-comet\.webp"[^>]* srcset="\/media\/art\/600\/1668-celestial-map-figura-observat-comet\.webp 600w, \/media\/art\/1668-celestial-map-figura-observat-comet\.webp 1200w" sizes="[^"]+"/);
   assert.doesNotMatch(read('p/uit-art/index.html'), /srcset="\/media\/art\/600\//);
 });
+test('comment icon opens the thread at its replies (no members-only gate)', () => {
+  const home = read('index.html');
+  assert.match(home, /<a class="act act-reply" href="\/p\/uit-art\/#replies" aria-label="View replies">/);
+  assert.doesNotMatch(home, /data-gate="reply"/);
+  const thread = read('p/uit-art/index.html');
+  assert.match(thread, /<h2 class="section-h" id="replies" tabindex="-1">Replies<\/h2>/);
+  assert.match(read('p/uit-xpost/index.html'), /<p class="empty" id="replies" tabindex="-1">/);
+  assert.equal((thread.match(/id="replies"/g) ?? []).length, 1);
+  const app = fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8');
+  assert.match(app, /closest\('a\.act-reply'\)/);
+  assert.match(app, /location\.hash === '#replies'/);
+});

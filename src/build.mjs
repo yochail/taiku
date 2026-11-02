@@ -346,7 +346,7 @@ function postCard(post, opts = {}) {
   }
   if (!compact) {
     parts.push(`<footer class="actions" aria-label="${t('act.engagement')}">
-      <button type="button" class="act act-reply" data-gate="reply" aria-label="${t('act.reply')}">${ICONS.reply}<span>${convoReplies(post) || ''}</span></button>
+      <a class="act act-reply" href="/p/${post.id}/#replies" aria-label="${t('act.viewReplies')}">${ICONS.reply}<span>${convoReplies(post) || ''}</span></a>
       <button type="button" class="act act-repost" data-gate="retaik" aria-label="${t('act.retaik')}">${ICONS.repost}<span>${compactNumber(s.reposts + s.quotes)}</span></button>
       <button type="button" class="act act-like" data-like="${post.id}" data-count="${s.likes}" aria-pressed="false" aria-label="${t('act.like')}">${ICONS.like}<span>${compactNumber(s.likes)}</span></button>
       <span class="act act-views" title="${t('act.views')}">${ICONS.views}<span>${compactNumber(s.views)}</span></span>
@@ -674,7 +674,7 @@ function postPages() {
     if (selfParts.length) body += `<div class="self-thread">${selfParts.map((sp, i) => postCard(sp, { connector: i < selfParts.length - 1 })).join('')}</div>`;
     let tree = '';
     for (const node of [post, ...selfParts]) tree += renderReplyTree(node, 0, rendered);
-    body += tree ? `<h2 class="section-h">${t('post.replies')}</h2>${tree}` : `<p class="empty">${t('post.noReplies', { tradition: esc(author.tradition) })}</p>`;
+    body += tree ? `<h2 class="section-h" id="replies" tabindex="-1">${t('post.replies')}</h2>${tree}` : `<p class="empty" id="replies" tabindex="-1">${t('post.noReplies', { tradition: esc(author.tradition) })}</p>`;
     const qs = idx.quotes.get(post.id) ?? [];
     if (qs.length) body += `<h2 class="section-h">${t('post.quotedBy')}</h2><div class="feed">${qs.map((q) => postCard(q)).join('')}</div>`;
 

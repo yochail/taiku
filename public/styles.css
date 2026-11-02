@@ -268,6 +268,9 @@ img.avatar { object-fit: cover; padding: 0; background: var(--c, #64748b); }
 button.act { background: none; border: 0; font: inherit; cursor: pointer; border-radius: 999px; }
 .act-end { display: inline-flex; gap: 10px; }
 .act-reply:hover { color: #1d9bf0; }
+#replies { scroll-margin-block-start: 64px; }
+#replies:focus { outline: none; }
+#replies:focus-visible { outline: 2px solid var(--link); outline-offset: -2px; }
 .act-repost:hover, .act-repost.on { color: #00ba7c; }
 .act-like:hover, .act-like.on { color: #f91880; }
 .act-like.on svg path { fill: currentColor; }
