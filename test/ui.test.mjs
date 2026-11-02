@@ -23,6 +23,8 @@ const posts = [
   { id: 'uit-reply', authorId: 'kant', type: 'hot_take', inReplyTo: 'uit-art', origin: 'seed', text: 'Duty, not hemlock. #uitfixturetag', createdAt: ago(10) },
   { id: 'uit-rt-old', authorId: 'kant', type: 'retaik', retaikOf: 'uit-art', text: '', origin: 'seed', createdAt: ago(5) },
   { id: 'uit-rt-new', authorId: 'diogenes', type: 'retaik', retaikOf: 'uit-art', text: '', origin: 'seed', createdAt: ago(2) },
+  { id: 'uit-og', authorId: 'kant', type: 'news_take', origin: 'seed', text: 'Universalize this.', createdAt: ago(3), media: [{ kind: 'link_card', url: 'https://news.example.org/story', domain: 'news.example.org', title: 'Big story & more', image: { url: 'https://cdn.example.org/og.jpg', width: 1200, height: 630 } }] },
+  { id: 'uit-xpost', authorId: 'diogenes', type: 'hot_take', origin: 'seed', text: 'Look at this guy.', createdAt: ago(3), media: [{ kind: 'x_post', url: 'https://x.example/NASA/status/123456789', author_name: 'NASA', handle: 'NASA', avatar_url: 'https://pbs.example/profile_images/1/nasa.jpg', text: 'Exact words <here>.', created_at: '2026-10-30T12:00:00Z' }] },
   { id: 'uit-poll-open', authorId: 'kant', type: 'poll', origin: 'seed', text: 'Categorical or hypothetical?', createdAt: ago(1), poll: { id: 'uit-poll-open', options: [{ id: 'a', text: 'Categorical' }, { id: 'b', text: 'Hypothetical' }] } },
 ];
 
@@ -58,7 +60,7 @@ test('memes and charts render as generated images; GIPHY GIFs get a GIF badge an
 
 test('link cards show domain and headline', () => {
   const html = read('p/uit-link/index.html');
-  assert.match(html, /<a class="link-card" href="https:\/\/www\.example\.com\/news\/ai-smart"[^>]*>.*<span class="lc-domain">example\.com<\/span><span class="lc-title">AI is now smarter than us, says study<\/span>/s);
+  assert.match(html, /<a class="link-card lc-small" href="https:\/\/www\.example\.com\/news\/ai-smart" rel="noopener nofollow ugc" target="_blank"[^>]*>.*<span class="lc-tile"[^>]*>E<\/span>.*<span class="lc-domain">example\.com<\/span><span class="lc-title">AI is now smarter than us, says study<\/span>/s);
 });
 
 test('polls render X-style with deterministic counts, final results or time left', () => {
@@ -248,4 +250,17 @@ test('discovery: topics/trends data, /connect and /me pages, onboarding outside 
   assert.ok(items.every((x) => Array.isArray(x.g)));
   const people = JSON.parse(read('data/personas.json')).personas;
   assert.ok(Object.values(people).some((p) => Array.isArray(p.tp) && Array.isArray(p.co) && Array.isArray(p.rel)));
+});
+
+test('X-style link cards and real-post quotes: whole card links out, hotlinked images, no third-party JS', () => {
+  const og = read('p/uit-og/index.html');
+  assert.match(og, /<a class="link-card lc-large" href="https:\/\/news\.example\.org\/story" rel="noopener nofollow ugc" target="_blank"[^>]*><span class="lc-img"><img src="https:\/\/cdn\.example\.org\/og\.jpg" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" width="1200" height="630"><span class="lc-overlay">Big story &amp; more<\/span><\/span><span class="lc-from">From news\.example\.org<\/span><\/a>/);
+  const xp = read('p/uit-xpost/index.html');
+  assert.match(xp, /<a class="real-post quote rp-x" href="https:\/\/x\.example\/NASA\/status\/123456789" rel="noopener nofollow ugc" target="_blank" aria-label="NASA on X">/);
+  assert.match(xp, /class="rp-avatar" src="https:\/\/pbs\.example[^"]+"[^>]*referrerpolicy="no-referrer"/);
+  assert.match(xp, /<span class="rp-text">Exact words [^<]*here[^<]*<\/span>/);
+  assert.doesNotMatch(xp, /<here>/);
+  assert.match(xp, /<span class="rp-net" title="X"><svg/);
+  assert.doesNotMatch(xp, /platform\.twitter\.com|widgets\.js/);
+  assert.match(read('_headers'), /img-src[^;]* https:/);
 });

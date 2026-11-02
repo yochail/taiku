@@ -162,12 +162,15 @@ function linkCard({ url: href0, title: title0, domain, site_name: site0, descrip
   const height = num(image ? image.height : h0);
   const dom = domain || (href ? hostOf(href) : '') || site || 'news';
   const size = width && height ? ` width="${width}" height="${height}"` : '';
-  const img = src
-    ? `<span class="lc-img"><img src="${esc(src)}" alt="${esc(alt ?? '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"${size}></span>`
-    : `<span class="lc-icon">${icon ? `<img class="lc-favicon" src="${esc(icon)}" alt="" width="32" height="32" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : LINK_ICON}</span>`;
-  const inner = `${img}<span class="lc-body"><span class="lc-domain">${esc(dom)}</span><span class="lc-title">${esc(title ?? href)}</span>${description ? `<span class="lc-desc">${esc(truncate(description, 140))}</span>` : ''}</span>`;
-  const cls = `link-card${src ? ' lc-large' : ''}`;
-  return href ? `<a class="${cls}" href="${esc(href)}" rel="nofollow noopener" target="_blank">${inner}</a>` : `<div class="${cls} lc-static" title="${esc(STR.linkUnavailable)}">${inner}</div>`;
+  const tile = `<span class="lc-tile" aria-hidden="true">${esc((dom.match(/[\p{L}\p{N}]/u) || ['?'])[0].toUpperCase())}</span>`;
+  const shown = esc(title || href);
+  // Large card like X: the image carries the headline as an overlay and "From domain" sits below it.
+  // Summary card: favicon (or a domain-letter tile) beside domain, headline and description.
+  const inner = src
+    ? `<span class="lc-img"><img src="${esc(src)}" alt="${esc(alt ?? '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"${size}><span class="lc-overlay">${shown}</span></span><span class="lc-from">${esc(t('card.from', { domain: dom }))}</span>`
+    : `<span class="lc-icon">${icon ? `<img class="lc-favicon" src="${esc(icon)}" alt="" width="32" height="32" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : tile}</span><span class="lc-body"><span class="lc-domain">${esc(dom)}</span><span class="lc-title">${shown}</span>${description ? `<span class="lc-desc">${esc(truncate(description, 140))}</span>` : ''}</span>`;
+  const cls = `link-card ${src ? 'lc-large' : 'lc-small'}`;
+  return href ? `<a class="${cls}" href="${esc(href)}" rel="noopener nofollow ugc" target="_blank" data-tile="${esc(dom)}">${inner}</a>` : `<div class="${cls} lc-static" title="${esc(STR.linkUnavailable)}">${inner}</div>`;
 }
 
 /** Quote of a real public post (x_post / bsky_post): exact fetched text, links out to the original. */
@@ -177,12 +180,18 @@ function realPostHtml(m0) {
   const handle = /^[A-Za-z0-9_.:-]{1,64}$/.test(m0.handle ?? '') ? m0.handle : '';
   if (!url || !text || !handle) return '';
   const m = { ...m0, url, text, handle, author_name: sanitizeUntrusted(m0.author_name ?? '', 80), avatar_url: safeUrl(m0.avatar_url), media_thumb: safeUrl(m0.media_thumb) };
-  const net = m.kind === 'x_post' ? 'X' : 'Bluesky';
-  const when = Number.isFinite(Date.parse(m.created_at ?? '')) ? new Date(m.created_at).toISOString().slice(0, 10) : '';
-  const av = m.avatar_url ? `<img class="rp-avatar" src="${esc(m.avatar_url)}" alt="" width="20" height="20" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : '';
-  const thumb = m.media_thumb ? `<span class="lc-img"><img src="${esc(m.media_thumb)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></span>` : '';
-  return `<a class="real-post quote" href="${esc(m.url)}" rel="nofollow noopener" target="_blank"><span class="rp-head">${av}<b>${esc(m.author_name || m.handle)}</b> <span class="rp-handle">@${esc(m.handle)}</span>${when ? ` · <time datetime="${esc(when)}">${esc(when)}</time>` : ''} <span class="rp-net">${net}</span></span><span class="rp-text">${esc(truncate(m.text, 400))}</span>${thumb}</a>`;
+  const x = m.kind === 'x_post';
+  const net = x ? 'X' : 'Bluesky';
+  const ts = Date.parse(m.created_at ?? '');
+  const when = Number.isFinite(ts) ? ` · <time datetime="${new Date(ts).toISOString()}">${esc(shortDate(new Date(ts).toISOString()))}</time>` : '';
+  const name = m.author_name || m.handle;
+  const av = m.avatar_url ? `<img class="rp-avatar" src="${esc(m.avatar_url)}" alt="" width="20" height="20" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : `<span class="rp-avatar rp-av-tile" aria-hidden="true">${esc((name.match(/[\p{L}\p{N}]/u) || ['?'])[0].toUpperCase())}</span>`;
+  const thumb = m.media_thumb ? `<span class="lc-img rp-thumb"><img src="${esc(m.media_thumb)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></span>` : '';
+  return `<a class="real-post quote rp-${x ? 'x' : 'bsky'}" href="${esc(m.url)}" rel="noopener nofollow ugc" target="_blank" aria-label="${esc(t('card.realPost', { name, net }))}"><span class="rp-head">${av}<b class="rp-name">${esc(name)}</b><span class="rp-handle">@${esc(m.handle)}${when}</span><span class="rp-net" title="${net}">${x ? X_LOGO : BSKY_LOGO}</span></span><span class="rp-text">${esc(truncate(m.text, 400))}</span>${thumb}</a>`;
 }
+
+const X_LOGO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
+const BSKY_LOGO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.3 4.2C8.6 5.9 11 9.4 12 11.3c1-1.9 3.4-5.4 5.7-7.1 1.6-1.2 4.3-2.2 4.3.9 0 .6-.4 5.1-.6 5.8-.7 2.5-3.2 3.1-5.5 2.7 4 .7 5 2.9 2.8 5.2-4.2 4.3-6-1.1-6.5-2.5L12 15.7l-.2.6c-.5 1.4-2.3 6.8-6.5 2.5-2.2-2.3-1.2-4.5 2.8-5.2-2.3.4-4.8-.2-5.5-2.7C2.4 10.2 2 5.7 2 5.1c0-3.1 2.7-2.1 4.3-.9z"/></svg>';
 
 const VISUAL = new Set(['image', 'art', 'meme', 'gif', 'chart']);
 

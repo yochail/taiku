@@ -175,6 +175,24 @@
     poll.querySelector('.poll-state').textContent = closed ? S('final', 'Final results') : h >= 24 ? ago('days', Math.floor(h / 24), '{n} day left', '{n} days left') : h >= 1 ? ago('hours', h, '{n} hour left', '{n} hours left') : ago('minutes', Math.max(1, Math.round(left / 60000)), '{n} minute left', '{n} minutes left');
   };
 
+  // Hotlinked card images (og:image, favicons, avatars) can vanish: fall back to the summary card / letter tile.
+  document.addEventListener('error', (e) => {
+    const img = e.target;
+    if (!(img instanceof HTMLImageElement)) return;
+    const card = img.closest('.link-card, .real-post');
+    if (!card) return;
+    const letter = (s) => esc(((s || '').match(/[\p{L}\p{N}]/u) || ['?'])[0].toUpperCase());
+    if (img.classList.contains('rp-avatar')) { img.outerHTML = `<span class="rp-avatar rp-av-tile" aria-hidden="true">${letter(card.querySelector('.rp-name')?.textContent)}</span>`; return; }
+    if (img.classList.contains('lc-favicon')) { img.outerHTML = `<span class="lc-tile" aria-hidden="true">${letter(card.dataset.tile)}</span>`; return; }
+    if (card.classList.contains('lc-large')) {
+      const dom = card.dataset.tile || '';
+      const title = card.querySelector('.lc-overlay')?.textContent || '';
+      card.classList.replace('lc-large', 'lc-small');
+      card.innerHTML = `<span class="lc-icon"><span class="lc-tile" aria-hidden="true">${letter(dom)}</span></span><span class="lc-body"><span class="lc-domain">${esc(dom)}</span><span class="lc-title">${esc(title)}</span></span>`;
+      return;
+    }
+    img.closest('.lc-img')?.remove();
+  }, true);
   // Image viewer: post photos, profile avatar and header open full size, like X.
   const lightbox = document.getElementById('lightbox');
   let lbFrom = null;

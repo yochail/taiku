@@ -132,7 +132,24 @@ a:hover { text-decoration: underline; }
 .rp-net { margin-inline-start: auto; font-size: 12px; }
 .rp-text { display: block; margin-top: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .real-post .lc-img { display: block; margin: 8px -12px -10px; }
-.link-card.lc-large .lc-body { border-top: 1px solid var(--line); }
+.link-card.lc-large { border: 0; border-radius: 0; background: none; }
+.link-card.lc-large:hover { background: none; }
+.link-card.lc-large .lc-img { position: relative; display: block; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.link-card.lc-large:hover .lc-img img { filter: brightness(.92); }
+.lc-overlay { position: absolute; inset-block-end: 12px; inset-inline-start: 12px; max-inline-size: calc(100% - 24px); padding: 2px 6px; border-radius: 4px; background: rgb(0 0 0 / .77); color: #fff; font-size: 13px; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-from { display: block; margin-block-start: 4px; color: var(--muted); font-size: 13px; }
+.link-card.lc-large:hover .lc-from { text-decoration: underline; }
+.lc-small .lc-icon { width: 130px; min-height: 130px; }
+.lc-tile { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 10px; background: color-mix(in srgb, #1d9bf0 22%, var(--bg2)); color: var(--fg); font-weight: 800; font-size: 22px; }
+.rp-head { flex-wrap: nowrap; min-width: 0; }
+.rp-name { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-handle { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-net { flex: none; display: inline-flex; color: var(--fg); }
+.rp-net svg { width: 16px; height: 16px; }
+.rp-bsky .rp-net { color: #1185fe; }
+.rp-av-tile { display: inline-grid; place-items: center; flex: none; background: var(--bg2); color: var(--fg); font-size: 11px; font-weight: 700; }
+.rp-thumb { border-block-start: 1px solid var(--line); }
+@media (max-width: 500px) { .lc-small .lc-icon { width: 96px; min-height: 96px; } }
 .poll { margin: 12px 0 8px; }
 .poll-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .poll-opt { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 34px; padding: 6px 12px; border: 1px solid #1d9bf0; border-radius: 999px; background: none; color: #1d9bf0; font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1.2; cursor: pointer; text-align: start; }
