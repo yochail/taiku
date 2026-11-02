@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Extract glyph outlines + metrics from the self-hosted OFL meme fonts (assets/memes/fonts/src/*.woff,
-// Fontsource subsets of Anton and Inter) into compact JSON, so meme text renders as SVG paths with
+// Fontsource subsets of Anton, Inter and Heebo) into compact JSON, so meme text renders as SVG paths with
 // zero runtime dependencies and looks identical everywhere. Dev-only (needs opentype.js):
 //   npm install && node scripts/build-meme-fonts.mjs
 import fs from 'node:fs';
@@ -15,7 +15,13 @@ const FONTS = {
   anton: ['anton-latin-400-normal', 'anton-latin-ext-400-normal'],
   'inter-regular': ['inter-latin-400-normal', 'inter-latin-ext-400-normal', 'inter-greek-400-normal', 'inter-cyrillic-400-normal'],
   'inter-bold': ['inter-latin-700-normal', 'inter-latin-ext-700-normal', 'inter-greek-700-normal', 'inter-cyrillic-700-normal'],
+  // Hebrew fallbacks merged into the fonts above at render time (meme-render.mjs FALLBACK).
+  'heebo-regular': ['heebo-hebrew-400-normal'],
+  'heebo-bold': ['heebo-hebrew-700-normal'],
+  'heebo-black': ['heebo-hebrew-900-normal'],
 };
+// Hebrew letters + punctuation (maqaf, sof pasuq, geresh, gershayim); points/cantillation are dropped.
+const HEBREW = (cp) => cp === 0x05be || cp === 0x05c0 || cp === 0x05c3 || cp === 0x05c6 || (cp >= 0x05d0 && cp <= 0x05f4);
 const KERN_CHARS = [...' !"\'(),-./0123456789:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz‘’“”…'];
 
 for (const [name, files] of Object.entries(FONTS)) {
@@ -28,7 +34,7 @@ for (const [name, files] of Object.entries(FONTS)) {
       const ch = String.fromCodePoint(Number(code));
       const cp = Number(code);
       // Latin/Greek/Cyrillic + punctuation, currency, arrows; keeps the JSON small.
-      const keep = (cp >= 32 && cp <= 0x052f) || (cp >= 0x1e00 && cp <= 0x1eff) || (cp >= 0x2000 && cp <= 0x20cf) || cp === 0x2122 || (cp >= 0x2190 && cp <= 0x2193);
+      const keep = name.startsWith('heebo') ? HEBREW(cp) : (cp >= 32 && cp <= 0x052f) || (cp >= 0x1e00 && cp <= 0x1eff) || (cp >= 0x2000 && cp <= 0x20cf) || cp === 0x2122 || (cp >= 0x2190 && cp <= 0x2193);
       if (out.glyphs[ch] || !keep) continue;
       const g = f.glyphs.get(idx);
       out.glyphs[ch] = [Math.round(g.advanceWidth), g.getPath(0, 0, f.unitsPerEm).toPathData(0)];

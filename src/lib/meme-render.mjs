@@ -63,11 +63,62 @@ export function font(name) {
   if (!fonts[name]) {
     const f = readJson(path.join(MEMES, 'fonts', `${name}.json`));
     f.scaleTo = (size) => size / f.unitsPerEm;
+    const fb = FALLBACK[name];
+    if (fb) {
+      // Merge Hebrew glyphs (Heebo), scaled to this font's em and optically matched to its cap height.
+      const h = readJson(path.join(MEMES, 'fonts', `${fb.name}.json`));
+      const k = (f.unitsPerEm / h.unitsPerEm) * fb.scale;
+      const sc = (n) => Math.round(n * k * 10) / 10;
+      for (const [ch, [adv, d]] of Object.entries(h.glyphs)) {
+        if (!f.glyphs[ch]) f.glyphs[ch] = [sc(adv), d ? d.replace(/-?\d*\.?\d+(?:e-?\d+)?/g, (n) => String(sc(Number(n)))) : d];
+      }
+    }
     fonts[name] = f;
   }
   return fonts[name];
 }
 const FONT = { impact: 'anton', plain: 'inter-regular', bold: 'inter-bold' };
+const FALLBACK = {
+  anton: { name: 'heebo-black', scale: 1.3 },
+  'inter-regular': { name: 'heebo-regular', scale: 1.12 },
+  'inter-bold': { name: 'heebo-bold', scale: 1.12 },
+};
+
+// ---------- minimal bidi (Hebrew RTL inside LTR fonts) ----------
+const RTL_CH = /[\u0590-\u05ff\ufb1d-\ufb4f]/;
+const LTR_CH = /[\p{L}\p{N}]/u;
+const dirOf = (ch) => (RTL_CH.test(ch) ? 'R' : LTR_CH.test(ch) ? 'L' : 'N');
+/** Paragraph direction: that of the first strong character (default LTR). */
+export function isRtl(text) {
+  for (const ch of String(text ?? '')) { const t = dirOf(ch); if (t !== 'N') return t === 'R'; }
+  return false;
+}
+const MIRROR = { '(': ')', ')': '(', '[': ']', ']': '[', '{': '}', '}': '{', '<': '>', '>': '<', '«': '»', '»': '«' };
+/** Logical -> visual order for one line (simplified UBA: strong R/L, neutrals resolved by neighbours). */
+export function visualOrder(line, rtl) {
+  const chs = [...line];
+  if (!chs.some((c) => RTL_CH.test(c))) return line;
+  const base = rtl ? 'R' : 'L';
+  const t = chs.map(dirOf);
+  for (let i = 0; i < t.length; i++) {
+    if (t[i] !== 'N') continue;
+    let j = i; while (j < t.length && t[j] === 'N') j++;
+    const before = i > 0 ? t[i - 1] : base, after = j < t.length ? t[j] : base;
+    for (let k = i; k < j; k++) t[k] = before === after ? before : base;
+    i = j - 1;
+  }
+  const lv = t.map((d) => (rtl ? (d === 'R' ? 1 : 2) : (d === 'R' ? 1 : 0)));
+  const idx = chs.map((_, i) => i);
+  for (let level = Math.max(...lv); level >= 1; level--) {
+    for (let i = 0; i < idx.length; i++) {
+      if (lv[idx[i]] < level) continue;
+      let j = i; while (j < idx.length && lv[idx[j]] >= level) j++;
+      idx.splice(i, j - i, ...idx.slice(i, j).reverse());
+      i = j - 1;
+    }
+  }
+  return idx.map((i) => (lv[i] % 2 && MIRROR[chs[i]]) || chs[i]).join('');
+}
 
 const SUBST = { '\u2018': "'", '\u2019': "'", '\u201c': '"', '\u201d': '"', '\u2013': '-', '\u2014': '-', '\u2026': '...', '\u00a0': ' ', '\t': ' ' };
 /** Keep only characters the font can draw (fold accents / smart quotes; drop emoji etc.). */
@@ -139,12 +190,18 @@ export function fitText(f, text, { w, h, max, min, lh = 1.1, maxLines = 99 }) {
 }
 
 const r1 = (n) => Math.round(n * 10) / 10;
-/** Path data for laid-out lines; (x, y) = top-left of the text block, line boxes lh*size tall. */
-export function textPath(f, lines, { size, lh, x, y, w, align = 'center' }) {
+/**
+ * Path data for laid-out lines; (x, y) = top-left of the text block, line boxes lh*size tall.
+ * Hebrew is drawn right-to-left; `align: 'left'` means "start" (right for RTL text) unless `fixed`.
+ */
+export function textPath(f, lines, { size, lh, x, y, w, align = 'center', fixed = false }) {
   const s = f.scaleTo(size), L = lh * size;
   const capH = f.capHeight * s;
+  const rtl = isRtl(lines.join('\n'));
+  if (rtl && !fixed && align === 'left') align = 'right';
   let d = '';
-  lines.forEach((line, i) => {
+  lines.forEach((logical, i) => {
+    const line = visualOrder(logical, rtl);
     const lw = measure(f, line, size);
     let ox = align === 'left' ? x : align === 'right' ? x + w - lw : x + (w - lw) / 2;
     const base = y + i * L + (L + capH) / 2;
@@ -300,14 +357,14 @@ export function tweetCard(quote, W, y0 = 0) {
     : `<circle cx="${r1(acx)}" cy="${r1(acy)}" r="${r1(r)}" fill="${quote.color || '#536471'}"/>`
       + `<path d="${textPath(bold, [supported(bold, quote.initials || name.slice(0, 1)).toUpperCase()], { size: av * 0.38, lh: 1, x: cx + p, y: ay + av * 0.31, w: av, align: 'center' })}" fill="#fff"/>`;
   const nameY = ay + av * 0.08;
-  s += `<path d="${textPath(bold, [name], { size: nameSize, lh: 1.25, x: tx, y: nameY, w: nameW, align: 'left' })}" fill="#0f1419"/>`;
+  s += `<path d="${textPath(bold, [name], { size: nameSize, lh: 1.25, x: tx, y: nameY, w: nameW, align: 'left', fixed: true })}" fill="#0f1419"/>`;
   const nw = measure(bold, name, nameSize);
   // X-style blue check after the name.
   const ck = nameSize * 0.95, ckx = tx + nw + nameSize * 0.25, cky = nameY + (nameSize * 1.25 - ck) / 2;
   s += `<g transform="translate(${r1(ckx)} ${r1(cky)}) scale(${r1(ck / 24 * 100) / 100})"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34z" fill="#1d9bf0"/><path d="M10.54 16.2l-3.5-3.5 1.41-1.42 2.09 2.1 5.55-5.56 1.41 1.42z" fill="#fff"/></g>`;
   let h = handle;
   while (h.length > 2 && measure(reg, h, nameSize) > nameW) h = h.slice(0, -1);
-  s += `<path d="${textPath(reg, [h], { size: nameSize, lh: 1.25, x: tx, y: nameY + nameSize * 1.3, w: nameW, align: 'left' })}" fill="#536471"/>`;
+  s += `<path d="${textPath(reg, [h], { size: nameSize, lh: 1.25, x: tx, y: nameY + nameSize * 1.3, w: nameW, align: 'left', fixed: true })}" fill="#536471"/>`;
   s += `<path d="${textPath(reg, fit.lines, { size: fit.size, lh, x: cx + p, y: textY, w: tw, align: 'left' })}" fill="#0f1419"/>`;
   return { svg: s, height: ch + 2 * m, box: { x: cx + p, y: textY, w: tw, h: textH }, ...fit };
 }
