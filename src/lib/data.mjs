@@ -262,6 +262,23 @@ export function displayNameProblems(p) {
   return out;
 }
 
+/**
+ * Bios are X-style self-written profiles (first person, short, in voice). Encyclopedic third-person
+ * summaries belong in `background` (About tab). Flags life-span years, born/died wording and Hebrew
+ * third-person "היה/הייתה", plus the X 160-char cap.
+ */
+export function bioProblems(p) {
+  const bio = String(p?.bio ?? '');
+  const out = [];
+  if ([...bio].length > 160) out.push(`bio over 160 chars (${[...bio].length})`);
+  if (/\b\d{3,4}\s*[–—-]\s*\d{2,4}\b/.test(bio)) out.push('bio has a life-span year range (wiki style; move to background)');
+  if (/\b(born|died)\b/i.test(bio)) out.push('bio says born/died (wiki style; move to background)');
+  if (/(^|[^\p{L}])(היה|הייתה|היתה|נולד|נולדה|נפטר|נפטרה)(?=[^\p{L}]|$)/u.test(bio)) out.push('bio is third-person/encyclopedic Hebrew (היה/נולד/נפטר); write it as the persona, move facts to background');
+  // Sites with a Hebrew About tab (wikipedia_he) keep encyclopedia links out of the X-style header.
+  if (p?.wikipedia_he && /wikipedia\.org/i.test(String(p?.x_profile?.website ?? ''))) out.push('x_profile.website is an encyclopedia link (keep it in wikipedia/wikipedia_he for the About tab)');
+  return out;
+}
+
 function validatePersonas(personas, errors) {
   const schema = loadSchema(ROOT, 'persona');
   const ids = new Set();
@@ -271,6 +288,7 @@ function validatePersonas(personas, errors) {
     if (personaKind(p) === 'thinker') for (const k of THINKER_FIELDS) if (p[k] === undefined) errors.push(`persona ${p.id}: thinker missing "${k}"`);
     validatePersonaKind(p, errors);
     for (const e of displayNameProblems(p)) errors.push(`persona ${p.id}: ${e}`);
+    for (const e of bioProblems(p)) errors.push(`persona ${p.id}: ${e}`);
     for (const t of p.tools ?? []) if (!PERSONA_TOOLS.includes(t)) errors.push(`persona ${p.id}: unknown tool ${t}`);
     for (const img of [p.avatar?.image, p.avatar?.banner, ...Object.values(p.avatar?.srcset ?? {})].filter(Boolean)) {
       if (!fs.existsSync(publicFile(img))) errors.push(`persona ${p.id}: missing image public${img}`);
