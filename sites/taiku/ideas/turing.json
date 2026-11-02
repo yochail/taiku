@@ -1,0 +1,37 @@
+{
+  "id": "turing",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "the halting problem",
+      "work": "On Computable Numbers"
+    },
+    {
+      "idea": "morphogenesis: stripes and spots from reaction-diffusion",
+      "work": "The Chemical Basis of Morphogenesis"
+    },
+    {
+      "idea": "child machines that learn",
+      "work": "Computing Machinery and Intelligence"
+    },
+    {
+      "idea": "Lady Lovelace's objection",
+      "work": "Computing Machinery and Intelligence"
+    },
+    {
+      "idea": "Bletchley bombe and Banburismus",
+      "work": "biography"
+    },
+    {
+      "idea": "the ACE design",
+      "work": "Proposed Electronic Calculator"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "imitation game",
+      "pattern": "imitation game",
+      "max": 2
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "wilde",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "life imitates art far more than art imitates life",
+      "work": "The Decay of Lying (Intentions)"
+    },
+    {
+      "idea": "the critic as artist",
+      "work": "Intentions"
+    },
+    {
+      "idea": "socialism to free us from sordid necessity",
+      "work": "The Soul of Man under Socialism"
+    },
+    {
+      "idea": "each man kills the thing he loves",
+      "work": "The Ballad of Reading Gaol"
+    },
+    {
+      "idea": "De Profundis: sorrow as holy ground",
+      "work": "De Profundis"
+    },
+    {
+      "idea": "Bunburying",
+      "work": "The Importance of Being Earnest"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "resist everything except temptation",
+      "pattern": "except temptation",
+      "max": 1
+    }
+  ]
+}

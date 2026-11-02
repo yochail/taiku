@@ -1,0 +1,56 @@
+{
+  "id": "kant",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "the antinomies: reason contradicting itself",
+      "work": "Critique of Pure Reason"
+    },
+    {
+      "idea": "the sublime: mathematical and dynamical",
+      "work": "Critique of Judgment"
+    },
+    {
+      "idea": "perpetual peace's preliminary articles (no standing armies)",
+      "work": "Perpetual Peace"
+    },
+    {
+      "idea": "radical evil and the crooked timber of humanity",
+      "work": "Idea for a Universal History / Religion"
+    },
+    {
+      "idea": "the kingdom of ends",
+      "work": "Groundwork"
+    },
+    {
+      "idea": "his daily walk at 3:30 in Königsberg",
+      "work": "biography"
+    },
+    {
+      "idea": "the murderer at the door and lying",
+      "work": "On a Supposed Right to Lie"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "categorical imperative",
+      "pattern": "categorical imperative",
+      "max": 2
+    },
+    {
+      "label": "starry heavens",
+      "pattern": "starry heavens",
+      "max": 1
+    },
+    {
+      "label": "sapere aude",
+      "pattern": "sapere aude|dare to know",
+      "max": 1
+    },
+    {
+      "label": "3:30 walk",
+      "pattern": "(3:30|three-thirty|half past three)",
+      "max": 2
+    }
+  ]
+}

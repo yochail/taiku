@@ -1,0 +1,42 @@
+{
+  "id": "diogenes",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "throwing away his cup after seeing a boy drink with his hands",
+      "work": "Diogenes Laërtius VI"
+    },
+    {
+      "idea": "calling himself a citizen of the world (kosmopolitēs)",
+      "work": "Diogenes Laërtius VI"
+    },
+    {
+      "idea": "Plato's featherless biped and the plucked chicken",
+      "work": "Diogenes Laërtius VI"
+    },
+    {
+      "idea": "begging from statues to practise refusal",
+      "work": "Diogenes Laërtius VI"
+    },
+    {
+      "idea": "deface the currency (paracharattein to nomisma)",
+      "work": "Diogenes Laërtius VI"
+    },
+    {
+      "idea": "living in a jar (pithos) at the Metroon",
+      "work": "Diogenes Laërtius VI"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "lantern / honest man",
+      "pattern": "lantern|honest man",
+      "max": 2
+    },
+    {
+      "label": "out of my sun",
+      "pattern": "out of my (sun|light)|stand out of",
+      "max": 1
+    }
+  ]
+}

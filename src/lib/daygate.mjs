@@ -11,6 +11,7 @@
 // (generate --repair), and a short markdown scorecard.
 import { withDisplayStats } from './crowd.mjs';
 import { rotationStats } from './formats.mjs';
+import { maxSimilarityByPersona, noveltyConfig, scanRepetition } from './ideas.mjs';
 import { classify, evaluate, expectedReplyForms, lengthWeights, measure, mediaOf, personaReplyStyle } from './realism.mjs';
 
 const charLen = (text) => [...String(text ?? '')].length;
@@ -175,6 +176,16 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
   const lowH = rotRows.filter((r) => r.entropy < minH && r.formats.length >= Math.max(gate.format_min_items ?? 5, 6));
   add({ id: 'persona.format_entropy', status: lowH.length ? 'warn' : 'pass', value: rotRows.length ? Math.min(...rotRows.map((r) => r.entropy)) : null, n: rotRows.length, min: minH, max: null, blocking: false, detail: lowH.map((r) => `${r.personaId}: ${r.entropy.toFixed(2)} bits over ${r.n}`) });
 
+  // 3c) Novelty: today's taiks vs the same persona's last window (and earlier today) + catchphrase caps.
+  const ncfg = noveltyConfig(spec);
+  const novWindow = Number.isFinite(dayStart) ? [...context.filter((p) => { const t = Date.parse(p.createdAt); return t < dayStart && t >= dayStart - Math.max(ncfg.window_days, ncfg.catchphrase_window_days) * 864e5; }), ...day] : day;
+  const isToday = (p) => todayIds.has(p.id);
+  const repeats = scanRepetition(novWindow, { personas, cfg: ncfg, isTarget: isToday });
+  add({ id: 'persona.novelty', status: repeats.length ? (gate.novelty_blocking === false ? 'warn' : 'fail') : 'pass', value: repeats.length, n: authored.length, min: 0, max: 0, blocking: gate.novelty_blocking !== false, detail: repeats.map((r) => `${r.personaId}: ${r.postId} ${r.reason === 'catchphrase' ? `catchphrase "${r.label}"` : `repeats ${r.otherId} (cos ${r.score}${r.gram ? `, "${r.gram}"` : ''})`}`) });
+  const sims = maxSimilarityByPersona(novWindow.filter((p) => Date.parse(p.createdAt) >= dayStart - ncfg.window_days * 864e5 || isToday(p)), { personas, cfg: ncfg, isTarget: isToday });
+  const topSim = [...sims].sort((a, b) => b[1] - a[1])[0];
+  add({ id: 'persona.max_similarity', status: 'pass', value: topSim ? topSim[1] : null, n: sims.size, min: null, max: ncfg.cosine, blocking: false, detail: topSim ? [`${topSim[0]}`] : undefined });
+
   // 4) Offenders the pipeline can regenerate (text items with a taskId; timing/role-mix are planner-level).
   const offenders = new Map();
   const flag = (p, reason, length) => {
@@ -212,6 +223,8 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
     list.slice(0, need).forEach((p) => flag(p, tooLong ? `persona_too_long:${r.personaId}` : `persona_too_short:${r.personaId}`, tooLong ? { min: 5, max: shortChars } : { min: 60, max: 140 }));
   }
 
+  if (failed('persona.novelty')) for (const r of repeats) flag(all.get(r.postId), r.reason === 'catchphrase' ? `catchphrase:${r.label}` : `repetitive:${r.otherId}`);
+
   const failures = checks.filter((c) => c.status === 'fail');
   const ok = failures.length === 0;
   const scorecard = renderScorecard({ label, ok, checks, personaRows, offenders: [...offenders.values()], counts: { posts: day.length, authored: authored.length, originals: originals.length, polls, mediaItems } });
@@ -232,7 +245,7 @@ function renderScorecard({ label, ok, checks, personaRows, offenders, counts }) 
     '| | check | value | band | n | blocks |',
     '|---|---|---|---|---|---|',
     ...checks
-      .filter((c) => c.blocking || c.status === 'warn')
+      .filter((c) => c.blocking || c.status === 'warn' || c.id === 'persona.max_similarity')
       .map((c) => `| ${ICON[c.status]} | ${c.id} | ${fmt(round(c.value))} | ${fmt(round(c.min))}–${fmt(round(c.max))} | ${c.n} | ${c.blocking ? 'yes' : ''} |`),
   ];
   for (const c of fails) if (c.detail?.length) lines.push('', `**${c.id}**: ${c.detail.slice(0, 12).join('; ')}`);

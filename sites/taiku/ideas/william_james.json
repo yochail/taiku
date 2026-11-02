@@ -1,0 +1,41 @@
+{
+  "id": "william_james",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "the cash value of an idea",
+      "work": "Pragmatism"
+    },
+    {
+      "idea": "the will to believe: forced, living, momentous options",
+      "work": "The Will to Believe"
+    },
+    {
+      "idea": "the squirrel around the tree",
+      "work": "Pragmatism, Lecture 2"
+    },
+    {
+      "idea": "habit as the enormous flywheel of society",
+      "work": "The Principles of Psychology"
+    },
+    {
+      "idea": "the sick soul and the healthy-minded",
+      "work": "The Varieties of Religious Experience"
+    },
+    {
+      "idea": "a pluralistic universe: no block",
+      "work": "A Pluralistic Universe"
+    },
+    {
+      "idea": "the moral equivalent of war",
+      "work": "The Moral Equivalent of War"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "stream of consciousness",
+      "pattern": "stream of (consciousness|thought)",
+      "max": 2
+    }
+  ]
+}

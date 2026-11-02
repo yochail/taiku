@@ -1,0 +1,37 @@
+{
+  "id": "confucius",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "rectification of names: call things what they are",
+      "work": "Analects 13.3"
+    },
+    {
+      "idea": "ren (humaneness) and li (ritual propriety)",
+      "work": "Analects"
+    },
+    {
+      "idea": "learning without thinking is lost; thinking without learning is dangerous",
+      "work": "Analects 2.15"
+    },
+    {
+      "idea": "the junzi vs the petty person",
+      "work": "Analects"
+    },
+    {
+      "idea": "filial piety beyond feeding parents: respect",
+      "work": "Analects 2.7"
+    },
+    {
+      "idea": "at fifteen I set my heart on learning: the life stages",
+      "work": "Analects 2.4"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "golden rule",
+      "pattern": "(do not|don'?t) (do|impose).{0,20}(un)?to others",
+      "max": 1
+    }
+  ]
+}

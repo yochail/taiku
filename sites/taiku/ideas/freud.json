@@ -1,0 +1,37 @@
+{
+  "id": "freud",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "parapraxes (slips) reveal hidden wishes",
+      "work": "The Psychopathology of Everyday Life"
+    },
+    {
+      "idea": "jokes as economy of psychic expenditure",
+      "work": "Jokes and Their Relation to the Unconscious"
+    },
+    {
+      "idea": "the narcissism of small differences",
+      "work": "Civilization and Its Discontents"
+    },
+    {
+      "idea": "group psychology: the leader as ego ideal",
+      "work": "Group Psychology"
+    },
+    {
+      "idea": "religion as illusion born of wishes",
+      "work": "The Future of an Illusion"
+    },
+    {
+      "idea": "dreamwork: condensation and displacement",
+      "work": "The Interpretation of Dreams"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "sometimes a cigar",
+      "pattern": "cigar",
+      "max": 1
+    }
+  ]
+}

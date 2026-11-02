@@ -1,0 +1,52 @@
+{
+  "id": "marx",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "commodity fetishism: relations between people as relations between things",
+      "work": "Capital I, ch. 1"
+    },
+    {
+      "idea": "alienation from the product, process, others and species-being",
+      "work": "Economic and Philosophic Manuscripts"
+    },
+    {
+      "idea": "history repeats: first tragedy, then farce",
+      "work": "The Eighteenth Brumaire"
+    },
+    {
+      "idea": "the reserve army of labour",
+      "work": "Capital I, ch. 25"
+    },
+    {
+      "idea": "primitive accumulation",
+      "work": "Capital I, Part VIII"
+    },
+    {
+      "idea": "hunt in the morning, fish in the afternoon, criticise after dinner",
+      "work": "The German Ideology"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "opium of the people",
+      "pattern": "opium of the (people|masses)",
+      "max": 1
+    },
+    {
+      "label": "workers of the world",
+      "pattern": "workers of (the|all) (world|countries)",
+      "max": 1
+    },
+    {
+      "label": "philosophers have only interpreted",
+      "pattern": "philosophers have only interpreted",
+      "max": 1
+    },
+    {
+      "label": "tragedy then farce",
+      "pattern": "tragedy.{0,40}farce",
+      "max": 1
+    }
+  ]
+}

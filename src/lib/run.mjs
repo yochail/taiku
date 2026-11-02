@@ -34,6 +34,7 @@ import { cosineVec, createEmbedder, personaVectors, stanceAnchors, stanceHint, t
 import { MICRO_REFILL_MAX, MICRO_REFILL_PERSONAS, MICRO_REPLIES, runMicro } from './micro.mjs';
 import { chooseStance, createPoolPicker, entryMedia, loadPools, loadReactionUsage, reactionId, saveReactionUsage, usageFile } from './pools.mjs';
 import { createRotation as createFormatRotation, formatOfTask } from './formats.mjs';
+import { acceptNovelty, fingerprint, ideaUsage, ledgerItems, noveltyConfig, noveltyContext, pickIdea } from './ideas.mjs';
 import { defaultFill, enforceUniqueVisuals, materializeFor, planFor, schemaAllowsGiphy } from './gen-media.mjs';
 import { handleRates } from './handles.mjs';
 import { runBatch } from './gen-batch.mjs';
@@ -565,7 +566,26 @@ export async function runDaily(opts = {}) {
   const externalTasks = plan.nodes.filter((n) => n.kind === 'external').map((n) => ({ taskId: n.id, kind: 'external', role: 'original', exec: 'external', level: -1, personaId: n.authorId, postId: n.external.id, parentTaskId: null, topicId: null, at: n.external.createdAt, status: 'done', fields: { text: n.external.text ?? '' }, stance: n.external.stance ?? null, source: 'corpus' }));
   // Per-persona format rotation, seeded from the persona's last items before today (later files must not
   // change a rerun); plan order is time order.
-  const rot = createFormatRotation(others.filter((p) => Date.parse(p.createdAt) < plan.day.start), spec.sampling.format_rotation);
+  const pastBefore = others.filter((p) => Date.parse(p.createdAt) < plan.day.start);
+  const rot = createFormatRotation(pastBefore, spec.sampling.format_rotation);
+  // Idea ledger (LRU over the persona's own works/ideas) + novelty context (last 7 days, catchphrase caps),
+  // both from posts before today only so reruns are deterministic.
+  const ncfg = noveltyConfig(spec);
+  const pastBy = new Map();
+  for (const p of pastBefore) (pastBy.get(p.authorId) ?? pastBy.set(p.authorId, []).get(p.authorId)).push(p);
+  const ledgers = new Map();
+  const ledgerOf = (persona) => {
+    if (!ledgers.has(persona.id)) {
+      const items = ledgerItems(persona);
+      ledgers.set(persona.id, { items, usage: ideaUsage(items, pastBy.get(persona.id) ?? []) });
+    }
+    return ledgers.get(persona.id);
+  };
+  const noveltyCtx = new Map();
+  const noveltyOf = (persona) => {
+    if (!noveltyCtx.has(persona.id)) noveltyCtx.set(persona.id, noveltyContext(persona, pastBy.get(persona.id) ?? [], plan.day.start, ncfg));
+    return noveltyCtx.get(persona.id);
+  };
   const tasks = plan.nodes.filter((n) => n.kind !== 'external').map((n) => {
     const persona = byId.get(n.authorId);
     const spec1 = taskSpec({ node: n, persona, topic: topicById.get(n.topicId), sampler: plan.sampler, rand: plan.rand, postId: postIdOf(n.id), hasPassages: hasPassages(persona), giphy, rot });
@@ -574,6 +594,18 @@ export async function runDaily(opts = {}) {
     if (n.followOn === 'resurface' || n.followOn === 'pile-on') spec1.followOn = n.followOn;
     if (n.textMentions?.length) spec1.mentions = n.textMentions.map((id) => byId.get(id)?.handle).filter(Boolean);
     if (n.kind !== 'wire' && !isNews(persona)) spec1.handleStyle = { ...handleRates(spec), targetId: nodeById.get(n.parent ?? n.quoteOf)?.authorId ?? null, seed: spec1.postId };
+    if (n.kind !== 'wire' && n.exec !== 'pool' && !isNews(persona) && !CHEAP_FORMS.has(n.form)) {
+      if ((spec1.role === 'original' && n.kind !== 'thread-part') || spec1.role === 'quote' || (spec1.role === 'reply' && n.form === 'full')) {
+        const L = ledgerOf(persona);
+        const pick = pickIdea(seededRng('idea', n.id, nonce), L.items, L.usage, n.createdAt, ncfg.lru_days);
+        if (pick) {
+          spec1.idea = { draw_on: pick.label, ...(pick.work && pick.work !== pick.label ? { work: pick.work } : {}) };
+          L.usage.set(pick.id, n.createdAt);
+        }
+      }
+      const capped = [...noveltyOf(persona).capped];
+      if (capped.length) spec1.avoid = capped;
+    }
     const t = { taskId: n.id, kind: n.kind ?? n.role, role: spec1.role, exec: n.exec, form: n.form ?? null, level: n.kind === 'thread-part' ? 0 : n.depth ?? 0, personaId: n.authorId, postId: spec1.postId, parentTaskId: n.parent ?? n.quoteOf ?? null, topicId: n.topicId, at: iso(n.createdAt), archetype: spec1.archetype, media: spec1.media, status: 'pending', spec: spec1 };
     t.sig = sig(t);
     return t;
@@ -597,6 +629,7 @@ export async function runDaily(opts = {}) {
     if (!r || t.exec === 'pool' || t.exec === 'wire') continue;
     if (r.length) t.spec.length = { ...r.length };
     t.repair = r.reason ?? 'gate';
+    if (/^(repetitive|catchphrase):/.test(t.repair)) t.spec.repair = t.repair;
   }
 
   // 6) Execute by depth level (a parent's text exists before its children), resuming finished work.
@@ -636,6 +669,19 @@ export async function runDaily(opts = {}) {
   const postToTask = new Map([...externalTasks, ...tasks].map((t) => [t.postId, t.taskId]));
   const threadFn = (postId) => chain(postToTask.get(postId) ?? '', 6);
   const topicCtx = (topic) => (topic ? { id: topic.id, title: topic.title, domain: topic.domain || domainOf(topic.url ?? '') || topic.source } : null);
+  const otherById = new Map(others.map((p) => [p.id, p]));
+  // In-turn novelty guard (validateItem): prior days only; a gate repair also avoids the item it repeated.
+  const noveltyFor = (t, persona) => {
+    if (!persona || isNews(persona) || t.kind === 'wire' || t.exec === 'pool' || CHEAP_FORMS.has(t.form)) return null;
+    const base = noveltyOf(persona);
+    const [why, ref] = String(t.repair ?? '').split(/:(.*)/s);
+    if (why === 'catchphrase') return { ...base, capped: new Set([...base.capped, ref]) };
+    if (why !== 'repetitive') return base;
+    const tid = postToTask.get(ref);
+    const text = (tid && textOf.get(tid)) ?? otherById.get(ref)?.text;
+    const fp = text ? fingerprint(text, base.cfg) : null;
+    return fp ? { ...base, prev: [...base.prev, { id: ref, text, fp }] } : base;
+  };
   const ctxFor = (t) => {
     const persona = byId.get(t.personaId);
     const parent = t.parentTaskId ? taskById.get(t.parentTaskId) : null;
@@ -649,6 +695,7 @@ export async function runDaily(opts = {}) {
       theme: node?.theme ? themeLine(persona, node.theme, turnRand) : null,
       pool: newsPool,
       threadFn,
+      novelty: noveltyFor(t, persona),
     };
   };
   const stanceFor = (t) => {
@@ -669,6 +716,11 @@ export async function runDaily(opts = {}) {
     toolbox.call('search_sources', { query: [topicById.get(t.topicId)?.title, nodeById.get(t.taskId)?.theme, parent].filter(Boolean).join(' ').slice(0, 200) || persona.name });
     return toolbox.passages;
   };
+  // Execution is sequential, so earlier-today texts join the persona's novelty context in a fixed order.
+  const noteNovel = (t, text) => {
+    const persona = byId.get(t.personaId);
+    if (persona && !isNews(persona) && t.kind !== 'wire') acceptNovelty(noveltyOf(persona), t.postId, text);
+  };
   const markDone = (t, { fields, model, source, reactionId: rid = null }) => {
     t.status = 'done';
     t.fields = fields;
@@ -676,6 +728,7 @@ export async function runDaily(opts = {}) {
     t.source = source;
     if (rid) t.reactionId = rid;
     textOf.set(t.taskId, fields.text);
+    noteNovel(t, fields.text);
     work[t.taskId] = { sig: t.sig, fields, model, source, stance: t.stance, ...(rid ? { reactionId: rid } : {}) };
   };
   const markFailed = (t, r) => {
@@ -718,6 +771,7 @@ export async function runDaily(opts = {}) {
       else {
         Object.assign(t, { status: 'done', fields: cached.fields, model: cached.model, source: cached.source ?? 'llm', stance: cached.stance ?? null, ...(cached.reactionId ? { reactionId: cached.reactionId } : {}) });
         textOf.set(t.taskId, cached.fields.text);
+        noteNovel(t, cached.fields.text);
       }
       return false;
     }

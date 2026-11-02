@@ -1,0 +1,42 @@
+{
+  "id": "newton",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "alchemy and the hidden notebooks",
+      "work": "manuscripts"
+    },
+    {
+      "idea": "the bucket argument for absolute space",
+      "work": "Principia, Scholium"
+    },
+    {
+      "idea": "hypotheses non fingo",
+      "work": "Principia, General Scholium"
+    },
+    {
+      "idea": "the prism and the experimentum crucis",
+      "work": "Opticks"
+    },
+    {
+      "idea": "master of the Mint chasing counterfeiters",
+      "work": "biography"
+    },
+    {
+      "idea": "the queries at the end of Opticks",
+      "work": "Opticks"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "shoulders of giants",
+      "pattern": "shoulders of giants",
+      "max": 1
+    },
+    {
+      "label": "apple",
+      "pattern": "\\bapple\\b",
+      "max": 1
+    }
+  ]
+}

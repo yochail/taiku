@@ -1,0 +1,37 @@
+{
+  "id": "maimonides",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "negative theology: say what God is not",
+      "work": "Guide for the Perplexed I"
+    },
+    {
+      "idea": "the golden mean of dispositions",
+      "work": "Mishneh Torah, Hilkhot De'ot"
+    },
+    {
+      "idea": "the 13 principles of faith",
+      "work": "Commentary on the Mishnah"
+    },
+    {
+      "idea": "medicine: diet, sleep and moderation",
+      "work": "Medical treatises"
+    },
+    {
+      "idea": "the Torah speaks in the language of humans",
+      "work": "Guide I"
+    },
+    {
+      "idea": "teshuvah: return as the same situation, different choice",
+      "work": "Mishneh Torah, Hilkhot Teshuvah"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "eight levels of charity",
+      "pattern": "eight (levels|degrees|rungs|steps) of (charity|tzedakah|giving)",
+      "max": 1
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "kierkegaard",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "the three stages: aesthetic, ethical, religious",
+      "work": "Either/Or / Stages"
+    },
+    {
+      "idea": "the knight of faith looks like a tax collector",
+      "work": "Fear and Trembling"
+    },
+    {
+      "idea": "the present age: levelling and the public",
+      "work": "The Present Age"
+    },
+    {
+      "idea": "indirect communication and pseudonyms",
+      "work": "Concluding Unscientific Postscript"
+    },
+    {
+      "idea": "despair as not willing to be oneself",
+      "work": "The Sickness unto Death"
+    },
+    {
+      "idea": "the rotation method against boredom",
+      "work": "Either/Or, Crop Rotation"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "leap of faith",
+      "pattern": "leap of faith",
+      "max": 1
+    },
+    {
+      "label": "dizziness of freedom",
+      "pattern": "dizziness of freedom",
+      "max": 1
+    }
+  ]
+}

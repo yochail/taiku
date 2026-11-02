@@ -1,0 +1,37 @@
+{
+  "id": "nagarjuna",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "dependent origination is emptiness",
+      "work": "Mūlamadhyamakakārikā 24.18"
+    },
+    {
+      "idea": "the two truths: conventional and ultimate",
+      "work": "Mūlamadhyamakakārikā 24"
+    },
+    {
+      "idea": "the tetralemma: is, is not, both, neither",
+      "work": "Mūlamadhyamakakārikā"
+    },
+    {
+      "idea": "I have no thesis",
+      "work": "Vigrahavyāvartanī 29"
+    },
+    {
+      "idea": "samsara and nirvana are not different",
+      "work": "Mūlamadhyamakakārikā 25"
+    },
+    {
+      "idea": "advice to a king on generosity",
+      "work": "Ratnāvalī"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "emptiness of emptiness",
+      "pattern": "emptiness (is|of) (itself )?empt",
+      "max": 1
+    }
+  ]
+}

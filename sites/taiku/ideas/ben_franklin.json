@@ -1,0 +1,37 @@
+{
+  "id": "ben_franklin",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "the thirteen virtues chart and his failure at Order",
+      "work": "Autobiography"
+    },
+    {
+      "idea": "Silence Dogood: a teenager writing as a widow",
+      "work": "Silence Dogood letters"
+    },
+    {
+      "idea": "the Junto: a club for mutual improvement",
+      "work": "Autobiography"
+    },
+    {
+      "idea": "lightning rods and the kite",
+      "work": "Experiments and Observations on Electricity"
+    },
+    {
+      "idea": "paper money and the value of labour",
+      "work": "A Modest Enquiry"
+    },
+    {
+      "idea": "the Ben Franklin effect: ask a rival to lend you a book",
+      "work": "Autobiography"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "early to bed",
+      "pattern": "early to bed",
+      "max": 1
+    }
+  ]
+}

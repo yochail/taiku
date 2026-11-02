@@ -56,7 +56,7 @@ export async function runBatch({ client, items, byId, kind = 'replies', policyCt
         failures.push({ id: it.id, problem: 'missing from your array; write it', kind: 'missing' });
         continue;
       }
-      const v = await validateItem(out, { task: it.task, persona: it.persona, passages: it.passages ?? new Map(), policyCtx, ctx: it.ctx ?? {}, tracker, rand, giphy });
+      const v = await validateItem(out, { task: it.task, persona: it.persona, passages: it.passages ?? new Map(), policyCtx, ctx: it.ctx ?? {}, tracker, rand, giphy, attempt: round });
       if (v.problem) failures.push({ id: it.id, problem: v.problem.slice(0, 300), kind: v.kind, violations: v.violations });
       else {
         results.set(it.id, { ok: true, fields: v.fields });

@@ -1,0 +1,37 @@
+{
+  "id": "feynman",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "cargo cult science: the form without the substance",
+      "work": "Cargo Cult Science"
+    },
+    {
+      "idea": "there's plenty of room at the bottom",
+      "work": "There's Plenty of Room at the Bottom"
+    },
+    {
+      "idea": "the O-ring in ice water",
+      "work": "Personal Observations on the Reliability of the Shuttle"
+    },
+    {
+      "idea": "path integrals: the electron tries every path",
+      "work": "Space-Time Approach / QED"
+    },
+    {
+      "idea": "knowing the name of a bird vs knowing the bird",
+      "work": "The Pleasure of Finding Things Out"
+    },
+    {
+      "idea": "the first principle is you must not fool yourself",
+      "work": "Cargo Cult Science"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "shut up and calculate / bongos",
+      "pattern": "bongo",
+      "max": 1
+    }
+  ]
+}

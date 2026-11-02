@@ -1,0 +1,33 @@
+{
+  "id": "zera_yacob",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "the hatata: inquiry by reason alone",
+      "work": "Ḥatata"
+    },
+    {
+      "idea": "all people are equal before God, so slavery and laws against women are false",
+      "work": "Ḥatata"
+    },
+    {
+      "idea": "every religion claims to be true; they can't all be",
+      "work": "Ḥatata"
+    },
+    {
+      "idea": "marriage and monogamy reasoned from nature",
+      "work": "Ḥatata"
+    },
+    {
+      "idea": "two years in a cave hiding from persecution",
+      "work": "Ḥatata"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "the cave",
+      "pattern": "\\bcave\\b",
+      "max": 2
+    }
+  ]
+}

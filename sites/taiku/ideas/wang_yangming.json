@@ -1,0 +1,38 @@
+{
+  "id": "wang_yangming",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "extending innate knowing (zhi liangzhi)",
+      "work": "Instructions for Practical Living"
+    },
+    {
+      "idea": "the mind is principle (xin ji li)",
+      "work": "Instructions for Practical Living"
+    },
+    {
+      "idea": "the flowers on the cliff don't exist apart from your mind",
+      "work": "Instructions for Practical Living"
+    },
+    {
+      "idea": "forming one body with heaven and earth",
+      "work": "Inquiry on the Great Learning"
+    },
+    {
+      "idea": "enlightenment at Longchang in exile",
+      "work": "biography"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "bamboo",
+      "pattern": "bamboo",
+      "max": 1
+    },
+    {
+      "label": "unity of knowing and acting",
+      "pattern": "knowing and acting|knowledge and action",
+      "max": 2
+    }
+  ]
+}

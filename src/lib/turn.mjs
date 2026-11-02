@@ -14,9 +14,11 @@ import { checkPost, repairHint } from './policy.mjs';
 import { formatRepair, quoteRepair, shortenRepair, systemMessage, targetCeiling, targetRepair, userMessage } from './prompts.mjs';
 import { createToolbox } from './tools.mjs';
 import { ensureMentions } from './tags.mjs';
+import { checkNovelty } from './ideas.mjs';
 
 export const MAX_TOOL_ROUNDS = 2;
 export const MAX_REPAIRS = 3;
+export const NOVELTY_ATTEMPTS = 2;
 const MAX_CALLS_PER_ROUND = 3;
 
 const str = (v, max) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
@@ -86,7 +88,7 @@ const tagsOf = (t) => [...new Set((Array.isArray(t) ? t : []).map((x) => String(
  * the run via tracker) → quotes verified against THIS turn's tool log → fields (media/poll/note)
  * → policy gate. Returns { problem: string|null, violations?, fields? }.
  */
-export async function validateItem(out, { task, persona, passages, policyCtx, ctx = {}, tracker = null, rand = Math.random, giphy = null }) {
+export async function validateItem(out, { task, persona, passages, policyCtx, ctx = {}, tracker = null, rand = Math.random, giphy = null, attempt = 0 }) {
   if (!out || typeof out !== 'object' || typeof out.text !== 'string' || !out.text.trim()) return { problem: formatRepair(), kind: 'format' };
   const stripped = stripTells(out.text.replace(/\r\n?/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim(), { hashtags: task.hashtags ?? (task.hashtag ? 1 : 0) });
   const text = stripped && task.mentions?.length ? ensureMentions(stripped, task.mentions, task.length && task.role !== 'wire' ? Math.min(MAX_TAIK_CHARS, targetCeiling(task.length)) : MAX_TAIK_CHARS) : stripped;
@@ -96,12 +98,15 @@ export async function validateItem(out, { task, persona, passages, policyCtx, ct
     const max = task.length && task.role !== 'wire' ? Math.min(MAX_TAIK_CHARS, targetCeiling(task.length)) : MAX_TAIK_CHARS;
     const hs = task.handleStyle;
     const styled = unlinkUnknown(applyHandleStyle(text, { authorId: persona?.id, targetId: hs.targetId, decide: seededDecide(hs, hs.seed), maxChars: max }).text, knownHandles());
-    if (styled !== text) return validateItem({ ...out, text: styled }, { task: { ...task, handleStyle: null }, persona, passages, policyCtx, ctx, tracker, rand, giphy });
+    if (styled !== text) return validateItem({ ...out, text: styled }, { task: { ...task, handleStyle: null }, persona, passages, policyCtx, ctx, tracker, rand, giphy, attempt });
   }
   if (len > MAX_TAIK_CHARS) return { problem: shortenRepair(len, task.length.min, Math.min(task.length.max, MAX_TAIK_CHARS)), kind: 'length' };
   if (task.length && task.role !== 'wire' && len > targetCeiling(task.length)) return { problem: targetRepair(len, task.length.min, task.length.max), kind: 'length' };
   const style = [...lintTaik(text, persona), ...(tracker ? tracker.check(text) : [])];
   if (style.length) return { problem: houseStyleRepair(style), kind: 'style', style };
+  // Novelty is a soft check: NOVELTY_ATTEMPTS tries to say something new, then the day gate decides.
+  const nv = attempt < NOVELTY_ATTEMPTS ? checkNovelty(text, ctx.novelty) : null;
+  if (nv) return { problem: nv.problem, kind: 'style', style: [nv.reason] };
   const { refs, bad } = resolveQuotes(text, out.quoteRefs, passages);
   if (bad.length) return { problem: quoteRepair(bad), kind: 'quote' };
   const fields = await assembleFields({ out, text, refs, task, persona, passages, rand, giphy });
@@ -153,7 +158,7 @@ export async function runTurn({ client, persona, byId, task, ctx, nativeTools = 
     let repairs = 0;
     let policyRepairs = 0;
     for (;;) {
-      const v = await validateItem(parseJsonLoose(msg.content), { task, persona, passages: toolbox.passages, policyCtx, ctx, tracker, rand, giphy });
+      const v = await validateItem(parseJsonLoose(msg.content), { task, persona, passages: toolbox.passages, policyCtx, ctx, tracker, rand, giphy, attempt: repairs });
       if (!v.problem) {
         tracker?.add(v.fields.text);
         return { ok: true, fields: v.fields, toolLog: toolbox.log, calls: client.calls - start, repairs };

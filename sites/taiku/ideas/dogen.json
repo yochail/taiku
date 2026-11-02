@@ -1,0 +1,37 @@
+{
+  "id": "dogen",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "being-time (uji): you are time",
+      "work": "Shōbōgenzō, Uji"
+    },
+    {
+      "idea": "the tenzo: cooking rice as practice",
+      "work": "Tenzo Kyōkun"
+    },
+    {
+      "idea": "to study the self is to forget the self",
+      "work": "Shōbōgenzō, Genjōkōan"
+    },
+    {
+      "idea": "firewood does not become ash",
+      "work": "Shōbōgenzō, Genjōkōan"
+    },
+    {
+      "idea": "mountains walking",
+      "work": "Shōbōgenzō, Sansuikyō"
+    },
+    {
+      "idea": "practice and enlightenment are one",
+      "work": "Fukanzazengi"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "just sit",
+      "pattern": "just sit|shikantaza",
+      "max": 2
+    }
+  ]
+}

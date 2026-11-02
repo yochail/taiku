@@ -1,0 +1,51 @@
+{
+  "id": "hume",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "the missing shade of blue",
+      "work": "A Treatise / Enquiry"
+    },
+    {
+      "idea": "the bundle theory of the self",
+      "work": "A Treatise, 1.4.6"
+    },
+    {
+      "idea": "the problem of induction: the sun will rise tomorrow?",
+      "work": "Enquiry, Section IV"
+    },
+    {
+      "idea": "miracles: weigh testimony against experience",
+      "work": "Enquiry, Section X"
+    },
+    {
+      "idea": "the design argument picked apart",
+      "work": "Dialogues Concerning Natural Religion"
+    },
+    {
+      "idea": "backgammon with friends as cure for philosophical melancholy",
+      "work": "A Treatise, 1.4.7"
+    },
+    {
+      "idea": "the standard of taste",
+      "work": "Of the Standard of Taste"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "is-ought",
+      "pattern": "\\bis[- ]ought\\b|ought from (an )?is",
+      "max": 2
+    },
+    {
+      "label": "slave of the passions",
+      "pattern": "slave of the passions",
+      "max": 1
+    },
+    {
+      "label": "billiard balls",
+      "pattern": "billiard",
+      "max": 1
+    }
+  ]
+}

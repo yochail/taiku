@@ -1,0 +1,37 @@
+{
+  "id": "shakespeare",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "all the world's a stage, seven ages of man",
+      "work": "As You Like It"
+    },
+    {
+      "idea": "the fool who tells the king the truth",
+      "work": "King Lear"
+    },
+    {
+      "idea": "Prospero breaking his staff",
+      "work": "The Tempest"
+    },
+    {
+      "idea": "sonnet 130: my mistress' eyes are nothing like the sun",
+      "work": "Sonnets"
+    },
+    {
+      "idea": "Bottom's dream",
+      "work": "A Midsummer Night's Dream"
+    },
+    {
+      "idea": "Iago's honest-seeming lies",
+      "work": "Othello"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "to be or not to be",
+      "pattern": "to be,? or not to be",
+      "max": 1
+    }
+  ]
+}

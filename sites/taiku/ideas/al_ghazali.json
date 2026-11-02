@@ -1,0 +1,42 @@
+{
+  "id": "al_ghazali",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "causation as God's habit: fire does not burn cotton by itself",
+      "work": "Tahāfut al-Falāsifa, 17th discussion"
+    },
+    {
+      "idea": "the heart as a mirror that must be polished",
+      "work": "Iḥyāʾ ʿUlūm al-Dīn"
+    },
+    {
+      "idea": "taqlīd: inherited belief breaks once you see it is inherited",
+      "work": "al-Munqidh min al-Ḍalāl"
+    },
+    {
+      "idea": "the dangers of the tongue: gossip, boasting, needless argument",
+      "work": "Iḥyāʾ, Book of the Banes of the Tongue"
+    },
+    {
+      "idea": "the alchemy of happiness: knowing yourself to know God",
+      "work": "Kīmiyā-yi Saʿādat"
+    },
+    {
+      "idea": "dhawq (taste): knowing about drunkenness is not being drunk",
+      "work": "al-Munqidh"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "leaving the Nizamiyya chair",
+      "pattern": "nizamiy+a|left (my|a|the) chair",
+      "max": 1
+    },
+    {
+      "label": "fire and cotton",
+      "pattern": "cotton",
+      "max": 1
+    }
+  ]
+}

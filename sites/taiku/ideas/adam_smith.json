@@ -1,0 +1,42 @@
+{
+  "id": "adam_smith",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "the impartial spectator: judging yourself through an imagined fair observer",
+      "work": "The Theory of Moral Sentiments"
+    },
+    {
+      "idea": "sympathy as imaginatively changing places with another",
+      "work": "The Theory of Moral Sentiments"
+    },
+    {
+      "idea": "the man of system who moves people like chess pieces",
+      "work": "The Theory of Moral Sentiments"
+    },
+    {
+      "idea": "division of labour can make workers 'as stupid and ignorant as it is possible'; public schooling as remedy",
+      "work": "Wealth of Nations, Book V"
+    },
+    {
+      "idea": "merchants conspiring against the public when they meet",
+      "work": "Wealth of Nations, Book I"
+    },
+    {
+      "idea": "the history of astronomy: theories as soothing the imagination's surprise",
+      "work": "Essays on Philosophical Subjects"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "invisible hand",
+      "pattern": "invisible hand",
+      "max": 1
+    },
+    {
+      "label": "butcher and baker",
+      "pattern": "butcher|baker",
+      "max": 1
+    }
+  ]
+}

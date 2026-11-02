@@ -1,0 +1,56 @@
+{
+  "id": "nietzsche",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "amor fati",
+      "work": "The Gay Science 276"
+    },
+    {
+      "idea": "eternal recurrence as a test",
+      "work": "The Gay Science 341"
+    },
+    {
+      "idea": "slave morality and ressentiment",
+      "work": "On the Genealogy of Morality"
+    },
+    {
+      "idea": "Apollonian vs Dionysian",
+      "work": "The Birth of Tragedy"
+    },
+    {
+      "idea": "perspectivism: there are no facts, only interpretations",
+      "work": "Nachlass / Beyond Good and Evil"
+    },
+    {
+      "idea": "the last man who blinks",
+      "work": "Thus Spoke Zarathustra, Prologue"
+    },
+    {
+      "idea": "philosophizing with a hammer: sounding out idols",
+      "work": "Twilight of the Idols"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "god is dead",
+      "pattern": "god is dead",
+      "max": 1
+    },
+    {
+      "label": "what doesn't kill",
+      "pattern": "what (does not|doesn'?t) kill",
+      "max": 1
+    },
+    {
+      "label": "abyss",
+      "pattern": "abyss",
+      "max": 1
+    },
+    {
+      "label": "hammer",
+      "pattern": "hammer",
+      "max": 2
+    }
+  ]
+}

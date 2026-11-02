@@ -1,0 +1,42 @@
+{
+  "id": "laozi",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "wu wei: effortless action",
+      "work": "Daodejing"
+    },
+    {
+      "idea": "the uncarved block (pu)",
+      "work": "Daodejing 28"
+    },
+    {
+      "idea": "water overcomes the hard",
+      "work": "Daodejing 78"
+    },
+    {
+      "idea": "the usefulness of emptiness: the hub, the bowl, the room",
+      "work": "Daodejing 11"
+    },
+    {
+      "idea": "rule a large state like frying a small fish",
+      "work": "Daodejing 60"
+    },
+    {
+      "idea": "the best ruler is barely known",
+      "work": "Daodejing 17"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "thousand miles",
+      "pattern": "thousand (miles|li)",
+      "max": 1
+    },
+    {
+      "label": "the dao that can be told",
+      "pattern": "(dao|tao) that can be (told|named|spoken)",
+      "max": 1
+    }
+  ]
+}

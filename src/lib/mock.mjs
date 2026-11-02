@@ -11,6 +11,7 @@
 import { quoteMatches, taikLength, MAX_TAIK_CHARS } from './data.mjs';
 import { lintTaik } from './house-style.mjs';
 import { seededRng, sha256 } from './pipeline-util.mjs';
+import { compareNovelty, fingerprint } from './ideas.mjs';
 
 const tagContent = (s, tag) => s.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`))?.[1] ?? null;
 const lastOf = (messages, role) => [...messages].reverse().find((m) => m.role === role);
@@ -97,11 +98,17 @@ function subjectOf(title) {
 /** Candidate sentences for a role (lowercase-ish; no names, no stock AI phrasing). */
 function sentences(ctx, rand) {
   const s = subjectOf(ctx.title);
-  const i = idea(ctx.profile, rand);
+  const drawOn = String(ctx.spec.idea?.draw_on ?? '').split(/[.;:—(]/)[0].trim().toLowerCase();
+  const i = drawOn.length > 3 && drawOn.length < 60 ? drawOn : idea(ctx.profile, rand);
   const tics = (ctx.profile.voice?.tics ?? []).filter((x) => !/["“”@—]/.test(x));
   const tic = tics.length ? pick(tics, rand) : null;
   const at = ctx.targetHandle && ctx.spec.mention ? `@${ctx.targetHandle} ` : '';
   const role = ctx.spec.role;
+  if (ctx.fresh) {
+    // Novelty repair: a different point, built on the assigned idea, in short-word frames.
+    const frames = [`ok but ${i}.`, `so: ${i}.`, `and yet, ${i}.`, `${i}. yes, still.`, `no one is on ${i} and it shows.`, `all of it is ${i} if you sit with it.`, `try ${i}. i'll wait.`, `${i}?`, `me on day one: ${i}.`];
+    return [...frames.map((f) => at + f)].sort(() => rand() - 0.5);
+  }
   const pools = {
     original: [`hot take: ${s} is just ${i} with better marketing.`, `everyone arguing about ${s} and nobody checking what it does to the soul.`, `${s}. we really did this to ourselves.`, `nobody:\nme, two thousand years early: ${i}.`, `unpopular opinion: ${s} is the most honest thing to happen this week.`, `${i} still applies to ${s}. i will not be taking questions.`, `i have thought about ${s} for ten minutes and i am already tired.`, `${s} is ${i} wearing a lanyard.`, `imagine reading about ${s} and not thinking about ${i}. couldn't be me.`, `ok so ${s}. lol. lmao even.`],
     reply: [`${at}respectfully, you skipped the part where ${i} ruins your whole point.`, `${at}counterpoint: no.`, `${at}this is what happens when you skip ${i}.`, `${at}decent take, shame about ${i}.`, `${at}you said this with your whole chest and it is still wrong.`, `${at}yes, and it gets worse once you factor in ${i}.`, `${at}be so for real.`, `${at}finally someone said it.`, `${at}i'm logging off. this is too stupid even for here.`],
@@ -178,9 +185,14 @@ function clipWords(text, max) {
 }
 
 /** On a repair round, a compliant model fixes what it was told: recompose until clean and in range. */
-function composeOk(ctx, passages, rand, opts) {
+// Novelty repairs quote the repeated taik: a model would make a different point, so recompose until it no longer matches.
+const repeatedSnippets = (msg) => [...String(msg ?? '').matchAll(/This repeats your recent taik \("([\s\S]*?)"\)\./g)].map((m) => fingerprint(m[1].replace(/…$/, ''), { ...NOVELTY_LOOSE })).filter(Boolean).map((fp) => ({ id: 'x', fp }));
+const NOVELTY_LOOSE = { window_days: 7, cosine: 0.36, min_shared_tokens: 3, ngram: 4, min_tokens: 3, dims: 512 };
+const repeats = (text, avoid) => avoid?.length && compareNovelty(fingerprint(text, NOVELTY_LOOSE), avoid, NOVELTY_LOOSE).repetitive;
+function composeOk(ctx0, passages, rand, opts) {
+  const ctx = opts.avoid?.length ? { ...ctx0, fresh: true } : ctx0;
   let out = compose(ctx, passages, rand, opts);
-  for (let i = 0; opts.repairing && i < 8 && (lintTaik(out.text).length || taikLength(out.text) > ctx.max); i++) out = compose(ctx, passages, rand, opts);
+  for (let i = 0; opts.repairing && i < 12 && (lintTaik(out.text).length || taikLength(out.text) > ctx.max || repeats(out.text, opts.avoid)); i++) out = compose(ctx, passages, rand, opts);
   return out;
 }
 
@@ -192,7 +204,7 @@ function compose(ctx, passages, rand, { repairing }) {
   let text;
   let quoteRefs;
   const quotable = passages.filter((p) => taikLength(p.text) <= Math.min(200, max - 4) && !/"/.test(p.text));
-  if (spec.role !== 'wire' && quotable.length && rand() < (spec.quote ? 0.75 : 0.3)) {
+  if (spec.role !== 'wire' && !ctx.fresh && quotable.length && rand() < (spec.quote ? 0.75 : 0.3)) {
     const p = pick(quotable, rand);
     let qtext = p.text;
     if (p.translated && rand() < 0.35) qtext = fuzzVariant(p.text, rand) ?? p.text;
@@ -244,7 +256,7 @@ function composeBatch(ctx, messages, rand) {
       targetHandle: thread.at(-1)?.match(/@([\w-]+)/)?.[1] ?? null,
       ...rangeOf(it.length),
     };
-    return { id: it.id, ...composeOk(sub, it.passages ?? [], rand, { repairing: Boolean(repairMsg) }) };
+    return { id: it.id, ...composeOk(sub, it.passages ?? [], rand, { repairing: Boolean(repairMsg), avoid: repeatedSnippets(repairMsg) }) };
   });
   if (!repairMsg && items.length > 2 && rand() < 0.08) items.pop(); // partial array → regenerated
   const body = JSON.stringify(items);
@@ -320,7 +332,7 @@ export function createMockClient({ maxCalls = 1000, tools = 'on', nonce = '', mo
         return reply({ content: null, tool_calls: [{ id: `call_${calls}`, type: 'function', function: { name: 'search_sources', arguments: JSON.stringify({ query }) } }] });
       }
       const repairing = /Too long:|not verbatim|not a valid JSON|content policy|House style:/.test(lastOf(messages, 'user')?.content ?? '');
-      return reply({ content: JSON.stringify(composeOk(ctx, returnedPassages(messages), rand, { repairing })) });
+      return reply({ content: JSON.stringify(composeOk(ctx, returnedPassages(messages), rand, { repairing, avoid: repeatedSnippets(lastOf(messages, 'user')?.content) })) });
     },
   };
 }

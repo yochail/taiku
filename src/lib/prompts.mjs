@@ -100,6 +100,9 @@ export function userMessage(task, ctx) {
     ...(ctx.relation ? { relationship: `${ctx.relation.kind} — ${ctx.relation.why ?? ''}`.slice(0, 160) } : {}),
     ...(task.followOn ? { timing: task.followOn === 'pile-on' ? 'the post is from an earlier day and is blowing up today; everyone is piling in, so add your own angle' : 'the post is from an earlier day and is circulating again; react as someone who just came across it' } : {}),
     ...(task.mention ? { mention: `you may address @${task.mention}` } : {}),
+    ...(task.idea ? { idea: { ...task.idea, how: 'build the taik on this, in your own words; go beyond your most famous lines' } } : {}),
+    ...(task.avoid?.length ? { avoid: `you used these recently; skip them this time: ${task.avoid.join('; ')}` } : {}),
+    ...(task.repair ? { novelty: 'your last version repeated something you posted this week; make a different point' } : {}),
     handles: 'when you speak to or dunk on another account, use its @handle (from the profiles/thread); third-person talk may use the name. Never invent handles.',
   };
   const parts = [`<task_spec>${JSON.stringify(spec)}</task_spec>`];
@@ -173,6 +176,9 @@ export function batchMessages(items, byId, { kind = 'replies' } = {}) {
       ...(t.native ? { native: 'put one of your native phrases verbatim in "original" and the English in "text"' } : {}),
       ...(mediaInstruction(t.mediaPlan) ? { media: mediaInstruction(t.mediaPlan) } : {}),
       ...(t.threadPart ? { thread_part: t.threadPart } : {}),
+    ...(t.idea ? { idea: { ...t.idea, how: 'build the taik on this, in your own words; go beyond your most famous lines' } } : {}),
+    ...(t.avoid?.length ? { avoid: `you used these recently; skip them this time: ${t.avoid.join('; ')}` } : {}),
+    ...(t.repair ? { novelty: 'your last version repeated something you posted this week; make a different point' } : {}),
       ...(it.ctx?.relation ? { relationship: `${it.ctx.relation.kind}: ${it.ctx.relation.why ?? ''}`.slice(0, 140) } : {}),
       ...(it.ctx?.target ? { replying_to: `@${it.ctx.target.handle}` } : {}),
       ...(it.ctx?.theme && !it.ctx?.topic ? { riff_on: String(it.ctx.theme).slice(0, 140) } : {}),
