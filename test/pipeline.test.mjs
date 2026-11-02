@@ -229,5 +229,5 @@ test('pool reactions: picks store reactionId + stance and land in the usage stat
   const fb = r2.manifest.tasks.filter((t) => /pool exhausted/.test(t.fallback ?? ''));
   assert.ok(fb.length > 0, 'cheap forms fell back');
   assert.ok(fb.some((t) => t.status === 'done'), 'some fallbacks were written by the LLM (batched short replies)');
-  assert.ok(fb.every((t) => ['done', 'liked', 'skipped', 'blocked', 'failed'].includes(t.status)));
+  assert.ok(fb.every((t) => ['done', 'liked', 'skipped', 'blocked', 'dropped', 'failed'].includes(t.status)));
 });
