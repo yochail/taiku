@@ -1,0 +1,51 @@
+{
+  "id": "ben_gurion",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "שדה בוקר: לחלוץ בנגב",
+      "work": "נאום 1953"
+    },
+    {
+      "idea": "ממלכתיות",
+      "work": "כוכבים ועפר"
+    },
+    {
+      "idea": "פירוק הפלמ״ח",
+      "work": "יומן"
+    },
+    {
+      "idea": "יוגה: עמידה על הראש",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "אפלטון ובודהה בספרייה",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "מלחמה בלבן: משטר שלא נבחר",
+      "work": "יומן"
+    },
+    {
+      "idea": "תורת התנ״ך כחוזה",
+      "work": "עיונים בתנ״ך"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "מה שחשוב זה מה שהיהודים עושים",
+      "pattern": "מה שהיהודים עושים|מה יאמרו הגויים|אום שמום",
+      "max": 1
+    },
+    {
+      "label": "בנגב",
+      "pattern": "נגב",
+      "max": 3
+    },
+    {
+      "label": "מי שאינו מאמין בנסים",
+      "pattern": "בנסים",
+      "max": 1
+    }
+  ]
+}

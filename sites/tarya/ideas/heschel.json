@@ -1,0 +1,46 @@
+{
+  "id": "heschel",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "השבת כמקדש בזמן",
+      "work": "השבת"
+    },
+    {
+      "idea": "השתאות רדיקלית",
+      "work": "אלוהים מבקש את האדם"
+    },
+    {
+      "idea": "הפתוס של הנביאים",
+      "work": "הנביאים"
+    },
+    {
+      "idea": "אין דת אי",
+      "work": "פגישה עם אגודת הכנסיות"
+    },
+    {
+      "idea": "שיחה עם מרטין לותר קינג על הגזענות",
+      "work": "נאום בשיקגו 1963"
+    },
+    {
+      "idea": "ויקטוריה: יהדות ברית המועצות",
+      "work": "שיחות"
+    },
+    {
+      "idea": "עלי ספר: ספר שירים ביידיש",
+      "work": "דער שם המפורש: מענטש"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "הרגליים שלי מתפללות",
+      "pattern": "רגליים שלי מתפללות|הרגליים מתפללות|רגלי מתפללות",
+      "max": 1
+    },
+    {
+      "label": "מקדש בזמן",
+      "pattern": "מקדש בזמן",
+      "max": 1
+    }
+  ]
+}

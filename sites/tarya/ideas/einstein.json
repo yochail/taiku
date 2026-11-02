@@ -1,0 +1,46 @@
+{
+  "id": "einstein",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "האוניברסיטה העברית ודגל",
+      "work": "הרצאה 1923"
+    },
+    {
+      "idea": "הצעת נשיאות 1952: סירוב",
+      "work": "מכתב לאבא אבן"
+    },
+    {
+      "idea": "מכתב לרוזוולט וחרטה",
+      "work": "מכתבים"
+    },
+    {
+      "idea": "כינור: מוצרט",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "מכתב פרוידי: למה מלחמה",
+      "work": "למה מלחמה"
+    },
+    {
+      "idea": "ערכים מתוך ניסיון ולא מדע",
+      "work": "מדע ודת"
+    },
+    {
+      "idea": "שומר פטנטים בברן",
+      "work": "ביוגרפיה"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "אלוהים אינו משחק בקוביות",
+      "pattern": "קוביות",
+      "max": 1
+    },
+    {
+      "label": "דמיון חשוב מידע",
+      "pattern": "דמיון חשוב",
+      "max": 1
+    }
+  ]
+}

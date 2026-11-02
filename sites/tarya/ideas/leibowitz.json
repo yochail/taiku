@@ -1,0 +1,51 @@
+{
+  "id": "leibowitz",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "יהדות דתית מול לאומיות דתית",
+      "work": "יהדות עם יהודי ומדינת ישראל"
+    },
+    {
+      "idea": "קדושה אינה בחומר אלא במצווה",
+      "work": "שיחות"
+    },
+    {
+      "idea": "האנציקלופדיה העברית: עורך ראשי",
+      "work": "האנציקלופדיה העברית"
+    },
+    {
+      "idea": "הנוירולוגיה של התודעה",
+      "work": "גוף ונפש"
+    },
+    {
+      "idea": "שבת הארץ: מצווה, לא סמל",
+      "work": "שיחות"
+    },
+    {
+      "idea": "שיעורי פרשת השבוע",
+      "work": "שיחות על פרשת השבוע"
+    },
+    {
+      "idea": "אמונה כהחלטה",
+      "work": "אמונה היסטוריה וערכים"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "יודו-נאצים",
+      "pattern": "יודו",
+      "max": 1
+    },
+    {
+      "label": "דיסקוטק",
+      "pattern": "דיסקוטק",
+      "max": 1
+    },
+    {
+      "label": "עבודה זרה",
+      "pattern": "עבודה זרה",
+      "max": 2
+    }
+  ]
+}

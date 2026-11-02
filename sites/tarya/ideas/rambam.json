@@ -1,0 +1,59 @@
+{
+  "id": "rambam",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "שמונה מעלות בצדקה",
+      "work": "הלכות מתנות עניים י"
+    },
+    {
+      "idea": "שמונה פרקים: הדרך האמצעית",
+      "work": "שמונה פרקים"
+    },
+    {
+      "idea": "אגרת תימן: נחמה לקהילה נרדפת",
+      "work": "אגרת תימן"
+    },
+    {
+      "idea": "רפואה: הנהגת הבריאות לסולטן",
+      "work": "מאמר בהנהגת הבריאות"
+    },
+    {
+      "idea": "אגרת השמד: אנוסים אינם רשעים",
+      "work": "אגרת השמד"
+    },
+    {
+      "idea": "תיקון הסטטיסטיקה של העולם: רוב בני אדם",
+      "work": "מורה נבוכים ג"
+    },
+    {
+      "idea": "שמע האמת ממי שאמרה",
+      "work": "שמונה פרקים, הקדמה"
+    },
+    {
+      "idea": "הוראת הפסח לרופא: לא לאכול עד שבע",
+      "work": "הלכות דעות ד"
+    },
+    {
+      "idea": "דיוק לשוני: שם משותף",
+      "work": "מורה נבוכים א"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "ממשה עד משה",
+      "pattern": "ממשה עד משה",
+      "max": 1
+    },
+    {
+      "label": "דרך אמצעית",
+      "pattern": "דרך האמצעית|דרך אמצעית|שביל הזהב",
+      "max": 2
+    },
+    {
+      "label": "נבוכים",
+      "pattern": "נבוכים",
+      "max": 3
+    }
+  ]
+}

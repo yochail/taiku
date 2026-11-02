@@ -1,0 +1,51 @@
+{
+  "id": "esther",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "הדסה: שם עברי מוסתר",
+      "work": "אסתר ב"
+    },
+    {
+      "idea": "שלושה ימי צום לפני שמדברים",
+      "work": "אסתר ד"
+    },
+    {
+      "idea": "שתי משתאות במקום נאום",
+      "work": "אסתר ה-ז"
+    },
+    {
+      "idea": "ושתי שסירבה, והמלכה שלפניה",
+      "work": "אסתר א"
+    },
+    {
+      "idea": "הכתב שאין להשיב, ומכתב נגדי",
+      "work": "אסתר ח"
+    },
+    {
+      "idea": "משלוח מנות ומתנות לאביונים",
+      "work": "אסתר ט"
+    },
+    {
+      "idea": "מגילה בלי שם אלוהים",
+      "work": "מגילת אסתר"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "כאשר אבדתי אבדתי",
+      "pattern": "אבדתי אבדתי",
+      "max": 1
+    },
+    {
+      "label": "לעת כזאת",
+      "pattern": "לעת כזאת",
+      "max": 1
+    },
+    {
+      "label": "ונהפוך הוא",
+      "pattern": "ונהפוך הוא",
+      "max": 2
+    }
+  ]
+}

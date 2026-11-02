@@ -1,0 +1,38 @@
+{
+  "id": "shabazi",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "גלות מוזע: לאתיופיה של תימן",
+      "work": "דיואן"
+    },
+    {
+      "idea": "שירה בעברית, ארמית וערבית בשיר אחד",
+      "work": "דיואן"
+    },
+    {
+      "idea": "קבר בתעז ועלייה לרגל",
+      "work": "מסורת"
+    },
+    {
+      "idea": "אורג בבית",
+      "work": "מסורת"
+    },
+    {
+      "idea": "שירי חתונה ושבת",
+      "work": "דיואן"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "אהבת הדסה",
+      "pattern": "אהבת הדסה",
+      "max": 1
+    },
+    {
+      "label": "אם ננעלו",
+      "pattern": "אם ננעלו",
+      "max": 1
+    }
+  ]
+}

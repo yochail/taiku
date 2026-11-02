@@ -1,0 +1,38 @@
+{
+  "id": "bilaam",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "אתון שמדברת",
+      "work": "במדבר כב"
+    },
+    {
+      "idea": "מה טובו אהליך",
+      "work": "במדבר כד"
+    },
+    {
+      "idea": "ישמע מלך, ישמע ספק",
+      "work": "במדבר כב"
+    },
+    {
+      "idea": "כתובת דיר עלא",
+      "work": "כתובת"
+    },
+    {
+      "idea": "עצה למדיין: בעל פעור",
+      "work": "במדבר לא טז"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "מה טובו",
+      "pattern": "מה טובו",
+      "max": 1
+    },
+    {
+      "label": "אתון",
+      "pattern": "אתון",
+      "max": 2
+    }
+  ]
+}

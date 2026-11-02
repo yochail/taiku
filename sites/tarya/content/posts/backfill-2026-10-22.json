@@ -31,8 +31,10 @@
         {
           "kind": "link_card",
           "url": "https://www.haaretz.co.il/news/politics/2026-10-22/ty-article/.premium/000001a1-5fe2-dc69-a1ff-7feed7a40000",
+          "domain": "haaretz.co.il",
           "title": "צה\"ל: חמאס מתעצם, לא יוותר על נשקו ונערך לחידוש הלחימה",
-          "domain": "haaretz.co.il"
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
         }
       ],
       "origin": "backfill"
@@ -77,8 +79,10 @@
         {
           "kind": "link_card",
           "url": "https://www.haaretz.co.il/news/elections/2026-10-22/ty-article/.premium/000001a1-622b-d686-a7a9-e7ab09680000",
+          "domain": "haaretz.co.il",
           "title": "הבטחת הבחירות של ש\"ס: כל נער בן 13 יקבל תפילין וטלית",
-          "domain": "haaretz.co.il"
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
         }
       ],
       "origin": "backfill",
@@ -123,6 +127,16 @@
         "sarah",
         "senesh",
         "schenirer"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://forward.com/news/857222/jewish-deli-kosher-kibitz-room-cherry-hill/",
+          "domain": "forward.com",
+          "title": "This deli serves ham and calls itself Jewish. New Jersey says it's not kosher.",
+          "site_name": "The Forward",
+          "icon": "https://forward.com/favicon.ico"
+        }
       ]
     },
     {
@@ -321,6 +335,14 @@
             "url": "https://www.artic.edu/artworks/150773",
             "title": "Seated Woman with a Parasol (study for La Grande Jatte)"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://forward.com/yiddish/857510/video-a-hasid-gives-us-a-tour-of-morocco-in-yiddish/",
+          "domain": "forward.com",
+          "title": "VIDEO: A Hasid gives us a tour of Morocco in Yiddish",
+          "site_name": "The Forward",
+          "icon": "https://forward.com/favicon.ico"
         }
       ],
       "origin": "backfill"
@@ -387,7 +409,21 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.aljazeera.com/news/2026/10/22/iran-says-seven-ships-hit-in-hormuz-strait-warns-us-of-wider-response",
+          "domain": "aljazeera.com",
+          "title": "Iran says seven ships hit in Hormuz Strait, warns US of wider response",
+          "description": "The US has pushed back on the IRGC's claims, dismissing them as an attempt to increase oil prices ahead of US elections.",
+          "site_name": "Al Jazeera",
+          "image": {
+            "url": "https://www.aljazeera.com/wp-content/uploads/2026/08/getty_6a6e03d2c6-1785594834.jpg?resize=1920%2C1440"
+          },
+          "icon": "https://www.aljazeera.com/favicon_aje.ico"
+        }
+      ]
     },
     {
       "id": "ty20261022-7-rt-schenirer",
@@ -426,8 +462,17 @@
         {
           "kind": "link_card",
           "url": "https://www.jta.org/2026/10/22/israel/the-missing-peace-in-israels-election-campaign",
-          "title": "The Palestinian issue once defined Israeli elections. Now no one's talking about it.",
-          "domain": "jta.org"
+          "domain": "jta.org",
+          "title": "The Palestinian issue once defined Israeli elections. Now no one's talking about it. - Jewish Telegraphic Agency",
+          "description": "As settler violence in the West Bank draws international condemnation, candidates are largely avoiding the question of what comes next for Israelis and Palestinians.",
+          "site_name": "Jewish Telegraphic Agency",
+          "published": "2026-10-22T08:09:07.000Z",
+          "image": {
+            "url": "https://www.jta.org/wp-content/uploads/2026/10/Palestine-peace-A.jpg",
+            "width": 2160,
+            "height": 1201
+          },
+          "icon": "https://www.jta.org/wp-content/uploads/2024/04/cropped-JTA-Favicon-32x32.png"
         }
       ],
       "origin": "backfill",
@@ -499,7 +544,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://forward.com/news/sports/857732/atlanta-falcons-logo-nazi-memes/",
+          "domain": "forward.com",
+          "title": "'Heil' Mary? New Atlanta Falcons logo inspires Nazi comparisons",
+          "site_name": "The Forward",
+          "icon": "https://forward.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261022-21-rt-satmar",
@@ -569,6 +624,23 @@
         "korach",
         "karo",
         "leibowitz"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://forward.com/yiddish/857618/tidbits-a-publishing-firm-for-jewish-writers-excluded-by-mainstream-publishers/",
+          "domain": "forward.com",
+          "title": "Tidbits: A publishing firm for Jewish writers excluded by mainstream publishers",
+          "description": "אַ צאָל ייִדישע און ישׂראלדיקע שרײַבער זאָרגן זיך, אַז פֿאַרלאַגן פּובליקירן נישט זייערע ביכער צוליב זייער אָפּשטאַם אָדער מיינונגען.",
+          "site_name": "The Forward",
+          "published": "2026-10-22T15:32:20.000Z",
+          "image": {
+            "url": "https://forward.com/wp-content/uploads/2026/10/tidbits-sharabi-scaled.jpg?_t=1792683144",
+            "width": 2560,
+            "height": 1707
+          },
+          "icon": "https://forward.com/wp-content/uploads/2021/11/cropped-favicon-32x32.png"
+        }
       ]
     },
     {
@@ -673,7 +745,24 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.jta.org/2026/10/22/global/uk-adopts-sweeping-measures-against-antisemitism-in-schools",
+          "domain": "jta.org",
+          "title": "UK adopts sweeping measures against antisemitism in schools - Jewish Telegraphic Agency",
+          "description": "The country’s largest teachers’ union raised concerns about a recommended definition of antisemitism.",
+          "site_name": "Jewish Telegraphic Agency",
+          "published": "2026-10-22T17:38:31.000Z",
+          "image": {
+            "url": "https://www.jta.org/wp-content/uploads/2026/10/GettyImages-2299472459.jpg",
+            "width": 2160,
+            "height": 1200
+          },
+          "icon": "https://www.jta.org/wp-content/uploads/2024/04/cropped-JTA-Favicon-32x32.png"
+        }
+      ]
     },
     {
       "id": "ty20261022-34",
@@ -736,8 +825,14 @@
         {
           "kind": "link_card",
           "url": "https://www.aljazeera.com/news/2026/10/22/magnitude-7-earthquake-kills-16-people-in-chinas-tibet-xinhua-reports",
-          "title": "Magnitude 7.0 earthquake strikes Tibet, killing at least 16",
-          "domain": "aljazeera.com"
+          "domain": "aljazeera.com",
+          "title": "Powerful earthquake in Tibet kills at least 16 people",
+          "description": "Authorities warn they expect death toll from magnitude 7 quake that hit remote part of Tibet to rise.",
+          "site_name": "Al Jazeera",
+          "image": {
+            "url": "https://www.aljazeera.com/wp-content/uploads/2026/10/reuters_6adaf7eb-1792735211.jpg?resize=1200%2C675"
+          },
+          "icon": "https://www.aljazeera.com/favicon_aje.ico"
         }
       ],
       "origin": "backfill",
@@ -778,7 +873,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://forward.com/opinion/857702/netanyahus-torah-exemption-pledge-highlights-election-stakes/",
+          "domain": "forward.com",
+          "title": "PM's Torah exemption pledge highlights election stakes",
+          "site_name": "The Forward",
+          "icon": "https://forward.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261022-69",
@@ -858,6 +963,14 @@
             "url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_Le_D%C3%A9sesp%C3%A9r%C3%A9_(1843).jpg",
             "title": "The Desperate Man (self-portrait)"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/gallery/music/2026-10-22/ty-article/000001a1-6396-dbb8-abb5-67d670f40000",
+          "domain": "haaretz.co.il",
+          "title": "שבועיים לפני ההופעה, זמר בריטי מתקשה למצוא נגנים שיגיעו לישראל",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
         }
       ],
       "origin": "backfill",
@@ -898,7 +1011,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/gallery/music/2026-10-22/ty-article/000001a1-6396-dbb8-abb5-67d670f40000",
+          "domain": "haaretz.co.il",
+          "title": "שבועיים לפני ההופעה, זמר בריטי מתקשה למצוא נגנים שיגיעו לישראל",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261022-45",
@@ -930,6 +1053,16 @@
         "shammai",
         "shaar_hair",
         "shabazi"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/sport/nba/2026-10-22/ty-article/000001a1-61bc-da49-abe9-6ffce3bf0000",
+          "domain": "haaretz.co.il",
+          "title": "הפורוורד הישראלי פתח את העונה עם 18 נקודות, פורטלנד הביסה את פיניקס 83:124",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
+        }
       ]
     },
     {
@@ -965,7 +1098,24 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.jta.org/2026/10/22/global/uk-adopts-sweeping-measures-against-antisemitism-in-schools",
+          "domain": "jta.org",
+          "title": "UK adopts sweeping measures against antisemitism in schools - Jewish Telegraphic Agency",
+          "description": "The country’s largest teachers’ union raised concerns about a recommended definition of antisemitism.",
+          "site_name": "Jewish Telegraphic Agency",
+          "published": "2026-10-22T17:38:31.000Z",
+          "image": {
+            "url": "https://www.jta.org/wp-content/uploads/2026/10/GettyImages-2299472459.jpg",
+            "width": 2160,
+            "height": 1200
+          },
+          "icon": "https://www.jta.org/wp-content/uploads/2024/04/cropped-JTA-Favicon-32x32.png"
+        }
+      ]
     },
     {
       "id": "ty20261022-46-rt-shabazi",
@@ -1085,6 +1235,14 @@
             "url": "https://www.artic.edu/artworks/21510",
             "title": "Crowd Visiting Benzaiten Shrine at Enoshima in Sagami Province (Soshu Enoshima Benzaiten kaicho sankei gunshu no zu)"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/news/elections/2026-10-22/ty-article/.premium/000001a1-622b-d686-a7a9-e7ab09680000",
+          "domain": "haaretz.co.il",
+          "title": "הבטחת הבחירות של ש\"ס: כל נער בן 13 יקבל תפילין וטלית",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
         }
       ],
       "origin": "backfill"
@@ -1133,7 +1291,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/news/politics/2026-10-22/ty-article/.premium/000001a1-5fe2-dc69-a1ff-7feed7a40000",
+          "domain": "haaretz.co.il",
+          "title": "צה\"ל: חמאס מתעצם, לא יוותר על נשקו ונערך לחידוש הלחימה",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261022-59",
@@ -1149,7 +1317,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://forward.com/news/857222/jewish-deli-kosher-kibitz-room-cherry-hill/",
+          "domain": "forward.com",
+          "title": "This deli serves ham and calls itself Jewish. New Jersey says it's not kosher.",
+          "site_name": "The Forward",
+          "icon": "https://forward.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261022-60",
@@ -1205,7 +1383,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://forward.com/opinion/857702/netanyahus-torah-exemption-pledge-highlights-election-stakes/",
+          "domain": "forward.com",
+          "title": "PM's Torah exemption pledge highlights election stakes",
+          "site_name": "The Forward",
+          "icon": "https://forward.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261022-62",
@@ -1281,6 +1469,14 @@
             "url": "https://www.artic.edu/artworks/25825",
             "title": "Woman at the Piano"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/news/elections/2026-10-22/ty-article/.premium/000001a1-622b-d686-a7a9-e7ab09680000",
+          "domain": "haaretz.co.il",
+          "title": "הבטחת הבחירות של ש\"ס: כל נער בן 13 יקבל תפילין וטלית",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
         }
       ],
       "origin": "backfill"
@@ -1350,6 +1546,16 @@
       "origin": "backfill",
       "personaReposts": [
         "karo"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://forward.com/news/sports/857732/atlanta-falcons-logo-nazi-memes/",
+          "domain": "forward.com",
+          "title": "'Heil' Mary? New Atlanta Falcons logo inspires Nazi comparisons",
+          "site_name": "The Forward",
+          "icon": "https://forward.com/favicon.ico"
+        }
       ]
     },
     {

@@ -1,0 +1,50 @@
+{
+  "id": "ahad_haam",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "לא זה הדרך",
+      "work": "לא זה הדרך, 1889"
+    },
+    {
+      "idea": "מרכז רוחני",
+      "work": "מדינת היהודים וצרת היהודים"
+    },
+    {
+      "idea": "חיקוי והתבוללות",
+      "work": "על פרשת דרכים"
+    },
+    {
+      "idea": "כהן ונביא",
+      "work": "על פרשת דרכים"
+    },
+    {
+      "idea": "השילוח: עורך קפדן",
+      "work": "השילוח"
+    },
+    {
+      "idea": "עבדות בתוך חירות",
+      "work": "על פרשת דרכים"
+    },
+    {
+      "idea": "תה ויסוצקי: מנהל בלונדון",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "בני משה: אגודה סודית",
+      "work": "ביוגרפיה"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "אמת מארץ ישראל",
+      "pattern": "אמת מארץ ישראל",
+      "max": 1
+    },
+    {
+      "label": "יותר משישראל שמרו את השבת",
+      "pattern": "שמרו את השבת|שמרה אותם",
+      "max": 1
+    }
+  ]
+}

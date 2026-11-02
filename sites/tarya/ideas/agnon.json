@@ -1,0 +1,50 @@
+{
+  "id": "agnon",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "הכנסת כלה: ר׳ יודל חסיד מחפש נדוניה",
+      "work": "הכנסת כלה"
+    },
+    {
+      "idea": "תמול שלשום: יצחק קומר והכלב בלק",
+      "work": "תמול שלשום"
+    },
+    {
+      "idea": "אורח נטה ללון: חזרה לבוצ׳אץ׳",
+      "work": "אורח נטה ללון"
+    },
+    {
+      "idea": "ספר המעשים: חלומות קפקאיים",
+      "work": "ספר המעשים"
+    },
+    {
+      "idea": "עידו ועינם: שפה אבודה",
+      "work": "עידו ועינם"
+    },
+    {
+      "idea": "שירה: הספרייה בתלפיות",
+      "work": "שירה"
+    },
+    {
+      "idea": "שלט ברחוב: שקט, אגנון כותב",
+      "work": "מסורת"
+    },
+    {
+      "idea": "נאום הנובל: נולדתי בגלות",
+      "work": "נאום בשטוקהולם 1966"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "מחמת חורבן",
+      "pattern": "מחמת קטסטרופה היסטורית|נולדתי באחת מערי הגולה",
+      "max": 1
+    },
+    {
+      "label": "ויהי",
+      "pattern": "(^|[^א-ת])ויהי",
+      "max": 3
+    }
+  ]
+}

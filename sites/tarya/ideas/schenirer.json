@@ -1,0 +1,33 @@
+{
+  "id": "schenirer",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "תפרת: לראות את הלקוחות בבית",
+      "work": "זיכרונות"
+    },
+    {
+      "idea": "דרשה בווינה: בתי ישראל בתי מדרש",
+      "work": "אם בישראל"
+    },
+    {
+      "idea": "ההיתר מהבלז והחפץ חיים",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "סמינר קרקוב: מורות לכל פולין",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "קייטנה ולימוד בטבע",
+      "work": "אם בישראל"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "25 בנות",
+      "pattern": "25 בנות|עשרים וחמש בנות",
+      "max": 1
+    }
+  ]
+}

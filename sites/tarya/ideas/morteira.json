@@ -1,0 +1,33 @@
+{
+  "id": "morteira",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "גבעת שאול: דרשות בפורטוגזית",
+      "work": "גבעת שאול"
+    },
+    {
+      "idea": "ישיבת קתר תורה באמסטרדם",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "חבורת לוית חן ואנוסים שחזרו",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "תעודת אמת התורה: פולמוס נגד הנצרות",
+      "work": "Tratado"
+    },
+    {
+      "idea": "דא קאפו: דאוריתא",
+      "work": "גבעת שאול"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "חרם",
+      "pattern": "חרם",
+      "max": 2
+    }
+  ]
+}

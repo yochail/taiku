@@ -1,0 +1,46 @@
+{
+  "id": "hannah",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "תפילה בלחש: רק שפתיה נעות",
+      "work": "שמואל א א"
+    },
+    {
+      "idea": "עלי חושב שהיא שיכורה, והיא עונה לו",
+      "work": "שמואל א א"
+    },
+    {
+      "idea": "פנינה המכעיסה, וקנאה בין נשים בבית אחד",
+      "work": "שמואל א א"
+    },
+    {
+      "idea": "אלקנה: הלוא אנכי טוב לך מעשרה בנים",
+      "work": "שמואל א א"
+    },
+    {
+      "idea": "מעיל קטן כל שנה",
+      "work": "שמואל א ב"
+    },
+    {
+      "idea": "מקים מעפר דל: מהפך חברתי בשיר",
+      "work": "שמואל א ב"
+    },
+    {
+      "idea": "לא בכוח יגבר איש",
+      "work": "שמואל א ב"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "רק שפתיה נעות",
+      "pattern": "שפתיה נעות|שפתיים נעות",
+      "max": 1
+    },
+    {
+      "label": "על הילד הזה התפללתי",
+      "pattern": "הילד הזה התפללתי",
+      "max": 1
+    }
+  ]
+}

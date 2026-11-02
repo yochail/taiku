@@ -1,0 +1,59 @@
+{
+  "id": "spinoza",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "שחיקת עדשות ואבק זכוכית",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "מאמר על תיקון השכל",
+      "work": "תיקון השכל"
+    },
+    {
+      "idea": "אנחנו לא מרגישים חופשיים, רק לא יודעים את הסיבות",
+      "work": "אתיקה א, נספח"
+    },
+    {
+      "idea": "קונאטוס: כל דבר שואף להתמיד בהווייתו",
+      "work": "אתיקה ג"
+    },
+    {
+      "idea": "תשובה לבלינברג על הרוע",
+      "work": "מכתבים"
+    },
+    {
+      "idea": "סירוב לקתדרה בהיידלברג",
+      "work": "מכתב 48"
+    },
+    {
+      "idea": "רגשות שאינם כנים כנחשבים: רגש הוא רעיון מבולבל",
+      "work": "אתיקה ג"
+    },
+    {
+      "idea": "דקדוק לשון עברית",
+      "work": "Compendium grammatices"
+    },
+    {
+      "idea": "אולטימי ברברורום: השלט בהאג",
+      "work": "ביוגרפיה"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "דאוס סיווה נטורה",
+      "pattern": "סיווה נטורה|אלוהים או הטבע",
+      "max": 1
+    },
+    {
+      "label": "לא לבכות ולא לצחוק אלא להבין",
+      "pattern": "לא לבכות|אלא להבין",
+      "max": 1
+    },
+    {
+      "label": "חרם",
+      "pattern": "חרם",
+      "max": 2
+    }
+  ]
+}

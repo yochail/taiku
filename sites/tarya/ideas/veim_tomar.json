@@ -1,0 +1,34 @@
+{
+  "id": "veim_tomar",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "קושיה מתוך פשטות",
+      "work": "מסורת"
+    },
+    {
+      "idea": "ואם תאמר: איך שאל המקשה",
+      "work": "תוספות"
+    },
+    {
+      "idea": "ויש לומר",
+      "work": "תוספות"
+    },
+    {
+      "idea": "אין להקשות",
+      "work": "תוספות"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "ואם תאמר",
+      "pattern": "ואם תאמר",
+      "max": 4
+    },
+    {
+      "label": "ויש לומר",
+      "pattern": "ויש לומר",
+      "max": 4
+    }
+  ]
+}

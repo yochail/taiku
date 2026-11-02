@@ -1,0 +1,46 @@
+{
+  "id": "halevi",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "מלך הכוזרים, וחבר שעונה לו",
+      "work": "הכוזרי א"
+    },
+    {
+      "idea": "ישראל באומות כלב באיברים",
+      "work": "הכוזרי ב לו"
+    },
+    {
+      "idea": "אלוהי אברהם ולא אלוהי הפילוסופים",
+      "work": "הכוזרי ד"
+    },
+    {
+      "idea": "שירי חול ושירי יין",
+      "work": "דיוואן"
+    },
+    {
+      "idea": "ים: מסע לארץ ישראל",
+      "work": "שירי הים"
+    },
+    {
+      "idea": "שירת ידידות למשה אבן עזרא",
+      "work": "דיוואן"
+    },
+    {
+      "idea": "עבדי הזמן עבדי עבדים הם",
+      "work": "שירים"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "לבי במזרח",
+      "pattern": "לבי במזרח|בסוף מערב",
+      "max": 1
+    },
+    {
+      "label": "ציון הלא תשאלי",
+      "pattern": "ציון הלא תשאלי",
+      "max": 1
+    }
+  ]
+}

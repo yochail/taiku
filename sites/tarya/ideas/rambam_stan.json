@@ -1,0 +1,38 @@
+{
+  "id": "rambam_stan",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "מורה נבוכים",
+      "work": "מורה נבוכים"
+    },
+    {
+      "idea": "שמונה פרקים",
+      "work": "שמונה פרקים"
+    },
+    {
+      "idea": "רפואה",
+      "work": "פרקי משה"
+    },
+    {
+      "idea": "אגרת תימן",
+      "work": "אגרת תימן"
+    },
+    {
+      "idea": "י״ג עיקרים",
+      "work": "פירוש המשניות"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "ממשה עד משה",
+      "pattern": "ממשה עד משה",
+      "max": 1
+    },
+    {
+      "label": "גאון",
+      "pattern": "גאון",
+      "max": 3
+    }
+  ]
+}

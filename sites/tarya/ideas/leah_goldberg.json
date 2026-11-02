@@ -1,0 +1,55 @@
+{
+  "id": "leah_goldberg",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "דירה להשכיר",
+      "work": "דירה להשכיר"
+    },
+    {
+      "idea": "מעשה בחיפה ובלשון",
+      "work": "שירים"
+    },
+    {
+      "idea": "בעלת הארמון",
+      "work": "בעלת הארמון"
+    },
+    {
+      "idea": "פזמונות לילדים: הסתיו",
+      "work": "שירים"
+    },
+    {
+      "idea": "תרגום מלחמה ושלום",
+      "work": "תרגומים"
+    },
+    {
+      "idea": "מכתבים מנסיעה מדומה",
+      "work": "מכתבים מנסיעה מדומה"
+    },
+    {
+      "idea": "אהבתה של תרזה די מון",
+      "work": "שירים"
+    },
+    {
+      "idea": "ספרות כמחקר: האוניברסיטה העברית",
+      "work": "ביוגרפיה"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "האמנם עוד יבואו ימים",
+      "pattern": "האמנם",
+      "max": 1
+    },
+    {
+      "label": "שלום לך אדמתי",
+      "pattern": "אדמתי",
+      "max": 1
+    },
+    {
+      "label": "מה עושות האיילות",
+      "pattern": "האיילות",
+      "max": 1
+    }
+  ]
+}

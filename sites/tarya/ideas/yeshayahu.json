@@ -1,0 +1,55 @@
+{
+  "id": "yeshayahu",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "הלא זה צום אבחרהו: פתח חרצובות רשע",
+      "work": "ישעיהו נח"
+    },
+    {
+      "idea": "הוי מגיעי בית בבית: נדל״ן ונביאים",
+      "work": "ישעיהו ה"
+    },
+    {
+      "idea": "שיר הכרם: ויקו למשפט והנה משפח",
+      "work": "ישעיהו ה"
+    },
+    {
+      "idea": "נחמו נחמו עמי",
+      "work": "ישעיהו מ"
+    },
+    {
+      "idea": "למה זה זבחיכם, ידיכם דמים מלאו",
+      "work": "ישעיהו א"
+    },
+    {
+      "idea": "הנני שלחני: מתנדב לנבואה",
+      "work": "ישעיהו ו"
+    },
+    {
+      "idea": "קולו של שומר: מה מלילה",
+      "work": "ישעיהו כא"
+    },
+    {
+      "idea": "לא ישא גוי אל גוי חרב: חזון ולא תוכנית עבודה",
+      "work": "ישעיהו ב"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "וכתתו חרבותם לאתים",
+      "pattern": "וכתתו חרבותם|חרבותם לאתים",
+      "max": 1
+    },
+    {
+      "label": "וגר זאב עם כבש",
+      "pattern": "וגר זאב",
+      "max": 1
+    },
+    {
+      "label": "אור לגויים",
+      "pattern": "אור לגוי",
+      "max": 1
+    }
+  ]
+}

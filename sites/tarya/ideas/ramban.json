@@ -1,0 +1,46 @@
+{
+  "id": "ramban",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "נבל ברשות התורה: קדושים תהיו",
+      "work": "רמב״ן ויקרא יט ב"
+    },
+    {
+      "idea": "מצוות ישוב הארץ, ומה שהרמב״ם השמיט",
+      "work": "השגות לספר המצוות"
+    },
+    {
+      "idea": "ויכוח ברצלונה מול המלך",
+      "work": "ויכוח הרמב״ן"
+    },
+    {
+      "idea": "אגרת מירושלים: עשרה מניין בעיר חרבה",
+      "work": "אגרת הרמב״ן"
+    },
+    {
+      "idea": "מעשה אבות סימן לבנים",
+      "work": "רמב״ן בראשית יב"
+    },
+    {
+      "idea": "ועשית הישר והטוב: מעבר לשורת הדין",
+      "work": "רמב״ן דברים ו יח"
+    },
+    {
+      "idea": "תורת האדם: הלכות אבלות",
+      "work": "תורת האדם"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "נבל ברשות התורה",
+      "pattern": "נבל ברשות התורה",
+      "max": 1
+    },
+    {
+      "label": "מעשה אבות סימן לבנים",
+      "pattern": "סימן לבנים",
+      "max": 1
+    }
+  ]
+}

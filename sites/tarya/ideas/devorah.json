@@ -1,0 +1,46 @@
+{
+  "id": "devorah",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "יושבת תחת התומר ושופטת, בלי ארמון",
+      "work": "שופטים ד"
+    },
+    {
+      "idea": "ברק שלא הולך בלעדיה, והכבוד שהולך לאישה",
+      "work": "שופטים ד"
+    },
+    {
+      "idea": "יעל ביתד ובפטיש, והגבורה השקטה של האוהל",
+      "work": "שופטים ה"
+    },
+    {
+      "idea": "אם סיסרא בחלון: קינה גם לאם האויב",
+      "work": "שופטים ה"
+    },
+    {
+      "idea": "ראובן נשאר בין המשפתיים: שבטים שלא באו",
+      "work": "שופטים ה"
+    },
+    {
+      "idea": "הכוכבים ממסלותם נלחמו עם סיסרא",
+      "work": "שופטים ה"
+    },
+    {
+      "idea": "ותשקוט הארץ ארבעים שנה",
+      "work": "שופטים ה"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "עד שקמתי דבורה",
+      "pattern": "עד ש?קמתי|שקמתי אם בישראל",
+      "max": 1
+    },
+    {
+      "label": "עורי עורי",
+      "pattern": "עורי עורי",
+      "max": 1
+    }
+  ]
+}

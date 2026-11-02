@@ -1,0 +1,55 @@
+{
+  "id": "rachel",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "כנרת",
+      "work": "שירים"
+    },
+    {
+      "idea": "ספיח",
+      "work": "ספיח"
+    },
+    {
+      "idea": "ניגון: אל ארצי",
+      "work": "אל ארצי"
+    },
+    {
+      "idea": "רחוק ממני",
+      "work": "נבו"
+    },
+    {
+      "idea": "ביקור בטולוז: אגרונומיה",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "עקרה",
+      "work": "נבו"
+    },
+    {
+      "idea": "צמח אחרי שיר",
+      "work": "מכתבים"
+    },
+    {
+      "idea": "רוסית וגרמנית לפני עברית",
+      "work": "ביוגרפיה"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "רק על עצמי לספר",
+      "pattern": "על עצמי לספר",
+      "max": 1
+    },
+    {
+      "label": "ואולי לא היו הדברים",
+      "pattern": "לא היו הדברים",
+      "max": 1
+    },
+    {
+      "label": "כנרת שלי",
+      "pattern": "כנרת",
+      "max": 2
+    }
+  ]
+}

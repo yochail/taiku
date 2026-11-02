@@ -1,0 +1,55 @@
+{
+  "id": "eliyahu",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "עורבים מביאים לחם בנחל כרית",
+      "work": "מלכים א יז"
+    },
+    {
+      "idea": "כד הקמח וצפחת השמן של האלמנה",
+      "work": "מלכים א יז"
+    },
+    {
+      "idea": "מתחת לרותם: רב עתה ה׳ קח נפשי",
+      "work": "מלכים א יט"
+    },
+    {
+      "idea": "קול דממה דקה, לא ברעש",
+      "work": "מלכים א יט"
+    },
+    {
+      "idea": "כרם נבות: הרצחת וגם ירשת",
+      "work": "מלכים א כא"
+    },
+    {
+      "idea": "האדרת שעוברת לאלישע",
+      "work": "מלכים ב ב"
+    },
+    {
+      "idea": "כוס של אליהו וכיסא של אליהו במילה",
+      "work": "מסורת"
+    },
+    {
+      "idea": "הלעג לנביאי הבעל: כי שיח וכי שיג לו",
+      "work": "מלכים א יח"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "עד מתי אתם פוסחים",
+      "pattern": "פוסחים על שתי|עד מתי אתם פוסחים",
+      "max": 1
+    },
+    {
+      "label": "קנא קנאתי",
+      "pattern": "קנא קנאתי",
+      "max": 1
+    },
+    {
+      "label": "קול דממה דקה",
+      "pattern": "דממה דקה",
+      "max": 1
+    }
+  ]
+}

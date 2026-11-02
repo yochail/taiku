@@ -1,0 +1,55 @@
+{
+  "id": "rashi",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "איני יודע מה מלמדנו",
+      "work": "רש״י על בראשית"
+    },
+    {
+      "idea": "לעז צרפתי: מילים בצרפתית עתיקה",
+      "work": "פירוש רש״י, לעזים"
+    },
+    {
+      "idea": "לא בא המקרא אלא",
+      "work": "פירוש רש״י"
+    },
+    {
+      "idea": "תשובות רש״י לקהילות",
+      "work": "תשובות רש״י"
+    },
+    {
+      "idea": "בנות רש״י ותפילין",
+      "work": "מסורת"
+    },
+    {
+      "idea": "כרמים בטרואה",
+      "work": "מסורת"
+    },
+    {
+      "idea": "קונטרס: פירוש על הגמרא",
+      "work": "פירוש רש״י לתלמוד"
+    },
+    {
+      "idea": "מדרש אגדה המיישב דברי המקרא דבר דבור על אופניו",
+      "work": "רש״י על בראשית ג ח"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "פשוטו של מקרא",
+      "pattern": "פשוטו של מקרא",
+      "max": 2
+    },
+    {
+      "label": "בראשית ברא: לא היה צריך להתחיל",
+      "pattern": "לא היה צריך להתחיל",
+      "max": 1
+    },
+    {
+      "label": "דבר אחר",
+      "pattern": "דבר אחר",
+      "max": 3
+    }
+  ]
+}

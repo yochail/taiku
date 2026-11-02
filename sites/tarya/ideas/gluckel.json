@@ -1,0 +1,42 @@
+{
+  "id": "gluckel",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "זיכרונות לילדים בלילות בלי שינה",
+      "work": "זיכרונות, ספר א"
+    },
+    {
+      "idea": "משל הציפור ושלושת הגוזלים",
+      "work": "זיכרונות, ספר א"
+    },
+    {
+      "idea": "נשים בשוק התכשיטים בלייפציג",
+      "work": "זיכרונות"
+    },
+    {
+      "idea": "חיים אחרי חיים: נישואים שניים במץ",
+      "work": "זיכרונות, ספר ז"
+    },
+    {
+      "idea": "שבתי צבי וחביות לדרך",
+      "work": "זיכרונות, ספר ה"
+    },
+    {
+      "idea": "שתיים עשרה ילדים ושידוכים",
+      "work": "זיכרונות"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "חביות",
+      "pattern": "חביות",
+      "max": 1
+    },
+    {
+      "label": "ילדים יקרים",
+      "pattern": "ילדיי היקרים|ילדים יקרים",
+      "max": 2
+    }
+  ]
+}

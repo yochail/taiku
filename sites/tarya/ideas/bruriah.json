@@ -1,0 +1,46 @@
+{
+  "id": "bruriah",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "יתמו חטאים ולא חוטאים",
+      "work": "ברכות י ע״א"
+    },
+    {
+      "idea": "פיקדון שהופקד: הבשורה לרבי מאיר על הבנים",
+      "work": "מדרש משלי לא"
+    },
+    {
+      "idea": "לא אמרו חכמים אל תרבה שיחה עם האשה: באיזו דרך ללוד",
+      "work": "עירובין נג ע״ב"
+    },
+    {
+      "idea": "בעטה בתלמיד שלמד בלחש",
+      "work": "עירובין נד"
+    },
+    {
+      "idea": "שלוש מאות הלכות ביום",
+      "work": "פסחים סב ע״ב"
+    },
+    {
+      "idea": "הלכה בטהרות: יפה אמרה ברוריה",
+      "work": "תוספתא כלים"
+    },
+    {
+      "idea": "בת רבי חנינא בן תרדיון, אחרי השריפה",
+      "work": "עבודה זרה יח"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "יתמו חטאים",
+      "pattern": "יתמו חטאים",
+      "max": 1
+    },
+    {
+      "label": "באיזו דרך נלך ללוד",
+      "pattern": "דרך נלך ללוד|ללוד",
+      "max": 1
+    }
+  ]
+}

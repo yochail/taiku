@@ -1,0 +1,38 @@
+{
+  "id": "acharei_rabim",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "תנור של עכנאי",
+      "work": "בבא מציעא נט"
+    },
+    {
+      "idea": "לא בשמים היא",
+      "work": "בבא מציעא נט"
+    },
+    {
+      "idea": "הלכה כבית הלל",
+      "work": "עירובין יג"
+    },
+    {
+      "idea": "רוב ומיעוט בסנהדרין",
+      "work": "סנהדרין"
+    },
+    {
+      "idea": "יחיד ורבים: למה מזכירים דעת יחיד",
+      "work": "עדויות א ה"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "אחרי רבים להטות",
+      "pattern": "אחרי רבים",
+      "max": 1
+    },
+    {
+      "label": "הצבעה",
+      "pattern": "הצבעה|סקר",
+      "max": 4
+    }
+  ]
+}

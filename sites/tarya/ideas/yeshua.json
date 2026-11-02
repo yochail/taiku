@@ -1,0 +1,68 @@
+{
+  "id": "yeshua",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "הזרע על אדמה סלעית ובין הקוצים",
+      "work": "מתי יג"
+    },
+    {
+      "idea": "הפועלים בכרם בשעה האחת עשרה",
+      "work": "מתי כ"
+    },
+    {
+      "idea": "התאנה שלא נתנה פרי",
+      "work": "לוקאס יג"
+    },
+    {
+      "idea": "השמרו מצדקה לראווה, תפילה בחדר סגור",
+      "work": "מתי ו"
+    },
+    {
+      "idea": "חבצלות השדה וציפורי השמים",
+      "work": "מתי ו"
+    },
+    {
+      "idea": "האלמנה וגזברי המקדש: שתי פרוטות",
+      "work": "מרקוס יב"
+    },
+    {
+      "idea": "שאלת הצדוקים על שבעת האחים",
+      "work": "מרקוס יב"
+    },
+    {
+      "idea": "אל תשפטו: קיסם וקורה",
+      "work": "מתי ז"
+    },
+    {
+      "idea": "הבן האובד והאח הגדול שכועס",
+      "work": "לוקאס טו"
+    },
+    {
+      "idea": "השומרוני הטוב: מי היה רע",
+      "work": "לוקאס י"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "שמעתם כי נאמר",
+      "pattern": "שמעתם כי נאמר",
+      "max": 2
+    },
+    {
+      "label": "ואני אומר לכם",
+      "pattern": "ואני אומר לכם",
+      "max": 3
+    },
+    {
+      "label": "מי בכם האיש",
+      "pattern": "מי בכם",
+      "max": 2
+    },
+    {
+      "label": "קורה בעין",
+      "pattern": "קורה",
+      "max": 2
+    }
+  ]
+}

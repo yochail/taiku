@@ -1,0 +1,46 @@
+{
+  "id": "sarah",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "הצחוק באוהל, ואחר כך ההכחשה: לא צחקתי",
+      "work": "בראשית יח"
+    },
+    {
+      "idea": "שרי במצרים ובגרר: לשרוד ממלכים זרים",
+      "work": "בראשית יב; כ"
+    },
+    {
+      "idea": "הצעת הגר לאברם, והמחיר של רעיון טוב",
+      "work": "בראשית טז"
+    },
+    {
+      "idea": "גרש האמה הזאת: החלטה קשה שאלוהים אומר לשמוע בקולה",
+      "work": "בראשית כא"
+    },
+    {
+      "idea": "מי מלל לאברהם היניקה בנים שרה",
+      "work": "בראשית כא"
+    },
+    {
+      "idea": "שינוי השם משרי לשרה",
+      "work": "בראשית יז"
+    },
+    {
+      "idea": "קבורה בחברון: האישה שבשבילה נקנתה הארץ הראשונה",
+      "work": "בראשית כג"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "צחוק עשה לי אלהים",
+      "pattern": "צחוק עשה לי",
+      "max": 1
+    },
+    {
+      "label": "היפלא מה׳ דבר",
+      "pattern": "היפלא מ",
+      "max": 1
+    }
+  ]
+}

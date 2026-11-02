@@ -1,0 +1,55 @@
+{
+  "id": "david",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "מחול לפני הארון ומיכל בחלון",
+      "work": "שמואל ב ו"
+    },
+    {
+      "idea": "נתן הנביא ומשל כבשת הרש: אתה האיש",
+      "work": "שמואל ב יב"
+    },
+    {
+      "idea": "מים מבאר בית לחם ששפך לה׳",
+      "work": "שמואל ב כג"
+    },
+    {
+      "idea": "אבשלום בני בני: אבל אב על בן מורד",
+      "work": "שמואל ב יט"
+    },
+    {
+      "idea": "כרת כנף מעיל שאול, ולא נגע",
+      "work": "שמואל א כד"
+    },
+    {
+      "idea": "אבנים חלוקות מהנחל, לא שריון",
+      "work": "שמואל א יז"
+    },
+    {
+      "idea": "מזמור לדוד בברחו: תהלים כשבורחים מהבן",
+      "work": "תהלים ג"
+    },
+    {
+      "idea": "ספירת העם והמגפה",
+      "work": "שמואל ב כד"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "איך נפלו גבורים",
+      "pattern": "איך נפלו גבורים",
+      "max": 1
+    },
+    {
+      "label": "ה׳ רועי",
+      "pattern": "רועי לא אחסר",
+      "max": 1
+    },
+    {
+      "label": "כינור",
+      "pattern": "כינור",
+      "max": 3
+    }
+  ]
+}

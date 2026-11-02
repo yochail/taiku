@@ -58,8 +58,10 @@
         {
           "kind": "link_card",
           "url": "https://www.haaretz.co.il/news/politics/2026-10-03/ty-article/000001a1-001b-d350-a9ab-de5fc99d0000",
+          "domain": "haaretz.co.il",
           "title": "הטייס התוקף הוא הומאם אל־הומאמי; דיווח: צילם מטוסים ישראליים אחרי 7.10",
-          "domain": "haaretz.co.il"
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
         }
       ],
       "origin": "backfill",
@@ -125,8 +127,10 @@
         {
           "kind": "link_card",
           "url": "https://www.nytimes.com/2026/10/02/business/diesel-reserves-g7.html",
+          "domain": "nytimes.com",
           "title": "G7 plans to release 100 million barrels of diesel and crude to curb fuel prices",
-          "domain": "nytimes.com"
+          "site_name": "The New York Times",
+          "icon": "https://www.nytimes.com/favicon.ico"
         }
       ],
       "origin": "backfill"
@@ -173,6 +177,18 @@
             "url": "https://www.artic.edu/artworks/106550",
             "title": "Celestial Map of the Northern Sky with the Twelve Zodiac Signs"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://cedardb.com/blog/sqldoom/",
+          "domain": "cedardb.com",
+          "title": "We ported the original Doom to SQL",
+          "description": "CedarDB is a database system that delivers unmatched performance for transactions and analytics, from small writes to handling billions of rows. Built on cutting-edge research to power today’s tools and tomorrow’s challenges.",
+          "site_name": "CedarDB",
+          "image": {
+            "url": "https://cedardb.com/blog/sqldoom/hero.jpg"
+          },
+          "icon": "https://cedardb.com/img/favicon.svg"
         }
       ],
       "origin": "backfill"
@@ -216,7 +232,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/news/politics/2026-10-03/ty-article/000001a1-001b-d350-a9ab-de5fc99d0000",
+          "domain": "haaretz.co.il",
+          "title": "הטייס התוקף הוא הומאם אל־הומאמי; דיווח: צילם מטוסים ישראליים אחרי 7.10",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261003-51-rt-ben-gurion",
@@ -298,6 +324,14 @@
             "url": "https://commons.wikimedia.org/wiki/File:%27Democritus%27_by_Luca_Giordano,_called_Fa_Presto.jpg",
             "title": "Democritus, the Laughing Philosopher"
           }
+        },
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/sport/world-soccer/2026-10-03/ty-article/000001a1-02d3-d2e8-afb1-16f7e5950000",
+          "domain": "haaretz.co.il",
+          "title": "אנגליה הביסה את קרואטיה 0:7 והנחילה לה את ההפסד הגדול בתולדותיה",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
         }
       ],
       "origin": "backfill",
@@ -337,7 +371,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.reuters.com/world/latvians-vote-election-shadow-drone-incursions-war-ukraine-2026-10-03/",
+          "domain": "reuters.com",
+          "title": "Latvians vote in election under shadow of drone incursions",
+          "site_name": "Reuters",
+          "icon": "https://www.reuters.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261003-20",
@@ -483,6 +527,16 @@
       "origin": "backfill",
       "personaReposts": [
         "izevel"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/news/politics/2026-10-03/ty-article/000001a1-00bd-d6fb-a9ab-86bfb7440000",
+          "domain": "haaretz.co.il",
+          "title": "מתנחלים תקפו מוסקים וגנבו יבול בכפרים רבים בגדה; צה\"ל מנע מסיק",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
+        }
       ]
     },
     {
@@ -549,6 +603,16 @@
       "origin": "backfill",
       "personaReposts": [
         "agnon"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/news/politics/2026-10-03/ty-article/000001a1-00bd-d6fb-a9ab-86bfb7440000",
+          "domain": "haaretz.co.il",
+          "title": "מתנחלים תקפו מוסקים וגנבו יבול בכפרים רבים בגדה; צה\"ל מנע מסיק",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
+        }
       ]
     },
     {
@@ -720,7 +784,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.nytimes.com/2026/10/02/business/diesel-reserves-g7.html",
+          "domain": "nytimes.com",
+          "title": "G7 plans to release 100 million barrels of diesel and crude to curb fuel prices",
+          "site_name": "The New York Times",
+          "icon": "https://www.nytimes.com/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261003-40",
@@ -828,7 +902,17 @@
         "kind": "news",
         "tier": "curated"
       },
-      "origin": "backfill"
+      "origin": "backfill",
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/sport/basketball/2026-10-03/ty-article/000001a1-034e-d6fb-a9ab-87eefdf50000",
+          "domain": "haaretz.co.il",
+          "title": "הפועל ת\"א עלתה לגמר גביע ווינר אחרי ניצחון על עירוני נס ציונה 76:79",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
+        }
+      ]
     },
     {
       "id": "ty20261003-44",
@@ -923,6 +1007,16 @@
         "shlomtzion",
         "szold",
         "spinoza"
+      ],
+      "media": [
+        {
+          "kind": "link_card",
+          "url": "https://www.haaretz.co.il/news/law/2026-10-03/ty-article/.premium/000001a1-028e-d6fb-a9ab-86ae3c9b0000",
+          "domain": "haaretz.co.il",
+          "title": "\"עשו עליי חיפוש בעירום\": הכומר האורתודוקסי של יפו נעצר על הפרעה לשוטר",
+          "site_name": "הארץ",
+          "icon": "https://www.haaretz.co.il/favicon.ico"
+        }
       ]
     },
     {

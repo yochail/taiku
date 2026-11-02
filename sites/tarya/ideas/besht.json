@@ -1,0 +1,42 @@
+{
+  "id": "besht",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "עבודה בגשמיות",
+      "work": "צוואת הריב״ש"
+    },
+    {
+      "idea": "תיקון המחשבה הזרה",
+      "work": "צוואת הריב״ש"
+    },
+    {
+      "idea": "עליית הנשמה ושאלה למשיח: אימתי אתי מר",
+      "work": "אגרת הקודש"
+    },
+    {
+      "idea": "שומר בית מדרש שנחשב לעם הארץ",
+      "work": "שבחי הבעש״ט"
+    },
+    {
+      "idea": "הילד עם החליל ביום כיפור",
+      "work": "סיפורי חסידים"
+    },
+    {
+      "idea": "הנהגה של סעודה ואמונה פשוטה",
+      "work": "שבחי הבעש״ט"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "אימתי אתי מר",
+      "pattern": "אימתי אתי",
+      "max": 1
+    },
+    {
+      "label": "דבקות",
+      "pattern": "דבקות",
+      "max": 2
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "ruth",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "ללקט אחרי הקוצרים: עבודה בשדה של זר",
+      "work": "רות ב"
+    },
+    {
+      "idea": "גורן בלילה: אומץ ושקט",
+      "work": "רות ג"
+    },
+    {
+      "idea": "נעמי ששינתה שם למרה",
+      "work": "רות א"
+    },
+    {
+      "idea": "ערפה שחזרה הביתה ואינה רשעה",
+      "work": "רות א"
+    },
+    {
+      "idea": "השם שלא ניתן: פלוני אלמוני והגאולה",
+      "work": "רות ד"
+    },
+    {
+      "idea": "שכנות קוראות שם לילד",
+      "work": "רות ד"
+    },
+    {
+      "idea": "חסד אחרון מן הראשון",
+      "work": "רות ג"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "באשר תלכי אלך",
+      "pattern": "באשר תלכי|ובאשר תליני",
+      "max": 1
+    },
+    {
+      "label": "עמך עמי",
+      "pattern": "עמך עמי",
+      "max": 1
+    }
+  ]
+}

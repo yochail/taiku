@@ -1,0 +1,42 @@
+{
+  "id": "emma_lazarus",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "אפוסטרופה: מכתבים לעברים",
+      "work": "Epistle to the Hebrews"
+    },
+    {
+      "idea": "ביקור בוורדס איילנד",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "ריקוד אל המוות",
+      "work": "The Dance to Death"
+    },
+    {
+      "idea": "בית הקברות בניופורט",
+      "work": "The Jewish Cemetery at Newport"
+    },
+    {
+      "idea": "תרגום היינה",
+      "work": "Poems and Ballads of Heine"
+    },
+    {
+      "idea": "גדי והרצל לפני הרצל",
+      "work": "Epistle to the Hebrews"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "ההמונים המצטופפים",
+      "pattern": "מצטופפ|לנשום חופשי",
+      "max": 1
+    },
+    {
+      "label": "קולוסוס",
+      "pattern": "קולוסוס",
+      "max": 1
+    }
+  ]
+}

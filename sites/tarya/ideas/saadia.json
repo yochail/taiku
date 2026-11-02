@@ -1,0 +1,50 @@
+{
+  "id": "saadia",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "ארבעה מקורות ידיעה: חושים, שכל, היסק, מסורת",
+      "work": "האמונות והדעות, הקדמה"
+    },
+    {
+      "idea": "התפסיר: תורה בערבית לכל אחד",
+      "work": "תפסיר"
+    },
+    {
+      "idea": "מחלוקת הלוח עם בן מאיר מארץ ישראל",
+      "work": "ספר המועדים"
+    },
+    {
+      "idea": "האגרון: מילון לשון הקודש לחרוזים",
+      "work": "האגרון"
+    },
+    {
+      "idea": "מאמר על דרך החיים הטובה: איזון בין התאוות",
+      "work": "האמונות והדעות י"
+    },
+    {
+      "idea": "סידור רב סעדיה",
+      "work": "סידור"
+    },
+    {
+      "idea": "מחלוקת עם ראש הגולה דוד בן זכאי",
+      "work": "אגרות"
+    },
+    {
+      "idea": "אומתנו אינה אומה אלא בתורותיה",
+      "work": "האמונות והדעות ג"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "אומתנו אינה אומה אלא בתורותיה",
+      "pattern": "אינה אומה אלא בתורותיה",
+      "max": 1
+    },
+    {
+      "label": "קראים",
+      "pattern": "קראי|ענן",
+      "max": 3
+    }
+  ]
+}

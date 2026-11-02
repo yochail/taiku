@@ -1,0 +1,69 @@
+{
+  "id": "hillel",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "פרוזבול: תקנה לטובת הלווים",
+      "work": "שביעית י"
+    },
+    {
+      "idea": "על הגג בשלג, ללמוד מהחלון",
+      "work": "יומא לה ע״ב"
+    },
+    {
+      "idea": "ראה גולגולת צפה: על דאטפת אטפוך",
+      "work": "אבות ב ו"
+    },
+    {
+      "idea": "אל תאמר לכשאפנה אשנה",
+      "work": "אבות ב ד"
+    },
+    {
+      "idea": "במקום שאין אנשים השתדל להיות איש",
+      "work": "אבות ב ה"
+    },
+    {
+      "idea": "לא הבור ירא חטא",
+      "work": "אבות ב ה"
+    },
+    {
+      "idea": "הנח להם לישראל, אם אינם נביאים בני נביאים הם",
+      "work": "פסחים סו"
+    },
+    {
+      "idea": "סוס לרוץ לפני עני שהיה עשיר",
+      "work": "כתובות סז ע״ב"
+    },
+    {
+      "idea": "כלה כמות שהיא נאה וחסודה",
+      "work": "כתובות יז"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "מה ששנוא עליך",
+      "pattern": "ששנוא עליך|שנוא עליך",
+      "max": 1
+    },
+    {
+      "label": "על רגל אחת",
+      "pattern": "על רגל אחת",
+      "max": 1
+    },
+    {
+      "label": "אם אין אני לי",
+      "pattern": "אם אין אני לי",
+      "max": 1
+    },
+    {
+      "label": "אם לא עכשיו אימתי",
+      "pattern": "ואם לא עכשיו|אם לא עכשיו",
+      "max": 1
+    },
+    {
+      "label": "לך ולמד",
+      "pattern": "לך ולמד|זיל גמור",
+      "max": 2
+    }
+  ]
+}

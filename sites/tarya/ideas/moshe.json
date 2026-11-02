@@ -1,0 +1,59 @@
+{
+  "id": "moshe",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "עצת יתרו: שרי אלפים ושרי מאות, לא לשפוט לבד",
+      "work": "שמות יח"
+    },
+    {
+      "idea": "מי יתן כל עם ה׳ נביאים, על אלדד ומידד",
+      "work": "במדבר יא"
+    },
+    {
+      "idea": "תפילה קצרה: אל נא רפא נא לה",
+      "work": "במדבר יב"
+    },
+    {
+      "idea": "לא חמור אחד מהם נשאתי, מול קורח",
+      "work": "במדבר טז"
+    },
+    {
+      "idea": "מי מריבה: המכה בסלע והמחיר",
+      "work": "במדבר כ"
+    },
+    {
+      "idea": "ושננתם לבניך, ערי מקלט ושכר שכיר ביומו",
+      "work": "דברים"
+    },
+    {
+      "idea": "לא בשמים היא: התורה בפה ובלב",
+      "work": "דברים ל"
+    },
+    {
+      "idea": "מת מול הארץ, בלי להיכנס: לראות מנגד",
+      "work": "דברים לד"
+    },
+    {
+      "idea": "כבד פה וכבד לשון: מנהיג מגמגם",
+      "work": "שמות ד"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "שלח את עמי",
+      "pattern": "שלח את עמי",
+      "max": 1
+    },
+    {
+      "label": "כבד פה",
+      "pattern": "כבד פה",
+      "max": 1
+    },
+    {
+      "label": "לא בשמים היא",
+      "pattern": "לא בשמים",
+      "max": 1
+    }
+  ]
+}

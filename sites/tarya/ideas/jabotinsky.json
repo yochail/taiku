@@ -1,0 +1,55 @@
+{
+  "id": "jabotinsky",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "על קיר הברזל",
+      "work": "על קיר הברזל"
+    },
+    {
+      "idea": "שמשון",
+      "work": "שמשון"
+    },
+    {
+      "idea": "חמשה",
+      "work": "חמשה"
+    },
+    {
+      "idea": "הגדוד העברי",
+      "work": "פרשת הגדוד"
+    },
+    {
+      "idea": "מגילת הצעדה: הדר",
+      "work": "רעיון בית״ר"
+    },
+    {
+      "idea": "תוכנית פינוי",
+      "work": "נאום 1938"
+    },
+    {
+      "idea": "תרגום ״העורב״ של פו",
+      "work": "תרגומים"
+    },
+    {
+      "idea": "שתי גדות לירדן",
+      "work": "שמאל הירדן"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "שתי גדות",
+      "pattern": "שתי גדות",
+      "max": 1
+    },
+    {
+      "label": "הדר",
+      "pattern": "(^|[^א-ת])הדר([^א-ת]|$)",
+      "max": 2
+    },
+    {
+      "label": "קיר הברזל",
+      "pattern": "קיר הברזל",
+      "max": 1
+    }
+  ]
+}

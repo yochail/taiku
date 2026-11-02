@@ -1,0 +1,46 @@
+{
+  "id": "shammai",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "אמור מעט ועשה הרבה",
+      "work": "אבות א טו"
+    },
+    {
+      "idea": "הוי מקבל את כל האדם בסבר פנים יפות",
+      "work": "אבות א טו"
+    },
+    {
+      "idea": "עשה תורתך קבע",
+      "work": "אבות א טו"
+    },
+    {
+      "idea": "נר חנוכה פוחת והולך",
+      "work": "שבת כא ע״ב"
+    },
+    {
+      "idea": "בית שמאי אומרים: כלה כמות שהיא",
+      "work": "כתובות יז"
+    },
+    {
+      "idea": "שמונה עשר דבר ביום אחד",
+      "work": "שבת יג ע״ב"
+    },
+    {
+      "idea": "הבית החדש: ערוות דבר בגירושין",
+      "work": "גיטין צ"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "אמת הבניין",
+      "pattern": "אמת הבני",
+      "max": 1
+    },
+    {
+      "label": "מקל",
+      "pattern": "במקל|עם מקל|ומקל",
+      "max": 2
+    }
+  ]
+}

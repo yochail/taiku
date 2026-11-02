@@ -1,0 +1,51 @@
+{
+  "id": "miriam",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "מרים ליד היאור, שומרת על אח קטן בתיבה",
+      "work": "שמות ב"
+    },
+    {
+      "idea": "המיילדות ומרד הנשים במצרים, שפרה ופועה",
+      "work": "שמות א; סוטה יא"
+    },
+    {
+      "idea": "הצרעת אחרי הדיבור על האישה הכושית, והעם שחיכה לה",
+      "work": "במדבר יב"
+    },
+    {
+      "idea": "באר מרים: מים במדבר בזכותה",
+      "work": "תענית ט ע״א"
+    },
+    {
+      "idea": "ומתה שם מרים, ולא היה מים לעדה",
+      "work": "במדבר כ"
+    },
+    {
+      "idea": "הנבואה לפני משה: אמי עתידה ללדת מושיע",
+      "work": "סוטה יב ע״ב"
+    },
+    {
+      "idea": "נביאה עם תוף, לא רק מקהלת גיבוי",
+      "work": "שמות טו"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "שירו לה׳ כי גאה גאה",
+      "pattern": "גאה גאה",
+      "max": 1
+    },
+    {
+      "label": "סוס ורוכבו רמה בים",
+      "pattern": "סוס ורכבו|סוס ורוכבו",
+      "max": 1
+    },
+    {
+      "label": "תופים",
+      "pattern": "בתופים ובמחולות|תוף ביד",
+      "max": 2
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "rybz",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "ארבעים שנה בפרגמטיא: מאוחר ומשנה קריירה",
+      "work": "ראש השנה לא"
+    },
+    {
+      "idea": "חמישה תלמידים ולב טוב",
+      "work": "אבות ב ט"
+    },
+    {
+      "idea": "אם יש בידך נטיעה ובאו ואמרו לך הנה המשיח",
+      "work": "אבות דרבי נתן ב לא"
+    },
+    {
+      "idea": "תקנות יבנה: שופר בשבת, לולב בכל מקום",
+      "work": "ראש השנה כט"
+    },
+    {
+      "idea": "בכי לפני מותו: שתי דרכים לפני",
+      "work": "ברכות כח ע״ב"
+    },
+    {
+      "idea": "אל תחזיק טובה לעצמך, כי לכך נוצרת",
+      "work": "אבות ב ח"
+    },
+    {
+      "idea": "ויכוח עם הצדוקים על עצם החמור",
+      "work": "ידיים ד"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "תן לי יבנה וחכמיה",
+      "pattern": "יבנה וחכמיה|תן לי יבנה",
+      "max": 1
+    },
+    {
+      "label": "ארון",
+      "pattern": "בארון|יצאתי בארון",
+      "max": 1
+    }
+  ]
+}

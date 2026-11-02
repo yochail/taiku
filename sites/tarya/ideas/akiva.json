@@ -1,0 +1,59 @@
+{
+  "id": "akiva",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "טיפות מים חוקקות אבן",
+      "work": "אבות דרבי נתן ו"
+    },
+    {
+      "idea": "שועל יוצא מבית קדשי הקדשים, וצחוק",
+      "work": "מכות כד ע״ב"
+    },
+    {
+      "idea": "כל מה דעביד רחמנא לטב עביד",
+      "work": "ברכות ס ע״ב"
+    },
+    {
+      "idea": "שלי ושלכם שלה: רחל אשתו",
+      "work": "כתובות סג"
+    },
+    {
+      "idea": "הכל צפוי והרשות נתונה",
+      "work": "אבות ג טו"
+    },
+    {
+      "idea": "חביב אדם שנברא בצלם",
+      "work": "אבות ג יד"
+    },
+    {
+      "idea": "שיר השירים קודש קודשים",
+      "work": "ידיים ג ה"
+    },
+    {
+      "idea": "משל השועל והדגים",
+      "work": "ברכות סא ע״ב"
+    },
+    {
+      "idea": "בעשרים וארבעה אלף תלמידים שלא נהגו כבוד זה בזה",
+      "work": "יבמות סב ע״ב"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "ואהבת לרעך כמוך כלל גדול",
+      "pattern": "כלל גדול בתורה",
+      "max": 1
+    },
+    {
+      "label": "עוד ישבו זקנים וזקנות",
+      "pattern": "ישבו זקנים|זקנים וזקנות",
+      "max": 1
+    },
+    {
+      "label": "באחד",
+      "pattern": "אחד באחד|יצאה נשמתו",
+      "max": 1
+    }
+  ]
+}

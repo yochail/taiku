@@ -1,0 +1,33 @@
+{
+  "id": "satmar",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "שלוש השבועות: לא לעלות בחומה",
+      "work": "ויואל משה"
+    },
+    {
+      "idea": "הצלה ברכבת קסטנר",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "וויליאמסבורג: קהילה מהאפס",
+      "work": "ביוגרפיה"
+    },
+    {
+      "idea": "עמידה נגד השתתפות בבחירות",
+      "work": "על הגאולה ועל התמורה"
+    },
+    {
+      "idea": "צניעות וגבולות",
+      "work": "דרשות"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "שלוש השבועות",
+      "pattern": "שלוש השבועות|ג׳ שבועות",
+      "max": 1
+    }
+  ]
+}

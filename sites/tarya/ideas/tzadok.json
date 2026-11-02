@@ -1,0 +1,46 @@
+{
+  "id": "tzadok",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "ממחרת השבת: ספירת העומר מיום ראשון",
+      "work": "מנחות סה"
+    },
+    {
+      "idea": "אין תחיית המתים בתורת משה",
+      "work": "אבות דרבי נתן ה"
+    },
+    {
+      "idea": "קטורת ביום הכיפורים: מתקנים בחוץ",
+      "work": "יומא יט"
+    },
+    {
+      "idea": "עין תחת עין כפשוטו",
+      "work": "מגילת תענית"
+    },
+    {
+      "idea": "ניצוק טהור: ויכוח על מים",
+      "work": "ידיים ד ז"
+    },
+    {
+      "idea": "הכהונה הגדולה והמשפחה",
+      "work": "קדמוניות יח"
+    },
+    {
+      "idea": "רק מה שכתוב",
+      "work": "קדמוניות יג"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "רק מה שכתוב",
+      "pattern": "רק מה שכתוב",
+      "max": 2
+    },
+    {
+      "label": "תורה שבעל פה",
+      "pattern": "שבעל פה",
+      "max": 2
+    }
+  ]
+}

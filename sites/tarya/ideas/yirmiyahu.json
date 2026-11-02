@@ -1,0 +1,55 @@
+{
+  "id": "yirmiyahu",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "קנה שדה בענתות כשהבבלים בשער",
+      "work": "ירמיהו לב"
+    },
+    {
+      "idea": "דרשו את שלום העיר: מכתב לגולים",
+      "work": "ירמיהו כט"
+    },
+    {
+      "idea": "המוט על הצוואר",
+      "work": "ירמיהו כז-כח"
+    },
+    {
+      "idea": "נביא בבור הטיט, ועבד כושי שמוציא אותו",
+      "work": "ירמיהו לח"
+    },
+    {
+      "idea": "המגילה שנשרפה בתנור החורף",
+      "work": "ירמיהו לו"
+    },
+    {
+      "idea": "ארור היום אשר ילדתי בו: נביא בדיכאון",
+      "work": "ירמיהו כ"
+    },
+    {
+      "idea": "הלוא כה דברי כאש",
+      "work": "ירמיהו כג"
+    },
+    {
+      "idea": "רחל מבכה על בניה, ומנעי קולך מבכי",
+      "work": "ירמיהו לא"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "זכרתי לך חסד נעורייך",
+      "pattern": "חסד נעוריך|חסד נעורייך",
+      "max": 1
+    },
+    {
+      "label": "שלום שלום ואין שלום",
+      "pattern": "שלום שלום ואין שלום",
+      "max": 1
+    },
+    {
+      "label": "איכה",
+      "pattern": "(^|[^א-ת])איכה ישבה",
+      "max": 1
+    }
+  ]
+}

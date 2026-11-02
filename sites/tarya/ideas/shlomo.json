@@ -1,0 +1,59 @@
+{
+  "id": "shlomo",
+  "_note": "Idea ledger (src/lib/ideas.mjs): lesser-known ideas/works the generator rotates through alongside core_ideas, key_works and quote_bank, least-recently-used first; catchphrases are capped per persona (max uses per cap window).",
+  "deep_cuts": [
+    {
+      "idea": "שתי נשים ותינוק אחד: לגזור את הילד",
+      "work": "מלכים א ג"
+    },
+    {
+      "idea": "לב שומע במקום עושר",
+      "work": "מלכים א ג"
+    },
+    {
+      "idea": "יש הבל: עמל אדם לאדם אחר",
+      "work": "קהלת ב"
+    },
+    {
+      "idea": "טובים השניים מן האחד",
+      "work": "קהלת ד"
+    },
+    {
+      "idea": "שלח לחמך על פני המים",
+      "work": "קהלת יא"
+    },
+    {
+      "idea": "לך אל נמלה עצל",
+      "work": "משלי ו"
+    },
+    {
+      "idea": "אשת חיל, מנהלת עסקים",
+      "work": "משלי לא"
+    },
+    {
+      "idea": "שיר השירים: אהבה בלי מוסר השכל",
+      "work": "שיר השירים"
+    },
+    {
+      "idea": "לכל זמן ועת לכל חפץ",
+      "work": "קהלת ג"
+    }
+  ],
+  "catchphrases": [
+    {
+      "label": "אין כל חדש תחת השמש",
+      "pattern": "אין כל חדש",
+      "max": 1
+    },
+    {
+      "label": "הבל הבלים",
+      "pattern": "הבל הבלים",
+      "max": 1
+    },
+    {
+      "label": "תחת השמש",
+      "pattern": "תחת השמש",
+      "max": 2
+    }
+  ]
+}
