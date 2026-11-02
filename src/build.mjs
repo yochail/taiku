@@ -18,8 +18,8 @@ const STR = {
   followers: t('profile.followers'),
   profileSections: t('profile.sectionsAria'),
   followLists: t('profile.followListsAria'),
-  tabs: { posts: t('profile.tabPosts'), replies: t('profile.tabReplies'), media: t('profile.tabMedia'), likes: t('profile.tabLikes') },
-  tabTitle: { posts: t('profile.tabPosts'), replies: t('profile.tabTitleReplies'), media: t('profile.tabMedia'), likes: t('profile.tabLikes') },
+  tabs: { posts: t('profile.tabPosts'), replies: t('profile.tabReplies'), media: t('profile.tabMedia'), about: t('profile.tabAbout') },
+  tabTitle: { posts: t('profile.tabPosts'), replies: t('profile.tabTitleReplies'), media: t('profile.tabMedia'), about: t('profile.tabAbout') },
   viewPhoto: t('media.viewPhoto'),
   viewBanner: t('media.viewBanner'),
   viewImage: t('media.viewImage'),
@@ -28,7 +28,6 @@ const STR = {
   imageDescription: t('media.alt'),
   emptyPosts: (handle) => ({ title: t('profile.emptyPostsTitle', { handle }), body: t('profile.emptyPostsBody') }),
   emptyMedia: (handle) => ({ title: t('profile.emptyMediaTitle', { handle }), body: t('profile.emptyMediaBody') }),
-  likesPrivate: (handle) => ({ title: t('profile.likesPrivateTitle', { handle }), body: t('profile.likesPrivateBody') }),
   followNote: (kind, a, n) => t(kind === 'followers' ? 'follow.noteFollowers' : 'follow.noteFollowing', { name: a.name, n }),
   noFollows: (kind, handle) => t(kind === 'followers' ? 'follow.noFollowers' : 'follow.noFollowing', { handle }),
   linkUnavailable: t('media.linkUnavailable'),
@@ -743,6 +742,57 @@ function imageCredit(a) {
   return `<p class="credit">${t('profile.image')} <a href="${esc(c.source)}" rel="noopener" target="_blank">${esc(c.title)}</a>, ${esc(c.author)}${c.date ? ` (${esc(c.date)})` : ''}. ${lic}, ${t('profile.viaCommons')}${c.modified ? `; ${esc(c.modified)}` : ''}.${c.note ? ` ${esc(c.note)}` : ''}</p>`;
 }
 
+/** schema.org Person for the real historical figure (About tab). */
+function aboutLd(a) {
+  const same = [...new Set([a.wikipedia, wikiLocal(a)].filter(Boolean))];
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': url(`/thinkers/${a.id}/about/#person`),
+    url: url(`/thinkers/${a.id}/about/`),
+    name: a.name,
+    description: a.background || undefined,
+    birthDate: a.birth_display || undefined,
+    deathDate: a.death_display || undefined,
+    homeLocation: a.region ? { '@type': 'Place', name: a.region } : undefined,
+    knowsAbout: a.core_ideas?.length ? a.core_ideas : a.favorite_topics,
+    image: a.avatar?.image ? url(a.avatar.image) : undefined,
+    sameAs: same.length ? same : undefined,
+  };
+}
+/**
+ * Educational About tab: who the real person was, key ideas, major works, cited quotes, public-domain
+ * texts, relations on the site, Wikipedia and the image credit. Only public, educational persona fields
+ * are read here; the voice/behaviour fields that drive generation never reach the page.
+ */
+function personaAbout(a) {
+  const ext = (u, label) => { const h = safeUrl(u); return h ? `<a href="${esc(h)}" rel="noopener" target="_blank">${label}</a>` : label; };
+  const facts = [[t('profile.lived'), a.lifespan], [t('profile.place'), a.region], [t('profile.era'), a.era_group], [t('profile.tradition'), [a.tradition, a.school].filter(Boolean).join(' · ')]]
+    .filter(([, v]) => v)
+    .map(([k, v]) => `<div><dt>${k}</dt><dd${CA}>${cw(esc(v))}</dd></div>`)
+    .join('');
+  const ideas = (a.core_ideas ?? []).map((x) => `<li${CA}>${esc(x)}</li>`).join('');
+  const works = (a.key_works ?? []).map((w) => `<li${CA}><b>${esc(w.title)}</b>${w.year ? ` (${esc(w.year)})` : ''}${w.note ? ` — ${esc(w.note)}` : ''}</li>`).join('');
+  const quotes = (a.quotables ?? []).slice(0, 6).map((q) => `<blockquote class="ab-quote"><p${CA}>“${esc(q.text)}”</p>${q.context ? `<p class="muted"${CA}>${esc(q.context)}</p>` : ''}${q.citation ? `<cite>— ${q.source_url ? ext(q.source_url, esc(q.citation)) : esc(q.citation)}</cite>` : ''}</blockquote>`).join('');
+  const reads = (a.sources ?? []).filter((x) => x.url && safeUrl(x.url) && x.kind !== 'internal').slice(0, 10)
+    .map((x) => `<li>${ext(x.url, esc(x.title))}${x.public_domain ? ` <span class="ab-pd">${t('profile.publicDomain')}</span>` : ''}</li>`).join('');
+  const phrases = (a.native_language?.phrases ?? []).slice(0, 3).map((x) => `<li><span lang="${esc(a.native_language.code ?? '')}">${esc(x.text)}</span>${x.translation ? ` — <i>${esc(x.translation)}</i>` : ''}</li>`).join('');
+  const wiki = wikiLocal(a) || a.wikipedia;
+  const sec = (title, inner) => (inner ? `<section><h3>${title}</h3>${inner}</section>` : '');
+  return `<article class="p-about ab-page">
+    <h2${CA}>${esc(t('profile.aboutName', { name: a.name }))}</h2>
+    <p class="ab-note">${esc(t('profile.aboutNote', { name: a.name }))}</p>
+    ${facts ? `<dl class="ab-facts">${facts}</dl>` : ''}
+    ${a.background ? `<p${CA}>${esc(a.background)}</p>` : ''}
+    ${sec(t('profile.ideas'), ideas && `<ul>${ideas}</ul>`)}
+    ${sec(t('profile.works'), works && `<ul>${works}</ul>`)}
+    ${sec(t('profile.quotes'), quotes)}
+    ${sec(t('profile.read'), reads && `<ul>${reads}</ul>`)}
+    ${sec(a.native_language?.name ? t('profile.ownLanguage', { lang: a.native_language.name }) : '', phrases && `<ul>${phrases}</ul>`)}
+    ${relChips(a.allies, t('profile.allies'))}${relChips(a.frenemies, t('profile.frenemies'))}${relChips(a.rivals, t('profile.rivals'))}
+    ${wiki ? `<p class="ab-wiki">${ext(wiki, t('profile.wikipedia'))}</p>` : ''}
+  </article>${imageCredit(a)}`;
+}
 /** Who a persona "follows" on Taiku: allies, frenemies and rivals (with the reason), and the reverse for followers. */
 function followGraph() {
   const following = new Map(personas.map((a) => [a.id, new Map()]));
@@ -755,7 +805,7 @@ function followGraph() {
   return { following, followers };
 }
 
-const PROFILE_TABS = [['', 'posts'], ['with_replies/', 'replies'], ['media/', 'media'], ['likes/', 'likes']];
+const PROFILE_TABS = [['', 'posts'], ['with_replies/', 'replies'], ['media/', 'media'], ['about/', 'about']];
 function profileHeader(a, { count, back = '/thinkers/', backLabel = STR.back } = {}) {
   const full = a.avatar?.srcset?.[400] ?? a.avatar?.image;
   const av = avatar(a, 'xl');
@@ -768,6 +818,7 @@ function profileHeader(a, { count, back = '/thinkers/', backLabel = STR.back } =
       <h2 class="p-name">${cw(esc(displayName(a)))}${kindLabel(a)}</h2>
       <div class="handle">@${esc(a.handle)}</div>
       <p class="p-bio"${CA}>${renderText(a.bio, handleMap)}</p>
+      <a class="p-about-link" href="/thinkers/${a.id}/about/">${esc(t('profile.aboutName', { name: a.name }))} →</a>
       <div class="p-meta">${a.location ? `<span>📍 ${cw(esc(a.location))}</span>` : ''}${a.x_profile?.website ? `<a href="${esc(a.x_profile.website)}" rel="nofollow noopener" target="_blank">🔗 ${esc(new URL(a.x_profile.website).hostname.replace(/^www\./, ''))}</a>` : ''}${a.x_profile?.joined ? `<span>🗓️ ${esc(a.x_profile.joined)}</span>` : ''}</div>
       <div class="p-stats"><a href="/thinkers/${a.id}/following/"><b>${compactNumber(Math.max(a.x_profile?.following ?? 0, g.following.get(a.id).size))}</b> ${STR.following}</a><a href="/thinkers/${a.id}/followers/"><b data-followers="${esc(a.id)}" data-count="${a.x_profile?.followers ?? 0}">${compactNumber(a.x_profile?.followers ?? 0)}</b> ${STR.followers}</a></div>
     </section>`;
@@ -792,7 +843,6 @@ function profilePages() {
       posts: STR.emptyPosts(a.handle),
       replies: STR.emptyPosts(a.handle),
       media: STR.emptyMedia(a.handle),
-      likes: STR.likesPrivate(a.handle),
     };
     const ld = {
       '@context': 'https://schema.org',
@@ -815,24 +865,27 @@ function profilePages() {
     const aside = whoToFollow(a.id, [a.id]) + trending();
     for (const [sub, key] of PROFILE_TABS) {
       const list = lists[key] ?? [];
-      const feed = profileTabs(a, key) + (list.length ? `<div class="feed">${list.map(card).join('')}</div>` : `<div class="p-empty"><h2>${esc(empty[key].title)}</h2><p>${esc(empty[key].body)}</p></div>`);
+      const about = key === 'about';
+      const feed = profileTabs(a, key) + (about ? personaAbout(a) : list.length ? `<div class="feed">${list.map(card).join('')}</div>` : `<div class="p-empty"><h2>${esc(empty[key].title)}</h2><p>${esc(empty[key].body)}</p></div>`);
       const main = key === 'posts';
       write(
         `/thinkers/${a.id}/${sub}`,
         layout({
-          title: main ? t('profile.title', { name: a.name, handle: a.handle }) : `${STR.tabTitle[key]} · ${a.name} (@${a.handle})`,
-          description: `${a.headline} ${a.bio}`,
+          title: main ? t('profile.title', { name: a.name, handle: a.handle }) : about ? t('profile.aboutTitle', { name: a.name, lifespan: a.lifespan ?? '' }) : `${STR.tabTitle[key]} · ${a.name} (@${a.handle})`,
+          description: about ? truncate(a.background || `${a.headline} ${a.bio}`, 300) : `${a.headline} ${a.bio}`,
           pathname: `/thinkers/${a.id}/${sub}`,
           body: (main ? aboutSection(a) + imageCredit(a) : '') + feed,
-          ld: main ? [ld] : [],
+          ld: main ? [ld] : about ? [aboutLd(a)] : [],
           ogType: 'profile',
           header,
           aside,
-          noindex: !main,
+          noindex: !main && !about,
         }),
-        main ? { lastmod: mine[0]?.createdAt ?? BUILD_TIME, priority: 0.8 } : { inSitemap: false },
+        main ? { lastmod: mine[0]?.createdAt ?? BUILD_TIME, priority: 0.8 } : about ? { priority: 0.7 } : { inSitemap: false },
       );
     }
+    // The old private Likes tab moved to About; keep shared links working.
+    write(`/thinkers/${a.id}/likes/`, `<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><link rel="canonical" href="${url(`/thinkers/${a.id}/about/`)}"><meta http-equiv="refresh" content="0; url=/thinkers/${a.id}/about/"><a href="/thinkers/${a.id}/about/">${esc(t('profile.aboutName', { name: a.name }))}</a>`, { inSitemap: false });
     for (const kind of ['following', 'followers']) {
       const rel = graph[kind].get(a.id);
       const tabs = `<nav class="p-tabs" aria-label="${esc(STR.followLists)}">${['followers', 'following'].map((k) => `<a href="/thinkers/${a.id}/${k}/"${k === kind ? ' aria-current="page"' : ''}>${STR[k]}</a>`).join('')}</nav>`;

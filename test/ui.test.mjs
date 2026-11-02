@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { ROOT } from '../src/lib/data.mjs';
+import { ROOT, SITE_DIR } from '../src/lib/data.mjs';
 import { readPostPage } from '../src/lib/postpack.mjs';
 
 const POSTS = path.join(ROOT, 'test', '.ui-fixture-posts');
@@ -209,8 +209,8 @@ test('profile tabs are real routes; Posts excludes replies, Replies includes the
   assert.match(posts, /<a [^>]*aria-current="page"[^>]*>Posts</);
   assert.doesNotMatch(posts, /data-pid="uit-reply"/);
   assert.match(replies, /data-pid="uit-reply"/);
-  for (const r of ['media', 'likes', 'following', 'followers']) assert.ok(fs.existsSync(path.join(DIST, 'thinkers', 'kant', r, 'index.html')), r);
-  assert.match(read('thinkers/kant/likes/index.html'), /likes are private/);
+  for (const r of ['media', 'about', 'following', 'followers']) assert.ok(fs.existsSync(path.join(DIST, 'thinkers', 'kant', r, 'index.html')), r);
+  assert.match(read('thinkers/kant/likes/index.html'), /url=\/thinkers\/kant\/about\//);
   assert.match(posts, /href="\/thinkers\/kant\/following\/"[^>]*>/);
   assert.match(posts, /href="\/thinkers\/kant\/followers\/"[^>]*>/);
 });
@@ -270,4 +270,26 @@ test('@mentions link to persona profiles (with hovercards), #tags link to tag pa
   assert.match(html, /<a class="hashtag" href="\/tags\/uitfixturetag\/">#uitfixturetag<\/a>/);
   assert.ok(fs.existsSync(path.join(DIST, 'tags', 'uitfixturetag', 'index.html')));
   assert.match(fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8'), /a\.mention'\)/);
+});
+test('persona About tab: educational content, indexable Person JSON-LD, no internal persona fields', () => {
+  const kant = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'personas', 'kant.json'), 'utf8'));
+  const posts = read('thinkers/kant/index.html');
+  const about = read('thinkers/kant/about/index.html');
+  assert.match(posts, /<nav class="p-tabs"[\s\S]*?href="\/thinkers\/kant\/about\/"[^>]*>About</);
+  assert.doesNotMatch(posts, /href="\/thinkers\/kant\/likes\/"/);
+  assert.match(posts, /class="p-about-link" href="\/thinkers\/kant\/about\/">About Immanuel Kant/);
+  assert.match(about, /<a [^>]*aria-current="page"[^>]*>About</);
+  assert.match(about, /<meta name="robots" content="index,follow/);
+  assert.match(about, /"@type":"Person"[^<]*"sameAs":\["https:\/\/en\.wikipedia\.org\/wiki\/Immanuel_Kant"/);
+  assert.match(about, /Read more on Wikipedia/);
+  assert.match(about, /class="credit"/);
+  assert.match(about, /Key ideas/);
+  if (kant.quotables?.length) assert.match(about, /class="ab-quote"/);
+  const plain = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const leaks = [];
+  for (const k of ['voice', 'temperament', 'x_behavior', 'reaction_pool', 'sensitive_notes', 'system_prompt', 'never', 'pet_peeves', 'argument_style', 'avatar_prompt', 'sample_posts', 'signature_moves', 'news_lens', 'search_hints']) {
+    const strs = JSON.stringify(kant[k] ?? '').match(/"([^"\\]{40,})"/g) ?? [];
+    for (const q of strs) { const v = JSON.parse(q); if (about.includes(v) || about.includes(plain(v))) leaks.push(`${k}: ${v.slice(0, 50)}`); }
+  }
+  assert.deepEqual(leaks, []);
 });

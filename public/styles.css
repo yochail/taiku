@@ -475,6 +475,21 @@ button.act { background: none; border: 0; font: inherit; cursor: pointer; border
 .p-about h3 { font-size: 15px; margin: 12px 0 4px; }
 .p-about p { margin: 0 0 8px; }
 .p-about ul { margin: 0 0 8px; padding-inline-start: 20px; }
+.p-about-link { display: inline-block; margin: 0 16px 8px; font-size: 15px; }
+.ab-page { border-bottom: 0; line-height: 1.5; }
+.ab-page h2 { font-size: 20px; }
+.ab-page section { margin-block: 14px; }
+.ab-page li { margin-block-end: 4px; }
+.ab-note { color: var(--muted); font-size: 13px; }
+.ab-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; margin: 12px 0; }
+.ab-facts dt { color: var(--muted); font-size: 13px; }
+.ab-facts dd { margin: 0; }
+.ab-quote { margin: 0 0 12px; padding-inline-start: 12px; border-inline-start: 3px solid var(--line); }
+.ab-quote p { margin: 0 0 4px; }
+.ab-quote cite { font-size: 13px; font-style: normal; color: var(--muted); }
+.ab-pd { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 0 6px; }
+.ab-page .rel { margin-block: 12px; }
+.ab-wiki { font-weight: 600; }
 /* ---------- discovery: topics, trends, who to follow, onboarding, /connect/, /me/ ---------- */
 .trend-f { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; padding: 0; }
 .trend-f .trend-link { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; padding-block: 10px; padding-inline: 16px 0; color: var(--fg); }
