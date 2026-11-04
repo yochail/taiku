@@ -128,7 +128,12 @@ export function createRotation({ config, plan, env = process.env, makeClient = n
   /** A client-like facade pinned to one model for a turn/batch (switches only between whole requests without tool state). */
   function clientFor(role, personaId = null, { needTools = false } = {}) {
     let pinned = null;
-    const pickModel = (repair, exclude = new Set()) => order(role, personaId).find((m) => !exclude.has(m) && usable(m, repair) && !(needTools && m.tools === false)) ?? null;
+    // needTools prefers native function calling; with none of those left, a model that runs the turn
+    // with emulated tools (TOOL_EMULATION) beats leaving the task pending.
+    const pickModel = (repair, exclude = new Set()) => {
+      const ok = order(role, personaId).filter((m) => !exclude.has(m) && usable(m, repair));
+      return (needTools && ok.find((m) => m.tools !== false)) || ok[0] || null;
+    };
     let calls = 0;
     const facade = {
       role,
@@ -170,7 +175,9 @@ export function createRotation({ config, plan, env = process.env, makeClient = n
           pinned = m;
           calls++;
           try {
-            const r = await m.client.chat(rest);
+            // A turn built for native tools can land on a model without them after a switch: drop the schemas.
+            const send = m.tools === false && rest.tools ? (({ tools, tool_choice, ...b }) => b)(rest) : rest;
+            const r = await m.client.chat(send);
             account(m, rest, r);
             return { ...r, model: m.model };
           } catch (e) {

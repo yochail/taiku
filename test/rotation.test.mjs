@@ -131,6 +131,20 @@ test('config/llm.json: reasoning that eats max_tokens is switched off', () => {
   assert.equal(byName['cf-gemma-4-26b'].extra?.chat_template_kwargs?.enable_thinking, false);
 });
 
+test('rotation: a needTools turn falls back to a non-native (emulated-tools) model when no native one is left', async () => {
+  const plan = planBudget({ config });
+  const seen = [];
+  const r429 = () => new Response('rate limited', { status: 429 });
+  const [first, second] = config.chains.voice;
+  const caps = Object.fromEntries(config.providers.map((p) => [`${llmConfig(env, p).baseUrl}|${p.model}`, p.name === first]));
+  const rot = createRotation({ config, plan, env, caps, makeClient: fakeClients({ [first]: [r429] }, seen) });
+  await rot.probe();
+  const c = rot.clientFor('voice', 'socrates', { needTools: true });
+  const r = await c.chat({ messages: [{ role: 'user', content: 'x' }], tools: [{ type: 'function', function: { name: 'f', parameters: {} } }] });
+  assert.equal(JSON.parse(r.message.content).text, `from ${second}`);
+  assert.equal(seen.at(-1).body.tools, undefined, 'tool schemas are not sent to a model without native tools');
+});
+
 test('rotation: providers without their secret are skipped (live runs)', async () => {
   const seen = [];
   const fetchImpl = async (url, init) => {
