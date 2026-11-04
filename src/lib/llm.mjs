@@ -199,8 +199,12 @@ export function createClient({ cfg = llmConfig(), fetchImpl = globalThis.fetch, 
     }
     throw lastErr;
   }
+  // Workers AI rejects `content: null` (an assistant tool-call message) with a 400 schema error.
   const prefixUser = (messages) =>
-    !cfg.userPrefix ? messages : messages.map((m) => (m.role === 'user' && typeof m.content === 'string' && !m.content.startsWith(cfg.userPrefix) ? { ...m, content: `${cfg.userPrefix} ${m.content}` } : m));
+    messages.map((m) => {
+      if (m.content == null && m.role === 'assistant') m = { ...m, content: '' };
+      return cfg.userPrefix && m.role === 'user' && typeof m.content === 'string' && !m.content.startsWith(cfg.userPrefix) ? { ...m, content: `${cfg.userPrefix} ${m.content}` } : m;
+    });
   return {
     cfg,
     stats,

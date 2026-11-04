@@ -100,6 +100,37 @@ test('rotation: a 429 / quota / 410 moves straight on to the next model in the c
   assert.equal(seen3.at(-1).auth, 'Bearer tok');
 });
 
+test('rotation: a 413 or an empty reply moves this request to the next model without capping', async () => {
+  const plan = planBudget({ config });
+  const [micro, next] = config.chains.micro;
+  const tooLarge = () => new Response('Request too large for model', { status: 413 });
+  const empty = () => new Response(JSON.stringify({ choices: [{ message: { role: 'assistant', content: null } }] }), { status: 200 });
+  // 413 is not retried in place; an empty reply is retried once (maxAttempts 2) before moving on.
+  for (const script of [[tooLarge], [empty, empty]]) {
+    const seen = [];
+    const rot = createRotation({ config, plan, env, makeClient: fakeClients({ [micro]: script }, seen) });
+    const r = await rot.clientFor('micro').chat({ messages: [{ role: 'user', content: 'x' }] });
+    assert.equal(JSON.parse(r.message.content).text, `from ${next}`);
+    assert.ok(!rot.report().find((m) => m.name === micro).capped, 'model stays usable for later requests');
+    const r2 = await rot.clientFor('micro').chat({ messages: [{ role: 'user', content: 'y' }] });
+    assert.equal(JSON.parse(r2.message.content).text, `from ${micro}`);
+  }
+});
+
+test('llm client: an assistant tool-call message with content null is sent as "" (Workers AI rejects null)', async () => {
+  const bodies = [];
+  const c = createClient({ cfg: { ...llmConfig(env), rpm: 0 }, fetchImpl: async (u, init) => (bodies.push(JSON.parse(init.body)), ok()), sleep });
+  await c.chat({ messages: [{ role: 'user', content: 'x' }, { role: 'assistant', content: null, tool_calls: [{ id: 'c1', type: 'function', function: { name: 'f', arguments: '{}' } }] }, { role: 'tool', tool_call_id: 'c1', content: 'r' }] });
+  assert.equal(bodies[0].messages[1].content, '');
+  assert.equal(bodies[0].messages[1].tool_calls.length, 1);
+});
+
+test('config/llm.json: reasoning that eats max_tokens is switched off', () => {
+  const byName = Object.fromEntries(config.providers.map((p) => [p.name, p]));
+  for (const n of ['or-nemotron-3-ultra', 'or-nemotron-3.5-super']) assert.equal(byName[n].extra?.reasoning?.enabled, false, n);
+  assert.equal(byName['cf-gemma-4-26b'].extra?.chat_template_kwargs?.enable_thinking, false);
+});
+
 test('rotation: providers without their secret are skipped (live runs)', async () => {
   const seen = [];
   const fetchImpl = async (url, init) => {

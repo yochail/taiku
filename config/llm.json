@@ -91,8 +91,8 @@
       "rpm": 12,
       "max_tokens": 1600,
       "temperature": 0.95,
-      "extra": {},
-      "_note": "Reasoning model: below ~1500 max_tokens the reasoning eats the budget and content comes back empty.",
+      "extra": { "chat_template_kwargs": { "enable_thinking": false } },
+      "_note": "Reasoning model: below ~1500 max_tokens the reasoning eats the budget and content comes back empty, so thinking is off (chat_template_kwargs): ~8x fewer tokens, no empty replies.",
       "neuronRate": {
         "input": 9091,
         "output": 27273
@@ -188,8 +188,8 @@
         "HTTP-Referer": "https://taiku.app",
         "X-Title": "Taiku"
       },
-      "extra": {},
-      "_note": "Top voice quality in the test, but slow (7-28s). Shares the OpenRouter free quota."
+      "extra": { "reasoning": { "enabled": false } },
+      "_note": "Top voice quality in the test, but slow (7-28s). Shares the OpenRouter free quota. reasoning is off: with it on (the default since Nov 2026) the reasoning eats max_tokens and content comes back null."
     },
     {
       "name": "or-nemotron-3.5-super",
@@ -209,7 +209,7 @@
         "HTTP-Referer": "https://taiku.app",
         "X-Title": "Taiku"
       },
-      "extra": {}
+      "extra": { "reasoning": { "enabled": false } }
     },
     {
       "name": "groq-gpt-oss-120b",

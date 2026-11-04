@@ -180,6 +180,14 @@ export function createRotation({ config, plan, env = process.env, makeClient = n
               if (e.status === 429) m.r429++;
               m.capped = String(e.message).slice(0, 80);
               log(`model ${m.name} capped: ${m.capped}`);
+            } else if (!hasToolState && (e.status === 413 || /^empty content$/.test(e.message))) {
+              // This request is too big for, or keeps coming back empty from, this model: try the next
+              // model for this request only, without capping the model for the rest of the run.
+              tried.add(m);
+              if (!pickModel(repair, tried)) throw e;
+              log(`model ${m.name} failed this request (${String(e.message).slice(0, 40)}), trying the next model`);
+              pinned = null;
+              continue;
             } else throw e;
             tried.add(m);
             if (hasToolState) throw new LlmError(`model ${m.name} capped mid-turn`, { capped: true });
