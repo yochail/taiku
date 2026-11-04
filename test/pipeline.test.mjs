@@ -2,6 +2,7 @@ import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { pinUsedArtCorpus } from '../src/lib/art-select.mjs';
 import { ROOT, validate } from '../src/lib/data.mjs';
 import { loadDistribution } from '../src/lib/crowd.mjs';
 import { outputPaths, runDaily } from '../src/lib/run.mjs';
@@ -19,7 +20,12 @@ const freshRoot = () => {
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 };
-after(() => fs.rmSync(SCRATCH, { recursive: true, force: true }));
+// Fixed art corpus (seed + backfill), so new daily files on main don't change the fixture runs' picks.
+pinUsedArtCorpus({ include: (f) => f === '0000-seed.json' || f.startsWith('backfill-') });
+after(() => {
+  pinUsedArtCorpus();
+  fs.rmSync(SCRATCH, { recursive: true, force: true });
+});
 
 const DATE = '2026-11-02';
 const run = (o) => runDaily({ date: DATE, mock: true, quiet: true, seed: 'test', nonce: 'nonce1', spec, personas: base, env: {}, ...o });
