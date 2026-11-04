@@ -263,8 +263,22 @@ jobs:
           name: daily-content-${{ matrix.site }}
           path: .
 
-      - name: Re-validate before publishing
+      # The artifact uploads even when generation failed (always()), but then without gen-meta/dayfile.txt
+      # or the day file itself: skip this site with a clear error instead of tripping the allowlist below.
+      - name: Generated day file present?
+        id: have
         if: steps.dl.outcome == 'success'
+        run: |
+          DAYFILE="$(head -n1 gen-meta/dayfile.txt 2>/dev/null || true)"
+          if [ -z "$DAYFILE" ] || [ ! -f "$DAYFILE" ]; then
+            echo "::error::generate (${SITE}) produced no day file${DAYFILE:+ ($DAYFILE missing)}; nothing to publish for $SITE. See the generate job log."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Re-validate before publishing
+        if: steps.dl.outcome == 'success' && steps.have.outputs.ok == 'true'
         run: |
           DAYFILE="$(head -n1 gen-meta/dayfile.txt)"
           # The artifact is untrusted input here: only this site's day file shape is accepted.
@@ -274,7 +288,7 @@ jobs:
           npm run realism -- --file "$DAYFILE"
 
       - name: Commit & push
-        if: steps.dl.outcome == 'success'
+        if: steps.dl.outcome == 'success' && steps.have.outputs.ok == 'true'
         env:
           GH_PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

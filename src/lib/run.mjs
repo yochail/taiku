@@ -47,7 +47,7 @@ import { cachedUrls } from './data.mjs';
 import { PROMPT_VERSION } from './prompts.mjs';
 import { checkPost, policyContext } from './policy.mjs';
 import { runTurn } from './turn.mjs';
-import { clamp, editorialDay, hash8, readJson, round3, seededRng, sha256, weightedPick, writeJsonAtomic } from './pipeline-util.mjs';
+import { clamp, editorialDay, hash8, readJson, round3, seededRng, sha256, shuffle, weightedPick, writeJsonAtomic } from './pipeline-util.mjs';
 
 export const DEFAULT_MAX_CALLS = 90;
 export const DEFAULT_MIN_COMPLETE = 0.7;
