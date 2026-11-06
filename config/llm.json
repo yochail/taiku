@@ -27,7 +27,7 @@
     ],
     "micro": [
       "groq-qwen3.8-27b",
-      "cf-qwen3.8-27b"
+      "cf-gemma-4-26b-micro"
     ],
     "fallback": [
       "cf-gpt-oss-120b"
@@ -103,24 +103,24 @@
       }
     },
     {
-      "name": "cf-qwen3.8-27b",
+      "name": "cf-gemma-4-26b-micro",
       "baseURL": "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/v1",
       "keyEnv": "CF_AI_TOKEN",
-      "model": "@cf/qwen/qwen3.8-27b",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "role": "micro",
       "voiceWeight": 0,
       "tools": "off",
       "capUnit": "neurons",
-      "cap": 700,
-      "calls": 5,
+      "cap": 1300,
+      "calls": 50,
       "rpm": 12,
       "max_tokens": 700,
       "temperature": 0.9,
       "extra": { "chat_template_kwargs": { "enable_thinking": false } },
-      "_note": "Replaced @cf/qwen/qwen3-30b-a3b-fp8 (deprecated 2026-11-20). Reasoning model (thinking on by default), so thinking is off via chat_template_kwargs. $0.45/M input, $3.20/M output (~134 Neurons per micro call), so the 700-Neuron cap allows ~5 calls/day.",
+      "_note": "Replaced @cf/qwen/qwen3-30b-a3b-fp8 (deprecated 2026-11-20). Same model as cf-gemma-4-26b with its own micro budget. Reasoning model, so thinking is off via chat_template_kwargs. $0.10/M input, $0.30/M output (~20.5 Neurons per micro call), so the 1300-Neuron cap (80% planShare) allows ~50 calls/day.",
       "neuronRate": {
-        "input": 40909,
-        "output": 290909
+        "input": 9091,
+        "output": 27273
       },
       "est": {
         "input": 1500,
