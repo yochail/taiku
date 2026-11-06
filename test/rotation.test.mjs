@@ -30,13 +30,13 @@ test('config/llm.json: quality-ranked chains (Gemini → OpenRouter → Groq →
   const chain = (r) => config.chains[r].map(model);
   assert.deepEqual(chain('voice'), ['gemini-3.5-flash', 'nvidia/nemotron-3-ultra-550b-a55b:free', 'nvidia/nemotron-3.5-super-vl:free', '@cf/meta/llama-3.3-70b-instruct-fp8-fast']);
   assert.deepEqual(chain('batch'), ['gemini-3.5-flash', 'nvidia/nemotron-3.5-super-vl:free', 'openai/gpt-oss-120b', '@cf/google/gemma-4-26b-a4b-it']);
-  assert.deepEqual(chain('micro'), ['qwen/qwen3.8-27b', '@cf/qwen/qwen3-30b-a3b-fp8']);
+  assert.deepEqual(chain('micro'), ['qwen/qwen3.8-27b', '@cf/qwen/qwen3.8-27b']);
   assert.deepEqual(chain('fallback'), ['@cf/openai/gpt-oss-120b']);
   assert.ok(!config.providers.some((p) => /gemma/.test(p.model) && /googleapis/.test(p.baseURL)), 'no gemma via Gemini (leaks <thought>)');
   assert.ok(!config.providers.some((p) => /gemini-2\.5-flash|inkling|llama-3\.1-8b/.test(p.model)));
   const byName = Object.fromEntries(config.providers.map((p) => [p.name, p]));
   assert.ok(byName['cf-gemma-4-26b'].max_tokens >= 1500);
-  assert.match(byName['cf-qwen3-30b'].userPrefix, /\/no_think/);
+  assert.equal(byName['cf-qwen3.8-27b'].extra?.chat_template_kwargs?.enable_thinking, false);
   const hosts = { CF_AI_TOKEN: 'api.cloudflare.com', GEMINI_API_KEY: 'generativelanguage.googleapis.com', GROQ_API_KEY: 'api.groq.com', OPENROUTER_API_KEY: 'openrouter.ai' };
   for (const p of config.providers) {
     assert.ok(hosts[p.keyEnv], `${p.name} key env`);

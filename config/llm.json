@@ -27,7 +27,7 @@
     ],
     "micro": [
       "groq-qwen3.8-27b",
-      "cf-qwen3-30b"
+      "cf-qwen3.8-27b"
     ],
     "fallback": [
       "cf-gpt-oss-120b"
@@ -103,24 +103,24 @@
       }
     },
     {
-      "name": "cf-qwen3-30b",
+      "name": "cf-qwen3.8-27b",
       "baseURL": "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/v1",
       "keyEnv": "CF_AI_TOKEN",
-      "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+      "model": "@cf/qwen/qwen3.8-27b",
       "role": "micro",
       "voiceWeight": 0,
       "tools": "off",
       "capUnit": "neurons",
       "cap": 700,
-      "calls": 50,
+      "calls": 5,
       "rpm": 12,
       "max_tokens": 700,
       "temperature": 0.9,
-      "userPrefix": "/no_think",
-      "extra": {},
+      "extra": { "chat_template_kwargs": { "enable_thinking": false } },
+      "_note": "Replaced @cf/qwen/qwen3-30b-a3b-fp8 (deprecated 2026-11-20). Reasoning model (thinking on by default), so thinking is off via chat_template_kwargs. $0.45/M input, $3.20/M output (~134 Neurons per micro call), so the 700-Neuron cap allows ~5 calls/day.",
       "neuronRate": {
-        "input": 4625,
-        "output": 30475
+        "input": 40909,
+        "output": 290909
       },
       "est": {
         "input": 1500,
