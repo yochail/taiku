@@ -662,8 +662,82 @@ function renderReplyTree(post, depth, rendered) {
     .join('')}</div>`;
 }
 
+/** Author node for a persona: labelled as an AI persona, pointing at its profile (the ProfilePage mainEntity). */
 function personLd(a) {
-  return { '@type': 'Person', name: t('ld.persona', { name: a.name }), url: url(`/thinkers/${a.id}/`) };
+  return { '@type': a.kind === 'news' ? 'Organization' : 'Person', name: t('ld.persona', { name: a.name }), url: url(`/thinkers/${a.id}/`) };
+}
+
+/** schema.org Date (ISO 8601) from a display date like "1723 (baptised 16 June)"; undefined unless it is plainly a year/date. */
+function isoDate(s) {
+  const m = /^\s*(\d{3,4})(-\d\d(-\d\d)?)?\s*$/.exec(String(s ?? ''));
+  return m ? m[1].padStart(4, '0') + (m[2] ?? '') : undefined;
+}
+
+const absUrl = (u) => {
+  try {
+    const h = new URL(u, SITE.baseUrl + '/');
+    return /^https?:$/.test(h.protocol) ? h.href : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+/** The reposted original of a retaik, if it exists. */
+const retaikTarget = (p) => (p.type === 'retaik' && p.retaikOf ? idx.byId.get(p.retaikOf) ?? null : null);
+
+/** First external link shown on a post (link card, news or topic card) as { url, title }. */
+function sharedLink(p) {
+  const items = mediaByPost.get(p.id) ?? [];
+  const cands = [
+    ...items.filter((m) => m.kind === 'link_card').map((m) => ({ url: m.url, title: m.title })),
+    { url: p.news?.url, title: p.news?.title },
+    { url: p.topic?.url, title: p.topic?.title },
+  ];
+  for (const c of cands) {
+    const u = c.url && safeUrl(c.url);
+    if (u && c.title) return { url: u, title: String(c.title) };
+  }
+  return null;
+}
+
+/** Plain text for JSON-LD: never empty (Google needs text, image or video on every posting/comment). */
+function ldText(p) {
+  const own = shownText(p).trim();
+  if (own) return own;
+  const orig = retaikTarget(p);
+  if (orig) return ldText(orig);
+  const opts = p.poll?.options ?? (Array.isArray(p.media) ? p.media : []).find((m) => m?.kind === 'poll')?.options;
+  if (opts?.length) return opts.map((o) => `○ ${typeof o === 'string' ? o : o?.text ?? o?.label ?? ''}`).join('\n');
+  return sharedLink(p)?.title ?? p.news?.title ?? p.topic?.title ?? '';
+}
+
+/** Absolute image URLs shown on a post (first four visuals). */
+function ldImages(p) {
+  return (mediaByPost.get(p.id) ?? []).filter((m) => VISUAL.has(m.kind) && m.src).slice(0, 4).map((m) => absUrl(m.src)).filter(Boolean);
+}
+
+/** Minimal valid posting/comment node: url, author, datePublished, headline and text (+ image). */
+function postingLd(p, type = 'DiscussionForumPosting') {
+  const text = ldText(p);
+  const images = ldImages(p);
+  return {
+    '@type': type,
+    '@id': type === 'Comment' ? undefined : url(`/p/${p.id}/`),
+    url: url(`/p/${p.id}/`),
+    headline: truncate(text, 110) || undefined,
+    text: text || undefined,
+    image: images.length ? images : undefined,
+    datePublished: p.createdAt,
+    author: personLd(P.get(p.authorId)),
+  };
+}
+
+/** What a post shares: the reposted/quoted post, else the linked web page. */
+function sharedContentLd(p) {
+  const orig = retaikTarget(p) ?? (p.quoteOf ? idx.byId.get(p.quoteOf) : null);
+  if (orig) return postingLd(orig);
+  const link = sharedLink(p);
+  return link ? { '@type': 'WebPage', url: link.url, name: link.title, headline: truncate(link.title, 110) } : undefined;
 }
 
 function postPages() {
@@ -687,25 +761,13 @@ function postPages() {
     const allKids = idx.children.get(post.id) ?? [];
     const ld = {
       '@context': 'https://schema.org',
-      '@type': 'DiscussionForumPosting',
-      '@id': url(`/p/${post.id}/`),
-      url: url(`/p/${post.id}/`),
-      headline: truncate(shownText(post), 110),
-      text: shownText(post),
-      datePublished: post.createdAt,
-      author: personLd(author),
+      ...postingLd(post),
       about: { '@type': 'Person', name: author.name, sameAs: author.wikipedia ? [author.wikipedia] : undefined },
       keywords: (post.tags ?? []).join(', ') || undefined,
-      isPartOf: post.inReplyTo ? { '@type': 'DiscussionForumPosting', url: url(`/p/${idx.rootOf(post).id}/`) } : undefined,
-      sharedContent: post.quoteOf ? { '@type': 'DiscussionForumPosting', url: url(`/p/${post.quoteOf}/`) } : undefined,
+      isPartOf: post.inReplyTo ? url(`/p/${idx.rootOf(post).id}/`) : undefined,
+      sharedContent: sharedContentLd(post),
       interactionStatistic: { '@type': 'InteractionCounter', interactionType: 'https://schema.org/CommentAction', userInteractionCount: allKids.length },
-      comment: allKids.slice(0, 20).map((c) => ({
-        '@type': 'Comment',
-        url: url(`/p/${c.id}/`),
-        text: c.text,
-        datePublished: c.createdAt,
-        author: personLd(P.get(c.authorId)),
-      })),
+      comment: allKids.filter((c) => ldText(c) || ldImages(c).length).slice(0, 20).map((c) => postingLd(c, 'Comment')),
     };
     const lastmod = [post, ...idx.descendants(post)].map((p) => p.createdAt).sort().pop();
     write(
@@ -756,14 +818,14 @@ function aboutLd(a) {
   const same = [...new Set([a.wikipedia, wikiLocal(a)].filter(Boolean))];
   return {
     '@context': 'https://schema.org',
-    '@type': 'Person',
+    '@type': a.kind === 'news' ? 'Organization' : 'Person',
     '@id': url(`/thinkers/${a.id}/about/#person`),
     url: url(`/thinkers/${a.id}/about/`),
     name: a.name,
     description: a.background || undefined,
-    birthDate: a.birth_display || undefined,
-    deathDate: a.death_display || undefined,
-    homeLocation: a.region ? { '@type': 'Place', name: a.region } : undefined,
+    birthDate: a.kind === 'news' ? undefined : isoDate(a.birth_display),
+    deathDate: a.kind === 'news' ? undefined : isoDate(a.death_display),
+    homeLocation: a.region && a.kind !== 'news' ? { '@type': 'Place', name: a.region } : undefined,
     knowsAbout: a.core_ideas?.length ? a.core_ideas : a.favorite_topics,
     image: a.avatar?.image ? url(a.avatar.image) : undefined,
     sameAs: same.length ? same : undefined,
@@ -852,21 +914,30 @@ function profilePages() {
       replies: STR.emptyPosts(a.handle),
       media: STR.emptyMedia(a.handle),
     };
+    const dates = mine.map((p) => p.createdAt).filter(Boolean).sort();
     const ld = {
       '@context': 'https://schema.org',
       '@type': 'ProfilePage',
       url: url(`/thinkers/${a.id}/`),
       name: t('profile.ldName', { name: a.name }),
       description: t('profile.ldDesc', { headline: a.headline, name: a.name }),
+      dateCreated: dates[0],
+      dateModified: dates.at(-1),
+      // The historical figure the persona is based on (Wikipedia links live here, not on the persona).
+      about: { '@type': a.kind === 'news' ? 'Organization' : 'Person', '@id': url(`/thinkers/${a.id}/about/#person`), name: a.name, sameAs: [a.wikipedia, wikiLocal(a)].filter(Boolean).length ? [...new Set([a.wikipedia, wikiLocal(a)].filter(Boolean))] : undefined },
+      // The AI persona (same node as post authors), not the historical person; that one lives on /about/.
       mainEntity: {
-        '@type': 'Person',
-        name: a.name,
+        ...personLd(a),
+        '@id': url(`/thinkers/${a.id}/#persona`),
         alternateName: `@${a.handle}`,
+        identifier: a.id,
         description: a.bio,
-        birthDate: a.birth_display || undefined,
-        deathDate: a.death_display || undefined,
-        knowsAbout: a.favorite_topics,
-        sameAs: [a.wikipedia, wikiLocal(a)].filter(Boolean).length ? [...new Set([a.wikipedia, wikiLocal(a)].filter(Boolean))] : undefined,
+        image: a.avatar?.image ? absUrl(a.avatar.image) : undefined,
+        knowsAbout: a.favorite_topics?.length ? a.favorite_topics : undefined,
+        interactionStatistic: [
+          a.x_profile?.followers > 0 ? { '@type': 'InteractionCounter', interactionType: 'https://schema.org/FollowAction', userInteractionCount: Math.round(Number(a.x_profile.followers)) } : null,
+          { '@type': 'InteractionCounter', interactionType: 'https://schema.org/WriteAction', userInteractionCount: mine.length },
+        ].filter(Boolean),
       },
     };
     const header = profileHeader(a, { count: mine.length });
