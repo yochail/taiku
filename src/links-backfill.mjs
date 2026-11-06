@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 // Backfill real link data into the committed corpus (idempotent; re-run safely):
+//  - Google News redirect links (news.google.com/rss/articles/…) become the publisher's article URL
+//    (src/lib/gnews.mjs); unresolvable ones are removed;
 //  - unfurls every link_card / news.url / topic.url through the fetch cache (og:image hotlinked, never downloaded);
 //  - news items without a URL: look up the real article, in order: titles already in the unfurl cache,
 //    Bing News RSS, then the Hacker News search API (hn.algolia.com; HN-sourced items keep the HN item URL).
@@ -20,6 +22,7 @@ import { sitePath } from './lib/site.mjs';
 import { safeUrl } from './lib/data.mjs';
 import { domainOf, decode } from './lib/news.mjs';
 import { safeFetch } from './lib/safe-fetch.mjs';
+import { isGoogleNewsUrl, resolveGoogleNews } from './lib/gnews.mjs';
 import { loadUnfurlCache, saveUnfurlCache, unfurl, linkCardFrom, genericTitle, UA } from './lib/unfurl.mjs';
 import { realPostCached, realPostKind, loadRealAccounts, allowedAccount, titleOverlap as overlap } from './lib/realposts.mjs';
 
@@ -146,7 +149,36 @@ async function main() {
     return { f, crlf: raw.includes('\r\n'), doc: JSON.parse(raw) };
   });
   const posts = docs.flatMap((d) => (Array.isArray(d.doc) ? d.doc : d.doc.posts));
-  const stats = { cards: 0, enriched: 0, images: 0, added: 0, searched: 0, found: 0, notFound: 0, realPosts: 0, dropped: [], unresolved: [] };
+  const stats = { cards: 0, enriched: 0, images: 0, added: 0, searched: 0, found: 0, notFound: 0, realPosts: 0, googleNews: 0, dropped: [], unresolved: [] };
+
+  // 0) Google News redirect links (news.google.com/rss/articles/…) → the publisher's article URL
+  //    (memoised in the cache under `gnews`). Unresolvable ones are removed: never a card or news/topic URL.
+  const gmemo = (cache.gnews ??= {});
+  const gurls = new Set();
+  for (const p of posts) {
+    for (const m of p.media ?? []) if (m.kind === 'link_card' && isGoogleNewsUrl(m.url)) gurls.add(m.url);
+    for (const u of [p.news?.url, p.topic?.url]) if (isGoogleNewsUrl(u)) gurls.add(u);
+  }
+  const gres = new Map();
+  await pool([...gurls], 3, async (u) => gres.set(u, await resolveGoogleNews(u, { cache: gmemo, offline })));
+  for (const p of posts) {
+    if (p.media) {
+      p.media = p.media.filter((m) => {
+        if (m.kind !== 'link_card' || !isGoogleNewsUrl(m.url)) return true;
+        const to = gres.get(m.url);
+        if (to) {
+          m.url = to;
+          stats.googleNews++;
+          return true;
+        }
+        stats.dropped.push(`${p.id}: unresolved Google News link ${m.url}`);
+        return false;
+      });
+      if (!p.media.length) delete p.media;
+    }
+    if (isGoogleNewsUrl(p.news?.url)) p.news.url = gres.get(p.news.url) ?? null;
+    if (isGoogleNewsUrl(p.topic?.url)) p.topic.url = gres.get(p.topic.url) ?? null;
+  }
 
   // 1) Real article lookups for URL-less news items (by unique title).
   const gone = (u) => [404, 410].includes(cache.items[u]?.status);

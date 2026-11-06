@@ -15,8 +15,8 @@
 //   daily-D.todo.json  one entry per item to write: persona, type, reply form, target length, parent /
 //                      quoted text, topic, stance and conversational move.
 // Fill every ⟦write⟧ in voice (keep ids, authors, parents, timestamps, media, topics and polls as they
-// are), copy the file to sites/<id>/content/posts/daily-D.json, then `npm run validate` and
-// `npm run gate -- D --strict`.
+// are), copy the file to sites/<id>/content/posts/daily-D.json, then `npm run links:backfill -- --refresh-images`,
+// `npm run validate` and `npm run gate -- D --strict`, and commit the day file AND content/state/unfurl-cache.json.
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SITE_DIR, SKELETON_PLACEHOLDER, loadPersonas, displayName } from '../src/lib/data.mjs';
@@ -26,6 +26,7 @@ import { gateDay } from '../src/lib/daygate.mjs';
 import { isoDate, localDate } from '../src/lib/pipeline-util.mjs';
 import { loadOtherPosts, outputPaths, runDaily } from '../src/lib/run.mjs';
 import { loadUnfurlCache, saveUnfurlCache, unfurl } from '../src/lib/unfurl.mjs';
+import { isGoogleNewsUrl, resolveGoogleNews } from '../src/lib/gnews.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
@@ -57,7 +58,8 @@ copy('pools', 'pools');
 const realFetch = globalThis.fetch;
 const base = { date, mock: true, quiet: true, seed, root: scratch, env: {}, personas, spec };
 if (!offline) {
-  const t = await runDaily({ ...base, topicsOnly: true, fetchImpl: realFetch });
+  // resolveRedirects: Google News items become the publisher's URL (or are dropped), never a card URL.
+  const t = await runDaily({ ...base, topicsOnly: true, fetchImpl: realFetch, resolveRedirects: true });
   const siteCache = loadUnfurlCache();
   for (const tp of t.topics?.picks ?? []) if (tp.url) await unfurl(tp.url, { cache: siteCache, fetchImpl: realFetch, timeoutMs: spec.media_policy?.link_preview?.fetch_timeout_ms ?? 8000 }).catch(() => null);
   saveUnfurlCache(siteCache);
@@ -145,6 +147,36 @@ const posts = sorted.map((p0) => {
   p.text = SKELETON_PLACEHOLDER;
   return p;
 });
+
+// Safeguard: no Google News redirect (news.google.com/rss/articles/…) may reach the day file. Resolve it to
+// the publisher's URL (memoised in the site cache) or drop the card / URL; validation rejects them too.
+{
+  const siteCache = loadUnfurlCache();
+  const memo = (siteCache.gnews ??= {});
+  const fix = async (u) => (isGoogleNewsUrl(u) ? await resolveGoogleNews(u, { cache: memo, offline, fetchImpl: realFetch }) : u);
+  let fixed = 0;
+  for (const p of posts) {
+    if (p.media) {
+      const kept = [];
+      for (const m of p.media) {
+        if (m.kind === 'link_card' && isGoogleNewsUrl(m.url)) {
+          m.url = await fix(m.url);
+          fixed++;
+          if (!m.url) continue;
+        }
+        kept.push(m);
+      }
+      if (kept.length) p.media = kept;
+      else delete p.media;
+    }
+    for (const k of ['news', 'topic']) if (isGoogleNewsUrl(p[k]?.url)) { p[k].url = await fix(p[k].url); fixed++; }
+  }
+  for (const t of todo) if (isGoogleNewsUrl(t.topic?.url)) t.topic.url = await fix(t.topic.url);
+  if (fixed) {
+    saveUnfurlCache(siteCache);
+    console.log(`  rewrote/dropped ${fixed} Google News link(s)`);
+  }
+}
 
 fs.mkdirSync(out, { recursive: true });
 const dayFile = path.join(out, `daily-${date}.json`);

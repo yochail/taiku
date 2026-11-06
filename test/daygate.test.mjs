@@ -151,6 +151,23 @@ test('repair: flagged tasks are regenerated to their new target; everything else
   days.set(date, afterPosts);
 });
 
+test('repair: a flagged self-thread part regenerates its whole thread (no dangling inReplyTo)', async () => {
+  const date = DATES[4];
+  const beforePosts = days.get(date);
+  const part = beforePosts.find((p) => /\.t2$/.test(p.taskId ?? ''));
+  assert.ok(part, 'fixture day has a self-thread');
+  const root = part.taskId.replace(/\.t2$/, '');
+  const r = await runDaily({ date, mock: true, quiet: true, seed: 'gate4', nonce: 'n4', spec, personas, env: {}, root: SCRATCH, repair: [{ taskId: part.taskId, reason: 'catchphrase:x' }] });
+  assert.equal(r.status, 'complete', r.errors?.slice(0, 3).join('; '));
+  const afterPosts = JSON.parse(fs.readFileSync(fileOf(date), 'utf8')).posts;
+  const ids = new Set(afterPosts.map((p) => p.id));
+  const sameDay = new Set(beforePosts.map((p) => p.id));
+  for (const p of afterPosts) for (const k of ['inReplyTo', 'quoteOf', 'retaikOf']) if (sameDay.has(p[k])) assert.ok(ids.has(p[k]), `${p.id}.${k} -> ${p[k]} dangling`);
+  const thread = afterPosts.filter((p) => p.taskId === root || (p.taskId ?? '').startsWith(`${root}.t`));
+  assert.ok(thread.length >= 3 && thread.some((p) => p.taskId === part.taskId), 'whole thread present after repair');
+  days.set(date, afterPosts);
+});
+
 test('realism on mock output: 0 warnings across days except product-choice metrics', () => {
   const posts = [...days.values()].flat().map((p) => ({ ...p }));
   withDisplayStats(posts, personas);

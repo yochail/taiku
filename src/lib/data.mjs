@@ -5,6 +5,7 @@ import { validateSchema, loadSchema } from './schema.mjs';
 import { findTells } from './tells.mjs';
 import { duplicateVisuals } from './visual-dupes.mjs';
 import { ROOT, SITE_DIR, sitePath } from './site.mjs';
+import { isGoogleNewsUrl } from './gnews.mjs';
 
 export { ROOT, SITE_DIR };
 export const PERSONAS_DIR = sitePath('personas');
@@ -381,9 +382,11 @@ const reservedUrl = (u) => {
 export function cardProblems(post, { knownUrls, cache = null } = {}) {
   const out = [];
   const own = new Set([post.news?.url, post.topic?.url].filter(Boolean));
+  for (const [k, u] of [['news.url', post.news?.url], ['topic.url', post.topic?.url]]) if (isGoogleNewsUrl(u)) out.push(`${k} is a Google News redirect; use the publisher URL (npm run links:backfill): ${u}`);
   for (const m of post.media ?? []) {
     if (!CARD_KINDS.has(m.kind)) continue;
     if (!m.url) out.push(`${m.kind} without url`);
+    else if (isGoogleNewsUrl(m.url)) out.push(`${m.kind} url is a Google News redirect; use the publisher URL (npm run links:backfill): ${m.url}`);
     else if (!knownUrls.has(m.url) && !(m.kind === 'link_card' && own.has(m.url)) && !reservedUrl(m.url)) out.push(`${m.kind} url not in the fetch cache: ${m.url}`);
     if (m.kind !== 'link_card') {
       if (!m.handle || !m.text) out.push(`${m.kind} needs handle and the fetched text`);

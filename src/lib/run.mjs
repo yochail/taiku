@@ -486,7 +486,7 @@ export async function runDaily(opts = {}) {
   let topicsDoc = opts.fresh || opts.refetch ? null : readJson(paths.topics);
   if (!topicsDoc) {
     const fetchImpl = opts.fetchImpl ?? (offline ? fixtureFetch(FEEDS) : globalThis.fetch);
-    const pool = await fetchPool({ env: offline ? { ...env, NEWS_FEEDS: '' } : env, fetchImpl, feeds: offline ? FEEDS : undefined, log });
+    const pool = await fetchPool({ env: offline ? { ...env, NEWS_FEEDS: '' } : env, fetchImpl, feeds: offline ? FEEDS : undefined, log, resolveRedirects: opts.resolveRedirects ?? !offline });
     const n = topicCount(opts.topics ?? env.GEN_TOPICS ?? content.topics);
     const sel = selectTopics(pool.items, personas.filter((p) => !isNews(p)), { n, date, rand: seededRng('topics', seed, date) });
     topicsDoc = {
@@ -666,12 +666,25 @@ export async function runDaily(opts = {}) {
   // Gate repair (generate --repair): regenerate the items the distribution gate flagged, once, with
   // the fix applied to their spec (shorter length bucket / persona-typical length). Everything else resumes.
   const repair = new Map((opts.repair ?? []).map((r) => [r.taskId, r]));
+  // A self-thread is written in one request (root + parts), so a flagged part regenerates its whole
+  // thread: otherwise the cached root keeps the group from running and the part stays pending under
+  // cached later parts (dangling inReplyTo).
+  const threadOf = (t) => (t.kind === 'thread' ? t.taskId : t.kind === 'thread-part' ? nodeById.get(t.taskId)?.threadRoot : null);
+  const repairThreads = new Map();
+  for (const t of tasks) {
+    const root = threadOf(t);
+    if (root && repair.has(t.taskId) && !repairThreads.has(root)) repairThreads.set(root, repair.get(t.taskId));
+  }
+  for (const t of tasks) {
+    const root = threadOf(t);
+    if (root && repairThreads.has(root) && !repair.has(t.taskId)) repair.set(t.taskId, { reason: repairThreads.get(root).reason ?? 'gate', thread: true });
+  }
   for (const t of tasks) {
     const r = repair.get(t.taskId);
     if (!r || t.exec === 'pool' || t.exec === 'wire') continue;
     if (r.length) t.spec.length = { ...r.length };
     t.repair = r.reason ?? 'gate';
-    if (/^(repetitive|catchphrase):/.test(t.repair)) t.spec.repair = t.repair;
+    if (/^(repetitive|catchphrase):/.test(t.repair) && !r.thread) t.spec.repair = t.repair;
   }
 
   // 6) Execute by depth level (a parent's text exists before its children), resuming finished work.
@@ -1050,6 +1063,19 @@ export async function runDaily(opts = {}) {
   for (const t of tasks) if (t.topicId && blockedTopics.has(t.topicId) && t.status === 'done') {
     t.status = 'dropped';
     t.error = 'topic blocked';
+  }
+  // Closed downward: a finished reply/quote whose parent didn't make it (failed, pending, dropped) is dropped,
+  // so a partial or repaired run never emits a dangling inReplyTo / quoteOf.
+  for (let changed = true; changed;) {
+    changed = false;
+    for (const t of tasks) {
+      if (t.status !== 'done' || !t.parentTaskId) continue;
+      const parent = taskById.get(t.parentTaskId);
+      if (parent && parent.status !== 'done') {
+        Object.assign(t, { status: 'dropped', error: `parent ${parent.status}` });
+        changed = true;
+      }
+    }
   }
   if (!dryRun) writeJsonAtomic(paths.work, { runId, date, nonce, results: work });
 

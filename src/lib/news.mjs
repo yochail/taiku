@@ -10,6 +10,7 @@ import path from 'node:path';
 import { ROOT, safeUrl } from './data.mjs';
 import { hash8 } from './pipeline-util.mjs';
 import { sitePath } from './site.mjs';
+import { isGoogleNewsUrl, resolveGoogleNews } from './gnews.mjs';
 
 export const FIXTURE_DIR = path.join(ROOT, 'test', 'fixtures', 'feeds');
 
@@ -183,7 +184,7 @@ export function feedConfig(env = process.env) {
 }
 
 /** Fetch + parse all feeds in parallel; per-feed failures are tolerated and reported. */
-export async function fetchPool({ env = process.env, fetchImpl = globalThis.fetch, feeds = feedConfig(env), log = () => {} } = {}) {
+export async function fetchPool({ env = process.env, fetchImpl = globalThis.fetch, feeds = feedConfig(env), log = () => {}, resolveRedirects = false } = {}) {
   const timeout = Number(env.NEWS_TIMEOUT_MS) || 8000;
   const perFeed = Number(env.NEWS_PER_FEED) || 25;
   const results = await Promise.allSettled(feeds.map(async (f) => {
@@ -214,5 +215,26 @@ export async function fetchPool({ env = process.env, fetchImpl = globalThis.fetc
     }
     report.push({ feed: f.id, ok: true, items: r.value.length, kept });
   });
-  return { items, report };
+  if (!resolveRedirects) return { items, report };
+  // Google News RSS links are redirect shells (no preview, rejected as cards): use the publisher URL or drop the item.
+  const out = [];
+  const gn = items.filter((it) => isGoogleNewsUrl(it.url));
+  let i = 0;
+  await Promise.all(Array.from({ length: Math.min(4, gn.length) }, async () => {
+    while (i < gn.length) {
+      const it = gn[i++];
+      it._resolved = await resolveGoogleNews(it.url, { fetchImpl, timeoutMs: timeout });
+    }
+  }));
+  let dropped = 0;
+  for (const it of items) {
+    if (!isGoogleNewsUrl(it.url)) out.push(it);
+    else if (it._resolved && !seen.has(it._resolved)) {
+      seen.add(it._resolved);
+      const { _resolved, ...rest } = it;
+      out.push({ ...rest, url: _resolved, domain: domainOf(_resolved) });
+    } else dropped++;
+  }
+  if (gn.length) log(`  google news: ${gn.length - dropped}/${gn.length} links resolved to the publisher${dropped ? `, ${dropped} dropped` : ''}`);
+  return { items: out, report };
 }
