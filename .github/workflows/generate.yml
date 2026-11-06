@@ -6,8 +6,14 @@ name: Daily feed
 #
 # Local-first: a local generation script writes sites/<site>/content/posts/daily-<UTC date>.json (origin "local",
 # provider "local") and pushes it to main around 09:00 UTC. This workflow is the FALLBACK:
-# at 12:00 UTC it exits early when that file is already on main, otherwise it runs the Cloudflare
-# Workers AI pipeline and writes the same filename with origin "cloudflare".
+# at 12:00 UTC (GitHub may start it hours late) it exits early, green, when that file is already on main
+# (checked against main as it is when the leg runs, and again before publishing), otherwise it runs the
+# Cloudflare Workers AI pipeline and writes the same filename with origin "cloudflare".
+#
+# Quota days are not failures: when generation ends partial (free-tier LLM quotas exhausted, below
+# GEN_MIN_COMPLETE, wall clock) scripts/ci-generate.sh emits a ::warning:: and a job summary, and the
+# site is skipped (nothing published) with the job green. Real errors still fail: exceptions, invalid
+# output, missing credentials, and a day gate that fails after repair for reasons other than quota.
 #
 # Distribution gate: the day's file must pass `npm run realism -- --file <day file>` (realism/spec.json,
 # bands widened for one day's sample, hard checks, per-persona plausibility). On failure the flagged
@@ -106,8 +112,14 @@ jobs:
           if [ -n "$MOCK" ]; then sfx="-mock"
           elif [ -n "$FORCE" ] && [ -f "sites/$SITE/content/posts/daily-$day.json" ] && ! grep -q '"origin": *"cloudflare"' "sites/$SITE/content/posts/daily-$day.json"; then sfx="-cf"; fi
           echo "dayfile=sites/$SITE/content/posts/daily-$day$sfx.json" >> "$GITHUB_OUTPUT"
-          if [ -z "$MOCK" ] && [ -z "$FORCE" ] && [ -f "sites/$SITE/content/posts/daily-$day.json" ]; then
-            echo "local run present, skipping (sites/$SITE/content/posts/daily-$day.json)"
+          # The local run may have pushed after this run was queued: look at main as it is now, not just the checkout.
+          f="sites/$SITE/content/posts/daily-$day.json"
+          onmain=""
+          if [ -f "$f" ]; then onmain=1
+          elif git fetch --quiet --depth=1 origin "$GITHUB_REF_NAME" 2>/dev/null && git cat-file -e "FETCH_HEAD:$f" 2>/dev/null; then onmain=1; fi
+          if [ -z "$MOCK" ] && [ -z "$FORCE" ] && [ -n "$onmain" ]; then
+            echo "::notice::local run present on main, skipping the fallback ($f)"
+            echo "Daily feed fallback for \`$SITE\` $day: skipped, the local run already published \`$f\`." >> "$GITHUB_STEP_SUMMARY"
             echo "skipped=true" >> "$GITHUB_OUTPUT"
           else
             echo "skipped=false" >> "$GITHUB_OUTPUT"
@@ -158,22 +170,20 @@ jobs:
           PUBLISH_ENABLED: ${{ vars.PUBLISH_ENABLED }}
           FORCE: ${{ inputs.force && '1' || '' }}
           MOCK: ${{ inputs.mock && '1' || '' }}
-        run: |
-          export TRANSFORMERS_CACHE="$HOME/.cache/taiku-hf"
-          args=(--date "$GEN_DATE")
-          [ -n "$GEN_NONCE" ] && args+=(--nonce "$GEN_NONCE")
-          [ -n "$FORCE" ] && args+=(--force)
-          if [ -n "$MOCK" ]; then npm run generate:mock -- "${args[@]}"; else npm run generate -- "${args[@]}"; fi
+          DAYFILE: ${{ steps.local.outputs.dayfile }}
+        # Partial (quota exhausted / below GEN_MIN_COMPLETE) → warning + summary, soft=true, nothing published.
+        run: bash scripts/ci-generate.sh
 
       - name: Day gate (distribution)
         id: gate
-        if: steps.local.outputs.skipped != 'true'
+        if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true'
         continue-on-error: true
         env:
           DAYFILE: ${{ steps.local.outputs.dayfile }}
         run: npm run realism -- --file "$DAYFILE" --json day-gate.json
       - name: Repair once (regenerate the flagged items)
-        if: steps.local.outputs.skipped != 'true' && steps.gate.outcome == 'failure'
+        id: repair
+        if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.gate.outcome == 'failure'
         env:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CF_AI_TOKEN: ${{ secrets.CF_AI_TOKEN }}
@@ -193,31 +203,40 @@ jobs:
           PUBLISH_ENABLED: ${{ vars.PUBLISH_ENABLED }}
           FORCE: ${{ inputs.force && '1' || '' }}
           MOCK: ${{ inputs.mock && '1' || '' }}
-        run: |
-          export TRANSFORMERS_CACHE="$HOME/.cache/taiku-hf"
-          args=(--date "$GEN_DATE" --repair)
-          [ -n "$GEN_NONCE" ] && args+=(--nonce "$GEN_NONCE")
-          [ -n "$FORCE" ] && args+=(--force)
-          if [ -n "$MOCK" ]; then npm run generate:mock -- "${args[@]}"; else npm run generate -- "${args[@]}"; fi
+          DAYFILE: ${{ steps.local.outputs.dayfile }}
+        run: bash scripts/ci-generate.sh --repair
       - name: Day gate after repair (blocking; a failure means nothing is committed)
-        if: steps.local.outputs.skipped != 'true' && steps.gate.outcome == 'failure'
+        id: regate
+        if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.gate.outcome == 'failure' && steps.repair.outputs.soft != 'true'
         env:
           DAYFILE: ${{ steps.local.outputs.dayfile }}
-        run: npm run realism -- --file "$DAYFILE" --json day-gate.json
+        run: |
+          npm run realism -- --file "$DAYFILE" --json day-gate.json && exit 0
+          # Still off-band. If the repair ran out of LLM quota (flagged items left as they were) that is a
+          # quota day, not a defect: skip publishing with a warning. Otherwise the gate blocks.
+          manifest="sites/$SITE/content/runs/$(basename "$DAYFILE" .json | sed 's/^daily-//').json"
+          if node -e 'const b=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).budget??{};process.exit(b.budgetHit||b.timeUp?0:1)' "$manifest" 2>/dev/null; then
+            echo "::warning title=Daily feed fallback skipped ($SITE)::the day gate still fails after repair and the repair ran out of LLM quota; nothing is published for $SITE."
+            printf '%s\n' "### Daily feed fallback: \`$SITE\` skipped" "" "The day gate still failed after \`--repair\`, which ran out of free-tier LLM quota. Nothing was published; see day-gate.json in the artifact." >> "$GITHUB_STEP_SUMMARY"
+            mkdir -p gen-meta && printf 'gate-after-repair (quota)\n' > gen-meta/skipped.txt
+            echo "soft=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          exit 1
 
       - name: Validate content
-        if: steps.local.outputs.skipped != 'true'
+        if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.repair.outputs.soft != 'true' && steps.regate.outputs.soft != 'true'
         run: npm run validate
       - name: Build, checks & unit tests
-        if: steps.local.outputs.skipped != 'true'
+        if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.repair.outputs.soft != 'true' && steps.regate.outputs.soft != 'true'
         run: if [ "$SITE" = "taiku" ]; then SITE= npm test; else npm run build; fi
       - name: Realism report, whole corpus (non-blocking)
-        if: steps.local.outputs.skipped != 'true'
+        if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.repair.outputs.soft != 'true' && steps.regate.outputs.soft != 'true'
         continue-on-error: true
         run: npm run realism
 
       - name: Record the day file for publish
-        if: steps.local.outputs.skipped != 'true'
+        if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.repair.outputs.soft != 'true' && steps.regate.outputs.soft != 'true'
         env:
           DAYFILE: ${{ steps.local.outputs.dayfile }}
         run: mkdir -p gen-meta && printf '%s\n' "$DAYFILE" > gen-meta/dayfile.txt
@@ -270,8 +289,15 @@ jobs:
         if: steps.dl.outcome == 'success'
         run: |
           DAYFILE="$(head -n1 gen-meta/dayfile.txt 2>/dev/null || true)"
-          if [ -z "$DAYFILE" ] || [ ! -f "$DAYFILE" ]; then
+          if [ -f gen-meta/skipped.txt ]; then
+            echo "::notice::generate (${SITE}) skipped publishing: $(head -n1 gen-meta/skipped.txt)"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          elif [ -z "$DAYFILE" ] || [ ! -f "$DAYFILE" ]; then
             echo "::error::generate (${SITE}) produced no day file${DAYFILE:+ ($DAYFILE missing)}; nothing to publish for $SITE. See the generate job log."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          elif [[ "$DAYFILE" != *-cf.json ]] && git fetch --quiet --depth=1 origin "$GITHUB_REF_NAME" 2>/dev/null && git cat-file -e "FETCH_HEAD:$DAYFILE" 2>/dev/null; then
+            # The local run landed on main while this fallback was generating: it wins, never clobber it.
+            echo "::notice::$DAYFILE is already on main (local run pushed meanwhile); not publishing the fallback for $SITE."
             echo "ok=false" >> "$GITHUB_OUTPUT"
           else
             echo "ok=true" >> "$GITHUB_OUTPUT"
