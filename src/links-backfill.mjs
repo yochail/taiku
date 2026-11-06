@@ -355,4 +355,23 @@ async function main() {
   console.log(JSON.stringify({ ...stats, swapped, noImage, cacheEntries: Object.keys(cache.items).length, cacheOk: ok, dropped: stats.dropped, unresolved: stats.unresolved.length }, null, 1));
 }
 
-if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, '/')}` || process.argv[1]?.endsWith('links-backfill.mjs')) await main();
+// Node 24 on Windows intermittently dies mid-run with a native fast-fail (0xC0000409, no JS stack,
+// roughly 1 run in 10). Nothing is written until the very end, so the parent reruns the work in a
+// child process and retries only on that kind of native crash.
+const NATIVE_CRASH = (code, signal) => signal != null || code < 0 || code > 255;
+async function supervise(tries = 3) {
+  const { spawnSync } = await import('node:child_process');
+  for (let attempt = 1; ; attempt++) {
+    const r = spawnSync(process.execPath, [...process.execArgv, process.argv[1], ...process.argv.slice(2)], { stdio: 'inherit', env: { ...process.env, LINKS_BACKFILL_CHILD: '1' } });
+    if (!NATIVE_CRASH(r.status, r.signal) || attempt >= tries) {
+      process.exitCode = r.status ?? 1;
+      return;
+    }
+    console.error(`links:backfill: worker crashed natively (${r.signal ?? `0x${(r.status >>> 0).toString(16)}`}), retrying (${attempt + 1}/${tries})`);
+  }
+}
+
+if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, '/')}` || process.argv[1]?.endsWith('links-backfill.mjs')) {
+  if (process.env.LINKS_BACKFILL_CHILD) await main();
+  else await supervise();
+}
