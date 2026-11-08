@@ -12,8 +12,10 @@ name: Daily feed
 #
 # Quota days are not failures: when generation ends partial (free-tier LLM quotas exhausted, below
 # GEN_MIN_COMPLETE, wall clock) scripts/ci-generate.sh emits a ::warning:: and a job summary, and the
-# site is skipped (nothing published) with the job green. Real errors still fail: exceptions, invalid
-# output, missing credentials, and a day gate that fails after repair for reasons other than quota.
+# site is skipped (nothing published) with the job green. The same holds when generation or the repair
+# dies on a quota / rate-limit error, and when the day gate still fails after a repair that was quota-
+# or rate-limited (429s, capped models, budget hit: scripts/ci-quota.mjs). Real errors still fail:
+# exceptions, invalid output, missing credentials, and a day gate that fails after an unlimited repair.
 #
 # Distribution gate: the day's file must pass `npm run realism -- --file <day file>` (realism/spec.json,
 # bands widened for one day's sample, hard checks, per-persona plausibility). On failure the flagged
@@ -210,18 +212,21 @@ jobs:
         if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.gate.outcome == 'failure' && steps.repair.outputs.soft != 'true'
         env:
           DAYFILE: ${{ steps.local.outputs.dayfile }}
+          REPAIR_QUOTA: ${{ steps.repair.outputs.quota }}
         run: |
           npm run realism -- --file "$DAYFILE" --json day-gate.json && exit 0
-          # Still off-band. If the repair ran out of LLM quota (flagged items left as they were) that is a
-          # quota day, not a defect: skip publishing with a warning. Otherwise the gate blocks.
-          manifest="sites/$SITE/content/runs/$(basename "$DAYFILE" .json | sed 's/^daily-//').json"
-          if node -e 'const b=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).budget??{};process.exit(b.budgetHit||b.timeUp?0:1)' "$manifest" 2>/dev/null; then
-            echo "::warning title=Daily feed fallback skipped ($SITE)::the day gate still fails after repair and the repair ran out of LLM quota; nothing is published for $SITE."
-            printf '%s\n' "### Daily feed fallback: \`$SITE\` skipped" "" "The day gate still failed after \`--repair\`, which ran out of free-tier LLM quota. Nothing was published; see day-gate.json in the artifact." >> "$GITHUB_STEP_SUMMARY"
-            mkdir -p gen-meta && printf 'gate-after-repair (quota)\n' > gen-meta/skipped.txt
+          # Still off-band. If the repair was quota- or rate-limited (budget hit, 429s, capped models: the
+          # flagged items could not all be regenerated) that is a quota day, not a defect: skip publishing
+          # with a warning. Otherwise the gate blocks.
+          if [ "$REPAIR_QUOTA" = "true" ]; then
+            why="$(head -c 500 gen-meta/quota-repair.txt 2>/dev/null || echo 'LLM quota / rate limits')"
+            echo "::warning title=Daily feed fallback skipped ($SITE)::the day gate still fails after repair and the repair was quota- or rate-limited ($why); nothing is published for $SITE."
+            printf '%s\n' "### Daily feed fallback: \`$SITE\` skipped" "" "The day gate still failed after \`--repair\`, which was limited by free-tier LLM quotas / rate limits. Nothing was published; see day-gate.json in the artifact." "" "- Rate / quota limits: $why" >> "$GITHUB_STEP_SUMMARY"
+            mkdir -p gen-meta && printf 'gate-after-repair (quota: %s)\n' "$why" > gen-meta/skipped.txt
             echo "soft=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          echo "::error title=Day gate failed ($SITE)::the day gate still fails after repair and the repair was not quota-limited; nothing is published."
           exit 1
 
       - name: Validate content
