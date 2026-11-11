@@ -1,0 +1,400 @@
+{
+  "date": "2026-11-11",
+  "generatedAt": "2026-11-11T19:26:27.217Z",
+  "sourceSnapshotHash": "83fd929462cb13d8",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 24,
+      "kept": 24
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 21
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 19
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 22,
+      "kept": 21
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": false,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "t92bde755",
+      "title": "Loot boxes, influencers, and addictive features face an EU crackdown",
+      "url": "https://www.theverge.com/policy/1031575/digital-fairness-act-eu-dfa-consumer-protection",
+      "source": "The Verge",
+      "domain": "theverge.com",
+      "feedId": "verge",
+      "tier": "curated",
+      "kind": "news",
+      "section": "tech",
+      "publishedAt": "2026-11-11T18:13:52.000Z",
+      "score": 1.127,
+      "keys": {
+        "culture": 1,
+        "memes": 1,
+        "tech": 1.5
+      }
+    },
+    {
+      "id": "t91118539",
+      "title": "2026 U.S. Senate Election Results",
+      "url": "https://apnews.com/projects/elections-2026/us-senate-results/",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-11T19:18:40.000Z",
+      "score": 1.058,
+      "keys": {
+        "politics": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t402c739f",
+      "title": "Legally restrict heading a football in training, says MP",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cm1ewpjyy3dzo",
+      "source": "BBC Sport",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-sport",
+      "tier": "curated",
+      "kind": "news",
+      "section": "sports",
+      "publishedAt": "2026-11-11T17:38:18.000Z",
+      "score": 0.843,
+      "keys": {
+        "sports": 2.5,
+        "economy": 1
+      }
+    },
+    {
+      "id": "t4755e632",
+      "title": "Toby Jones stars in film about UK Mars mission",
+      "url": "https://www.bbc.co.uk/news/articles/cqm2l304w0x9o",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-science",
+      "tier": "curated",
+      "kind": "news",
+      "section": "science",
+      "publishedAt": "2026-11-11T14:10:11.000Z",
+      "score": 0.912,
+      "keys": {
+        "culture": 1,
+        "science": 2.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "tc96019c6",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "taf3aefb2",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t31208e9b",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6f0714b5",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ted52fd72",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t07c05b01",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t42d118cb",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t265560c4",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t2496d2c5",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t822e5f8b",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tb80e7b58",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t780fd971",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t8d1a69de",
+      "feedId": "bbc-culture",
+      "reason": "nsfw"
+    },
+    {
+      "id": "td91b7aa0",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "td36f1a89",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t504989d6",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf9705a73",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta3128f80",
+      "feedId": "ap",
+      "reason": "nsfw"
+    },
+    {
+      "id": "td529098d",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc7ad0f0d",
+      "feedId": "ap",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t57de3b79",
+      "title": "Spain sees widespread disruption in first general strike for 14 years",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf7aac9d9",
+      "title": "Russia-Ukraine talks turn to post-war security but end without breakthrough",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t5d75d23c",
+      "title": "US Treasury Secretary Scott Bessent relocated after alleged Iranian threats",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tea2f3d55",
+      "title": "Schools in Italy, Scotland and Northern Ireland hit by threats in suspected bomb hoax",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tafce5ac8",
+      "title": "Indonesia's vice president resigns amid signs ruling alliance is fraying",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t983ec515",
+      "title": "Kidnapper, 74, escapes from house arrest in Argentina by abseiling from balcony",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0c54000c",
+      "title": "Kenya discharges last Ebola patient in major milestone towards virus-free status",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t5496ddc4",
+      "title": "Three Iran-backed suspects plotted attacks including RAF Fairford incident, US says",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t24d1c68d",
+      "title": "Vinícius Jr sends message to Sudan boy who received prosthetic legs after BBC report sparks appeal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t7a134459",
+      "title": "Transport workers in Chile block highways in protest over surging fuel prices",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9ce8e7b7",
+      "title": "US House blocks bid to impeach Defence Secretary Pete Hegseth",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t97e9c547",
+      "title": "Watch: Vinícius Jr's surprise message to boy who received prosthetic legs after Sudan drone strike",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t1b7b2e82",
+      "title": "Watch: E-bike battery explodes into massive fireball inside Oregon home",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "td2ce46ee",
+      "title": "Why are these purple flowers shutting down streets in Sydney?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t7dd7fb97",
+      "title": "'If I tell you to run, run': BBC joins a Ukrainian drone unit as it protects a front-line city",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tbca3c92c",
+      "title": "Why does Australia want Brits to swap Sydney for the outback?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9c2cd222",
+      "title": "Inside devastated front-line city that Russia wants Ukraine to give up",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6b4607dc",
+      "title": "New Indian mega library rocked by scandal over 'AI-generated books'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb76a63ca",
+      "title": "What we know so far about Jensen Huang's affair with suspected Chinese spy",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t83e998ce",
+      "title": "Robot vessels take on the dangerous work of mine hunting",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t95c1566b",
+      "title": "Nvidia hires major US law firm to investigate alleged Chinese spy affair",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t09c95ffb",
+      "title": "Claude chatbot maker set for $1.3tn stock market debut despite 'catastrophic' AI warning",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc95056dc",
+      "title": "Faisal Islam: What the boss of US tech giant Nvidia told me about China and national security",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "td3601493",
+      "title": "Trump says FBI investigating Nvidia boss's affair with alleged Chinese spy",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t926f288e",
+      "title": "Australia considers criminal penalties for rogue AI in wake of OpenAI hack",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t206c0e97",
+      "title": "Zoe Kleinman: Nvidia CEO's affair will cause ripples across US and beyond",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf7175dd5",
+      "title": "Nvidia shares tumble over investigation into Huang's affair with alleged Chinese spy",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6bf4cd2a",
+      "title": "Who is the suspected Chinese spy at centre of the Nvidia investigation?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfdb62f9a",
+      "title": "Government 'looking seriously' at banning under-16s from Vinted and eBay",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te9b7d06e",
+      "title": "Can the Zelda remake capture the magic of the original?",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
