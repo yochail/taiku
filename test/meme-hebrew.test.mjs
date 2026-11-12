@@ -49,7 +49,8 @@ test('stored memes with Hebrew captions render every caption with non-empty glyp
   for (const m of heb) {
     const t = templates.get(m.render.template);
     assert.ok(t, `${m.post}: template ${m.render.template}`);
-    const base = renderMeme(t, {}, {}).svg;
+    const opts = { quote: m.render.quote, reaction: m.render.reaction };
+    const base = renderMeme(t, {}, opts).svg;
     for (const [slot, cap] of Object.entries(m.render.captions)) {
       if (!hebrewOf(cap)) continue;
       for (const name of ['anton', 'inter-regular']) {
@@ -58,7 +59,7 @@ test('stored memes with Hebrew captions render every caption with non-empty glyp
         const d = textPath(f, [hebrewOf(cap)], { size: 40, lh: 1.2, x: 0, y: 0, w: 4000 });
         assert.ok(d.length > hebrewOf(cap).length * 10, `${m.post} ${slot}: empty path in ${name}`);
       }
-      const one = renderMeme(t, { [slot]: cap }, {}).svg;
+      const one = renderMeme(t, { [slot]: cap }, opts).svg;
       assert.ok(one.length > base.length + hebrewOf(cap).length * 20, `${m.site}/${m.post} ${slot}: caption renders empty`);
     }
   }
