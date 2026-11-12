@@ -1242,6 +1242,16 @@
       ]
     }
   },
+  "voice_attribution": {
+    "_note": "Voice distinctness, checked by the day gate (voice.attribution_lift) and test/voices.test.mjs with the same function (src/lib/voices.mjs dayAttribution). Each day's posts with >= min_letters letters are attributed by style (Hebrew-normalised char trigrams, words, prefix-stripped stems, punctuation/emoji, IDF across authors) to the nearest author centroid built from the previous window_days. Score = lift over chance (accuracy x candidate authors; 1 = guessing). Calibrated 2026-11-12 over daily-2026-11-02..12: real days 20.4-44.8 (median ~28; the old 30% whole-corpus accuracy check sat at 30-31%); the same days with shuffled authors <= 2.7, and with every post in one persona's voice <= 5.4. min_lift 10 is 2x below the worst real day and ~2x above the best same-voice day. CI checks the last recent_days daily files.",
+    "min_lift": 10,
+    "window_days": 30,
+    "min_letters": 20,
+    "min_context_items": 6,
+    "min_items": 20,
+    "recent_days": 7,
+    "blocking": true
+  },
   "gate": {
     "_note": "Blocking per-day distribution gate (npm run gate / realism --file). Share metrics are widened by a binomial z-interval around their spec band (z = ci_z) for the day's sample size; 'blocking' lists the metrics that fail the gate when outside the widened band, the rest are reported. Hard checks below always block. Personas with >= persona_min_items items are checked against their expected short-item share (style-weighted) with persona_slack extra slack.",
     "ci_z": 1.96,

@@ -60,32 +60,104 @@ export function closestVoices(personas) {
   return pairs.sort((x, y) => y.cos - x.cos);
 }
 
+// ---- Style features for post attribution -------------------------------------------------------
+// Hebrew-aware: niqqud/cantillation dropped, final letters folded (ם→מ …), geresh/gershayim unified,
+// and a word with clitic prefixes (ו/ה/ב/כ/ל/מ/ש) also counts as its bare stem plus the prefix, so
+// "ובשבת"/"שבת" share a feature. Punctuation and emoji are kept as tokens: they are style
+// ("📐 תוצאה:", "ודו״ק", "!!!").
+const FINALS = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+// Prefix order: ו, then ש/כש, then ב/כ/ל/מ, then ה.
+const HE_PREFIX = /^ו?(?:כש|ש)?[בכלמ]?ה?(?=[\u05D0-\u05EA]{2,})/;
+const TOKEN = /[\p{L}\p{N}'"]+|\p{Extended_Pictographic}|[^\s\p{L}\p{N}\p{M}\u200d\ufe0f]/gu;
+
+export function normalizeHebrew(text) {
+  return String(text ?? '').normalize('NFC').toLowerCase()
+    .replace(/https?:\/\/\S+|@\w+/g, ' ')
+    .replace(/[\u0591-\u05C7]/g, '')
+    .replace(/[ךםןףץ]/g, (c) => FINALS[c])
+    .replace(/[״"”“]/g, '"').replace(/[׳'’‘]/g, "'");
+}
+
+/** Sparse style vector: char trigrams of words, words, Hebrew stems/prefixes, symbols; sublinear tf, L2-normalised. */
+export function styleFeatures(text) {
+  const v = new Map();
+  const add = (k) => v.set(k, (v.get(k) ?? 0) + 1);
+  for (const w of normalizeHebrew(text).match(TOKEN) ?? []) {
+    if (!/[\p{L}\p{N}]/u.test(w)) { add(`s${w}`); continue; }
+    const t = ` ${w} `;
+    for (let i = 0; i + 3 <= t.length; i++) add(`c${t.slice(i, i + 3)}`);
+    add(`w${w}`);
+    const stem = w.replace(HE_PREFIX, '');
+    if (stem !== w) { add(`w${stem}`); add(`p${w.slice(0, w.length - stem.length)}`); }
+  }
+  let norm = 0;
+  for (const [k, x] of v) { const y = 1 + Math.log(x); v.set(k, y); norm += y * y; }
+  norm = Math.sqrt(norm);
+  if (norm) for (const [k, x] of v) v.set(k, x / norm);
+  return v;
+}
+
+/** Letters in the text (URLs, emoji, digits and punctuation excluded): the style signal a post carries. */
+export const letterCount = (text) => (String(text ?? '').replace(/https?:\/\/\S+/g, '').match(/\p{L}/gu) ?? []).length;
+
+export const VOICE_ATTRIBUTION_DEFAULTS = { min_lift: 10, window_days: 30, min_letters: 20, min_context_items: 6, min_items: 20, recent_days: 7, blocking: true };
+
+/** spec.voice_attribution (absent → the site does not gate on attribution). */
+export function voiceAttributionConfig(spec) {
+  const c = spec?.voice_attribution;
+  return c ? { ...VOICE_ATTRIBUTION_DEFAULTS, ...c } : null;
+}
+
+/** Items that can carry a voice: authored text with at least min_letters letters (emoji/one-word replies have no style to attribute). */
+export const attributable = (p, cfg = VOICE_ATTRIBUTION_DEFAULTS) => Boolean(p?.text && p.authorId && !p.retaikOf && letterCount(p.text) >= cfg.min_letters);
+
 /**
- * Nearest-centroid attribution on real posts: hold each post out, build per-author centroids
- * from the rest, and count how often the true author is the nearest. Returns accuracy in [0,1].
+ * Voice attribution of one day: per-author centroids from the previous window_days of posts
+ * (context, strictly before the day's first post), then each of the day's attributable posts is
+ * assigned to its nearest centroid. Features are IDF-weighted across authors so morphology every
+ * author shares (Hebrew prefixes, common trigrams) doesn't swamp the idiolect.
+ *
+ * Reported as lift over chance: accuracy × candidate authors (chance = 1/N, so lift 1 = guessing).
+ * A day where everyone writes in one voice scores ~1–5; distinct voices score ~15–35.
+ * The day gate and the CI test both call this, with the same inputs, so they agree.
  */
-export function attributionAccuracy(posts, { minLen = 40, minPerAuthor = 6 } = {}) {
-  const by = new Map();
-  for (const p of posts) {
-    if (!p.text || p.text.length < minLen) continue;
-    if (!by.has(p.authorId)) by.set(p.authorId, []);
-    by.get(p.authorId).push(trigrams(p.text));
+export function dayAttribution(dayPosts, context, cfg = VOICE_ATTRIBUTION_DEFAULTS) {
+  const c = { ...VOICE_ATTRIBUTION_DEFAULTS, ...cfg };
+  const times = dayPosts.map((p) => Date.parse(p.createdAt)).filter((t) => !Number.isNaN(t));
+  const start = times.length ? Math.min(...times) : NaN;
+  const dayIds = new Set(dayPosts.map((p) => p.id));
+  const train = context.filter((p) => !dayIds.has(p.id) && attributable(p, c) && Date.parse(p.createdAt) < start && Date.parse(p.createdAt) >= start - c.window_days * 864e5);
+  const sums = new Map();
+  const counts = new Map();
+  for (const p of train) {
+    if (!sums.has(p.authorId)) sums.set(p.authorId, new Map());
+    const m = sums.get(p.authorId);
+    for (const [k, x] of styleFeatures(p.text)) m.set(k, (m.get(k) ?? 0) + x);
+    counts.set(p.authorId, (counts.get(p.authorId) ?? 0) + 1);
   }
-  const authors = [...by].filter(([, v]) => v.length >= minPerAuthor);
-  const sum = (vs) => { const m = new Map(); for (const v of vs) for (const [k, x] of v) m.set(k, (m.get(k) ?? 0) + x); return m; };
-  const sums = new Map(authors.map(([a, vs]) => [a, sum(vs)]));
-  let hit = 0, n = 0;
-  for (const [a, vs] of authors) {
-    for (const v of vs) {
-      let best = null, bestCos = -1;
-      for (const [b] of authors) {
-        let c = sums.get(b);
-        if (b === a) { c = new Map(c); for (const [k, x] of v) c.set(k, c.get(k) - x); }
-        const s = cosine(v, c);
-        if (s > bestCos) { bestCos = s; best = b; }
-      }
-      n++; if (best === a) hit++;
+  const authors = [...sums.keys()].filter((a) => counts.get(a) >= c.min_context_items);
+  const df = new Map();
+  for (const a of authors) for (const k of sums.get(a).keys()) df.set(k, (df.get(k) ?? 0) + 1);
+  const idf = (k) => Math.log((1 + authors.length) / (1 + (df.get(k) ?? 0))) + 1;
+  const weigh = (m) => { const r = new Map(); for (const [k, x] of m) r.set(k, x * idf(k)); return r; };
+  const centroids = authors.map((a) => { const m = weigh(sums.get(a)); let s = 0; for (const x of m.values()) s += x * x; return [a, m, Math.sqrt(s)]; });
+  const known = new Set(authors);
+  let hit = 0;
+  const misses = [];
+  const test = dayPosts.filter((p) => attributable(p, c) && known.has(p.authorId));
+  for (const p of test) {
+    const v = weigh(styleFeatures(p.text));
+    let best = null, bestCos = -1;
+    for (const [a, cv, cn] of centroids) {
+      let dot = 0;
+      for (const [k, x] of v) { const y = cv.get(k); if (y) dot += x * y; }
+      const s = cn ? dot / cn : 0; // |v| is the same for every candidate, so it doesn't change the ranking
+      if (s > bestCos) { bestCos = s; best = a; }
     }
+    if (best === p.authorId) hit++;
+    else misses.push({ postId: p.id, personaId: p.authorId, taskId: p.taskId ?? null, guessed: best });
   }
-  return { accuracy: n ? hit / n : 0, n, authors: authors.length };
+  const n = test.length;
+  const accuracy = n ? hit / n : 0;
+  return { accuracy, lift: accuracy * authors.length, chance: authors.length ? 1 / authors.length : 0, n, authors: authors.length, misses };
 }

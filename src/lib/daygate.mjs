@@ -13,6 +13,7 @@ import { withDisplayStats } from './crowd.mjs';
 import { rotationStats } from './formats.mjs';
 import { maxSimilarityByPersona, noveltyConfig, scanRepetition } from './ideas.mjs';
 import { scanSelfBio, selfBioConfig } from './selfbio.mjs';
+import { dayAttribution, voiceAttributionConfig } from './voices.mjs';
 import { classify, evaluate, expectedReplyForms, lengthWeights, measure, mediaOf, personaReplyStyle } from './realism.mjs';
 
 const charLen = (text) => [...String(text ?? '')].length;
@@ -196,6 +197,17 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
   const sbBlocking = gate.self_bio_blocking === true;
   add({ id: 'persona.self_bio', status: selfBio.offenders.length ? (sbBlocking ? 'fail' : 'warn') : 'pass', value: authored.length ? sbToday.length / authored.length : 0, n: authored.length, min: null, max: sbcfg.site_max_share, blocking: sbBlocking, detail: selfBio.offenders.map((o) => `${o.personaId}: ${o.postId} ${o.reason} "${String(o.episode).slice(0, 40)}"`) });
 
+  // 3e) Voice attribution (sites with spec.voice_attribution): can today's posts be matched to their
+  // author by style, well above chance? Same function and inputs as test/voices.test.mjs.
+  const vcfg = voiceAttributionConfig(spec);
+  let voice = null;
+  if (vcfg) {
+    voice = dayAttribution(day, context, vcfg);
+    const enough = voice.n >= vcfg.min_items && voice.authors >= 2;
+    const vOk = voice.lift >= vcfg.min_lift;
+    add({ id: 'voice.attribution_lift', status: !enough ? 'skip' : vOk ? 'pass' : vcfg.blocking ? 'fail' : 'warn', value: voice.lift, n: voice.n, min: vcfg.min_lift, max: null, blocking: Boolean(vcfg.blocking), detail: [`${pct(voice.accuracy)} of ${voice.n} posts attributed to their author among ${voice.authors} (chance ${(voice.chance * 100).toFixed(1)}%)`] });
+  }
+
   // 4) Offenders the pipeline can regenerate (text items with a taskId; timing/role-mix are planner-level).
   const offenders = new Map();
   const flag = (p, reason, length) => {
@@ -235,6 +247,10 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
 
   if (failed('persona.self_bio')) for (const o of selfBio.offenders) flag(all.get(o.postId), `self_bio:${String(o.episode).slice(0, 40)}`);
   if (failed('persona.novelty')) for (const r of repeats) flag(all.get(r.postId), r.reason === 'catchphrase' ? `catchphrase:${r.label}` : `repetitive:${r.otherId}`);
+  if (failed('voice.attribution_lift')) {
+    const cap = Math.ceil(authored.length * 0.3);
+    for (const m of voice.misses) { if (offenders.size >= cap) break; flag(all.get(m.postId), `off_voice:${m.personaId}`); }
+  }
 
   const failures = checks.filter((c) => c.status === 'fail');
   const ok = failures.length === 0;
