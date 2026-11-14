@@ -1,0 +1,552 @@
+{
+  "date": "2026-11-14",
+  "generatedAt": "2026-11-14T17:54:35.186Z",
+  "sourceSnapshotHash": "c544f8d3ce006132",
+  "feeds": [
+    {
+      "feed": "ynet",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ynetnews",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz-en",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "toi",
+      "ok": false,
+      "error": "HTTP 403"
+    },
+    {
+      "feed": "jpost",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "kan",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom-en",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "maariv",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "walla",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "jta",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "forward",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "jns",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "reuters",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-me",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    }
+  ],
+  "picks": [
+    {
+      "id": "t8496c9de",
+      "title": "Jacob's Well in Turkey: The beginning of the Bible's first love story reopens to tourists",
+      "url": "https://www.jpost.com/travel/article-914870",
+      "source": "The Jerusalem Post",
+      "domain": "jpost.com",
+      "feedId": "jpost",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "publishedAt": "2026-11-14T18:53:56.000Z",
+      "score": 1.128,
+      "keys": {
+        "culture": 1,
+        "economy": 1,
+        "politics": 1.5
+      }
+    },
+    {
+      "id": "t69321add",
+      "title": "Netanyahu urges Eisenkot to hold unity talks without preconditions, citing Iran nuclear threat",
+      "url": "https://www.haaretz.com/israel-news/israel-politics/2026-11-14/ty-article/.premium/after-briefing-eisenkot-netanyahu-urges-unity-government-without-preconditions/000001a1-db08-ddc9-abb7-dfca699e0000",
+      "source": "Haaretz",
+      "domain": "haaretz.com",
+      "feedId": "haaretz-en",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "publishedAt": "2026-11-14T17:13:21.000Z",
+      "score": 1.107,
+      "keys": {
+        "world": 1,
+        "politics": 1.5
+      }
+    },
+    {
+      "id": "t91118539",
+      "title": "2026 U.S. Senate Election Results",
+      "url": "https://apnews.com/projects/elections-2026/us-senate-results/",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-14T17:49:12.000Z",
+      "score": 1.099,
+      "keys": {
+        "politics": 1,
+        "world": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "tb76ea6ae",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t3065dc54",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t38601dd2",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t5596c294",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t198e492d",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t651f5dda",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t53513ae4",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta7398086",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t5d826cb2",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tda4c4535",
+      "feedId": "jpost",
+      "reason": "duplicate"
+    },
+    {
+      "id": "teb1d4ad6",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta8a70b7d",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6cba7f36",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tb21877be",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t63d16801",
+      "feedId": "kan",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t16ac5384",
+      "feedId": "kan",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t49a8a6e6",
+      "feedId": "israelhayom",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te835938e",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tb18b5672",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t0192544e",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t3e8bab3e",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tf0723091",
+      "feedId": "forward",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t58421df3",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t874d6a55",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tdfe07283",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t87f160d9",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t5032386b",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t16b314f1",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2b557cbe",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tdbe6444d",
+      "feedId": "reuters",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tf06ce62a",
+      "feedId": "reuters",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t3a91d9e0",
+      "feedId": "reuters",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t7daef602",
+      "feedId": "reuters",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tba04c804",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf6b74bc3",
+      "feedId": "ap",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t45c521b7",
+      "feedId": "bbc-world",
+      "reason": "duplicate"
+    },
+    {
+      "id": "ta61501fb",
+      "feedId": "bbc-world",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tf3c5272c",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9455bfed",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t31208e9b",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t42dd3bf6",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "td4590856",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0585a161",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9b1e4f71",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t638ef79e",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te20e75c8",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "tcb46eec7",
+      "title": "נתניהו לאיזנקוט: \"ניכנס לחדר בלי תנאים מוקדמים - ונגיע להסכמות\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tbcfd86f1",
+      "title": "נכנסה לקנות מאפים בכפר מנדא - ונפצעה מהרימון: \"אלוהים שמר על אמא שלנו\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t7244401e",
+      "title": "מנהלת בית ספר נהרגה בתאונה ליד עכו, בתה נפצעה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t39779257",
+      "title": "שקרי \"מלחמת המוקשים\" של איראן - והאזהרה ממתקן הגרעין הסודי שבו קבור האורניום",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t77fe59bf",
+      "title": "חשד: רוצח הפרופ' הישראלי בבולגריה הכיר אותו מלפני - וניסה להשתלט על נכסיו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t47241d67",
+      "title": "אישה נרצחה בפיצוץ רימון בצפון, אלפי טיסות שובשו בארה\"ב | כותרות השבת",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t0d48c03c",
+      "title": "אסון במרינה בהרצליה: אלכסנדר מעד - ונמשה מהים ללא רוח חיים",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5756a304",
+      "title": "\"לא נאפשר את מסיבת האשליות\": האזהרה של ישראל ביתנו לגוש השינוי",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t0a80848d",
+      "title": "התמונה שלהם ריגשה את המדינה: \"נתנו לאנשים תקווה\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t96c5675d",
+      "title": "אנגלה מרקל יוצאת להגנת ישראל: \"מעולם לא נאלצתי לפתור בעיה כזו קשה\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t4eb93023",
+      "title": "\"הלב שלי נשבר לרסיסים\": חבורת נערים התנפלה על בת 12 ושדדה אותה בחולון",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t12542ba1",
+      "title": "\"כל האזור רעד\": הרוגה ו-4 פצועים מרימון שהושלך לקונדיטוריה בצפון; 3 נעצרו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t15f4b97d",
+      "title": "החיישנים המשוכללים מגיעים לת\"א: הקנסות החדשים, והערים הבאות שעל הפרק",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t55f2764b",
+      "title": "דיווחים: טראמפ שוקל להשאיר את המו\"מ למדינות המפרץ - ולהימנע מתקיפה באיראן",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t70243d86",
+      "title": "\"שעה של צרחות שאתה אידיוט\": מאחורי הנפילה של מנכ\"ל אנבידיה | פרטים חדשים",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t9681460f",
+      "title": "כאוס אווירי שלא נראה בארה\"ב מ-2001: איך קרסה המערכת, והאם התקלה תחזור",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tfe80e283",
+      "title": "הסרטן שלי עלול לחזור. אבל משהו אחר מפחיד אותי יותר",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tcf18ecae",
+      "title": "גם לעיני הילדים: 19 נשים נרצחו מתחילת השנה | השמות, הפנים והסיפורים",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t274452ea",
+      "title": "\"חשד לפעילות כטב\"מים\": שוב תקרית ביטחונית בבסיס אמריקני בבריטניה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t27c11560",
+      "title": "התחזית: עלייה קלה בטמפרטורות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t0c32277d",
+      "title": "כאוס בשמי ארה\"ב: תקלת ענק השביתה את ההמראות, כ-17 אלף טיסות שובשו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t1347cfef",
+      "title": "ביידן נגד נתניהו: \"הבטיח דברים שלא התכוון לקיים, דאג לעצמו ולא לישראל\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tdc129f29",
+      "title": "תיעוד דרמטי מארה\"ב: מכלית נפט התנגשה בספינת קרוז - שהתהפכה | צפו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t633c7af7",
+      "title": "שלוש שנים לאחר ששוחרר: שורד השבי בילאל אל-זיאדנה התחתן",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tfc2f9cbb",
+      "title": "השוטרים השליכו את עומר בצד הכביש, עם פיג'מה וקטטר. אחר כך הוא מת",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t2227f05a",
+      "title": "Netanyahu, Eisenkot to meet for first time since Israel election",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t70e1676c",
+      "title": "US push to tighten Iran blockade meets resistance from Turkey, Iraq and Pakistan",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t710e201a",
+      "title": "Hundreds of days at war, now a warning: Israeli reservists tell politicians, 'Don't betray us'",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t0cb9d650",
+      "title": "Another GOP defeat: Mississippi elects first Black senator since 1874",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "ta2c3b5e5",
+      "title": "JD Vance could lead Iran talks as hard-line IRGC chief threatens deal",
+      "domain": "ynetnews.com"
+    }
+  ]
+}

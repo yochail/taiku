@@ -1,0 +1,983 @@
+{
+  "runId": "daily-2026-11-14",
+  "date": "2026-11-14",
+  "tz": "Asia/Jerusalem",
+  "seed": "2026-11-14",
+  "nonce": "5275259f",
+  "mode": "live",
+  "path": "cloudflare",
+  "origin": "cloudflare",
+  "degraded": true,
+  "promptVersion": "taiku-gen-2026.11.4",
+  "provider": "cloudflare-workers-ai",
+  "publishEnabled": true,
+  "sourceSnapshotHash": "c544f8d3ce006132",
+  "startedAt": "2026-11-14T17:54:30.128Z",
+  "updatedAt": "2026-11-14T17:56:48.844Z",
+  "wallClockSec": 139,
+  "status": "complete",
+  "completeness": {
+    "done": 19,
+    "tasks": 19,
+    "counted": 19,
+    "pending": 0,
+    "ratio": 1,
+    "minRatio": 0.7,
+    "topicsOk": 3,
+    "topics": 3,
+    "minTopics": 2,
+    "completeRoots": 3,
+    "droppedRoots": 0,
+    "threadPolicy": {
+      "min": 3,
+      "max": 8,
+      "weights": [
+        1,
+        2,
+        3,
+        3,
+        2,
+        1
+      ],
+      "substantive_reply_probability": 0.4,
+      "metrics": {
+        "activity.original_share": {
+          "min": 0.1,
+          "max": 0.25
+        },
+        "activity.reply_share": {
+          "min": 0.7,
+          "max": 0.9
+        },
+        "activity.quote_share": {
+          "min": 0,
+          "max": 0.05
+        },
+        "threads.zero_reply_root_share": {
+          "min": 0,
+          "max": 0
+        },
+        "threads.depth1_share_of_conversations": {
+          "min": 0,
+          "max": 0.25
+        },
+        "threads.back_and_forth_share": {
+          "min": 0.5,
+          "max": 1
+        }
+      }
+    }
+  },
+  "budget": {
+    "maxCalls": 1000,
+    "used": 16,
+    "neurons_est": 0,
+    "llmCap": 24,
+    "llmTasks": 19,
+    "budgetHit": false,
+    "timeUp": false,
+    "usageDay": "2026-11-14",
+    "sharedFreeUsage": {
+      "or-nemotron-3-ultra": {
+        "calls": 20,
+        "tokens": 96127,
+        "neurons": 0,
+        "keyEnv": "OPENROUTER_API_KEY"
+      },
+      "or-nemotron-3.5-super": {
+        "calls": 20,
+        "tokens": 125312,
+        "neurons": 0,
+        "keyEnv": "OPENROUTER_API_KEY"
+      }
+    }
+  },
+  "budgetPlan": {
+    "models": [
+      {
+        "name": "cf-llama-3.3-70b",
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "role": "voice",
+        "allowance": 0,
+        "plan": 0,
+        "reserve": 0,
+        "perCall": 102.1,
+        "neuronsPlanned": 0
+      },
+      {
+        "name": "cf-gemma-4-26b",
+        "model": "@cf/google/gemma-4-26b-a4b-it",
+        "role": "batch",
+        "allowance": 0,
+        "plan": 0,
+        "reserve": 0,
+        "perCall": 50,
+        "neuronsPlanned": 0
+      },
+      {
+        "name": "cf-gemma-4-26b-micro",
+        "model": "@cf/google/gemma-4-26b-a4b-it",
+        "role": "micro",
+        "allowance": 0,
+        "plan": 0,
+        "reserve": 0,
+        "perCall": 20.5,
+        "neuronsPlanned": 0
+      },
+      {
+        "name": "cf-gpt-oss-120b",
+        "model": "@cf/openai/gpt-oss-120b",
+        "role": "fallback",
+        "allowance": 0,
+        "plan": 0,
+        "reserve": 0,
+        "perCall": 94.3,
+        "neuronsPlanned": 0
+      },
+      {
+        "name": "gemini-3.5-flash",
+        "model": "gemini-3.5-flash",
+        "role": "voice",
+        "allowance": 0,
+        "plan": 0,
+        "reserve": 0,
+        "perCall": 0,
+        "neuronsPlanned": 0
+      },
+      {
+        "name": "or-nemotron-3-ultra",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "role": "voice",
+        "allowance": 12,
+        "plan": 11,
+        "reserve": 1,
+        "perCall": 0,
+        "neuronsPlanned": 0
+      },
+      {
+        "name": "or-nemotron-3.5-super",
+        "model": "nvidia/nemotron-3.5-super-vl:free",
+        "role": "batch",
+        "allowance": 13,
+        "plan": 12,
+        "reserve": 1,
+        "perCall": 0,
+        "neuronsPlanned": 0
+      },
+      {
+        "name": "groq-gpt-oss-120b",
+        "model": "openai/gpt-oss-120b",
+        "role": "batch",
+        "allowance": 0,
+        "plan": 0,
+        "reserve": 0,
+        "perCall": 0,
+        "neuronsPlanned": 0
+      },
+      {
+        "name": "groq-qwen3.8-27b",
+        "model": "qwen/qwen3.8-27b",
+        "role": "micro",
+        "allowance": 0,
+        "plan": 0,
+        "reserve": 0,
+        "perCall": 0,
+        "neuronsPlanned": 0
+      }
+    ],
+    "totals": {
+      "calls": 25,
+      "plan": 23,
+      "reserve": 2,
+      "neurons": 0,
+      "neuronCap": 10000,
+      "targetMin": 50,
+      "targetMax": 1000,
+      "degraded": true
+    },
+    "content": {
+      "topics": 3,
+      "originals": 3,
+      "singleTurns": 3,
+      "llmReplies": 24,
+      "llmItems": 27,
+      "threadPolicy": {
+        "min": 3,
+        "max": 8,
+        "weights": [
+          1,
+          2,
+          3,
+          3,
+          2,
+          1
+        ],
+        "substantive_reply_probability": 0.4,
+        "metrics": {
+          "activity.original_share": {
+            "min": 0.1,
+            "max": 0.25
+          },
+          "activity.reply_share": {
+            "min": 0.7,
+            "max": 0.9
+          },
+          "activity.quote_share": {
+            "min": 0,
+            "max": 0.05
+          },
+          "threads.zero_reply_root_share": {
+            "min": 0,
+            "max": 0
+          },
+          "threads.depth1_share_of_conversations": {
+            "min": 0,
+            "max": 0.25
+          },
+          "threads.back_and_forth_share": {
+            "min": 0.5,
+            "max": 1
+          }
+        }
+      },
+      "microPool": 0,
+      "selfThreads": 0,
+      "openerBatches": 0,
+      "standaloneBatches": 0,
+      "replyBatches": 12,
+      "shortBatches": 0
+    }
+  },
+  "discovery": {
+    "skipped": []
+  },
+  "models": [
+    {
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "name": "cf-llama-3.3-70b",
+      "role": "voice",
+      "calls": 0,
+      "cap": 10000,
+      "capUnit": "neurons",
+      "plan": 0,
+      "reserve": 0,
+      "neurons_est": 0,
+      "429s": 0,
+      "items": 0,
+      "tools": null
+    },
+    {
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "name": "cf-gemma-4-26b",
+      "role": "batch",
+      "calls": 0,
+      "cap": 10000,
+      "capUnit": "neurons",
+      "plan": 0,
+      "reserve": 0,
+      "neurons_est": 0,
+      "429s": 0,
+      "items": 0,
+      "tools": null
+    },
+    {
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "name": "cf-gemma-4-26b-micro",
+      "role": "micro",
+      "calls": 0,
+      "cap": 10000,
+      "capUnit": "neurons",
+      "plan": 0,
+      "reserve": 0,
+      "neurons_est": 0,
+      "429s": 0,
+      "items": 0,
+      "tools": null
+    },
+    {
+      "model": "@cf/openai/gpt-oss-120b",
+      "name": "cf-gpt-oss-120b",
+      "role": "fallback",
+      "calls": 0,
+      "cap": 10000,
+      "capUnit": "neurons",
+      "plan": 0,
+      "reserve": 0,
+      "neurons_est": 0,
+      "429s": 0,
+      "items": 0,
+      "tools": null
+    },
+    {
+      "model": "gemini-3.5-flash",
+      "name": "gemini-3.5-flash",
+      "role": "voice",
+      "calls": 0,
+      "cap": 200,
+      "capUnit": "requests",
+      "plan": 0,
+      "reserve": 0,
+      "neurons_est": 0,
+      "429s": 0,
+      "items": 0,
+      "tools": null
+    },
+    {
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "name": "or-nemotron-3-ultra",
+      "role": "voice",
+      "calls": 6,
+      "cap": 50,
+      "capUnit": "requests",
+      "plan": 34,
+      "reserve": 2,
+      "neurons_est": 0,
+      "429s": 0,
+      "items": 3,
+      "tools": false
+    },
+    {
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "name": "or-nemotron-3.5-super",
+      "role": "batch",
+      "calls": 10,
+      "cap": 50,
+      "capUnit": "requests",
+      "plan": 38,
+      "reserve": 2,
+      "neurons_est": 0,
+      "429s": 0,
+      "items": 16,
+      "tools": false
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "name": "groq-gpt-oss-120b",
+      "role": "batch",
+      "calls": 0,
+      "cap": 1000,
+      "capUnit": "requests",
+      "plan": 0,
+      "reserve": 0,
+      "neurons_est": 0,
+      "429s": 0,
+      "items": 0,
+      "tools": null
+    },
+    {
+      "model": "qwen/qwen3.8-27b",
+      "name": "groq-qwen3.8-27b",
+      "role": "micro",
+      "calls": 0,
+      "cap": 1000,
+      "capUnit": "requests",
+      "plan": 0,
+      "reserve": 0,
+      "neurons_est": 0,
+      "429s": 0,
+      "items": 0,
+      "tools": null
+    }
+  ],
+  "embeddings": {
+    "kind": "minilm",
+    "degraded": false,
+    "ms": 2450
+  },
+  "pools": {
+    "picked": 0,
+    "exhausted": 0,
+    "byKind": {},
+    "lintDropped": 3,
+    "usageScanned": 42
+  },
+  "micro": {
+    "calls": 0,
+    "requests": 0,
+    "replies": 0,
+    "rejected": 0,
+    "added": []
+  },
+  "items": {
+    "llm": 19,
+    "llmSingle": 3,
+    "llmBatched": 16,
+    "micro": 0,
+    "pool": 0,
+    "library": 0,
+    "wire": 0,
+    "retaikRows": 0,
+    "personaLikes": 0,
+    "personaReposts": 0,
+    "likeConversions": 0,
+    "visualSwaps": 0,
+    "total": 19,
+    "nonLlm": 0
+  },
+  "calibration": {
+    "k": 0.08495,
+    "qTilt": 0.426,
+    "rTilt": 1.594,
+    "originalsPerDay": 3,
+    "targets": {
+      "authoredRatio": 1.941,
+      "quoteRatio": 0.138,
+      "likesPerRepost": 7.143
+    },
+    "achieved": {
+      "original": 0.332,
+      "reply": 0.588,
+      "quote": 0.08,
+      "likesPerRepost": 7.162
+    }
+  },
+  "modelCaps": {
+    "https://openrouter.ai/api/v1|nvidia/nemotron-3-ultra-550b-a55b:free": false,
+    "https://openrouter.ai/api/v1|nvidia/nemotron-3.5-super-vl:free": false
+  },
+  "topics": [
+    {
+      "id": "t8496c9de",
+      "title": "Jacob's Well in Turkey: The beginning of the Bible's first love story reopens to tourists",
+      "url": "https://www.jpost.com/travel/article-914870",
+      "tier": "curated",
+      "kind": "news",
+      "score": 1.128,
+      "status": "ok",
+      "tasks": 6
+    },
+    {
+      "id": "t69321add",
+      "title": "Netanyahu urges Eisenkot to hold unity talks without preconditions, citing Iran nuclear threat",
+      "url": "https://www.haaretz.com/israel-news/israel-politics/2026-11-14/ty-article/.premium/after-briefing-eisenkot-netanyahu-urges-unity-government-without-preconditions/000001a1-db08-ddc9-abb7-dfca699e0000",
+      "tier": "curated",
+      "kind": "news",
+      "score": 1.107,
+      "status": "ok",
+      "tasks": 6
+    },
+    {
+      "id": "t91118539",
+      "title": "2026 U.S. Senate Election Results",
+      "url": "https://apnews.com/projects/elections-2026/us-senate-results/",
+      "tier": "curated",
+      "kind": "news",
+      "score": 1.099,
+      "status": "ok",
+      "tasks": 7
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "t69321add-root1",
+      "kind": "topic-root",
+      "role": "original",
+      "exec": "single",
+      "form": null,
+      "level": 0,
+      "personaId": "golda",
+      "postId": "d20261114-c6da7ef5",
+      "parentTaskId": null,
+      "topicId": "t69321add",
+      "at": "2026-11-14T11:17:56Z",
+      "archetype": "news_take",
+      "media": "chart",
+      "status": "done",
+      "plannedReactions": 5,
+      "stance": "disagree",
+      "calls": 1,
+      "repairs": 0,
+      "tools": [],
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t69321add-root1.r1",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 1,
+      "personaId": "begin",
+      "postId": "d20261114-8b7f1b07",
+      "parentTaskId": "t69321add-root1",
+      "topicId": "t69321add",
+      "at": "2026-11-14T11:20:09Z",
+      "archetype": "well_actually",
+      "media": null,
+      "status": "done",
+      "stance": "disagree",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t69321add-root1.r5",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 2,
+      "personaId": "jabotinsky",
+      "postId": "d20261114-984ae9fd",
+      "parentTaskId": "t69321add-root1.r1",
+      "topicId": "t69321add",
+      "at": "2026-11-14T11:51:04Z",
+      "archetype": "this_you",
+      "media": null,
+      "status": "done",
+      "stance": "disagree",
+      "calls": 0.33,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t69321add-root1.r2",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 1,
+      "personaId": "yalta",
+      "postId": "d20261114-865bbce7",
+      "parentTaskId": "t69321add-root1",
+      "topicId": "t69321add",
+      "at": "2026-11-14T12:02:49Z",
+      "archetype": "well_actually",
+      "media": null,
+      "status": "done",
+      "stance": "mock",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t69321add-root1.r4",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 2,
+      "personaId": "devorah",
+      "postId": "d20261114-0f8b7bab",
+      "parentTaskId": "t69321add-root1.r2",
+      "topicId": "t69321add",
+      "at": "2026-11-14T12:35:24Z",
+      "archetype": "joke",
+      "media": null,
+      "status": "done",
+      "stance": "mock",
+      "calls": 0.33,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t69321add-root1.r3",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 2,
+      "personaId": "golda",
+      "postId": "d20261114-60c53cf7",
+      "parentTaskId": "t69321add-root1.r1",
+      "topicId": "t69321add",
+      "at": "2026-11-14T12:42:24Z",
+      "archetype": "question_back",
+      "media": null,
+      "status": "done",
+      "stance": "mock",
+      "calls": 0.33,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t91118539-root1",
+      "kind": "topic-root",
+      "role": "original",
+      "exec": "single",
+      "form": null,
+      "level": 0,
+      "personaId": "vilna_gaon",
+      "postId": "d20261114-01c7a420",
+      "parentTaskId": null,
+      "topicId": "t91118539",
+      "at": "2026-11-14T17:13:17Z",
+      "archetype": "news_take",
+      "media": "link_card",
+      "status": "done",
+      "plannedReactions": 6,
+      "stance": "confused",
+      "calls": 1,
+      "repairs": 0,
+      "tools": [],
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t91118539-root1.r1",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 1,
+      "personaId": "herzl",
+      "postId": "d20261114-2523a010",
+      "parentTaskId": "t91118539-root1",
+      "topicId": "t91118539",
+      "at": "2026-11-14T17:19:28Z",
+      "archetype": "dunk",
+      "media": null,
+      "status": "done",
+      "stance": "mock",
+      "calls": 1,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t91118539-root1.r5",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 2,
+      "personaId": "yalta",
+      "postId": "d20261114-04d5c392",
+      "parentTaskId": "t91118539-root1.r1",
+      "topicId": "t91118539",
+      "at": "2026-11-14T17:44:32Z",
+      "archetype": "question_back",
+      "media": null,
+      "status": "done",
+      "stance": "disagree",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t91118539-root1.r3",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 2,
+      "personaId": "vilna_gaon",
+      "postId": "d20261114-fabe2fea",
+      "parentTaskId": "t91118539-root1.r1",
+      "topicId": "t91118539",
+      "at": "2026-11-14T17:58:09Z",
+      "archetype": "clapback",
+      "media": null,
+      "status": "done",
+      "stance": "disagree",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t8496c9de-root1",
+      "kind": "topic-root",
+      "role": "original",
+      "exec": "single",
+      "form": null,
+      "level": 0,
+      "personaId": "shlomo",
+      "postId": "d20261114-7408cd36",
+      "parentTaskId": null,
+      "topicId": "t8496c9de",
+      "at": "2026-11-14T19:16:05Z",
+      "archetype": "hot_take",
+      "media": "image",
+      "status": "done",
+      "plannedReactions": 5,
+      "stance": "mock",
+      "calls": 4,
+      "repairs": 1,
+      "tools": [
+        "search_sources",
+        "get_quote"
+      ],
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t8496c9de-root1.r1",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 1,
+      "personaId": "devorah",
+      "postId": "d20261114-0432eac2",
+      "parentTaskId": "t8496c9de-root1",
+      "topicId": "t8496c9de",
+      "at": "2026-11-14T19:19:13Z",
+      "archetype": "question_back",
+      "media": null,
+      "status": "done",
+      "stance": "disagree",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t8496c9de-root1.r3",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 2,
+      "personaId": "shlomo",
+      "postId": "d20261114-0970cfb4",
+      "parentTaskId": "t8496c9de-root1.r1",
+      "topicId": "t8496c9de",
+      "at": "2026-11-14T19:23:58Z",
+      "archetype": "joke",
+      "media": null,
+      "status": "done",
+      "stance": "disagree",
+      "calls": 2,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t8496c9de-root1.r5",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "short",
+      "form": "short",
+      "level": 2,
+      "personaId": "ben_gurion",
+      "postId": "d20261114-c7cca16e",
+      "parentTaskId": "t8496c9de-root1.r1",
+      "topicId": "t8496c9de",
+      "at": "2026-11-14T19:55:02Z",
+      "archetype": "question_back",
+      "media": null,
+      "status": "done",
+      "stance": "hype",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t91118539-root1.r2",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 1,
+      "personaId": "moshe",
+      "postId": "d20261114-ac4e801d",
+      "parentTaskId": "t91118539-root1",
+      "topicId": "t91118539",
+      "at": "2026-11-14T20:14:08Z",
+      "archetype": "well_actually",
+      "media": null,
+      "status": "done",
+      "stance": "mock",
+      "calls": 1,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t91118539-root1.r4",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 2,
+      "personaId": "eliyahu",
+      "postId": "d20261114-729927ce",
+      "parentTaskId": "t91118539-root1.r2",
+      "topicId": "t91118539",
+      "at": "2026-11-14T20:18:33Z",
+      "archetype": "question_back",
+      "media": "gif",
+      "status": "done",
+      "stance": "mock",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t8496c9de-root1.r2",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 1,
+      "personaId": "halevi",
+      "postId": "d20261114-09f30ce9",
+      "parentTaskId": "t8496c9de-root1",
+      "topicId": "t8496c9de",
+      "at": "2026-11-14T20:38:18Z",
+      "archetype": "concession",
+      "media": "chart",
+      "status": "done",
+      "stance": "disagree",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t91118539-root1.r6",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "full",
+      "form": "full",
+      "level": 2,
+      "personaId": "bogale",
+      "postId": "d20261114-7a6b9de1",
+      "parentTaskId": "t91118539-root1.r2",
+      "topicId": "t91118539",
+      "at": "2026-11-14T20:41:45Z",
+      "archetype": "question_back",
+      "media": null,
+      "status": "done",
+      "stance": "agree",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    },
+    {
+      "taskId": "t8496c9de-root1.r4",
+      "kind": "reply",
+      "role": "reply",
+      "exec": "short",
+      "form": "short",
+      "level": 2,
+      "personaId": "rashi",
+      "postId": "d20261114-82b51f90",
+      "parentTaskId": "t8496c9de-root1.r2",
+      "topicId": "t8496c9de",
+      "at": "2026-11-14T20:50:26Z",
+      "archetype": "well_actually",
+      "media": null,
+      "status": "done",
+      "stance": "hype",
+      "calls": 0.5,
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm"
+    }
+  ],
+  "outputs": {
+    "published": 19,
+    "staged": 0,
+    "errors": []
+  },
+  "reactions": [
+    {
+      "taskId": "t8496c9de-root1",
+      "personaId": "devorah",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T19:19:13.421Z"
+    },
+    {
+      "taskId": "t8496c9de-root1",
+      "personaId": "halevi",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T20:38:18.826Z"
+    },
+    {
+      "taskId": "t8496c9de-root1.r1",
+      "personaId": "shlomo",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T19:23:58.156Z"
+    },
+    {
+      "taskId": "t8496c9de-root1.r2",
+      "personaId": "rashi",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T20:50:26.301Z"
+    },
+    {
+      "taskId": "t8496c9de-root1.r1",
+      "personaId": "ben_gurion",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T19:55:02.260Z"
+    },
+    {
+      "taskId": "t69321add-root1",
+      "personaId": "begin",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T11:20:09.710Z"
+    },
+    {
+      "taskId": "t69321add-root1",
+      "personaId": "yalta",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T12:02:49.401Z"
+    },
+    {
+      "taskId": "t69321add-root1.r1",
+      "personaId": "golda",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T12:42:24.026Z"
+    },
+    {
+      "taskId": "t69321add-root1.r2",
+      "personaId": "devorah",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T12:35:24.880Z"
+    },
+    {
+      "taskId": "t69321add-root1.r1",
+      "personaId": "jabotinsky",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T11:51:04.714Z"
+    },
+    {
+      "taskId": "t91118539-root1",
+      "personaId": "herzl",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T17:19:28.337Z"
+    },
+    {
+      "taskId": "t91118539-root1",
+      "personaId": "moshe",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T20:14:08.690Z"
+    },
+    {
+      "taskId": "t91118539-root1.r1",
+      "personaId": "vilna_gaon",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T17:58:09.899Z"
+    },
+    {
+      "taskId": "t91118539-root1.r2",
+      "personaId": "eliyahu",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T20:18:33.483Z"
+    },
+    {
+      "taskId": "t91118539-root1.r1",
+      "personaId": "yalta",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T17:44:32.805Z"
+    },
+    {
+      "taskId": "t91118539-root1.r2",
+      "personaId": "bogale",
+      "action": "reply",
+      "forced": "minimum-thread",
+      "at": "2026-11-14T20:41:45.704Z"
+    }
+  ]
+}

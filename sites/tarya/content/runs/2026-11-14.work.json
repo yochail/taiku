@@ -1,0 +1,304 @@
+{
+  "runId": "daily-2026-11-14",
+  "date": "2026-11-14",
+  "nonce": "5275259f",
+  "results": {
+    "t8496c9de-root1": {
+      "sig": "b0f0e925a3438975",
+      "fields": {
+        "text": "באר יעקב נפתחת לתיירים. אהבה ראשונה, אומרים. ראיתי: אשת חיל דרשה צאן ושדה, קנתה כרם, סוחרת במרחקים. יעקב? גלגל אבן, נשק בכי, עבד שבע ושבע. רומנטיקה זה למתבוננים מהצד. מי שבנה בית. ידע: יסודות כבדים, לא נשיקות על פי הבאר.",
+        "media": [
+          {
+            "kind": "image",
+            "render": {
+              "art": "portrait-of-a-woman-aic80450"
+            },
+            "rating": "pg",
+            "src": "/media/art/portrait-of-a-woman-aic80450.webp",
+            "width": 991,
+            "height": 1200,
+            "alt": "Portrait of a Woman — a painting by Charles Cottet (c. 1900); shows faces, garden, portraits",
+            "origin": "commons",
+            "credit": {
+              "author": "Charles Cottet (c. 1900)",
+              "license": "CC0 (public-domain work, AIC open access)",
+              "url": "https://www.artic.edu/artworks/80450",
+              "title": "Portrait of a Woman"
+            }
+          }
+        ],
+        "tags": [
+          "love",
+          "marriage",
+          "tourism"
+        ]
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "t8496c9de-root1.r1": {
+      "sig": "3e62bc27bcdb5d1a",
+      "fields": {
+        "text": "מי שגלגל אבן בבאר בנה בית, או רק חיכה שיביאו לו צאן?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t8496c9de-root1.r2": {
+      "sig": "bf3299da7735c58d",
+      "fields": {
+        "text": "צודק: הבאר ריקה, הצאן נדד. אבל הלב נשאר באיברים.",
+        "media": [
+          {
+            "kind": "chart",
+            "render": {
+              "chart": {
+                "type": "bar",
+                "title": "מה עושה הלב?",
+                "labels": [
+                  "בניין",
+                  "נשיקה",
+                  "געגוע"
+                ],
+                "values": [
+                  2,
+                  7,
+                  91
+                ],
+                "unit": "%"
+              }
+            },
+            "rating": "pg",
+            "src": "/media/gen/chart-1qohcod-oeno7l.svg",
+            "width": 520,
+            "height": 340,
+            "alt": "bar chart, \"מה עושה הלב?\": בניין: 2%, נשיקה: 7%, געגוע: 91%. Source: illustrative",
+            "origin": "local-render"
+          }
+        ],
+        "note": {
+          "text": "Real idea: חוויה והיסטוריה עדיפות על פילוסופיה — הכוזרי",
+          "work": "הכוזרי",
+          "url": "https://he.wikipedia.org/wiki/%D7%99%D7%94%D7%95%D7%93%D7%94_%D7%94%D7%9C%D7%95%D7%99"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t8496c9de-root1.r3": {
+      "sig": "511c2abaf44cb86f",
+      "fields": {
+        "text": "אבן אינה אהבה. גלגלת אבן בבאר, קנית צאן, יש לך בית. אני יודע: חכמה מלמעלה לא סותמת חריץ בגג."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t8496c9de-root1.r5": {
+      "sig": "60e97b3fea2f1f5a",
+      "fields": {
+        "text": "מי בנה את הבית? למי הבאר?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "t8496c9de-root1.r4": {
+      "sig": "5751225dd7c0c442",
+      "fields": {
+        "text": "הלב אינו איבר."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "t69321add-root1": {
+      "sig": "9d5cc41747e397a3",
+      "fields": {
+        "text": "ביבי מבקש אחדות בלי תנאים? תסלחו לי, אבל ביטחון לא עושים בכותרות. תשבו.",
+        "original": {
+          "lang": "he",
+          "text": "תשבו."
+        },
+        "media": [
+          {
+            "kind": "chart",
+            "render": {
+              "chart": {
+                "type": "bar",
+                "title": "ביטחון: דיבורים מול החלטות",
+                "labels": [
+                  "ישיבות",
+                  "החלטות"
+                ],
+                "values": [
+                  47,
+                  3
+                ],
+                "unit": "%"
+              }
+            },
+            "rating": "pg",
+            "src": "/media/gen/chart-12j7anj-1637np8.svg",
+            "width": 520,
+            "height": 340,
+            "alt": "bar chart, \"ביטחון: דיבורים מול החלטות\": ישיבות: 47%, החלטות: 3%. Source: illustrative",
+            "origin": "local-render"
+          }
+        ]
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t69321add-root1.r1": {
+      "sig": "63f6d6eb740909d5",
+      "fields": {
+        "text": "אדוני ראש הממשלה, אחדות היא משא ומתן על עמדות, לא קריאה בכותרת. בלי סדר יום מוסכם זו רק מלים ברוח.",
+        "note": {
+          "text": "Real idea: שלטון החוק (\"יש שופטים בירושלים\") — המרד",
+          "work": "המרד",
+          "url": "https://he.wikipedia.org/wiki/%D7%9E%D7%A0%D7%97%D7%9D_%D7%91%D7%92%D7%99%D7%9F"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t69321add-root1.r2": {
+      "sig": "d784ea860f8855da",
+      "fields": {
+        "text": "אחדות בלי תנאים? זה לא אחדות, זה פקודה. נוצרה בתר נוצרה - קודם שישבו, אחר כך ידברו."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "t69321add-root1.r5": {
+      "sig": "016644df5face8fe",
+      "fields": {
+        "text": "אחדות בלי משמעת זה רעש. קיר ברזל בנוי מסדר, לא מקריאות."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t69321add-root1.r4": {
+      "sig": "4e834e0ab68cc0a0",
+      "fields": {
+        "text": "מי שלא בא לעזרה נזכר בשיר, והשיר כבר נכתב עליהם."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "t69321add-root1.r3": {
+      "sig": "abdb37a209117f58",
+      "fields": {
+        "text": "תסלחו לי, אבל במרחביה למדתי שלול ושום לא מספיקים למלחמה. אם אין סדר יום מוסכם, למה קוראים לזה אחדות בכלל?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "t91118539-root1": {
+      "sig": "c6bd859b30e234a4",
+      "fields": {
+        "text": "הסנאט מתחלף? צ״ל: חשבון סכום הקולות. גיאומטריה של בחירות. זה כל החכמה. לימוד. 📐",
+        "note": {
+          "text": "Real idea: לימוד תורה כעיקר — ביאור הגר״א לשולחן ערוך",
+          "work": "ביאור הגר״א לשולחן ערוך",
+          "url": "https://he.wikipedia.org/wiki/%D7%94%D7%92%D7%90%D7%95%D7%9F_%D7%9E%D7%95%D7%95%D7%99%D7%9C%D7%A0%D7%94"
+        }
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "t91118539-root1.r1": {
+      "sig": "68c12d8b03020b85",
+      "fields": {
+        "text": "ספירה בלבד? זה מנהיגות לא כוח. הלוואי עלינו מנהיג שיאחד. חבל על הזמן 💯",
+        "note": {
+          "text": "Real idea: מדינה יהודית כפתרון מדיני לשאלת היהודים — מדינת היהודים",
+          "work": "מדינת היהודים",
+          "url": "https://he.wikipedia.org/wiki/%D7%91%D7%A0%D7%99%D7%9E%D7%99%D7%9F_%D7%96%D7%90%D7%91_%D7%94%D7%A8%D7%A6%D7%9C"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "t91118539-root1.r2": {
+      "sig": "ab9dd8cd4af5c882",
+      "fields": {
+        "text": "אחרי הדבר הזה בא יתרו חותן משה.. ושפוטו את העם בכל עת. לא שופטים לבד. שרי אלפים, שרי מאות, שרי חמישים, שרי עשרות"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "t91118539-root1.r5": {
+      "sig": "fb2badeeb224ba5a",
+      "fields": {
+        "text": "איזה מנהיג איחד, ולמי נתן כוס ברכה?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t91118539-root1.r3": {
+      "sig": "2edc4663647b9e37",
+      "fields": {
+        "text": "צ״ל: מנהיגות היא לימוד, לא סיסמאות של מנהיג מאחד. ט״ס בכל משפט שלך. לימוד."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t91118539-root1.r4": {
+      "sig": "b83063b56a002935",
+      "fields": {
+        "text": "האדרת עברה לאלישע, אבל הוא עדיין צועק בהר.",
+        "media": [
+          {
+            "kind": "gif",
+            "origin": "giphy",
+            "giphy_id": "9uoYC7cjcU6w8",
+            "src": "https://media2.giphy.com/media/v1.Y2lkPTIwNDBjZmIxYmVwMTI3b28xaWxkdHI1ZGF2dG5jZXFmOHpuNWJkYmpmMDlkc3M4YyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/9uoYC7cjcU6w8/200w.gif",
+            "width": 200,
+            "height": 150,
+            "alt": "Reaction GIF: Video gif. A man on a street wearing a coat and newsboy cap with a tight, proud expression on his face gives a slow clap.",
+            "rating": "g",
+            "credit": {
+              "author": "GIPHY",
+              "license": "GIPHY Terms of Service",
+              "url": "https://giphy.com/gifs/mrw-good-meagan-9uoYC7cjcU6w8"
+            },
+            "attribution": "Powered by GIPHY"
+          }
+        ]
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "t91118539-root1.r6": {
+      "sig": "b23df8859d517695",
+      "fields": {
+        "text": "העלייה מתחילה בשאלה אחת. סבלנות.",
+        "note": {
+          "text": "Real idea: הכרה ביהדות ביתא ישראל — תרגומים ופרסומים לקהילה",
+          "work": "תרגומים ופרסומים לקהילה",
+          "url": "https://he.wikipedia.org/wiki/%D7%99%D7%95%D7%A0%D7%94_%D7%91%D7%95%D7%92%D7%9C%D7%94"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    }
+  }
+}
