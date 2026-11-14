@@ -110,3 +110,28 @@ test('API degrades cleanly without the Durable Object binding', async () => {
   const r = await worker.fetch(new Request(`${ORIGIN}/api/polls?ids=open`), env, ctx);
   assert.equal(r.status, 503);
 });
+
+test('analytics logs server-accepted polls only, without option/voter data, and respects opt-out', async () => {
+  const events = [];
+  const pending = [];
+  const context = { waitUntil: (p) => pending.push(p) };
+  env.ENGAGEMENT_ENABLED = 'true';
+  env.ASSETS.fetch = async (r) => Response.json(new URL(r.url).pathname === '/_p/polls.json'
+    ? index : { site: 'fixture', polls: ['open'], posts: [], personas: [] });
+  env.ENGAGEMENT_BUDGET = {
+    idFromName: (n) => n,
+    get: () => ({ fetch: async (r) => (events.push(await r.json()), new Response(null, { status: 204 })) }),
+  };
+  const cast = (opt, extra = {}) => worker.fetch(new Request(`${ORIGIN}/api/poll/open`, {
+    method: 'POST', body: JSON.stringify({ opt }),
+    headers: { origin: ORIGIN, 'content-type': 'application/json', 'cf-connecting-ip': '6.6.6.6', 'user-agent': 'private-browser', ...extra },
+  }), env, context);
+  assert.equal((await cast('1')).status, 200);
+  assert.equal((await cast('1')).status, 409);
+  assert.equal((await cast('invalid', { 'user-agent': 'other' })).status, 400);
+  assert.equal((await cast('0', { 'user-agent': 'other', 'x-engagement-opt-out': '1' })).status, 200);
+  assert.equal((await cast('0', { 'user-agent': 'gpc', 'sec-gpc': '1' })).status, 200);
+  assert.equal((await cast('0', { 'user-agent': 'dnt', dnt: '1' })).status, 200);
+  await Promise.all(pending);
+  assert.deepEqual(events, [{ type: 'poll_vote', id: 'open', site: 'fixture' }]);
+});

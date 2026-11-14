@@ -5,7 +5,7 @@
 // the CI token has no zone/DNS permissions, so deploys must not touch routes.
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, SITE, SITE_CONFIG } from '../src/lib/site.mjs';
+import { ROOT, SITE, SITE_CONFIG, listSites } from '../src/lib/site.mjs';
 
 const deploy = SITE_CONFIG.deploy || {};
 const host = SITE_CONFIG.domain;
@@ -35,6 +35,23 @@ const config = {
   // POLL_SECRET (HMAC key for voter hashes) is a Worker secret; deploy.yml creates it once if missing.
   ...(deploy.customDomain && host ? { routes: [{ pattern: host, custom_domain: true }] } : {}),
 };
+// Explicit pack opt-in only; existing packs/deploy schedules remain unchanged.
+const engagement = deploy.engagementAnalytics;
+if (engagement) {
+  if (!/^[a-z0-9-]{1,63}$/.test(engagement.budgetWorker ?? '')) throw new Error('engagementAnalytics.budgetWorker must name the single shared budget Worker');
+  const owner = engagement.budgetWorker === config.name;
+  config.vars = { ENGAGEMENT_ENABLED: engagement.enabled === true ? 'true' : 'false' };
+  config.durable_objects.bindings.push({
+    name: 'ENGAGEMENT_BUDGET', class_name: 'EngagementBudget',
+    ...(!owner ? { script_name: engagement.budgetWorker } : {}),
+  });
+  config.ratelimits.push({ name: 'ENGAGEMENT_RL', namespace_id: '1003', simple: { limit: 60, period: 60 } });
+  if (owner) {
+    config.analytics_engine_datasets = [{ binding: 'ENGAGEMENT', dataset: 'visitor_engagement' }];
+    config.vars.ENGAGEMENT_SITES = listSites().join(',');
+    config.migrations.push({ tag: 'v2-engagement', new_sqlite_classes: ['EngagementBudget'] });
+  }
+}
 const file = path.join(ROOT, `wrangler.${SITE}.json`);
 fs.writeFileSync(file, JSON.stringify(config, null, 2) + '\n');
 console.log(path.relative(ROOT, file));

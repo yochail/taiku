@@ -59,7 +59,7 @@ const storyKey = (p) => (p.type === 'retaik' && p.retaikOf && idx.byId.has(p.ret
 const dedupeStories = (list) => { const seen = new Set(); return list.filter((p) => !seen.has(storyKey(p)) && seen.add(storyKey(p))); };
 const feedRoots = dedupeStories(roots);
 const url = (p) => SITE.baseUrl + p;
-const assetVersion = hash(fs.readFileSync(path.join(ROOT, 'public', 'styles.css'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'rank.js'), 'utf8')).toString(36);
+const assetVersion = hash(fs.readFileSync(path.join(ROOT, 'public', 'styles.css'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'rank.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'engagement.js'), 'utf8')).toString(36);
 const SITE_CSS_FILE = path.join(SITE_DIR, 'public', 'site.css');
 const SITE_CSS = SITE_DIR !== ROOT && fs.existsSync(SITE_CSS_FILE) ? `\n<link rel="stylesheet" href="/site.css?v=${hash(fs.readFileSync(SITE_CSS_FILE, 'utf8')).toString(36)}">` : '';
 const BUILD_ID = hash(`${assetVersion}|${posts.length}|${BUILD_TIME}`).toString(36);
@@ -540,7 +540,8 @@ ${ld.map(jsonLd).join('\n')}
 <nav class="tabbar" aria-label="${t('nav.sectionsAria')}">${tabbar(pathname)}</nav>
 <button class="fab" type="button" data-gate="post" aria-label="${t('nav.post')}">${ICONS.compose}</button>
 <div class="toast" role="status" aria-live="polite"></div>
-${CLIENT_I18N}<script src="/rank.js?v=${assetVersion}" defer></script>
+${CLIENT_I18N}<script src="/engagement.js?v=${assetVersion}" defer></script>
+<script src="/rank.js?v=${assetVersion}" defer></script>
 <script src="/app.js?v=${assetVersion}" defer></script>
 </body>
 </html>`;
@@ -592,6 +593,7 @@ function mePage() {
   <div class="profile-top"><span class="avatar xl me-avatar" aria-hidden="true">${ICONS.user}</span></div>
   <h2 class="p-name">${esc(t('me.title'))}</h2><div class="handle">${esc(t('me.handle'))}</div>
   <p class="me-note">${esc(t('me.note'))}</p>
+  <p class="me-note">${esc(t('me.analytics'))} <label><input type="checkbox" data-engagement-opt-out> ${esc(t('me.analyticsOptOut'))}</label></p>
   <div class="p-stats"><a href="#following" data-mtab-link="following"><b data-me-n="follows">0</b> ${esc(STR.following)}</a><a href="#topics" data-mtab-link="topics"><b data-me-n="topics">0</b> ${esc(t('topic.topics'))}</a></div>
 </section>
 <div class="feed-tabs me-tabs" role="tablist" aria-label="${esc(t('me.title'))}">${tabs}</div>
@@ -1097,7 +1099,7 @@ function searchPage() {
 /** PWA: offline fallback page and a service worker whose cache name follows the build. */
 function pwa() {
   write('/offline.html', layout({ title: t('offline.title'), description: t('offline.desc'), pathname: '/offline.html', noindex: true, body: `<div class="offline-msg"><span class="logo">${LOGO}</span><h2>${t('offline.heading')}</h2><p>${t('offline.text')}</p><a class="btn" href="/">${t('offline.retry')}</a></div>` }), { inSitemap: false });
-  const shell = ['/offline.html', `/styles.css?v=${assetVersion}`, `/rank.js?v=${assetVersion}`, `/app.js?v=${assetVersion}`, '/favicon.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png']
+  const shell = ['/offline.html', `/styles.css?v=${assetVersion}`, `/engagement.js?v=${assetVersion}`, `/rank.js?v=${assetVersion}`, `/app.js?v=${assetVersion}`, '/favicon.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png']
     .filter((u) => !/^\/(favicon|manifest|icons)/.test(u) || fs.existsSync(publicFile(u.slice(1))));
   const sw = fs.readFileSync(path.join(ROOT, 'public', 'sw.js'), 'utf8').replace("'__VERSION__'", JSON.stringify(BUILD_ID)).replace('__SHELL__', JSON.stringify(shell));
   fs.writeFileSync(path.join(OUT, 'sw.js'), sw);
@@ -1226,5 +1228,8 @@ seoFiles();
 const packed = postPack?.finish();
 fs.mkdirSync(path.join(OUT, '_p'), { recursive: true });
 fs.writeFileSync(path.join(OUT, '_p', 'polls.json'), JSON.stringify(POLL_INDEX));
+fs.writeFileSync(path.join(OUT, '_p', 'engagement.json'), JSON.stringify({
+  site: SITE_CONFIG.id, posts: posts.map((p) => p.id), personas: personas.map((p) => p.id), polls: Object.keys(POLL_INDEX),
+}));
 if (packed && packed.count < posts.length) console.warn(`post pack: ${posts.length - packed.count} page(s) didn't fit the template; written as static files`);
 console.log(`Built ${sitemap.length} pages → ${path.relative(ROOT, OUT)}/ (${thinkers.length} thinkers, ${personas.length - thinkers.length} parody/news, ${posts.length} posts, ${roots.length} top-level, ${tagCount} tags, ${mediaOut.written} rendered media${packed ? `, ${packed.count} post pages in ${packed.files} pack files` : ''})`);

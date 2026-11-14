@@ -18,6 +18,12 @@
     get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
   };
+  const engagement = globalThis.TaikuEngagement.create(store);
+  const analyticsOptOut = document.querySelector('[data-engagement-opt-out]');
+  if (analyticsOptOut) {
+    analyticsOptOut.checked = engagement.optedOut();
+    analyticsOptOut.addEventListener('change', () => store.set('engagementOptOut', analyticsOptOut.checked));
+  }
 
   const btn = document.querySelector('.theme-toggle');
   if (btn) {
@@ -137,9 +143,9 @@
     clearTimeout(pollTimer);
     pollTimer = setTimeout(loadReal, 50);
   };
-  const sendVote = (id, opt) => {
+  const sendVote = (id, opt, trusted) => {
     if (!API) return;
-    fetch(`/api/poll/${encodeURIComponent(id)}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ opt }) })
+    fetch(`/api/poll/${encodeURIComponent(id)}`, { method: 'POST', headers: { 'content-type': 'application/json', ...(engagement.optedOut() || !trusted ? { 'x-engagement-opt-out': '1' } : {}) }, body: JSON.stringify({ opt }) })
       .then((r) => r.json().then((d) => {
         // 409: this browser/network already voted (e.g. storage was cleared), so the totals include that vote.
         if ((r.ok || r.status === 409) && d?.c) { real[id] = { c: d.c, at: d.at }; sent[id] = d.at; store.set('pollSent', sent); repaintPoll(id); }
@@ -217,7 +223,7 @@
         votes[poll.dataset.poll] = opt.dataset.opt;
         store.set('pollVotes', votes);
         repaintPoll(poll.dataset.poll);
-        sendVote(poll.dataset.poll, opt.dataset.opt);
+        sendVote(poll.dataset.poll, opt.dataset.opt, e.isTrusted);
       }
       return;
     }
@@ -230,6 +236,7 @@
       const id = like.dataset.like;
       likes.has(id) ? likes.delete(id) : likes.add(id);
       store.set('likes', [...likes]);
+      engagement.track('like', id, likes.has(id), e.isTrusted);
       document.querySelectorAll(`[data-like="${CSS.escape(id)}"]`).forEach(paintLike);
       if (likes.has(id)) { like.classList.remove('pop'); void like.offsetWidth; like.classList.add('pop'); bumpAffinity(like.closest('[data-author]')?.dataset.author, 1); }
       return;
@@ -239,6 +246,7 @@
       const id = mark.dataset.bookmark;
       marks.has(id) ? marks.delete(id) : marks.add(id);
       store.set('bookmarks', [...marks]);
+      engagement.track('bookmark', id, marks.has(id), e.isTrusted);
       document.querySelectorAll(`[data-bookmark="${CSS.escape(id)}"]`).forEach(paintMark);
       toast(marks.has(id) ? S('bmAdded', 'Added to your Bookmarks') : S('bmRemoved', 'Removed from your Bookmarks'));
       return;
@@ -246,6 +254,8 @@
     const share = e.target.closest('[data-share]');
     if (share) {
       const u = new URL(share.dataset.share, location.origin).href;
+      const shareId = /^\/p\/([A-Za-z0-9_.-]{1,80})\/$/.exec(new URL(u).pathname)?.[1];
+      engagement.track('share', shareId, true, e.isTrusted);
       if (navigator.share) navigator.share({ url: u }).catch(() => {});
       else if (navigator.clipboard) navigator.clipboard.writeText(u).then(() => toast(S('copied', 'Copied to clipboard')), () => toast(u));
       else toast(u);
@@ -478,6 +488,7 @@
     const id = fb.dataset.follow;
     const on = !follows.has(id);
     on ? follows.add(id) : follows.delete(id);
+    engagement.track('follow', id, on, e.isTrusted);
     saveFollows();
     document.querySelectorAll(`[data-follow="${CSS.escape(id)}"]`).forEach(paintFollow);
     document.querySelectorAll(`[data-followers="${CSS.escape(id)}"]`).forEach(paintFollowers);

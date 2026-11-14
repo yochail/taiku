@@ -101,6 +101,25 @@ test('follow buttons are real toggles and profiles expose a follower count to bu
   assert.doesNotMatch(html, /data-gate="follow"/);
 });
 
+test('anonymous analytics ships offline, discloses separation from simulation, and indexes only public targets', () => {
+  const html = read('me/index.html');
+  assert.match(html, /data-engagement-opt-out/);
+  assert.match(html, /separately from simulated engagement/);
+  assert.match(html, /<script src="\/engagement\.js\?v=[a-z0-9]+" defer><\/script>[\s\S]*<script src="\/app\.js/);
+  assert.match(read('sw.js'), /engagement\.js/);
+  const inventory = JSON.parse(read('_p/engagement.json'));
+  assert.ok(inventory.posts.includes('uit-art'));
+  assert.ok(inventory.personas.includes('socrates'));
+  assert.ok(inventory.polls.includes('uit-poll-open'));
+  const app = read('app.js');
+  assert.match(app, /engagement\.track\('like', id, likes\.has\(id\), e\.isTrusted\)/);
+  assert.match(app, /engagement\.track\('bookmark', id, marks\.has\(id\), e\.isTrusted\)/);
+  assert.match(app, /engagement\.track\('follow', id, on, e\.isTrusted\)/);
+  assert.match(app, /engagement\.track\('share', shareId, true, e\.isTrusted\)/);
+  assert.match(app, /sendVote\(poll\.dataset\.poll, opt\.dataset\.opt, e\.isTrusted\)/);
+  assert.match(app, /engagement\.optedOut\(\) \|\| !trusted/);
+});
+
 test('Following timeline data is emitted per author, newest first, without duplicate ids', () => {
   const data = JSON.parse(read('data/u/socrates.json'));
   const mine = data.posts.map((p) => p.id);

@@ -7,6 +7,8 @@
 // Abuse: same-origin + JSON-only POSTs, Workers Rate Limiting bindings per IP (VOTE_RL, READ_RL), PER_IP votes per
 // IP per poll, and a global MAX_VOTES cap per poll.
 
+import { recordPollVote } from './engagement.mjs';
+
 export const MAX_IDS = 20;
 export const PER_IP = 5; // votes per IP per poll (shared NATs, households)
 export const MAX_VOTES = 20000; // real votes per poll (global cap)
@@ -141,6 +143,7 @@ export async function handlePolls(request, env, ctx) {
     const { voter, ipKey, rl } = await voterKeys(env.POLL_SECRET, id, poll[1], ip, ua);
     if (!(await allowed(env.VOTE_RL, rl))) return json({ error: 'limited' }, 429);
     const r = await (await stub(id).fetch(new Request('https://poll/', { method: 'POST', body: JSON.stringify({ op: 'vote', opt, opts: poll[0], ends: poll[1], voter, ipKey }) }))).json();
+    if (r.ok) ctx.waitUntil(recordPollVote(request, env, id));
     if (r.ok && typeof caches !== 'undefined') ctx.waitUntil(caches.default.delete(new Request(`${url.origin}/api/_poll/${encodeURIComponent(id)}`)));
     return json(r, r.ok ? 200 : STATUS[r.error] ?? 400);
   }

@@ -3,8 +3,9 @@
 // what build.mjs renders, with the _headers rules for HTML applied and an edge-cache copy per build.
 import { assemble, bucketOf, readRecord } from './posts.mjs';
 import { handlePolls, PollVotes } from './polls.mjs';
+import { handleEngagement, EngagementBudget } from './engagement.mjs';
 
-export { PollVotes };
+export { PollVotes, EngagementBudget };
 
 const POST = /^\/p\/([^/]+)(\/|\/index\.html)?$/;
 const BROWSER_CACHE = 'public, max-age=0, must-revalidate';
@@ -32,6 +33,7 @@ async function render(env, origin, meta, id) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.pathname === '/api/engagement') return handleEngagement(request, env);
     if (url.pathname.startsWith('/api/')) return handlePolls(request, env, ctx);
     const m = POST.exec(url.pathname);
     if (!m || (request.method !== 'GET' && request.method !== 'HEAD')) return env.ASSETS.fetch(request);

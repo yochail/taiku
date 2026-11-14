@@ -10,6 +10,122 @@ Socrates asks one more question, Nietzsche dunks on Kierkegaard, Ada Lovelace ex
 
 No ads, no accounts, no tracking cookies. It's a hobby project and runs on free tiers.
 
+## Anonymous visitor engagement (optional)
+
+Tracking is **disabled in every pack by default**. When explicitly enabled, only real
+visitor actions reach Workers Analytics Engine, never simulated persona/crowd activity:
+likes, bookmarks and persona follows count **off-to-on additions**, and shares count
+**share-button clicks**, including cancelled share sheets (not completed external shares).
+Each action/target is sent at most once per page lifetime, without retries or a saved queue.
+Removing and re-adding in that page does not count again; a new page can count a new
+addition/click. These are action counts, **not unique visitors or current active totals**.
+Topic follows are not measured. Polls count only server-accepted votes, not attempts,
+duplicates, local-only fallback votes, or result reads. Analytics never changes the
+simulated counts displayed in the feed; poll totals still combine simulated and real votes.
+
+The server validates targets against the build's public post/persona/poll inventory.
+It writes only action type, public target ID, site ID, a server UTC minute bucket and
+the value `1`. Analytics Engine adds its own write timestamp. No IP, user-agent, cookie,
+account ID, visitor ID, option choice, referrer or URL is stored in analytics; its
+Durable Object stores just one aggregate budget row. The browser sends analytics
+without cookies/referrers. Existing poll abuse prevention separately uses secret-keyed
+IP/UA hashes, as before; these are never forwarded to analytics. Cloudflare necessarily
+handles network metadata when serving requests; this is not a promise about Cloudflare's
+own infrastructure logging. Disable analytics under [You](/me/), or use Do Not Track
+or Global Privacy Control. Those preferences also suppress poll analytics, not voting.
+
+### Free-only setup (not performed automatically)
+
+[Cloudflare's pricing documentation](https://developers.cloudflare.com/analytics/analytics-engine/pricing/)
+(checked 2026-11-14) includes **100,000 writes/day and 10,000 read queries/day on Workers Free**.
+It currently says Analytics Engine is not billed yet; billing is planned in coming months.
+The one shared `EngagementBudget` object reserves at most **90,000 writes per UTC day,
+60 per UTC minute across all packs**, before any `writeDataPoint`. Reservations survive
+restarts; failed writes consume their reservation. No code issues read queries.
+The endpoint is same-origin, JSON-only, limited to 256 streamed bytes, globally rate-limited
+without client identifiers, and fails closed without configuration/bindings.
+Lost events, full budgets and outages do not break local engagement or accepted poll votes.
+Anonymous clients can forge valid action requests; these are not verified unique humans.
+
+**Before enabling:** verify Workers Free and SQLite Durable Objects free availability
+on the account, and ensure other account-wide Analytics Engine writers use no more than
+the remaining 10,000 daily points. Otherwise leave this feature disabled. All packs must
+share **one existing budget namespace**; creating a second owner, renaming its Worker,
+changing the singleton key, or deleting its storage resets/splits the cap and invalidates
+the guarantee. This feature cannot bound unrelated account writers, operator SQL queries,
+or paid-account Workers/DO charges. Do not enable it on Workers Paid under a $0-only policy.
+The existing poll and Worker traffic also consumes account free quotas.
+
+After approval, add `"engagementAnalytics": {"budgetWorker": "taiku", "enabled": true}`
+inside `deploy` in each participating pack's `site.json` (use the **actual** chosen owner's
+`deploy.worker` name, not necessarily `taiku`). No pack configuration is changed by this
+implementation. The Wrangler generator preserves this opt-in on future builds. Deploy
+the owner first, then participating packs; do not change schedules. The owner configuration
+adds the following fields, **merging** bindings/migrations/rate limits with existing ones:
+
+```json
+{
+  "vars": {
+    "ENGAGEMENT_ENABLED": "true",
+    "ENGAGEMENT_SITES": "taiku,tarya"
+  },
+  "analytics_engine_datasets": [
+    {"binding": "ENGAGEMENT", "dataset": "visitor_engagement"}
+  ],
+  "durable_objects": {
+    "bindings": [
+      {"name": "ENGAGEMENT_BUDGET", "class_name": "EngagementBudget"}
+    ]
+  },
+  "migrations": [
+    {"tag": "v2-engagement", "new_sqlite_classes": ["EngagementBudget"]}
+  ],
+  "ratelimits": [
+    {"name": "ENGAGEMENT_RL", "namespace_id": "1003", "simple": {"limit": 60, "period": 60}}
+  ]
+}
+```
+
+The generator derives `ENGAGEMENT_SITES` from registered pack IDs. Other Workers bind
+`ENGAGEMENT_BUDGET` with `"script_name": "taiku"` to that same owner and have
+`ENGAGEMENT_ENABLED` and `ENGAGEMENT_RL`, **no dataset binding or new budget migration**.
+Cloudflare creates the dataset on its first write; no analytics secret is required.
+To switch off, set `engagementAnalytics.enabled` to `false` and deploy the owner
+(all writes stop), or a participating pack (only that pack stops). Keep the namespace
+and migration history for safe re-enablement. Account bindings, deployments and schedules
+are deliberately untouched here.
+
+### Where to see the real events
+
+**Do not expect custom engagement charts in the ordinary Cloudflare Web Analytics or
+Worker Metrics dashboard.** Current Cloudflare documentation verifies querying custom
+datasets through SQL APIs; it does not establish an in-dashboard custom chart/query UI.
+The dashboard can configure bindings and create an
+[Account Analytics Read token](https://dash.cloudflare.com/profile/api-tokens), but
+viewing these event counts requires SQL/API output or optional local Grafana.
+No paid dashboard service or public analytics read endpoint is added.
+
+Run this manually through the
+[Analytics Engine SQL API](https://developers.cloudflare.com/analytics/analytics-engine/sql-api/)
+at `https://api.cloudflare.com/client/v4/accounts/{account_id}/analytics_engine/sql`,
+with an Account Analytics Read token kept outside source/browser code:
+
+```sql
+SELECT blob3 AS site, blob1 AS action, SUM(_sample_interval * double2) AS events
+FROM visitor_engagement
+WHERE timestamp >= NOW() - INTERVAL '1' DAY
+GROUP BY site, action
+ORDER BY events DESC
+```
+
+For per-target counts, add `blob2 AS target` to `SELECT` and `target` to `GROUP BY`.
+For UTC minute series, add `double1 AS utc_minute` and group by it. Sample weighting
+matters: Analytics Engine can sample, so query totals may be estimates. These counts
+exclude dropped/capped/opted-out actions. Keep **all account read queries below 10,000/day**;
+there is no automated refresh/read workload here. The newer
+[Cloudflare Analytics SQL API](https://developers.cloudflare.com/analytics/sql-api/)
+also exposes `events.analyticsEngine.visitor_engagement`, using its own scope and SQL syntax.
+
 ## How it works
 
 - **Personas.** Each thinker is one JSON file: biography, core ideas, key works, voice, temperament, allies and rivals, posting habits, and a list of verified quotations with sources. Those files steer every generated post.
