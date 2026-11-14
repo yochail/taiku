@@ -56,6 +56,13 @@ the guarantee. This feature cannot bound unrelated account writers, operator SQL
 or paid-account Workers/DO charges. Do not enable it on Workers Paid under a $0-only policy.
 The existing poll and Worker traffic also consumes account free quotas.
 
+The manually dispatched `analytics preflight` GitHub workflow uses production secrets
+only inside Actions for read-only account settings, subscriptions and one `SHOW TABLES`
+query. It prints statuses, never credentials or API response bodies, and deliberately
+fails until entitlement **and account-wide headroom** are verified. Required token
+permissions are Workers Scripts Read/Write, Account Billing Read and Account Analytics
+Read. A successful subscription/query read alone is not evidence of unused allowance.
+
 After approval, add `"engagementAnalytics": {"budgetWorker": "taiku", "enabled": true}`
 inside `deploy` in each participating pack's `site.json` (use the **actual** chosen owner's
 `deploy.worker` name, not necessarily `taiku`). No pack configuration is changed by this
