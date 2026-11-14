@@ -114,6 +114,14 @@ jobs:
           [[ "$SITE" =~ ^[a-z0-9_-]+$ ]] || bad site
           day="${GEN_DATE:-$(date -u +%Y-%m-%d)}"
           echo "day=$day" >> "$GITHUB_OUTPUT"
+          if [ "$SITE" = "taiku" ]; then
+            git fetch --quiet --depth=1 origin "$GITHUB_REF_NAME" || { echo "::error::could not refresh the X draft dedupe state from $GITHUB_REF_NAME"; exit 1; }
+            draft_state="sites/taiku/content/state/x-draft-state.json"
+            if git cat-file -e "FETCH_HEAD:$draft_state" 2>/dev/null; then
+              mkdir -p "$(dirname "$draft_state")"
+              git show "FETCH_HEAD:$draft_state" > "$draft_state" || { echo "::error::could not restore the X draft dedupe state"; exit 1; }
+            fi
+          fi
           # The file this run owns: -mock in mock mode, -cf when --force runs next to a local file.
           sfx=""
           if [ -n "$MOCK" ]; then sfx="-mock"
@@ -123,7 +131,12 @@ jobs:
           f="sites/$SITE/content/posts/daily-$day.json"
           onmain=""
           if [ -f "$f" ]; then onmain=1
+          elif git cat-file -e "FETCH_HEAD:$f" 2>/dev/null; then onmain=1
           elif git fetch --quiet --depth=1 origin "$GITHUB_REF_NAME" 2>/dev/null && git cat-file -e "FETCH_HEAD:$f" 2>/dev/null; then onmain=1; fi
+          if [ -n "$onmain" ] && [ ! -f "$f" ]; then
+            mkdir -p "$(dirname "$f")"
+            git show "FETCH_HEAD:$f" > "$f" || { echo "::error::could not materialize the existing daily file for draft generation ($f)"; exit 1; }
+          fi
           if [ -z "$MOCK" ] && [ -z "$FORCE" ] && [ -n "$onmain" ]; then
             echo "::notice::local run present on main, skipping the fallback ($f)"
             echo "Daily feed fallback for \`$SITE\` $day: skipped, the local run already published \`$f\`." >> "$GITHUB_STEP_SUMMARY"
@@ -243,9 +256,11 @@ jobs:
           exit 1
 
       - name: Validate content
+        id: contentvalidate
         if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.repair.outputs.soft != 'true' && steps.regate.outputs.soft != 'true'
         run: npm run validate
       - name: Build, checks & unit tests
+        id: contentchecks
         if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.repair.outputs.soft != 'true' && steps.regate.outputs.soft != 'true'
         run: if [ "$SITE" = "taiku" ]; then SITE= npm test; else npm run build; fi
       - name: Realism report, whole corpus (non-blocking)
@@ -271,6 +286,56 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Create English X post and comment drafts
+        id: drafts
+        if: always() && matrix.site == 'taiku' && inputs.mock != true && (
+          steps.local.outputs.skipped == 'true' ||
+          (steps.gen.outputs.soft == 'true' && hashFiles(format('sites/taiku/content/posts/daily-{0}.json', steps.local.outputs.day)) != '') ||
+          (steps.gen.outputs.soft != 'true' && steps.repair.outputs.soft != 'true' && steps.regate.outputs.soft != 'true' && (steps.gate.outcome == 'success' || steps.regate.outcome == 'success') && steps.contentvalidate.outcome == 'success' && steps.contentchecks.outcome == 'success')
+          )
+        env:
+          DRAFT_DATE: ${{ steps.local.outputs.day }}
+          DRAFT_FILE: ${{ steps.gen.outputs.soft == 'true' && format('sites/taiku/content/posts/daily-{0}.json', steps.local.outputs.day) || steps.local.outputs.dayfile }}
+        run: |
+          node scripts/x-drafts.mjs \
+            --date "$DRAFT_DATE" \
+            --file "$DRAFT_FILE" \
+            --fallback "sites/taiku/content/posts/daily-$DRAFT_DATE.json" \
+            --staging "sites/taiku/staging/$DRAFT_DATE/posts.json" \
+            --out "_scratch/x-drafts/taiku"
+      - name: Upload readable X drafts
+        id: draftartifact
+        if: always() && matrix.site == 'taiku' && inputs.mock != true
+        uses: actions/upload-artifact@v4
+        with:
+          name: x-drafts-taiku-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            _scratch/x-drafts/taiku/drafts.md
+            _scratch/x-drafts/taiku/drafts.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Show X drafts and download link in run summary
+        if: always() && matrix.site == 'taiku' && steps.drafts.outcome == 'success' && steps.draftartifact.outcome == 'success'
+        env:
+          DRAFT_ARTIFACT_URL: ${{ steps.draftartifact.outputs.artifact-url }}
+        run: |
+          [ -n "$DRAFT_ARTIFACT_URL" ] || { echo "::error::draft upload returned no artifact link"; exit 1; }
+          printf '## X drafts ready for review\n\n[Download draft artifact](%s)\n\nSign in to GitHub to download. Available for 14 days. Open in X links only prepare drafts; review and submit manually.\n\n' "$DRAFT_ARTIFACT_URL" >> "$GITHUB_STEP_SUMMARY"
+          cat _scratch/x-drafts/taiku/drafts.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Prepare X draft dedupe state artifact
+        if: always() && matrix.site == 'taiku' && steps.drafts.outcome == 'success' && inputs.mock != true
+        run: |
+          mkdir -p _scratch/x-draft-state/sites/taiku/content/state
+          cp sites/taiku/content/state/x-draft-state.json _scratch/x-draft-state/sites/taiku/content/state/x-draft-state.json
+      - name: Upload X draft dedupe state
+        if: always() && matrix.site == 'taiku' && steps.drafts.outcome == 'success' && inputs.mock != true
+        uses: actions/upload-artifact@v4
+        with:
+          name: x-draft-state-taiku-${{ github.run_id }}-${{ github.run_attempt }}
+          path: _scratch/x-draft-state/
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Persist shared usage even when generation or gate fails
         if: always() && steps.budget.outcome == 'success'
         uses: actions/upload-artifact@v4
@@ -280,9 +345,11 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  # With content publishing disabled, this job may still persist Taiku's draft hashes only; no draft
+  # text or X target URL is committed, and the kill switch keeps feed content in staging.
   publish:
     needs: [sites, generate]
-    if: always() && needs.sites.result == 'success' && vars.PUBLISH_ENABLED != 'false' && !inputs.mock
+    if: always() && needs.sites.result == 'success' && !inputs.mock
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -309,6 +376,15 @@ jobs:
           name: daily-content-${{ matrix.site }}
           path: .
 
+      - name: Download X draft dedupe state
+        id: draftstate
+        if: matrix.site == 'taiku'
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: x-draft-state-taiku-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .
+
       # The artifact uploads even when generation failed (always()), but then without gen-meta/dayfile.txt
       # or the day file itself: skip this site with a clear error instead of tripping the allowlist below.
       - name: Generated day file present?
@@ -331,7 +407,7 @@ jobs:
           fi
 
       - name: Re-validate before publishing
-        if: steps.dl.outcome == 'success' && steps.have.outputs.ok == 'true'
+        if: steps.dl.outcome == 'success' && steps.have.outputs.ok == 'true' && vars.PUBLISH_ENABLED != 'false'
         run: |
           DAYFILE="$(head -n1 gen-meta/dayfile.txt)"
           # The artifact is untrusted input here: only this site's day file shape is accepted.
@@ -341,16 +417,28 @@ jobs:
           npm run realism -- --file "$DAYFILE"
 
       - name: Commit & push
-        if: steps.dl.outcome == 'success' && steps.have.outputs.ok == 'true'
+        if: (steps.dl.outcome == 'success' && steps.have.outputs.ok == 'true' && vars.PUBLISH_ENABLED != 'false') || (matrix.site == 'taiku' && steps.draftstate.outcome == 'success')
         env:
           GH_PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HAVE_DAY: ${{ steps.have.outputs.ok }}
+          PUBLISH_ENABLED: ${{ vars.PUBLISH_ENABLED }}
         run: |
-          rm -rf day-gate.json gen-meta
-          git add sites/$SITE/content sites/$SITE/staging 2>/dev/null || git add sites/$SITE/content
+          if [ "$HAVE_DAY" = "true" ] && [ "$PUBLISH_ENABLED" != "false" ]; then
+            rm -rf day-gate.json gen-meta
+            git add "sites/$SITE/content" "sites/$SITE/staging" 2>/dev/null || git add "sites/$SITE/content"
+          fi
+          if [ "$SITE" = "taiku" ] && [ -f sites/taiku/content/state/x-draft-state.json ]; then
+            node -e "const s=JSON.parse(require('fs').readFileSync('sites/taiku/content/state/x-draft-state.json','utf8')); if(s.version!==1 || !s.seen || Array.isArray(s.seen) || typeof s.seen!=='object') throw new Error('invalid X draft dedupe state');"
+            git add sites/taiku/content/state/x-draft-state.json
+          fi
           if git diff --cached --quiet; then echo "No new content."; exit 0; fi
           git config user.name "taiku-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "content($SITE): daily run (cloudflare fallback) $(date -u +%Y-%m-%d)"
+          if [ "$HAVE_DAY" = "true" ] && [ "$PUBLISH_ENABLED" != "false" ]; then
+            git commit -m "content($SITE): daily run (cloudflare fallback) $(date -u +%Y-%m-%d)"
+          else
+            git commit -m "content(taiku): update X draft dedupe state $(date -u +%Y-%m-%d)"
+          fi
           auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_PUSH_TOKEN" | base64 -w0)"
           git -c http.extraheader="$auth" pull --rebase origin "${GITHUB_REF_NAME}"
           git -c http.extraheader="$auth" push origin "HEAD:${GITHUB_REF_NAME}"
