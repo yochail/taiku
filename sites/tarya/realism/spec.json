@@ -34,6 +34,17 @@
       "quote": 0.08
     },
     "conversation": {
+      "daily_reactions": {
+        "min": 4, "target": 5, "substantive_reply_probability": 0.4,
+        "metrics": {
+          "activity.original_share": { "min": 0.1, "max": 0.2 },
+          "activity.reply_share": { "min": 0.75, "max": 0.9 },
+          "activity.quote_share": { "min": 0, "max": 0.05 },
+          "threads.zero_reply_root_share": { "min": 0, "max": 0 },
+          "threads.depth1_share_of_conversations": { "min": 0, "max": 0.25 },
+          "threads.back_and_forth_share": { "min": 0.5, "max": 1 }
+        }
+      },
       "_note": "Deliberate departure from real-X ratios for educational value: on X most replies get no answer and reply trees are shallow (nishi2016, goel2016). Taiku keeps the heavy tail (most taiks get a few replies, hot ones get long threads) but makes the person replied to answer back more often, so A<->B exchanges of 2-4 turns happen, and a third persona from either side's clash/ally graph sometimes joins. Replies are steered toward a move the thread can answer (rebuttal with a reason, concession and pivot, sharp question, example) instead of filler agreement. Weights are product choices. Confidence: product choice.",
       "continue_probability": 0.6,
       "continue_decay": 0.7,

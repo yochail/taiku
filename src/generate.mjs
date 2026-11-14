@@ -116,8 +116,10 @@ async function main() {
   if (opts.repair) {
     const paths = outputPaths(SITE_DIR, opts.date, { mock: opts.mock, suffix: opts.suffix ?? null });
     if (!fs.existsSync(paths.posts)) throw new Error(`--repair: ${paths.posts} does not exist; run the day first`);
-    const posts = JSON.parse(fs.readFileSync(paths.posts, 'utf8')).posts ?? [];
-    const g = gateDay({ posts, context: loadOtherPosts(paths.postsDir, [paths.posts]), personas: loadPersonas(), spec, label: paths.posts });
+    const doc = JSON.parse(fs.readFileSync(paths.posts, 'utf8'));
+    const posts = doc.posts ?? [];
+    const g = gateDay({ posts, context: loadOtherPosts(paths.postsDir, [paths.posts]), personas: loadPersonas(), spec, label: paths.posts,
+      threadPolicy: doc.threadPolicy ? spec.sampling.conversation?.daily_reactions : null });
     const fixable = g.offenders.filter((o) => o.taskId);
     if (g.ok || !fixable.length) {
       console.log(g.ok ? 'day gate passes; nothing to repair' : `day gate fails but no item is regenerable (${g.failures.map((c) => c.id).join(', ')}); not repairing`);

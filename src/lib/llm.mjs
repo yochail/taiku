@@ -128,7 +128,7 @@ const hasOutput = (m) => (typeof m.content === 'string' && m.content.trim() !== 
  * backoff + jitter, honouring Retry-After. 429 / quota errors / 404 / 410 throw `capped` errors
  * (after one Retry-After-bounded back-off for 429) so the rotation switches models.
  */
-export function createClient({ cfg = llmConfig(), fetchImpl = globalThis.fetch, maxCalls = 120, maxAttempts = 4, sleep = realSleep, rand = Math.random, log = () => {}, limiter = null, budget = null } = {}) {
+export function createClient({ cfg = llmConfig(), fetchImpl = globalThis.fetch, maxCalls = 120, maxAttempts = 4, sleep = realSleep, rand = Math.random, log = () => {}, limiter = null, budget = null, reserve = null } = {}) {
   let calls = 0;
   const stats = { calls: 0, retries: 0, errors: 0, rateLimited: 0, usage: { input: 0, output: 0 } };
   const limit = limiter ?? (cfg.rpm > 0 ? createLimiter(cfg.rpm, { sleep }) : null);
@@ -136,9 +136,11 @@ export function createClient({ cfg = llmConfig(), fetchImpl = globalThis.fetch, 
     let lastErr;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (calls >= maxCalls || (budget && !budget.take())) throw new BudgetError();
+      if (limit) await limit();
+      const reservation = reserve?.(body);
+      if (reserve && !reservation) throw new BudgetError('shared free allowance exhausted');
       calls++;
       stats.calls = calls;
-      if (limit) await limit();
       let res;
       let wait = null;
       try {
@@ -162,6 +164,7 @@ export function createClient({ cfg = llmConfig(), fetchImpl = globalThis.fetch, 
           if (!json || typeof json !== 'object') lastErr = new LlmError(`non-JSON response body (${String(text).slice(0, 40).replace(/\s+/g, ' ') || 'empty'})`, { status: res.status, retryable: true });
           else {
             const got = extractMessage(json);
+            if (got?.usage) reservation?.settle(got.usage);
             if (got && hasOutput(got.message)) {
               const u = got.usage ?? {};
               stats.usage.input += Number(u.prompt_tokens) || 0;

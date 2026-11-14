@@ -5,9 +5,9 @@ import { contentPlan, neuronsFor, planBudget } from '../src/lib/budget.mjs';
 
 const config = loadLlmConfig();
 
-test('fresh day: 50–90 calls within 80% of every cap, 10% kept as reserve', () => {
+test('fresh day: available allowance within shared caps, 5% kept as repair reserve', () => {
   const plan = planBudget({ config });
-  assert.ok(plan.totals.calls >= 50 && plan.totals.calls <= 90, `calls ${plan.totals.calls}`);
+  assert.ok(plan.totals.calls >= 50 && plan.totals.calls <= config.targetCalls.max, `calls ${plan.totals.calls}`);
   assert.ok(plan.totals.neurons <= config.totalCap.cap * config.planShare + 1, `neurons ${plan.totals.neurons}`);
   assert.equal(plan.totals.degraded, false);
   for (const m of plan.models) {
@@ -15,7 +15,7 @@ test('fresh day: 50–90 calls within 80% of every cap, 10% kept as reserve', ()
     assert.ok(m.allowance <= p.calls, `${m.name} call ceiling`);
     assert.ok(m.allowance * m.perCall <= p.cap * config.planShare + 1e-6, `${m.name} ≤80% of its Neuron cap`);
     assert.equal(m.plan + m.reserve, m.allowance);
-    if (m.allowance) assert.ok(m.reserve >= 1 && m.reserve <= Math.ceil(m.allowance * 0.1));
+    if (m.allowance) assert.ok(m.reserve >= 1 && m.reserve <= Math.ceil(m.allowance * config.reserveShare));
   }
   assert.ok(plan.content.topics >= 1 && plan.content.llmItems > plan.totals.calls, 'batching: more items than calls');
 });

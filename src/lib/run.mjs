@@ -18,6 +18,9 @@ import { SITE_DIR, displayName, loadPersonas, personaKind, safeUrl, validate } f
 import { POST_ARCHETYPES, REPLY_ARCHETYPES } from './archetypes.mjs';
 import { behaviorOf } from './behavior.mjs';
 import { crowdFor, loadDistribution } from './crowd.mjs';
+import { ROOT } from './site.mjs';
+import { createFreeBudget, freeProvider, ledgerUsage, readLedger } from './free-budget.mjs';
+import { completeThreads } from './complete-threads.mjs';
 import { createSampler, replyFormOf } from './realism.mjs';
 import { planMedia } from './media.mjs';
 import { createGiphyClient } from './giphy.mjs';
@@ -49,7 +52,7 @@ import { checkPost, policyContext } from './policy.mjs';
 import { runTurn } from './turn.mjs';
 import { clamp, editorialDay, hash8, readJson, round3, seededRng, sha256, shuffle, weightedPick, writeJsonAtomic } from './pipeline-util.mjs';
 
-export const DEFAULT_MAX_CALLS = 90;
+export const DEFAULT_MAX_CALLS = 1000;
 export const DEFAULT_MIN_COMPLETE = 0.7;
 export const MIN_TOPIC_SHARE = 0.6;
 const NOTE_RATE = 0.2;
@@ -192,6 +195,53 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
   const node = (o) => ({ depth: 0, mentions: new Set(), likes: [], reposts: [], rel: null, parent: null, quoteOf: null, topicId: null, ...o });
   const nodes = [];
   const opens = [];
+  if (content.threadPolicy) {
+    const count = Math.max(0, content.originals ?? 0);
+    const cal = calibrate({ personas, spec, originalsPerDay: count, cacheFile: calibrationFile, writeCache: writeCalibration });
+    const reactor = createReactor({ personas, spec, seed: `${date}:${seed}`, nonce, calibration: cal, llmCap: content.llmReplies, formFn, affinityFn });
+    const authored = new Map();
+    const replied = new Map();
+    for (let i = 0; i < count; i++) {
+      const topic = topics[i] ?? null;
+      const pid = weightedPick(rand, active.map((p) => [p.id,
+        ((behaviorOf(p).activity ?? 0.5) * (0.2 + topicAffinity(p, topic?.keys ?? {}))) / (1 + (authored.get(p.id) ?? 0))]));
+      if (!pid || active.length < 3) break;
+      authored.set(pid, (authored.get(pid) ?? 0) + 1);
+      const author = active.find((p) => p.id === pid);
+      const theme = weightedPick(rand, Object.entries(author.topic_affinity ?? { philosophy: 1 }));
+      const root = node({ id: topic ? `${topic.id}-root1` : `s${i + 1}`, authorId: pid, createdAt: sessionAt(pid),
+        vector: topic?.keys ?? { [theme]: 1 }, role: 'original', kind: topic ? 'topic-root' : 'standalone',
+        exec: i < content.singleTurns ? 'single' : 'originals', topicId: topic?.id ?? null, theme });
+      nodes.push(root);
+      const candidates = active.filter((p) => p.id !== pid);
+      const first = [];
+      const used = new Set();
+      for (let j = 0; j < content.threadPolicy.target; j++) {
+        const parent = j < 3 ? root : first[(j - 3) % first.length];
+        const fresh = candidates.filter((p) => p.id !== parent.authorId && !used.has(p.id));
+        const pool = fresh.length ? fresh : candidates.filter((p) => p.id !== parent.authorId);
+        const replyId = j === 3 ? pid : weightedPick(rand, pool.map((p) => [p.id,
+          (p.reactivity ?? 3) * (0.2 + topicAffinity(p, root.vector)) *
+          (conversationOf(spec).relation_boost[relationOf(p, author)] ?? 1) / (1 + (replied.get(p.id) ?? 0))]));
+        const persona = active.find((p) => p.id === replyId);
+        used.add(replyId);
+        replied.set(replyId, (replied.get(replyId) ?? 0) + 1);
+        const sampled = formFn?.(persona, 'reply', parent);
+        const form = sampled?.form === 'full' || rand() < (content.threadPolicy.substantive_reply_probability ?? 0) ? 'full' : 'short';
+        const reply = node({ id: `${root.id}.r${j + 1}`, authorId: persona.id,
+          createdAt: parent.createdAt + delay(), vector: root.vector, role: 'reply',
+          kind: 'reply', exec: form === 'full' ? 'full' : 'short', form, cheap: false,
+          parent: parent.id, topicId: root.topicId, depth: parent.depth + 1,
+          rel: relationOf(persona, personas.find((p) => p.id === parent.authorId)), pairAuthor: parent.authorId,
+          turn: turnOf(parent, persona.id), mentions: new Set([parent.authorId]) });
+        nodes.push(reply);
+        if (j < 3) first.push(reply);
+        reactor.force(parent, persona.id, 'reply', 'minimum-thread', reply.createdAt);
+      }
+    }
+    return { day, nodes: nodes.sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id)),
+      reactor, calibration: cal, llmCap: content.llmReplies, sampler, rand };
+  }
   for (const t of topics) {
     const T = at(6);
     const fans = active
@@ -469,16 +519,20 @@ export async function runDaily(opts = {}) {
   // 1) Budget plan (Neurons per model, from today's remaining quota). Reused on resume so every task id is stable.
   const usageDay = utcDay();
   const usageFileLlm = budgetFile(root, false);
-  const usedToday = offline ? {} : loadUsage(usageFileLlm, usageDay);
+  const sharedFile = env.GEN_USAGE_FILE || path.join(ROOT, '_scratch', 'free-budget.json');
+  const sharedUsage = offline || opts.client ? {} : ledgerUsage(readLedger(sharedFile, usageDay));
+  const usedToday = offline ? {} : { ...loadUsage(usageFileLlm, usageDay), ...sharedUsage };
   const discovery = offline || opts.client ? { available: null, skipped: [] } : await discoverModels({ config, env, fetchImpl: opts.fetchImpl, log });
   for (const s of discovery.skipped ?? []) log(`model ${s.name} (${s.model}) skipped: ${s.reason}`);
   if (!offline && !opts.client) {
     // Providers whose secret isn't set get no allowance, so the plan only counts usable models.
-    const keyed = config.providers.filter((p) => llmConfig(env, p).apiKey).map((p) => p.name);
-    for (const p of config.providers) if (!keyed.includes(p.name)) log(`model ${p.name} skipped: no ${p.keyEnv}`);
+    const keyed = config.providers.filter((p) => llmConfig(env, p).apiKey && freeProvider(p, env)).map((p) => p.name);
+    for (const p of config.providers) if (!keyed.includes(p.name)) log(`model ${p.name} skipped: missing key or free-only attestation for ${p.keyEnv}`);
     discovery.available = new Set(keyed.filter((n) => !discovery.available || discovery.available.has(n)));
   }
-  const budget = planBudget({ config, used: usedToday, available: discovery.available, maxCalls });
+  const threadPolicy = spec.sampling.conversation?.daily_reactions ?? null;
+  const shares = Math.max(1, Number(env.GEN_REMAINING_SITES) || 1);
+  const budget = planBudget({ config, used: usedToday, available: discovery.available, maxCalls, threadPolicy, shares });
   const content = prev?.nonce === nonce && prev?.budgetPlan?.content ? prev.budgetPlan.content : budget.content;
   log(`budget: ${budget.models.map((m) => `${m.name} ${m.plan}+${m.reserve}`).join(', ')} → ~${budget.totals.neurons} Neurons; plan ${JSON.stringify(content)}`);
 
@@ -487,8 +541,8 @@ export async function runDaily(opts = {}) {
   if (!topicsDoc) {
     const fetchImpl = opts.fetchImpl ?? (offline ? fixtureFetch(FEEDS) : globalThis.fetch);
     const pool = await fetchPool({ env: offline ? { ...env, NEWS_FEEDS: '' } : env, fetchImpl, feeds: offline ? FEEDS : undefined, log, resolveRedirects: opts.resolveRedirects ?? !offline });
-    const n = topicCount(opts.topics ?? env.GEN_TOPICS ?? content.topics);
-    const sel = selectTopics(pool.items, personas.filter((p) => !isNews(p)), { n, date, rand: seededRng('topics', seed, date) });
+    const n = threadPolicy ? Math.min(content.originals, Number(opts.topics ?? env.GEN_TOPICS) || content.topics) : topicCount(opts.topics ?? env.GEN_TOPICS ?? content.topics);
+    const sel = selectTopics(pool.items, personas.filter((p) => !isNews(p)), { n, date, prioritizeNews: Boolean(threadPolicy), rand: seededRng('topics', seed, date) });
     topicsDoc = {
       date,
       generatedAt: new Date().toISOString(),
@@ -555,6 +609,7 @@ export async function runDaily(opts = {}) {
         ? (p, cfg, allowance) => createMockClient({ maxCalls: Math.max(0, Math.min(allowance, cap)), tools: p.tools === 'off' || env.LLM_TOOLS === 'off' ? 'off' : 'on', nonce, model: `mock/${p.model.replace(/^@cf\//, '')}`, name: p.name })
         : null,
       fetchImpl: opts.fetchImpl,
+      freeBudget: offline ? null : createFreeBudget({ config, used: usedToday, file: dryRun ? null : sharedFile, day: usageDay, shares, maxCalls: budget.totals.calls }),
     });
   }
   Object.assign(caps, await rotation.probe(caps));
@@ -1010,9 +1065,17 @@ export async function runDaily(opts = {}) {
   };
 
   const chunk = (arr, n) => Array.from({ length: Math.ceil(arr.length / n) }, (_, i) => arr.slice(i * n, i * n + n));
-  const levels = [...new Set(tasks.map((t) => t.level))].sort((a, b) => a - b);
-  for (const L of levels) {
-    const todo = tasks.filter((t) => t.level === L && gate(t));
+  const taskRoot = (t) => {
+    while (t.parentTaskId && taskById.has(t.parentTaskId)) t = taskById.get(t.parentTaskId);
+    return t.taskId;
+  };
+  const priority = (t) => t.topicId ? topics.findIndex((tp) => tp.id === t.topicId) : topics.length;
+  const groups = threadPolicy ? tasks.filter((t) => !t.parentTaskId).sort((a, b) => priority(a) - priority(b))
+    .map((root) => tasks.filter((t) => taskRoot(t) === root.taskId)) : [tasks];
+  const stages = groups.flatMap((group) => [...new Set(group.map((t) => t.level))].sort((a, b) => a - b)
+    .map((level) => group.filter((t) => t.level === level)));
+  for (const stage of stages) {
+    const todo = stage.filter(gate);
     // Parent texts → vectors (stance hint, pool ranking).
     await embedMany(todo.map((t) => taskById.get(t.parentTaskId)).filter((p) => p?.status === 'done').map((p) => [`post:${p.taskId}`, p.fields.text]));
     for (const t of todo.filter((x) => x.exec === 'wire')) runWire(t);
@@ -1047,7 +1110,7 @@ export async function runDaily(opts = {}) {
     for (const g of chunk(todo.filter((x) => x.exec === 'full' && x.status === 'pending'), REPLIES_PER_BATCH)) await runGroup(g, { role: 'batch', kind: 'replies' });
     const shorts = [...todo.filter((x) => x.exec === 'short' && x.status === 'pending'), ...fallback];
     for (const g of chunk(shorts, SHORTS_PER_BATCH)) {
-      if (!stopped() && !checkClock() && !rotation.hasCapacity('micro')) {
+      if (!threadPolicy && !stopped() && !checkClock() && !rotation.hasCapacity('micro')) {
         for (const t of g.filter((x) => x.fallback)) markLiked(t, 'pool exhausted, no LLM capacity');
         continue;
       }
@@ -1089,14 +1152,16 @@ export async function runDaily(opts = {}) {
   const built = done.map((t) => assemblePost({ t, node: nodeById.get(t.taskId), taskById, byId, topic: topicById.get(t.topicId), runId, origin, rand: seededRng('votes', t.taskId, nonce) }));
   // One image/meme/chart per corpus, one reaction GIF per day and conversation (deterministic order).
   const uniq = enforceUniqueVisuals(built, others);
-  const posts = built.filter((p) => !uniq.drop.has(p.id));
+  const uniquePosts = built.filter((p) => !uniq.drop.has(p.id));
+  const threadResult = threadPolicy ? completeThreads(uniquePosts, threadPolicy.min) : null;
+  const posts = threadResult?.posts ?? uniquePosts;
   const retaiks = retaikRows({ posts, byId, sampler: createSampler(spec, `retaik:${seed}:${nonce}`), pairSampler: (k) => createSampler(spec, `retaik:${seed}:${nonce}:${k}`), key: `${seed}:${nonce}`, prefix, date, runId, origin });
   const allPosts = [...posts, ...retaiks];
 
   // 8) Completeness.
   const topicStatus = topics.map((tp) => {
     const own = tasks.filter((t) => t.topicId === tp.id);
-    const ok = !blockedTopics.has(tp.id) && own.some((t) => t.status === 'done' && (t.kind === 'wire' || t.kind === 'topic-root' || t.kind === 'opener'));
+    const ok = !blockedTopics.has(tp.id) && own.some((t) => posts.some((p) => p.taskId === t.taskId) && (t.kind === 'wire' || t.kind === 'topic-root' || t.kind === 'opener'));
     return { ...tp, status: blockedTopics.has(tp.id) ? 'blocked' : ok ? 'ok' : 'failed', tasks: own.length };
   });
   const topicsOk = topicStatus.filter((x) => x.status === 'ok').length;
@@ -1104,7 +1169,8 @@ export async function runDaily(opts = {}) {
   const counted = tasks.filter((t) => !(t.topicId && blockedTopics.has(t.topicId)) && t.status !== 'liked');
   const ratio = counted.length ? done.length / counted.length : 0;
   const pending = tasks.filter((t) => t.status === 'pending').length;
-  const complete = ratio >= minComplete && topicsOk >= Math.ceil(MIN_TOPIC_SHARE * topics.length) && !(stopped() && pending > counted.length * (1 - minComplete));
+  const complete = threadPolicy ? threadResult.roots > 0 && (stopped() || ratio >= minComplete && topicsOk >= Math.ceil(MIN_TOPIC_SHARE * topics.length)) :
+    ratio >= minComplete && topicsOk >= Math.ceil(MIN_TOPIC_SHARE * topics.length) && !(stopped() && pending > counted.length * (1 - minComplete));
 
   // 9) Split published vs staged, then validate the whole corpus.
   const stagedTopic = (id) => !publish || topicById.get(id)?.tier === 'community';
@@ -1165,8 +1231,10 @@ export async function runDaily(opts = {}) {
     updatedAt: new Date().toISOString(),
     wallClockSec: Math.round((Date.now() - t0) / 1000),
     status,
-    completeness: { done: done.length, tasks: tasks.length, counted: counted.length, pending, ratio: round3(ratio), minRatio: minComplete, topicsOk, topics: topics.length, minTopics: Math.ceil(MIN_TOPIC_SHARE * topics.length) },
-    budget: { maxCalls, used: rotation.calls, neurons_est: Math.round(rotation.neurons), llmCap: plan.llmCap, llmTasks: tasks.filter((t) => !['wire', 'pool'].includes(t.exec)).length, budgetHit, timeUp, usageDay },
+    completeness: { done: done.length, tasks: tasks.length, counted: counted.length, pending, ratio: round3(ratio), minRatio: minComplete, topicsOk, topics: topics.length, minTopics: Math.ceil(MIN_TOPIC_SHARE * topics.length),
+      ...(threadResult ? { completeRoots: threadResult.roots, droppedRoots: threadResult.droppedRoots, threadPolicy } : {}) },
+    budget: { maxCalls, used: rotation.calls, neurons_est: Math.round(rotation.neurons), llmCap: plan.llmCap, llmTasks: tasks.filter((t) => !['wire', 'pool'].includes(t.exec)).length, budgetHit, timeUp, usageDay,
+      ...(!offline && rotation.freeUsage ? { sharedFreeUsage: rotation.freeUsage() } : {}) },
     budgetPlan: { models: budget.models.map(({ name, model, role, allowance, plan: p, reserve, perCall, neuronsPlanned }) => ({ name, model, role, allowance, plan: p, reserve, perCall, neuronsPlanned })), totals: budget.totals, content },
     discovery: { skipped: discovery.skipped ?? [], ...(discovery.error ? { error: discovery.error } : {}) },
     models: models.map((m) => ({ model: m.model, name: m.name, role: m.role, calls: m.calls, cap: m.cap, capUnit: m.capUnit, plan: m.plan, reserve: m.reserve, neurons_est: m.neurons_est, '429s': m['429s'], items: m.items, tools: m.tools, ...(m.capped ? { capped: m.capped } : {}) })),
@@ -1193,7 +1261,7 @@ export async function runDaily(opts = {}) {
       if (publish) {
         // staged posts count later via the content/posts scan once promoted
         saveReactionUsage(usageFile(root, mock), picker.used, date);
-        if (published.length) writeJsonAtomic(paths.posts, { runId, generatedAt: new Date().toISOString(), origin, provider: manifest.provider, path: runPath, models: models.filter((m) => m.calls > 0).map((m) => m.model), promptVersion: PROMPT_VERSION, posts: published });
+        if (published.length) writeJsonAtomic(paths.posts, { runId, generatedAt: new Date().toISOString(), origin, provider: manifest.provider, path: runPath, models: models.filter((m) => m.calls > 0).map((m) => m.model), promptVersion: PROMPT_VERSION, ...(threadPolicy ? { threadPolicy } : {}), posts: published });
         else if (fs.existsSync(paths.posts)) fs.rmSync(paths.posts);
       }
       if (staged.length) {

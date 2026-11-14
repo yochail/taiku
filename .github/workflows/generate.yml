@@ -40,7 +40,7 @@ on:
         description: "Topics this run (3-5, blank = budget plan)"
         default: ""
       max_calls:
-        description: "LLM request ceiling incl. tool rounds and retries (blank = GEN_MAX_CALLS or 90)"
+        description: "LLM request ceiling incl. tool rounds and retries (blank = GEN_MAX_CALLS or 1000)"
         default: ""
       force:
         description: "Run even if the local daily file exists (writes daily-<date>-cf.json next to it)"
@@ -78,6 +78,7 @@ jobs:
     environment: production
     permissions:
       contents: read
+      actions: read
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -85,6 +86,10 @@ jobs:
         site: ${{ fromJSON(needs.sites.outputs.list) }}
     env:
       SITE: ${{ matrix.site }}
+      GEN_USAGE_FILE: ${{ github.workspace }}/_scratch/free-budget.json
+      CF_FREE_ONLY: ${{ vars.CF_FREE_ONLY }}
+      GROQ_FREE_ONLY: ${{ vars.GROQ_FREE_ONLY }}
+      GEMINI_FREE_ONLY: ${{ vars.GEMINI_FREE_ONLY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -128,9 +133,17 @@ jobs:
           fi
 
       - uses: actions/setup-node@v4
-        if: steps.local.outputs.skipped != 'true'
         with:
           node-version: 22
+
+      - name: Restore shared free-provider usage
+        id: budget
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/free-budget-sync.mjs
+
+      - name: Share remaining allowance fairly
+        run: echo "GEN_REMAINING_SITES=${{ steps.budget.outputs.remaining }}" >> "$GITHUB_ENV"
 
       # The site build is zero-dependency. The generate step optionally uses MiniLM embeddings
       # (@huggingface/transformers, optionalDependency); a failed install just degrades to tag overlap.
@@ -256,6 +269,15 @@ jobs:
             sites/${{ matrix.site }}/staging/
             day-gate.json
           if-no-files-found: warn
+          retention-days: 14
+
+      - name: Persist shared usage even when generation or gate fails
+        if: always() && steps.budget.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: free-budget-${{ steps.budget.outputs.day }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.site }}
+          path: _scratch/free-budget.json
+          if-no-files-found: error
           retention-days: 14
 
   publish:

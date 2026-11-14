@@ -11,6 +11,8 @@ import { promote } from '../scripts/promote.mjs';
 import { newsPersona, parodyPersona, realPersonas } from './fixtures/pipeline-fixtures.mjs';
 
 const spec = loadDistribution();
+// Keep coverage of the legacy cascade for packs without the opt-in deep-thread policy.
+delete spec.sampling.conversation.daily_reactions;
 const base = realPersonas();
 const SCRATCH = path.join(ROOT, 'test', '.pipeline-scratch');
 let n = 0;
@@ -28,7 +30,7 @@ after(() => {
 });
 
 const DATE = '2026-11-02';
-const run = (o) => runDaily({ date: DATE, mock: true, quiet: true, seed: 'test', nonce: 'nonce1', spec, personas: base, env: {}, ...o });
+const run = (o) => runDaily({ date: DATE, mock: true, quiet: true, seed: 'test', nonce: 'nonce1', spec, personas: base, env: {}, maxCalls: 90, ...o });
 const read = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
 const persErr = (e) => !/^(persona |duplicate persona|duplicate handle)/.test(e);
 
@@ -176,7 +178,7 @@ test('kill switch PUBLISH_ENABLED=false writes only to staging', async () => {
 
 test('dry-run writes nothing', async () => {
   const root = freshRoot();
-  const r = await runDaily({ date: DATE, dryRun: true, quiet: true, seed: 'ci', spec, personas: base, env: {}, root });
+  const r = await runDaily({ date: DATE, dryRun: true, quiet: true, seed: 'ci', spec, personas: base, env: {}, root, maxCalls: 90 });
   assert.equal(r.status, 'complete');
   assert.deepEqual(fs.readdirSync(root), []);
 });

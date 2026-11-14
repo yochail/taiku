@@ -10,6 +10,7 @@
 // Returns offenders [{ postId, taskId, reason, length? }] the pipeline can regenerate once
 // (generate --repair), and a short markdown scorecard.
 import { withDisplayStats } from './crowd.mjs';
+import { threadCoverage } from './complete-threads.mjs';
 import { rotationStats } from './formats.mjs';
 import { maxSimilarityByPersona, noveltyConfig, scanRepetition } from './ideas.mjs';
 import { scanSelfBio, selfBioConfig } from './selfbio.mjs';
@@ -80,7 +81,9 @@ export function binomCdf(k, n, p) {
   return Math.min(1, sum);
 }
 
-export function gateDay({ posts, context = [], personas, spec, label = 'day' }) {
+export function gateDay({ posts, context = [], personas, spec, label = 'day', threadPolicy = null }) {
+  if (threadPolicy) spec = { ...spec, metrics: Object.fromEntries(Object.entries(spec.metrics)
+    .map(([id, metric]) => [id, { ...metric, ...threadPolicy.metrics?.[id] }])) };
   const gate = spec.gate ?? {};
   const byP = new Map(personas.map((p) => [p.id, p]));
   const day = posts.map((p) => ({ ...p }));
@@ -108,6 +111,13 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day' }) 
   }
 
   // 2) Hard checks.
+  if (threadPolicy) {
+    const coverage = threadCoverage(day);
+    const shallow = coverage.roots.filter((p) => coverage.counts.get(p.id) < threadPolicy.min);
+    add({ id: 'hard.thread_reactions', status: shallow.length || !coverage.roots.length ? 'fail' : 'pass',
+      value: shallow.length, n: coverage.roots.length, min: 0, max: 0, blocking: true,
+      detail: shallow.map((p) => `${p.id}: ${coverage.counts.get(p.id)} replies, need ${threadPolicy.min}`) });
+  }
   const mediaItems = authored.flatMap((p) => mediaOf(p)).length;
   add({ id: 'hard.media_items', status: mediaItems >= (gate.min_media_items ?? 1) ? 'pass' : 'fail', value: mediaItems, n: authored.length, min: gate.min_media_items ?? 1, max: null, blocking: true });
   const originals = authored.filter((p) => role(p) === 'original');

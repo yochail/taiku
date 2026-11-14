@@ -53,7 +53,7 @@ export function filterPool(items) {
   const kept = [];
   const dropped = [];
   for (const it of items) {
-    const reason = it.injection ? 'injection' : isNsfw(it) ? 'nsfw' : isGrave(it.title) ? 'tragedy' : tokens(it.title).length < 1 ? 'empty' : kept.some((k) => jaccard(k.title, it.title) >= 0.6) ? 'duplicate' : null;
+    const reason = it.injection ? 'injection' : isNsfw(it) ? 'nsfw' : isGrave(it.title) ? 'tragedy' : tokens(it.title).length < 1 ? 'empty' : kept.some((k) => (it.url && k.url === it.url) || jaccard(k.title, it.title) >= 0.6) ? 'duplicate' : null;
     if (reason) dropped.push({ id: it.id, feedId: it.feedId, reason });
     else kept.push(it);
   }
@@ -101,12 +101,15 @@ export function pickTopics(scored, n, { lambda = 0.55 } = {}) {
 export const topicCount = (v) => Math.min(MAX_TOPICS, Math.max(MIN_TOPICS, Number(v) || 4));
 
 /** Full selection: filter → score → MMR, then evergreen fill. Returns { picks, dropped, poolHash }. */
-export function selectTopics(items, personas, { n = 4, date, rand = Math.random } = {}) {
+export function selectTopics(items, personas, { n = 4, date, rand = Math.random, prioritizeNews = false } = {}) {
   const { kept, dropped } = filterPool(items);
   const scored = scorePool(kept, personas);
-  const picks = pickTopics(scored, topicCount(n));
+  const count = prioritizeNews ? Math.max(0, Math.min(MAX_TOPICS, n)) : topicCount(n);
+  const main = prioritizeNews ? scored.filter((t) => t.tier === 'curated' && t.kind === 'news')
+    .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id)).slice(0, count) : [];
+  const picks = [...main, ...pickTopics(scored.filter((t) => !main.some((p) => p.id === t.id)), count - main.length)];
   const ever = [...EVERGREEN].sort(() => rand() - 0.5);
-  while (picks.length < MIN_TOPICS && ever.length) {
+  while (picks.length < (prioritizeNews ? count : MIN_TOPICS) && ever.length) {
     const e = ever.shift();
     picks.push({ id: `e${hash8(`${date}:${e.title}`)}`, title: e.title, url: null, domain: '', source: 'Taiku', feedId: 'evergreen', tier: 'evergreen', kind: 'evergreen', section: e.keys[0], publishedAt: null, keys: topicVector(e.title, e.keys), score: 0.2 });
   }

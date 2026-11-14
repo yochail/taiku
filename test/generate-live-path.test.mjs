@@ -30,6 +30,7 @@ test('live (non-offline) runDaily path completes with a mock client and stubbed 
   };
   const r = await runDaily({
     date: '2026-11-02',
+    maxCalls: 90,
     quiet: true,
     seed: 'live-path',
     nonce: 'live1',

@@ -15,7 +15,7 @@ No ads, no accounts, no tracking cookies. It's a hobby project and runs on free 
 - **Personas.** Each thinker is one JSON file: biography, core ideas, key works, voice, temperament, allies and rivals, posting habits, and a list of verified quotations with sources. Those files steer every generated post.
 - **Daily posts.** Once a day an LLM pipeline picks topics from public news feeds and writes the day. It plans who posts, who replies, who quotes, who leaves in a huff, then writes each item in the persona's voice. A style guide and automated checks filter out generic "AI voice", fake quotes and unsafe content.
 - **Realism.** Post lengths, reply forms (an emoji, "source?", a GIF), media mix, posting hours and engagement are sampled from target distributions based on research about real X usage. Each day must pass a statistical gate before it is published. Older posts with traction keep drawing replies and quote-taiks on later days, sometimes a pile-on (``spec.sampling.resurfacing``). ``npm run resurface:plan`` lists the follow-ons an existing corpus is missing. People who are @mentioned get a sampled reaction too. Each persona rotates formats (take, daily-life bit, quote-taik, meme, image, chart, poll, link card, thread, …): a format it used in its last few items is down-weighted (`spec.sampling.format_rotation`), and the gate fails a same-format run of more than 4. An image, meme or chart is used once in the whole corpus; a reaction GIF at most once per day and per conversation.
-- **Back-and-forth.** Taiku runs more replies than real X (about 34% originals, 58% replies, 8% quotes, versus about 42/49/9 on X) on purpose, so ideas get argued. The person replied to often answers back (A↔B exchanges of 2–4 turns), a rival or ally of either side sometimes joins, and rivals are the likeliest pairs. Each reply gets a move (rebuttal with a reason, disagreement, concession and pivot, a sharp question, an example) instead of "great point" filler. The tail stays heavy: most taiks get a few replies, hot ones get long threads. Settings: `sampling.conversation` in `sites/<id>/realism/spec.json`; the day gate checks `threads.back_and_forth_share`.
+- **Back-and-forth.** The daily fallback for taiku and tarya plans **five persona replies per original**, including an author answer-back and another participant. It finishes one thread before starting the next, covering the highest-scoring safe, relevant curated news first, one root per deduplicated event (up to five topics). Budget exhaustion can reduce this to **four replies**, never likes, reposts or self-thread continuations. Shallow roots and their descendants are withheld; complete threads still go through validation, the blocking day gate and its one repair. Persona affinities, relationships, voice, grounding, Hebrew house style and media checks still apply. The new day files carry `threadPolicy`; only those files use the deep-thread role bands in `sampling.conversation.daily_reactions`, leaving historical days' gate targets unchanged. Packs without that policy retain the original reaction cascade.
 - **No repeats.** Each persona draws on an idea ledger: its core ideas and key works plus lesser-known works and ideas (`sites/<id>/ideas/<persona>.json`), least recently used first. Famous catchphrases (the cogito, "God is dead") are capped at about one per persona per two weeks. Every new taik is compared with the same persona's last 7 days (embedding cosine plus shared 4-word phrases); a repeat is rewritten, and the day gate blocks any that remain (`spec.sampling.novelty`). Catchphrases are also derived from each persona's own profile on every site (famous quotes, song and poem titles, quoted signature lines, and for Hebrew packs the shared canon such as Hatikvah and "ירושלים של זהב"). Matching works in every language: Hebrew niqqud, geresh/gershayim, final letters, plene spelling and the ו/ה/ב/ל/מ/ש/כ prefixes are folded (`src/lib/textnorm.mjs`). `SITE=<id> npm run repetition:audit` lists the repeats in a site's corpus in `sites/<id>/staging/repetition-audit.json`; add `-- --model` for a semantic pass with the multilingual embedding model (`Xenova/paraphrase-multilingual-MiniLM-L12-v2`, pinned).
 - **Media at $0.** Public-domain paintings from Wikimedia Commons, memes rendered from a licensed template library, reaction GIFs from GIPHY, and link cards for news stories. Nothing is AI-generated imagery.
 - **Real links.** News takes carry a link card to the real article. The generator fetches the article page and reads its title, description, outlet, date and preview image. The image is hotlinked, and the result is cached in `content/state/unfurl-cache.json`. Personas can also quote real posts from news, institutional and public-figure accounts on X or Bluesky, using the exact fetched text, like a quote-retweet. Posts from private individuals are never quoted, and nothing is put in a real person's mouth. The validator rejects any card URL that wasn't actually fetched. Every card has a preview image: the page's og:image, twitter:image, `image_src` or first large article photo, otherwise a text-free topic illustration (`public/media/news/<topic>.svg`). `npm run links:check` fails on any card without an image (unless allowlisted in `sites/<site>/config/link-image-allowlist.json`) and spot-checks that the links still resolve. `npm run links:backfill` re-fetches cards for the existing posts and recovers missing article URLs by exact headline match (the unfurl cache, Bing News, then the Hacker News search API). With `--refresh-images` it also re-fetches imageless pages and swaps cards from bot-walled or imageless outlets (MSN, Reuters, AP, HN threads) to the same story on an outlet that has an image. A URL is never invented: an unmatched item gets a non-link headline card with the topic art.
@@ -40,6 +40,47 @@ npm run generate:dry
 ```
 
 `npm install` adds a few optional extras (embeddings, meme rasterising). Everything works without them.
+
+## Daily free-budget policy
+
+The GitHub fallback shares one UTC-day budget across both sites, models, repairs and workflow reruns:
+**10,000 Workers AI Neurons**, **50 OpenRouter `:free` requests**, and a conservative organization-wide
+**1,000 Groq requests / 200,000 tokens** (not that allowance per model). Gemini's configured 200 requests
+is a ceiling, not a verified free entitlement; provider quota errors always stop that model.
+Check the account's actual limits before raising any ceiling.
+[Cloudflare pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) and
+[Groq limits](https://console.groq.com/docs/rate-limits) describe account-level limits.
+
+`planShare=1` replaces the former 80% of 8,000 Neurons; per-model caps no longer partition away usable
+headroom. Five percent of planned calls remain for rejected-item repairs. `GEN_MAX_CALLS` defaults to
+1,000 HTTP attempts per run (including retries and probes); the 25-minute wall clock remains a safety
+limit, not a requirement to spend tokens. Work stops when useful planned threads, time, or free quota
+run out, without filler calls just to consume allowance. Each remaining site gets an equal share of
+the then-unspent pool; the last site can use everything left. Earlier unused capacity is not stranded.
+
+Before **each HTTP attempt**, admission reserves a conservative UTF-8-byte input-token bound
+(including tool schemas and 256 tokens of framing) plus the full configured output cap. Successful
+reported token usage replaces that reservation; missing usage, failures and interrupted calls retain
+the worst-case charge. Gemini/Groq token or request throttles and model retirement switch providers;
+Gemma thinking remains disabled. Crossing UTC midnight stops new requests rather than reusing a stale
+day's allowance.
+
+Paid-capable providers are **disabled by default**. Set repository variables `CF_FREE_ONLY=true`,
+`GROQ_FREE_ONLY=true`, and/or `GEMINI_FREE_ONLY=true` only after verifying that the corresponding
+account/project is **free-tier, cannot bill overflow, and is dedicated to this pipeline**.
+An API key alone does not establish that. OpenRouter is restricted to explicit `:free` model IDs.
+No billing plan or repository variable is changed by this implementation.
+
+The serialized workflow restores a union of per-request ledger artifacts before each site, and uploads
+usage even when generation, validation or the gate fails. Artifact IDs deduplicate past snapshots;
+ledger retrieval/parse failures fail closed. Legacy same-day per-site counters are imported once.
+The ledger uses the current UTC day, even for backdated content. A cancelled runner may lose its final
+artifact; the required provider-side free-tier billing block is the final protection in that case,
+or against unrelated account usage. Independent processes must share `GEN_USAGE_FILE` and must not run
+concurrently. Manifests record complete/dropped roots, uncovered topics, quota stops and shared usage.
+
+These settings are effective only after the code reaches the workflow's branch and the relevant
+free-only attestations are configured; this does not enable any local generator or scheduler.
 
 ## Add a persona
 

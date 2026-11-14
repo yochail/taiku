@@ -6,6 +6,7 @@
 import { BudgetError, LlmError, createClient, expandEnv, llmConfig, probeTools, toolCapsKey } from './llm.mjs';
 import { neuronsFor } from './budget.mjs';
 import { sha256 } from './pipeline-util.mjs';
+import { createFreeBudget } from './free-budget.mjs';
 
 /**
  * Models search: returns { available: Set<name>|null, skipped: [{name, model, reason}] }. A failed
@@ -68,23 +69,25 @@ const estTokens = (s) => Math.ceil(String(s ?? '').length / 4);
  * @param o.plan       planBudget(...) result (per-model plan/reserve); models with no allowance are skipped
  * @param o.makeClient (provider, cfg) => client  (mock clients in offline runs)
  */
-export function createRotation({ config, plan, env = process.env, makeClient = null, fetchImpl, sleep, log = () => {}, caps = {} }) {
+export function createRotation({ config, plan, env = process.env, makeClient = null, fetchImpl, sleep, log = () => {}, caps = {}, freeBudget = null }) {
+  const safety = freeBudget ?? createFreeBudget({ config, used: Object.fromEntries((plan?.models ?? []).map((m) => [m.name, m.usedToday ?? {}])), day: new Date().toISOString().slice(0, 10), maxCalls: plan?.totals?.calls });
   const planBy = new Map((plan?.models ?? []).map((m) => [m.name, m]));
   const planShare = config.planShare ?? 0.8;
   const models = [];
   for (const p of config.providers) {
     const pm = planBy.get(p.name) ?? { plan: p.calls ?? 10, reserve: 1, allowance: p.calls ?? 10 };
     const cfg = llmConfig(env, p);
-    const allowance = pm.allowance ?? pm.plan + pm.reserve;
-    const client = makeClient ? makeClient(p, cfg, allowance) : createClient({ cfg, fetchImpl, maxCalls: Math.max(1, allowance), log, ...(sleep ? { sleep } : {}) });
+    const allowance = pm.capacity ?? pm.allowance ?? pm.plan + pm.reserve;
+    const reserve = pm.capacity == null ? pm.reserve : Math.ceil(allowance * (config.reserveShare ?? 0.05));
+    const client = makeClient ? makeClient(p, cfg, allowance) : createClient({ cfg, fetchImpl, maxCalls: Math.max(1, allowance), reserve: (body) => safety.take(p, body), log, ...(sleep ? { sleep } : {}) });
     models.push({
       p,
       client,
       name: p.name,
       model: p.model,
       role: p.role,
-      plan: pm.plan,
-      reserve: pm.reserve,
+      plan: pm.capacity == null ? pm.plan : allowance - reserve,
+      reserve,
       neuronCap: p.capUnit === 'requests' ? Infinity : p.cap * planShare - (pm.usedToday?.neurons ?? 0),
       neurons: 0,
       r429: 0,
@@ -258,6 +261,7 @@ export function createRotation({ config, plan, env = process.env, makeClient = n
       return models.reduce((s, m) => s + m.neurons, 0);
     },
     usageByName: () => Object.fromEntries(models.map((m) => [m.name, { calls: m.client.calls, neurons: Math.round(m.neurons) }])),
+    freeUsage: () => safety.usage(),
     hasCapacity: (role) => Boolean(order(role, null).find((m) => usable(m, false))),
     caps,
   };

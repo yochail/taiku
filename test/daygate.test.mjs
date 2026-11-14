@@ -9,12 +9,27 @@ import { ROOT, loadPersonas } from '../src/lib/data.mjs';
 import { binomCdf, gateDay, widenBand } from '../src/lib/daygate.mjs';
 import { checkCorpus, loadSpec } from '../src/lib/realism.mjs';
 import { outputPaths, runDaily } from '../src/lib/run.mjs';
+import { loadLlmConfig } from '../src/lib/llm.mjs';
 
 const SCRATCH = path.join(ROOT, 'test', '.daygate-scratch');
 const DATES = ['2026-12-01', '2026-12-02', '2026-12-03', '2026-12-04', '2026-12-05'];
 // Product choices, not realism: mock GIFs never come from GIPHY.
 const PRODUCT_CHOICE = new Set(['media.gif.giphy_share']);
 const spec = loadSpec();
+delete spec.sampling.conversation.daily_reactions;
+// Pin the old cascade's recipe; deep-thread policies have separate integration coverage.
+const legacyCaps = {
+  'cf-llama-3.3-70b': [4000, 35], 'cf-gemma-4-26b': [1500, 30],
+  'cf-gemma-4-26b-micro': [1300, 50], 'cf-gpt-oss-120b': [1000, 10],
+  'gemini-3.5-flash': [200, 40], 'or-nemotron-3-ultra': [25, 20],
+  'or-nemotron-3.5-super': [20, 16], 'groq-gpt-oss-120b': [1000, 25],
+  'groq-qwen3.8-27b': [1000, 50],
+};
+const config = loadLlmConfig();
+const llmConfig = { ...config, freePools: {}, totalCap: { cap: 8000 }, planShare: 0.8, reserveShare: 0.1,
+  targetCalls: { min: 50, max: 90 }, providers: config.providers.map((p) => ({
+    ...p, cap: legacyCaps[p.name][0], calls: legacyCaps[p.name][1],
+  })) };
 const personas = loadPersonas();
 const days = new Map();
 const fileOf = (date) => outputPaths(SCRATCH, date, { mock: true }).posts;
@@ -27,7 +42,7 @@ before(async () => {
   fs.rmSync(SCRATCH, { recursive: true, force: true });
   fs.mkdirSync(SCRATCH, { recursive: true });
   for (const [i, date] of DATES.entries()) {
-    const r = await runDaily({ date, mock: true, quiet: true, seed: `gate${i}`, nonce: `n${i}`, spec, personas, env: {}, root: SCRATCH });
+    const r = await runDaily({ date, mock: true, quiet: true, seed: `gate${i}`, nonce: `n${i}`, spec, personas, env: {}, root: SCRATCH, llmConfig, maxCalls: 90 });
     assert.equal(r.status, 'complete', `${date}: ${r.errors?.slice(0, 3).join('; ')}`);
     days.set(date, JSON.parse(fs.readFileSync(fileOf(date), 'utf8')).posts);
   }

@@ -52,7 +52,7 @@ if (gateFiles.length) {
     const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
     const posts = doc.posts ?? doc;
     const ids = new Set(posts.map((p) => p.id));
-    const g = gateDay({ posts, context: everything.filter((p) => !ids.has(p.id)), personas, spec, label: path.basename(file) });
+    const g = gateDay({ posts, context: everything.filter((p) => !ids.has(p.id)), personas, spec, label: path.basename(file), threadPolicy: doc.threadPolicy ? spec.sampling.conversation?.daily_reactions : null });
     if (!g.ok) failed++;
     const warns = g.checks.filter((c) => c.status === 'warn');
     if (strict && g.ok && warns.length) failed++;

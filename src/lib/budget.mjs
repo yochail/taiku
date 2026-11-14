@@ -34,7 +34,7 @@ export function saveUsage(file, day, models) {
  * @param o.maxCalls hard cap on total HTTP calls (GEN_MAX_CALLS)
  * @returns { models: [...], roles: {voice|batch|micro|fallback: {calls, plan, reserve}}, totals, content }
  */
-export function planBudget({ config, used = {}, available = null, maxCalls = Infinity, maxTopics = 6 } = {}) {
+export function planBudget({ config, used = {}, available = null, maxCalls = Infinity, maxTopics = 6, threadPolicy = null, shares = 1 } = {}) {
   const planShare = config.planShare ?? 0.8;
   const reserveShare = config.reserveShare ?? 0.1;
   const target = config.targetCalls ?? { min: 50, max: 90 };
@@ -48,10 +48,21 @@ export function planBudget({ config, used = {}, available = null, maxCalls = Inf
     if (Number.isFinite(p.calls)) allowance = Math.min(allowance, p.calls - (u.calls ?? 0));
     return { name: p.name, model: p.model, role: p.role, capUnit: p.capUnit, cap: p.cap, perCall: Math.round(perCall * 10) / 10, usedToday: u, allowance: Math.max(0, allowance) };
   });
+  if (threadPolicy) for (const m of models) m.capacity = m.allowance;
   // Global Neuron cap (shared pool) and the total-call target / GEN_MAX_CALLS.
-  const neuronCap = (config.totalCap?.cap ?? Infinity) - models.reduce((s, m) => s + (m.usedToday.neurons ?? 0), 0);
+  const neuronCap = Math.max(0, ((config.totalCap?.cap ?? Infinity) - models.reduce((s, m) => s + (m.usedToday.neurons ?? 0), 0)) / shares);
+  for (const [key, quota] of Object.entries(config.freePools ?? {})) {
+    const group = models.filter((m) => config.providers.find((p) => p.name === m.name).keyEnv === key);
+    const remaining = Math.max(0, (quota.calls - group.reduce((s, m) => s + (m.usedToday.calls ?? 0), 0)) / shares);
+    const total = group.reduce((s, m) => s + m.allowance, 0);
+    if (total > remaining) for (const m of group) m.allowance = Math.floor(m.allowance * remaining / total);
+  }
   const maxTotal = Math.min(target.max ?? Infinity, maxCalls);
   const spend = () => models.reduce((s, m) => s + m.allowance * m.perCall, 0);
+  if (spend() > neuronCap) {
+    const scale = neuronCap / spend();
+    for (const m of models) if (m.perCall > 0) m.allowance = Math.floor(m.allowance * scale);
+  }
   // 1) Neuron cap (Workers AI only): trim micro first, voice last.
   const order = ['micro', 'fallback', 'batch', 'voice'];
   for (let guard = 0; guard < 5000 && spend() > neuronCap; guard++) {
@@ -87,11 +98,19 @@ export function planBudget({ config, used = {}, available = null, maxCalls = Inf
   const sum = (k) => order.reduce((t, r) => t + roles[r][k], 0);
   const totals = { calls: sum('calls'), plan: sum('plan'), reserve: sum('reserve'), neurons: Math.round(spend()), neuronCap: Math.round(neuronCap), targetMin: target.min, targetMax: target.max };
   totals.degraded = totals.calls < (target.min ?? 0);
-  return { models, roles, totals, content: contentPlan({ voice: roles.voice.plan + Math.floor(roles.fallback.plan / 2), batch: roles.batch.plan, micro: roles.micro.plan, maxTopics }) };
+  return { models, roles, totals, content: contentPlan({ voice: roles.voice.plan + Math.floor(roles.fallback.plan / 2), batch: roles.batch.plan, micro: roles.micro.plan, maxTopics, threadPolicy }) };
 }
 
 /** Convert per-role call budgets into a content plan. */
-export function contentPlan({ voice = 0, batch = 0, micro = 0, maxTopics = 6 }) {
+export function contentPlan({ voice = 0, batch = 0, micro = 0, maxTopics = 6, threadPolicy = null }) {
+  if (threadPolicy) {
+    const singleTurns = Math.floor(voice / CALLS_PER_TURN);
+    const roots = Math.min(Math.floor((singleTurns + batch) / 3), Math.floor(batch / 2));
+    return { topics: Math.min(maxTopics, roots), originals: roots, singleTurns: Math.min(singleTurns, roots),
+      llmReplies: roots * threadPolicy.target, llmItems: roots * (1 + threadPolicy.target),
+      threadPolicy, microPool: 0, selfThreads: 0, openerBatches: 0, standaloneBatches: 0,
+      replyBatches: roots * 2, shortBatches: 0 };
+  }
   const singleTurns = Math.floor(voice / CALLS_PER_TURN);
   const microPool = micro >= 3 ? 1 : 0;
   const topics = batch > 0 ? Math.max(1, Math.min(maxTopics, Math.round(batch / 4))) : Math.max(singleTurns > 0 ? 1 : 0, Math.min(maxTopics, Math.floor(singleTurns / 3)));
