@@ -25,7 +25,7 @@ import { createSampler, replyFormOf } from './realism.mjs';
 import { planMedia } from './media.mjs';
 import { createGiphyClient } from './giphy.mjs';
 import { MAX_DEPTH, calibrate, cascade, createReactor, relationOf } from './react.mjs';
-import { MOVE_ARCHETYPES, conversationOf, pickMove, turnOf } from './conversation.mjs';
+import { MOVE_ARCHETYPES, conversationOf, pickMove, reactionCount, turnOf } from './conversation.mjs';
 import { mentionDebts, mentionDecision, resurface } from './followon.mjs';
 import { mentionTargets } from './tags.mjs';
 import { FEEDS, domainOf, fetchPool, fixtureFetch, sanitizeUntrusted } from './news.mjs';
@@ -216,11 +216,13 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
       const candidates = active.filter((p) => p.id !== pid);
       const first = [];
       const used = new Set();
-      for (let j = 0; j < content.threadPolicy.target; j++) {
-        const parent = j < 3 ? root : first[(j - 3) % first.length];
+      const reactions = reactionCount(seededRng('reaction-count', seed, nonce, root.id), content.threadPolicy, author);
+      root.plannedReactions = reactions;
+      for (let j = 0; j < reactions; j++) {
+        const parent = j < 2 ? root : first[(j - 2) % first.length];
         const fresh = candidates.filter((p) => p.id !== parent.authorId && !used.has(p.id));
         const pool = fresh.length ? fresh : candidates.filter((p) => p.id !== parent.authorId);
-        const replyId = j === 3 ? pid : weightedPick(rand, pool.map((p) => [p.id,
+        const replyId = j === 2 ? pid : weightedPick(rand, pool.map((p) => [p.id,
           (p.reactivity ?? 3) * (0.2 + topicAffinity(p, root.vector)) *
           (conversationOf(spec).relation_boost[relationOf(p, author)] ?? 1) / (1 + (replied.get(p.id) ?? 0))]));
         const persona = active.find((p) => p.id === replyId);
@@ -235,7 +237,7 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
           rel: relationOf(persona, personas.find((p) => p.id === parent.authorId)), pairAuthor: parent.authorId,
           turn: turnOf(parent, persona.id), mentions: new Set([parent.authorId]) });
         nodes.push(reply);
-        if (j < 3) first.push(reply);
+        if (j < 2) first.push(reply);
         reactor.force(parent, persona.id, 'reply', 'minimum-thread', reply.createdAt);
       }
     }
@@ -533,7 +535,9 @@ export async function runDaily(opts = {}) {
   const threadPolicy = spec.sampling.conversation?.daily_reactions ?? null;
   const shares = Math.max(1, Number(env.GEN_REMAINING_SITES) || 1);
   const budget = planBudget({ config, used: usedToday, available: discovery.available, maxCalls, threadPolicy, shares });
-  const content = prev?.nonce === nonce && prev?.budgetPlan?.content ? prev.budgetPlan.content : budget.content;
+  const reusePlan = prev?.nonce === nonce && prev?.budgetPlan?.content &&
+    JSON.stringify(prev.budgetPlan.content.threadPolicy ?? null) === JSON.stringify(threadPolicy);
+  const content = reusePlan ? prev.budgetPlan.content : budget.content;
   log(`budget: ${budget.models.map((m) => `${m.name} ${m.plan}+${m.reserve}`).join(', ')} → ~${budget.totals.neurons} Neurons; plan ${JSON.stringify(content)}`);
 
   // 2) Topics (reused on resume).
@@ -703,7 +707,8 @@ export async function runDaily(opts = {}) {
       const capped = [...noveltyOf(persona).capped];
       if (capped.length) spec1.avoid = capped;
     }
-    const t = { taskId: n.id, kind: n.kind ?? n.role, role: spec1.role, exec: n.exec, form: n.form ?? null, level: n.kind === 'thread-part' ? 0 : n.depth ?? 0, personaId: n.authorId, postId: spec1.postId, parentTaskId: n.parent ?? n.quoteOf ?? null, topicId: n.topicId, at: iso(n.createdAt), archetype: spec1.archetype, media: spec1.media, status: 'pending', spec: spec1 };
+    const t = { taskId: n.id, kind: n.kind ?? n.role, role: spec1.role, exec: n.exec, form: n.form ?? null, level: n.kind === 'thread-part' ? 0 : n.depth ?? 0, personaId: n.authorId, postId: spec1.postId, parentTaskId: n.parent ?? n.quoteOf ?? null, topicId: n.topicId, at: iso(n.createdAt), archetype: spec1.archetype, media: spec1.media, status: 'pending', spec: spec1,
+      ...(n.plannedReactions != null ? { plannedReactions: n.plannedReactions } : {}) };
     t.sig = sig(t);
     return t;
   });
@@ -1153,7 +1158,7 @@ export async function runDaily(opts = {}) {
   // One image/meme/chart per corpus, one reaction GIF per day and conversation (deterministic order).
   const uniq = enforceUniqueVisuals(built, others);
   const uniquePosts = built.filter((p) => !uniq.drop.has(p.id));
-  const threadResult = threadPolicy ? completeThreads(uniquePosts, threadPolicy.min) : null;
+  const threadResult = threadPolicy ? completeThreads(uniquePosts, threadPolicy.min, threadPolicy.max) : null;
   const posts = threadResult?.posts ?? uniquePosts;
   const retaiks = retaikRows({ posts, byId, sampler: createSampler(spec, `retaik:${seed}:${nonce}`), pairSampler: (k) => createSampler(spec, `retaik:${seed}:${nonce}:${k}`), key: `${seed}:${nonce}`, prefix, date, runId, origin });
   const allPosts = [...posts, ...retaiks];

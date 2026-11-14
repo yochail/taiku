@@ -50,6 +50,15 @@ export function conversationOf(spec) {
   return { ...DEFAULT_CONVERSATION, ...c, relation_boost: { ...DEFAULT_CONVERSATION.relation_boost, ...(c.relation_boost ?? {}) } };
 }
 
+export function reactionCount(rand, policy, persona) {
+  const { min, max, weights } = policy;
+  if (!Number.isInteger(min) || min < 3 || !Number.isInteger(max) || max < min ||
+    !Array.isArray(weights) || weights.length !== max - min + 1 ||
+    weights.some((w) => !Number.isFinite(w) || w <= 0)) throw new Error('invalid daily reaction distribution');
+  const bias = ((persona.popularity ?? 5) - 5) / 10 + ((persona.reactivity ?? 3) - 3) / 4;
+  return weightedPick(rand, weights.map((w, i) => [min + i, w * Math.exp(bias * (min + i - (min + max) / 2))]));
+}
+
 /**
  * Turn number of a reply by `authorId` to `parent` in an A↔B exchange: 1 for a first reply, n+1
  * when answering the person who just replied to you (parent is a reply aimed at authorId).

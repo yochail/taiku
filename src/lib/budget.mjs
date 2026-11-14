@@ -105,11 +105,13 @@ export function planBudget({ config, used = {}, available = null, maxCalls = Inf
 export function contentPlan({ voice = 0, batch = 0, micro = 0, maxTopics = 6, threadPolicy = null }) {
   if (threadPolicy) {
     const singleTurns = Math.floor(voice / CALLS_PER_TURN);
-    const roots = Math.min(Math.floor((singleTurns + batch) / 3), Math.floor(batch / 2));
+    // Two reply levels, each potentially split into full/short batches; reserve for the upper draw.
+    const replyCalls = 2 * Math.ceil(threadPolicy.max / REPLIES_PER_BATCH);
+    const roots = Math.min(Math.floor((singleTurns + batch) / (1 + replyCalls)), Math.floor(batch / replyCalls));
     return { topics: Math.min(maxTopics, roots), originals: roots, singleTurns: Math.min(singleTurns, roots),
-      llmReplies: roots * threadPolicy.target, llmItems: roots * (1 + threadPolicy.target),
+      llmReplies: roots * threadPolicy.max, llmItems: roots * (1 + threadPolicy.max),
       threadPolicy, microPool: 0, selfThreads: 0, openerBatches: 0, standaloneBatches: 0,
-      replyBatches: roots * 2, shortBatches: 0 };
+      replyBatches: roots * replyCalls, shortBatches: 0 };
   }
   const singleTurns = Math.floor(voice / CALLS_PER_TURN);
   const microPool = micro >= 3 ? 1 : 0;

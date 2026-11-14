@@ -113,10 +113,11 @@ export function gateDay({ posts, context = [], personas, spec, label = 'day', th
   // 2) Hard checks.
   if (threadPolicy) {
     const coverage = threadCoverage(day);
-    const shallow = coverage.roots.filter((p) => coverage.counts.get(p.id) < threadPolicy.min);
-    add({ id: 'hard.thread_reactions', status: shallow.length || !coverage.roots.length ? 'fail' : 'pass',
-      value: shallow.length, n: coverage.roots.length, min: 0, max: 0, blocking: true,
-      detail: shallow.map((p) => `${p.id}: ${coverage.counts.get(p.id)} replies, need ${threadPolicy.min}`) });
+    const outside = coverage.roots.filter((p) => coverage.counts.get(p.id) < threadPolicy.min ||
+      coverage.counts.get(p.id) > threadPolicy.max);
+    add({ id: 'hard.thread_reactions', status: outside.length || !coverage.roots.length ? 'fail' : 'pass',
+      value: outside.length, n: coverage.roots.length, min: 0, max: 0, blocking: true,
+      detail: outside.map((p) => `${p.id}: ${coverage.counts.get(p.id)} replies, need ${threadPolicy.min}-${threadPolicy.max}`) });
   }
   const mediaItems = authored.flatMap((p) => mediaOf(p)).length;
   add({ id: 'hard.media_items', status: mediaItems >= (gate.min_media_items ?? 1) ? 'pass' : 'fail', value: mediaItems, n: authored.length, min: gate.min_media_items ?? 1, max: null, blocking: true });

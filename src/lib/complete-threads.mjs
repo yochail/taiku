@@ -20,9 +20,10 @@ export function threadCoverage(posts) {
   return { roots, counts, rootOf };
 }
 
-export function completeThreads(posts, min) {
+export function completeThreads(posts, min, max = Infinity) {
   const coverage = threadCoverage(posts);
-  const keep = new Set(coverage.roots.filter((p) => coverage.counts.get(p.id) >= min).map((p) => p.id));
+  const keep = new Set(coverage.roots.filter((p) => coverage.counts.get(p.id) >= min &&
+    coverage.counts.get(p.id) <= max).map((p) => p.id));
   return { posts: posts.filter((p) => keep.has(coverage.rootOf(p))), roots: keep.size,
     droppedRoots: coverage.roots.length - keep.size };
 }

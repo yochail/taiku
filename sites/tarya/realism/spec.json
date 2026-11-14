@@ -35,10 +35,10 @@
     },
     "conversation": {
       "daily_reactions": {
-        "min": 4, "target": 5, "substantive_reply_probability": 0.4,
+        "min": 3, "max": 8, "weights": [1, 2, 3, 3, 2, 1], "substantive_reply_probability": 0.4,
         "metrics": {
-          "activity.original_share": { "min": 0.1, "max": 0.2 },
-          "activity.reply_share": { "min": 0.75, "max": 0.9 },
+          "activity.original_share": { "min": 0.1, "max": 0.25 },
+          "activity.reply_share": { "min": 0.7, "max": 0.9 },
           "activity.quote_share": { "min": 0, "max": 0.05 },
           "threads.zero_reply_root_share": { "min": 0, "max": 0 },
           "threads.depth1_share_of_conversations": { "min": 0, "max": 0.25 },
