@@ -45,3 +45,14 @@ test('diagnostics show safe failure stage and status, but omit unexpected privat
   assert.match(verificationFailure(error), /Event rejected \(HTTP 429\); no SQL query performed/);
   assert.doesNotMatch(verificationFailure(new Error('secret-token private-account response')), /secret-token|private-account|response$/);
 });
+test('read-only verification checks recent delivery without adding another test event', async () => {
+  const calls = [];
+  await verifyEngagement({ ...opts, readOnly: true, fetcher: async (url, init) => {
+    calls.push({ url, init });
+    return url.endsWith('.json') ? Response.json({ site: 'taiku', posts: ['p1'] })
+      : Response.json({ data: [{ events: 1 }] });
+  } });
+  assert.equal(calls.length, 2);
+  assert.ok(calls[1].url.endsWith('/analytics_engine/sql'));
+  assert.match(calls[1].init.body, /blob3 = 'taiku'/);
+});
