@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { verifyEngagement } from '../scripts/verify-engagement.mjs';
+import { verifyEngagement, verificationFailure } from '../scripts/verify-engagement.mjs';
 
 const opts = { site: 'taiku', origin: 'https://site.example', account: 'a'.repeat(32), token: 'fixture-token', pause: async () => {} };
 test('deployment propagates piped Wrangler errors rather than claiming publication succeeded', () => {
@@ -34,4 +34,14 @@ test('rejected events are never retried or queried; missing delivery makes only 
   writes = 0;
   await assert.rejects(verifyEngagement({ ...opts, fetcher: fetcher(204) }), /not observed/);
   assert.equal(writes, 1); assert.equal(reads, 3);
+});
+test('diagnostics show safe failure stage and status, but omit unexpected private errors', async () => {
+  let error;
+  try {
+    await verifyEngagement({ ...opts, fetcher: async (url) => url.endsWith('.json')
+      ? Response.json({ site: 'taiku', posts: ['p1'] })
+      : new Response(null, { status: 429 }) });
+  } catch (failure) { error = failure; }
+  assert.match(verificationFailure(error), /Event rejected \(HTTP 429\); no SQL query performed/);
+  assert.doesNotMatch(verificationFailure(new Error('secret-token private-account response')), /secret-token|private-account|response$/);
 });
