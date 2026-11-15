@@ -156,6 +156,41 @@ there is no automated refresh/read workload here. The newer
 [Cloudflare Analytics SQL API](https://developers.cloudflare.com/analytics/sql-api/)
 also exposes `events.analyticsEngine.visitor_engagement`, using its own scope and SQL syntax.
 
+### Optional Google Analytics 4
+
+GA4 is separate from the anonymous Cloudflare counts and **off unless a pack explicitly
+enables it**. To configure it, create a free **standard** GA4 web stream for each
+site (or use one shared stream), then set `analytics.ga4MeasurementId` to its public
+`G-...` ID in each pack's `site.json`. Set `analytics.ga4Enabled` to `true` only after
+the privacy settings below are verified, then deploy. No Google API secret belongs in
+the repository. In each stream disable **Enhanced Measurement**, connected site tags,
+Google signals and advertising/personalization features; do not link advertising
+products. Review Google's settings and applicable consent obligations before activation.
+The [Google tag privacy settings](https://developers.google.com/tag-platform/security/guides/privacy)
+and [CSP guidance](https://developers.google.com/tag-platform/security/guides/csp#google_analytics)
+describe the tag's behavior.
+
+The Google tag is not loaded or contacted until the visitor explicitly allows it.
+The choice is stored per site in local storage and can be withdrawn under **You →
+Analytics settings**. The existing general engagement opt-out, Global Privacy Control
+and Do Not Track also prevent Google loading. Withdrawal stops future collection but
+does not delete previously sent data or existing Google cookies; clear browser site
+data to remove the latter. Unlike the Cloudflare dataset, Google may process IP and
+device/network data and uses analytics cookies/identifiers. The tag disables automatic
+page views and ad signals, scopes its cookies to the current host, and explicitly supplies only the site origin rather than
+the current URL, title or referrer; Google also collects its own standard metadata.
+Consent to Google does not change Cloudflare settings.
+
+In **Reports → Engagement → Events**, look for `engagement_like`,
+`engagement_bookmark`, `engagement_follow`, `engagement_share` and
+`engagement_poll_vote`. These are real action counts with the same addition, click,
+per-page deduplication and accepted-vote semantics as above, but only among Google-consenting
+visitors; they are not comparable as complete totals to Cloudflare's counts. No target ID,
+poll option or contact form content is sent in our custom event parameters. Google's
+own tag may emit standard events; reports are delayed and may be subject to Google
+sampling or reporting limits. Verify each site using Google Analytics Realtime/DebugView
+after granting consent, then test withdrawal and privacy signals.
+
 ## How it works
 
 - **Personas.** Each thinker is one JSON file: biography, core ideas, key works, voice, temperament, allies and rivals, posting habits, and a list of verified quotations with sources. Those files steer every generated post.

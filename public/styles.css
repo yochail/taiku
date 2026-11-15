@@ -530,6 +530,10 @@ button.act { background: none; border: 0; font: inherit; cursor: pointer; border
 .me-avatar { --c: #536471; color: #fff; }
 .me-avatar svg { width: 56px; height: 56px; fill: currentColor; }
 .me-note { margin-block: 12px 4px; margin-inline: 16px; padding: 10px 12px; border-radius: 12px; background: var(--bg2); color: var(--muted); font-size: 14px; line-height: 1.4; }
+.ga4-consent { position: fixed; z-index: 70; inset-inline: 12px; inset-block-end: 72px; max-width: 600px; max-height: 60vh; overflow-y: auto; margin-inline: auto; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg2); font-size: 14px; }
+.ga4-consent[hidden] { display: none; }
+.ga4-consent p { margin-block: 0 12px; }
+.ga4-consent .btn { margin-inline-end: 8px; }
 .me-tabs { border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
 .me-tabs [role='tab'] { flex: 1 0 auto; padding-inline: 14px; }
 .me-chips { padding-block: 16px; }

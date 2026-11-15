@@ -35,6 +35,16 @@ const STR = {
   noTagPosts: (tag) => t('tag.empty', { tag }),
 };
 const OUT = OUT_DIR;
+const GA4_CONFIG = SITE_CONFIG.analytics;
+const GA4_MEASUREMENT_ID = GA4_CONFIG?.ga4MeasurementId;
+if ((GA4_MEASUREMENT_ID != null && (typeof GA4_MEASUREMENT_ID !== 'string' || !/^G-[A-Z0-9]{4,20}$/.test(GA4_MEASUREMENT_ID)))
+  || (GA4_CONFIG?.ga4Enabled === true && !GA4_MEASUREMENT_ID)) {
+  throw new Error('site.json analytics.ga4MeasurementId must be a valid Google Analytics measurement ID');
+}
+if (GA4_CONFIG?.ga4Enabled != null && typeof GA4_CONFIG.ga4Enabled !== 'boolean') {
+  throw new Error('site.json analytics.ga4Enabled must be a boolean');
+}
+const GA4_ID = GA4_CONFIG?.ga4Enabled === true ? GA4_MEASUREMENT_ID : null;
 const LOGO = esc(SITE_CONFIG.logo ?? SITE.name[0]);
 const CLIENT_I18N = clientStrings();
 const PAGE_SIZE = 25;
@@ -59,7 +69,7 @@ const storyKey = (p) => (p.type === 'retaik' && p.retaikOf && idx.byId.has(p.ret
 const dedupeStories = (list) => { const seen = new Set(); return list.filter((p) => !seen.has(storyKey(p)) && seen.add(storyKey(p))); };
 const feedRoots = dedupeStories(roots);
 const url = (p) => SITE.baseUrl + p;
-const assetVersion = hash(fs.readFileSync(path.join(ROOT, 'public', 'styles.css'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'rank.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'engagement.js'), 'utf8')).toString(36);
+const assetVersion = hash(fs.readFileSync(path.join(ROOT, 'public', 'styles.css'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'app.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'rank.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'engagement.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'public', 'ga4.js'), 'utf8')).toString(36);
 const SITE_CSS_FILE = path.join(SITE_DIR, 'public', 'site.css');
 const SITE_CSS = SITE_DIR !== ROOT && fs.existsSync(SITE_CSS_FILE) ? `\n<link rel="stylesheet" href="/site.css?v=${hash(fs.readFileSync(SITE_CSS_FILE, 'utf8')).toString(36)}">` : '';
 const BUILD_ID = hash(`${assetVersion}|${posts.length}|${BUILD_TIME}`).toString(36);
@@ -481,7 +491,7 @@ function layout({ title, description, pathname, body, ld = [], ogType = 'website
     .map(([href, label, icon]) => `<a href="${href}"${pathname === href ? ' aria-current="page"' : ''}><span class="ni">${icon}</span><span class="nl">${label}</span></a>`)
     .join('');
   return `<!doctype html>
-<html lang="${esc(SITE.locale)}"${DIR === 'rtl' ? ' dir="rtl"' : ''}${HTML_CA}>
+<html lang="${esc(SITE.locale)}"${DIR === 'rtl' ? ' dir="rtl"' : ''}${HTML_CA}${GA4_ID ? ` data-ga4="${GA4_ID}"` : ''}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -540,7 +550,14 @@ ${ld.map(jsonLd).join('\n')}
 <nav class="tabbar" aria-label="${t('nav.sectionsAria')}">${tabbar(pathname)}</nav>
 <button class="fab" type="button" data-gate="post" aria-label="${t('nav.post')}">${ICONS.compose}</button>
 <div class="toast" role="status" aria-live="polite"></div>
+${GA4_ID ? `<section class="ga4-consent" data-ga4-consent hidden aria-label="${esc(t('ga4.title'))}">
+<p>${esc(t('ga4.notice'))} <a href="/me/#analytics-settings">${esc(t('ga4.settings'))}</a></p>
+<button type="button" class="btn btn-ghost" data-ga4-choice="accept">${esc(t('ga4.accept'))}</button>
+<button type="button" class="btn btn-ghost" data-ga4-choice="decline">${esc(t('ga4.decline'))}</button>
+<p data-ga4-error role="alert" hidden>${esc(t('ga4.storageError'))}</p>
+</section>` : ''}
 ${CLIENT_I18N}<script src="/engagement.js?v=${assetVersion}" defer></script>
+${GA4_ID ? `<script src="/ga4.js?v=${assetVersion}" defer></script>` : ''}
 <script src="/rank.js?v=${assetVersion}" defer></script>
 <script src="/app.js?v=${assetVersion}" defer></script>
 </body>
@@ -593,7 +610,8 @@ function mePage() {
   <div class="profile-top"><span class="avatar xl me-avatar" aria-hidden="true">${ICONS.user}</span></div>
   <h2 class="p-name">${esc(t('me.title'))}</h2><div class="handle">${esc(t('me.handle'))}</div>
   <p class="me-note">${esc(t('me.note'))}</p>
-  <p class="me-note">${esc(t('me.analytics'))} <label><input type="checkbox" data-engagement-opt-out> ${esc(t('me.analyticsOptOut'))}</label></p>
+  <p class="me-note"${GA4_ID ? ' id="analytics-settings"' : ''}>${esc(t('me.analytics'))} <label><input type="checkbox" data-engagement-opt-out> ${esc(t('me.analyticsOptOut'))}</label></p>
+  ${GA4_ID ? `<p class="me-note">${esc(t('ga4.notice'))} <label><input type="checkbox" data-ga4-preference> ${esc(t('ga4.preference'))}</label> ${esc(t('ga4.signal'))}</p><p data-ga4-error role="alert" hidden>${esc(t('ga4.storageError'))}</p>` : ''}
   <div class="p-stats"><a href="#following" data-mtab-link="following"><b data-me-n="follows">0</b> ${esc(STR.following)}</a><a href="#topics" data-mtab-link="topics"><b data-me-n="topics">0</b> ${esc(t('topic.topics'))}</a></div>
 </section>
 <div class="feed-tabs me-tabs" role="tablist" aria-label="${esc(t('me.title'))}">${tabs}</div>
@@ -1099,7 +1117,7 @@ function searchPage() {
 /** PWA: offline fallback page and a service worker whose cache name follows the build. */
 function pwa() {
   write('/offline.html', layout({ title: t('offline.title'), description: t('offline.desc'), pathname: '/offline.html', noindex: true, body: `<div class="offline-msg"><span class="logo">${LOGO}</span><h2>${t('offline.heading')}</h2><p>${t('offline.text')}</p><a class="btn" href="/">${t('offline.retry')}</a></div>` }), { inSitemap: false });
-  const shell = ['/offline.html', `/styles.css?v=${assetVersion}`, `/engagement.js?v=${assetVersion}`, `/rank.js?v=${assetVersion}`, `/app.js?v=${assetVersion}`, '/favicon.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png']
+  const shell = ['/offline.html', `/styles.css?v=${assetVersion}`, `/engagement.js?v=${assetVersion}`, ...(GA4_ID ? [`/ga4.js?v=${assetVersion}`] : []), `/rank.js?v=${assetVersion}`, `/app.js?v=${assetVersion}`, '/favicon.svg', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png']
     .filter((u) => !/^\/(favicon|manifest|icons)/.test(u) || fs.existsSync(publicFile(u.slice(1))));
   const sw = fs.readFileSync(path.join(ROOT, 'public', 'sw.js'), 'utf8').replace("'__VERSION__'", JSON.stringify(BUILD_ID)).replace('__SHELL__', JSON.stringify(shell));
   fs.writeFileSync(path.join(OUT, 'sw.js'), sw);
@@ -1204,6 +1222,17 @@ fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 fs.cpSync(path.join(ROOT, 'public'), OUT, { recursive: true });
 if (SITE_DIR !== ROOT && fs.existsSync(path.join(SITE_DIR, 'public'))) fs.cpSync(path.join(SITE_DIR, 'public'), OUT, { recursive: true });
+if (GA4_ID) {
+  const headersPath = path.join(OUT, '_headers');
+  const originalHeaders = fs.readFileSync(headersPath, 'utf8');
+  if (!originalHeaders.includes("script-src 'self'") || !originalHeaders.includes("connect-src 'self'")) {
+    throw new Error('Configured GA4 requires script-src and connect-src self directives in _headers');
+  }
+  const headers = originalHeaders
+    .replace("script-src 'self'", "script-src 'self' https://www.googletagmanager.com")
+    .replace("connect-src 'self'", "connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.google.com");
+  fs.writeFileSync(headersPath, headers);
+}
 const mediaOut = writeMediaFiles(posts, OUT);
 mediaByPost = mediaOut.byPost;
 feedPages();

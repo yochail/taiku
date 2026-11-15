@@ -19,10 +19,21 @@
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
   };
   const engagement = globalThis.TaikuEngagement.create(store);
+  const ga4 = globalThis.TaikuGA4?.create(root.dataset.ga4, store);
   const analyticsOptOut = document.querySelector('[data-engagement-opt-out]');
   if (analyticsOptOut) {
     analyticsOptOut.checked = engagement.optedOut();
-    analyticsOptOut.addEventListener('change', () => store.set('engagementOptOut', analyticsOptOut.checked));
+    analyticsOptOut.addEventListener('change', () => {
+      store.set('engagementOptOut', analyticsOptOut.checked);
+      if (ga4) {
+        globalThis[`ga-disable-${root.dataset.ga4}`] = true;
+        if (store.get('engagementOptOut', false) !== analyticsOptOut.checked) {
+          document.querySelectorAll('[data-ga4-error]').forEach((error) => { error.hidden = false; });
+          return;
+        }
+        location.reload();
+      }
+    });
   }
 
   const btn = document.querySelector('.theme-toggle');
@@ -145,8 +156,10 @@
   };
   const sendVote = (id, opt, trusted) => {
     if (!API) return;
+    const gaAllowedAtClick = ga4?.allowed() === true;
     fetch(`/api/poll/${encodeURIComponent(id)}`, { method: 'POST', headers: { 'content-type': 'application/json', ...(engagement.optedOut() || !trusted ? { 'x-engagement-opt-out': '1' } : {}) }, body: JSON.stringify({ opt }) })
       .then((r) => r.json().then((d) => {
+        ga4?.trackAcceptedVote(r, id, trusted, gaAllowedAtClick);
         // 409: this browser/network already voted (e.g. storage was cleared), so the totals include that vote.
         if ((r.ok || r.status === 409) && d?.c) { real[id] = { c: d.c, at: d.at }; sent[id] = d.at; store.set('pollSent', sent); repaintPoll(id); }
       }))
@@ -237,6 +250,7 @@
       likes.has(id) ? likes.delete(id) : likes.add(id);
       store.set('likes', [...likes]);
       engagement.track('like', id, likes.has(id), e.isTrusted);
+      ga4?.track('like', id, likes.has(id), e.isTrusted);
       document.querySelectorAll(`[data-like="${CSS.escape(id)}"]`).forEach(paintLike);
       if (likes.has(id)) { like.classList.remove('pop'); void like.offsetWidth; like.classList.add('pop'); bumpAffinity(like.closest('[data-author]')?.dataset.author, 1); }
       return;
@@ -247,6 +261,7 @@
       marks.has(id) ? marks.delete(id) : marks.add(id);
       store.set('bookmarks', [...marks]);
       engagement.track('bookmark', id, marks.has(id), e.isTrusted);
+      ga4?.track('bookmark', id, marks.has(id), e.isTrusted);
       document.querySelectorAll(`[data-bookmark="${CSS.escape(id)}"]`).forEach(paintMark);
       toast(marks.has(id) ? S('bmAdded', 'Added to your Bookmarks') : S('bmRemoved', 'Removed from your Bookmarks'));
       return;
@@ -256,6 +271,7 @@
       const u = new URL(share.dataset.share, location.origin).href;
       const shareId = /^\/p\/([A-Za-z0-9_.-]{1,80})\/$/.exec(new URL(u).pathname)?.[1];
       engagement.track('share', shareId, true, e.isTrusted);
+      ga4?.track('share', shareId, true, e.isTrusted);
       if (navigator.share) navigator.share({ url: u }).catch(() => {});
       else if (navigator.clipboard) navigator.clipboard.writeText(u).then(() => toast(S('copied', 'Copied to clipboard')), () => toast(u));
       else toast(u);
@@ -489,6 +505,7 @@
     const on = !follows.has(id);
     on ? follows.add(id) : follows.delete(id);
     engagement.track('follow', id, on, e.isTrusted);
+    ga4?.track('follow', id, on, e.isTrusted);
     saveFollows();
     document.querySelectorAll(`[data-follow="${CSS.escape(id)}"]`).forEach(paintFollow);
     document.querySelectorAll(`[data-followers="${CSS.escape(id)}"]`).forEach(paintFollowers);
