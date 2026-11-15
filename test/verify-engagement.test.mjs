@@ -1,8 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { verifyEngagement } from '../scripts/verify-engagement.mjs';
 
 const opts = { site: 'taiku', origin: 'https://site.example', account: 'a'.repeat(32), token: 'fixture-token', pause: async () => {} };
+test('deployment propagates piped Wrangler errors rather than claiming publication succeeded', () => {
+  const workflow = fs.readFileSync(new URL('../.github/workflows/deploy.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /run: \|\n\s+set -euo pipefail[\s\S]*wrangler deploy --config "\$cfg" \| tee deploy\.log/);
+});
 test('verification sends one minimal test event and bounded SQL reads, with no credential forwarded to the site', async () => {
   const calls = [];
   const result = await verifyEngagement({ ...opts, fetcher: async (url, init) => {

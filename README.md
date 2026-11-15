@@ -12,7 +12,7 @@ No ads, no accounts, no tracking cookies. It's a hobby project and runs on free 
 
 ## Anonymous visitor engagement (optional)
 
-Tracking is **enabled for Taiku and Tarya**, sharing Taiku's budget namespace, after
+Tracking is **configured for Taiku and Tarya**, sharing Taiku's budget namespace, after
 the operator accepted the risk that unrelated account usage could exceed free allowances.
 Other packs remain disabled unless configured. When enabled, only real
 visitor actions reach Workers Analytics Engine, never simulated persona/crowd activity:
@@ -27,6 +27,8 @@ simulated counts displayed in the feed; poll totals still combine simulated and 
 
 The server validates targets against the build's public post/persona/poll inventory.
 It writes only action type, public target ID, site ID, a server UTC minute bucket and
+Activation requires enabling Analytics Engine in the Cloudflare account dashboard and
+a successful deployment; configuration alone does not mean counters are live.
 the value `1`. Analytics Engine adds its own write timestamp. No IP, user-agent, cookie,
 account ID, visitor ID, option choice, referrer or URL is stored in analytics; its
 Durable Object stores just one aggregate budget row. The browser sends analytics
@@ -118,6 +120,11 @@ do not establish filtering or grouping on our arbitrary structured engagement fi
 or direct charts of our Analytics Engine dataset. Workers Logs is a separate product:
 enabling it may collect invocation metadata and incur usage/charges; it is not enabled
 by this feature. Its [current Workers Free allowance](https://developers.cloudflare.com/workers/platform/pricing/#workers-logs)
+If deployment reports error `10089`, first enable **Analytics Engine** in the Taiku
+account's Cloudflare dashboard under **Workers & Pages → Analytics Engine**, without
+upgrading a plan. Then rerun deployment for all sites so Taiku's budget migration
+precedes Tarya's cross-Worker binding. A failed owner deployment leaves the binding
+unavailable; successful Actions status alone is not proof of event collection.
 is 200,000 log events/day with 3-day retention; Cloudflare announces a pricing change
 on December 1, 2026. Do not turn it on as a workaround without reviewing privacy,
 account-wide usage and current pricing. Do not assume the documented `event type`
