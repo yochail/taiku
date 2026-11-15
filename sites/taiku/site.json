@@ -16,6 +16,10 @@
   },
   "deploy": {
     "worker": "taiku",
-    "customDomain": false
+    "customDomain": false,
+    "engagementAnalytics": {
+      "budgetWorker": "taiku",
+      "enabled": true
+    }
   }
 }

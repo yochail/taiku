@@ -19,7 +19,11 @@
   },
   "deploy": {
     "worker": "tarya",
-    "customDomain": false
+    "customDomain": false,
+    "engagementAnalytics": {
+      "budgetWorker": "taiku",
+      "enabled": true
+    }
   },
   "generate": true
 }

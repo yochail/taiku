@@ -80,6 +80,8 @@ jobs:
     environment: production
     strategy:
       fail-fast: false
+      # Sorted site list deploys the shared analytics budget owner (taiku) before tarya.
+      max-parallel: 1
       matrix:
         site: ${{ fromJSON(needs.plan.outputs.sites) }}
     env:

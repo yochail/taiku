@@ -1,0 +1,33 @@
+name: verify engagement
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: 'Write one disclosed test share and verify SQL delivery'
+        type: choice
+        options: [taiku, tarya]
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify one disclosed test event
+        env:
+          VERIFY_SITE: ${{ inputs.site }}
+          CLOUDFLARE_ANALYTICS_API_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}
+        run: node scripts/verify-engagement.mjs
