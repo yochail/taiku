@@ -37,7 +37,7 @@ or Global Privacy Control. Those preferences also suppress poll analytics, not v
 ### Free-only setup (not performed automatically)
 
 [Cloudflare's pricing documentation](https://developers.cloudflare.com/analytics/analytics-engine/pricing/)
-(checked 2026-11-14) includes **100,000 writes/day and 10,000 read queries/day on Workers Free**.
+(checked 2026-11-15) includes **100,000 writes/day and 10,000 read queries/day on Workers Free**.
 It currently says Analytics Engine is not billed yet; billing is planned in coming months.
 The one shared `EngagementBudget` object reserves at most **90,000 writes per UTC day,
 60 per UTC minute across all packs**, before any `writeDataPoint`. Reservations survive
@@ -47,21 +47,27 @@ without client identifiers, and fails closed without configuration/bindings.
 Lost events, full budgets and outages do not break local engagement or accepted poll votes.
 Anonymous clients can forge valid action requests; these are not verified unique humans.
 
-**Before enabling:** verify Workers Free and SQLite Durable Objects free availability
-on the account, and ensure other account-wide Analytics Engine writers use no more than
-the remaining 10,000 daily points. Otherwise leave this feature disabled. All packs must
+**Before enabling:** the operator must ensure Workers Free and SQLite Durable Objects
+free availability, and that other account-wide Analytics Engine writers use no more than
+the remaining 10,000 daily points. The code cannot enforce or observe other writers'
+usage or prevent paid-account charges. Otherwise leave this feature disabled. All packs must
 share **one existing budget namespace**; creating a second owner, renaming its Worker,
 changing the singleton key, or deleting its storage resets/splits the cap and invalidates
 the guarantee. This feature cannot bound unrelated account writers, operator SQL queries,
 or paid-account Workers/DO charges. Do not enable it on Workers Paid under a $0-only policy.
 The existing poll and Worker traffic also consumes account free quotas.
 
-The manually dispatched `analytics preflight` GitHub workflow uses production secrets
-only inside Actions for read-only account settings, subscriptions and one `SHOW TABLES`
-query. It prints statuses, never credentials or API response bodies, and deliberately
-fails until entitlement **and account-wide headroom** are verified. Required token
-permissions are Workers Scripts Read/Write, Account Billing Read and Account Analytics
-Read. A successful subscription/query read alone is not evidence of unused allowance.
+The manually dispatched `analytics preflight` workflow performs one optional SQL read
+using production environment secrets only inside Actions. Keep `CLOUDFLARE_API_TOKEN`
+as the existing deployment token (Workers Scripts Edit); the preflight does not use it.
+Add the separate Analytics token as `CLOUDFLARE_ANALYTICS_API_TOKEN` in
+GitHub **Settings → Environments → production → Environment secrets**. It needs
+Account → Account Analytics → Read for the `SHOW TABLES` query. Scope it to
+the Taiku Cloudflare account; zone-wide permissions are not needed for these
+account-scoped API calls. Do not replace the deployment token with this read-only
+token. No Billing permission, subscription or plan API call is used. It never falls
+back to the deployment token or prints credentials or API response bodies. A successful
+SQL access check does not establish a free plan or remaining account-wide headroom.
 
 After approval, add `"engagementAnalytics": {"budgetWorker": "taiku", "enabled": true}`
 inside `deploy` in each participating pack's `site.json` (use the **actual** chosen owner's
@@ -104,10 +110,18 @@ are deliberately untouched here.
 
 ### Where to see the real events
 
-**Do not expect custom engagement charts in the ordinary Cloudflare Web Analytics or
-Worker Metrics dashboard.** Current Cloudflare documentation verifies querying custom
-datasets through SQL APIs; it does not establish an in-dashboard custom chart/query UI.
-The dashboard can configure bindings and create an
+**Cloudflare Custom Dashboards supports Workers Observability Logs charts**, but the
+[documented chart dimensions](https://developers.cloudflare.com/analytics/custom-dashboards/#workers-observability-data)
+do not establish filtering or grouping on our arbitrary structured engagement fields,
+or direct charts of our Analytics Engine dataset. Workers Logs is a separate product:
+enabling it may collect invocation metadata and incur usage/charges; it is not enabled
+by this feature. Its [current Workers Free allowance](https://developers.cloudflare.com/workers/platform/pricing/#workers-logs)
+is 200,000 log events/day with 3-day retention; Cloudflare announces a pricing change
+on December 1, 2026. Do not turn it on as a workaround without reviewing privacy,
+account-wide usage and current pricing. Do not assume the documented `event type`
+dimension is our engagement action. The verified way to inspect this Analytics Engine
+dataset is SQL/API, not the ordinary Worker Metrics dashboard. The dashboard can
+configure bindings and create an
 [Account Analytics Read token](https://dash.cloudflare.com/profile/api-tokens), but
 viewing these event counts requires SQL/API output or optional local Grafana.
 No paid dashboard service or public analytics read endpoint is added.

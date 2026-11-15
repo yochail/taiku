@@ -3,43 +3,33 @@ import assert from 'node:assert/strict';
 import { preflight } from '../scripts/analytics-preflight.mjs';
 
 const account = 'a'.repeat(32);
-const token = 'fixture-not-a-credential';
+const analyticsToken = 'fixture-analytics-token';
 
-test('production preflight only reads metadata and never exposes credentials or response data', async () => {
+test('preflight uses only the separate analytics credential for one read query', async () => {
   const calls = [];
-  const result = await preflight({ account, token, fetcher: async (url, init) => {
+  const result = await preflight({ account, analyticsToken, fetcher: async (url, init) => {
     calls.push({ url, init });
-    return url.endsWith('/subscriptions') || url.endsWith('/sql')
-      ? new Response('private response body', { status: 403 })
-      : Response.json({ success: true, result: { default_usage_model: 'standard' } });
+    return Response.json({ data: [], private: 'do-not-report' });
   } });
-  assert.equal(result.settings.accessible, true);
-  assert.equal(result.subscriptions.status, 403);
-  assert.equal(result.sql.status, 403);
-  assert.equal(result.workersFreeVerified, false);
-  assert.equal(result.headroomVerified, false);
-  assert.deepEqual(calls.map((c) => c.init.method), ['GET', 'GET', 'POST']);
-  assert.equal(calls[2].init.body, 'SHOW TABLES', 'one read query; no event writes or row contents');
-  assert.ok(!JSON.stringify(result).includes(token));
-  assert.ok(!JSON.stringify(result).includes(account));
-  assert.ok(!JSON.stringify(result).includes('private'));
+  assert.equal(result.sql.accessible, true);
+  assert.equal(calls.length, 1);
+  assert.ok(calls[0].url.endsWith('/analytics_engine/sql'));
+  assert.equal(calls[0].init.headers.authorization, `Bearer ${analyticsToken}`);
+  assert.equal(calls[0].init.method, 'POST');
+  assert.equal(calls[0].init.body, 'SHOW TABLES');
+  for (const privateValue of [analyticsToken, account, 'do-not-report']) assert.ok(!JSON.stringify(result).includes(privateValue));
+  assert.deepEqual(Object.keys(result), ['sql'], 'does not infer plan or headroom');
 });
 
-test('successful reads or missing subscriptions do not infer free entitlement or quota headroom', async () => {
-  const check = async (plans) => preflight({ account, token, fetcher: async (url) => Response.json({
-    success: true, result: url.endsWith('/subscriptions') ? plans.map((id) => ({ rate_plan: { id } })) : {},
-  }) });
-  assert.equal((await check([])).workersFreeVerified, false);
-  assert.equal((await check(['WORKERS_PAID'])).workersFreeVerified, false);
-  assert.equal((await check(['WORKERS_FREE', 'WORKERS_PAID'])).workersFreeVerified, false);
-  const free = await check(['WORKERS_FREE']);
-  assert.equal(free.workersFreeVerified, true);
-  assert.equal(free.headroomVerified, false);
-});
-
-test('network failures, malformed responses and missing credentials fail closed without private error details', async () => {
-  const failed = await preflight({ account, token, fetcher: async () => { throw new Error(token); } });
+test('missing secret, denied access, malformed response and network failures are surfaced safely', async () => {
+  const missing = await preflight({ account, fetcher: async () => assert.fail('must not fall back to another token') });
+  assert.equal(missing.sql.status, 'missing secret');
+  const denied = await preflight({ account, analyticsToken, fetcher: async () => new Response('private response body', { status: 403 }) });
+  assert.deepEqual(denied.sql, { status: 403, accessible: false });
+  const malformed = await preflight({ account, analyticsToken, fetcher: async () => new Response('not json') });
+  assert.equal(malformed.sql.accessible, false);
+  const failed = await preflight({ account, analyticsToken, fetcher: async () => { throw new Error(analyticsToken); } });
   assert.equal(failed.sql.accessible, false);
-  assert.ok(!JSON.stringify(failed).includes(token));
-  await assert.rejects(preflight({ account: '', token }), /credentials are missing/);
+  assert.ok(!JSON.stringify(failed).includes(analyticsToken));
+  await assert.rejects(preflight({ account: '', analyticsToken }), /missing or invalid/);
 });
