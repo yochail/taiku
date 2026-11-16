@@ -3,7 +3,7 @@
 // Every output goes through the same per-item validator as single turns (turn.validateItem: 280
 // weighted chars, house-style lint, quotes verified against the tool log, policy gate) plus the
 // batch repetition lint; only the failed items are regenerated (one repair request).
-import { BudgetError, parseJsonArray } from './llm.mjs';
+import { BudgetError, LlmAuthError, parseJsonArray } from './llm.mjs';
 import { batchMessages, batchRepair } from './prompts.mjs';
 import { lintBatch } from './house-style.mjs';
 import { fingerprint } from './ideas.mjs';
@@ -29,7 +29,7 @@ export function matchOutputs(items, outputs) {
 /**
  * Run one batch. items: [{ id, persona, task, ctx, passages: Map }].
  * Returns { results: Map<id, { ok, fields?, error?, detail? }>, calls, repaired }.
- * Throws BudgetError only when the very first request cannot be made.
+ * Throws BudgetError when the first request cannot be made, and LlmAuthError even during repair.
  */
 export async function runBatch({ client, items, byId, kind = 'replies', policyCtx, tracker = null, rand = Math.random, giphy = null, maxRepairRounds = 1 }) {
   const results = new Map();
@@ -43,7 +43,7 @@ export async function runBatch({ client, items, byId, kind = 'replies', policyCt
   try {
     content = (await client.chat({ messages })).message?.content;
   } catch (e) {
-    if (e instanceof BudgetError) throw e;
+    if (e instanceof BudgetError || e instanceof LlmAuthError) throw e;
     for (const it of items) results.set(it.id, { ok: false, error: 'llm', detail: String(e.message).slice(0, 160) });
     return { results, calls: client.calls - start, repaired, capped: Boolean(e.capped) };
   }
@@ -94,6 +94,7 @@ export async function runBatch({ client, items, byId, kind = 'replies', policyCt
     try {
       content = (await client.chat({ messages, _repair: true })).message?.content;
     } catch (e) {
+      if (e instanceof LlmAuthError) throw e;
       for (const it of pending) results.set(it.id, { ok: false, error: 'llm', detail: String(e.message).slice(0, 160) });
       break;
     }

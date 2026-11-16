@@ -9,7 +9,7 @@ import { applyHandleStyle, seededDecide, unlinkUnknown } from './handles.mjs';
 let known = null;
 const knownHandles = () => (known ??= new Set(loadPersonas().map((p) => String(p.handle).toLowerCase())));
 import { houseStyleRepair, lintTaik, stripTells } from './house-style.mjs';
-import { BudgetError, parseJsonLoose } from './llm.mjs';
+import { BudgetError, LlmAuthError, parseJsonLoose } from './llm.mjs';
 import { checkPost, repairHint } from './policy.mjs';
 import { selfBioHit, selfBioProfile, selfBioRepair } from './selfbio.mjs';
 import { formatRepair, quoteRepair, shortenRepair, systemMessage, targetCeiling, targetRepair, userMessage } from './prompts.mjs';
@@ -123,7 +123,7 @@ export async function validateItem(out, { task, persona, passages, policyCtx, ct
 
 /**
  * Run one turn. Returns { ok, fields?, error?, toolLog, calls, repairs, violations? }.
- * Throws BudgetError when the shared request budget runs out.
+ * Throws BudgetError on budget exhaustion and LlmAuthError on rejected credentials.
  */
 export async function runTurn({ client, persona, byId, task, ctx, nativeTools = true, policyCtx, rand = Math.random, tracker = null, giphy = null }) {
   const emulated = !nativeTools;
@@ -179,7 +179,7 @@ export async function runTurn({ client, persona, byId, task, ctx, nativeTools = 
       msg = (await callModel(true, true)).message;
     }
   } catch (e) {
-    if (e instanceof BudgetError) throw e;
+    if (e instanceof BudgetError || e instanceof LlmAuthError) throw e;
     return { ok: false, error: 'llm', detail: String(e.message).slice(0, 200), toolLog: toolbox.log, calls: client.calls - start, repairs: 0, capped: Boolean(e.capped) };
   }
 }

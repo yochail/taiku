@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MAX_TAIK_CHARS, loadPersonas, taikLength } from '../src/lib/data.mjs';
-import { BudgetError, LlmError, createClient, llmConfig, parseRetryAfter, probeTools } from '../src/lib/llm.mjs';
+import { BudgetError, LlmAuthError, LlmError, createClient, llmConfig, parseRetryAfter, probeTools } from '../src/lib/llm.mjs';
+import { runMicro } from '../src/lib/micro.mjs';
 import { createMockClient } from '../src/lib/mock.mjs';
 import { policyContext } from '../src/lib/policy.mjs';
 import { passagesFor } from '../src/lib/tools.mjs';
@@ -97,6 +98,40 @@ test('client: plain "OK" bodies are retried then fail; 4xx fails fast; budget is
   await assert.rejects(c.chat({ messages: [] }), /empty content/);
 });
 
+test('provider authentication failures escape turns, batches, repairs, micro calls and tool probes', async () => {
+  const items = [{ id: 't1', persona, task: task(), ctx }];
+  const operations = [
+    (client) => runTurn({ client, persona, byId, task: task(), ctx, nativeTools: false, policyCtx }),
+    (client) => runBatch({ client, items, byId, policyCtx }),
+    (client) => runBatch({ client, items, byId, policyCtx }),
+    (client) => runMicro({ client, requests: [{ id: 't1', persona, form: 'short' }], byId, policyCtx }),
+    (client) => probeTools(client),
+  ];
+  for (const status of [401, 403]) {
+    for (const [i, operation] of operations.entries()) {
+      const repairing = i === 2;
+      const { fetchImpl, requests } = scripted([
+        ...(repairing ? [final([])] : []),
+        new Response('{"error":{"message":"User not found."}}', { status }),
+      ]);
+      const client = createClient({ cfg: cfg({ name: 'openrouter', keySource: 'OPENROUTER_API_KEY', model: `auth-${status}`, tools: 'auto' }), fetchImpl, sleep });
+      await assert.rejects(operation(client), (e) => {
+        assert.ok(e instanceof LlmAuthError);
+        assert.equal(e.status, status);
+        assert.equal(e.capped, false, 'not a quota failure');
+        assert.match(e.message, /OPENROUTER_API_KEY.*production environment secret overrides/);
+        return true;
+      });
+      assert.equal(requests.length, repairing ? 2 : 1, 'authentication failures are not retried');
+    }
+  }
+});
+
+test('a provider 403 quota response remains a capped quota error, not authentication', async () => {
+  const client = createClient({ cfg: cfg(), fetchImpl: scripted([new Response('daily free allocation exceeded', { status: 403 })]).fetchImpl, sleep });
+  await assert.rejects(client.chat({ messages: [] }), (e) => e instanceof LlmError && !(e instanceof LlmAuthError) && e.capped);
+});
+
 test('turn: native tool round, final tool_choice none, canonical comes from the tool log', async () => {
   const { fetchImpl, requests } = scripted([
     toolCall('search_sources', { query: passage.text.split(' ').slice(0, 3).join(' ') }),
@@ -169,8 +204,8 @@ test('turn: JSON tool-call emulation for models without function calling', async
   assert.equal(r.fields.quoteRefs[0].canonical, passage.text);
 });
 
-test('turn: LLM errors are reported, budget errors propagate', async () => {
-  let client = createClient({ cfg: cfg(), fetchImpl: scripted([new Response('nope', { status: 401 })]).fetchImpl, maxCalls: 10, sleep });
+test('turn: request errors are reported, budget errors propagate', async () => {
+  let client = createClient({ cfg: cfg(), fetchImpl: scripted([new Response('nope', { status: 400 })]).fetchImpl, maxCalls: 10, sleep });
   const r = await runTurn({ client, persona, byId, task: task(), ctx, nativeTools: true, policyCtx });
   assert.equal(r.ok, false);
   assert.equal(r.error, 'llm');

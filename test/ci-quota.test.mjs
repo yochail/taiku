@@ -42,6 +42,7 @@ test('quotaFailure: only the fatal error decides, not 429 lines logged while rot
   assert.equal(quotaFailure(bug), null);
   assert.equal(quotaFailure('Error: --repair: sites/x/daily.json does not exist; run the day first'), null);
   assert.equal(quotaFailure(''), null);
+  assert.equal(quotaFailure('model x capped: HTTP 429: quota\nLlmAuthError: HTTP 401: authentication/authorization rejected for openrouter. Check OPENROUTER_API_KEY.\n    at x (llm.mjs:1:1)'), null);
 });
 
 // End to end: scripts/ci-generate.sh with a stub `npm` that writes a run manifest and exits with a code.
@@ -104,6 +105,10 @@ test('ci-generate.sh: a genuine error still fails', { skip: bash.status !== 0 &&
   assert.match(r.stdout, /::error title=Daily feed fallback failed/);
   assert.doesNotMatch(r.output, /soft=true|quota=true/);
   assert.equal(r.skipped, '');
+  const auth = ciGenerate('auth', { rc: 1, stderr: 'LlmAuthError: HTTP 401: authentication/authorization rejected for openrouter. Check OPENROUTER_API_KEY.\n    at x (llm.mjs:1:1)\n' });
+  assert.equal(auth.status, 1);
+  assert.doesNotMatch(auth.output, /soft=true|quota=true/);
+  assert.equal(auth.skipped, '');
 });
 
 test('ci-generate.sh: a partial run stays a soft skip', { skip: bash.status !== 0 && 'no bash' }, () => {

@@ -1,7 +1,7 @@
 // The one optional "micro" LLM call per run (cheap model, low budget): ~20 tiny reactions riffed on
 // the personas' reaction pools, plus 5-10 new validated pool entries for personas running low on
 // fresh (out-of-cooldown) entries, appended to content/pools/<id>.json.
-import { BudgetError, parseJsonLoose } from './llm.mjs';
+import { BudgetError, LlmAuthError, parseJsonLoose } from './llm.mjs';
 import { microMessages } from './prompts.mjs';
 import { lintTaik, stripTells } from './house-style.mjs';
 import { checkPost } from './policy.mjs';
@@ -43,6 +43,7 @@ export async function runMicro({ client, requests = [], refills = [], byId, poli
   try {
     out = parseJsonLoose((await client.chat({ messages: microMessages({ requests, refills }, byId) })).message?.content);
   } catch (e) {
+    if (e instanceof LlmAuthError) throw e;
     if (e instanceof BudgetError) return res;
     log(`micro call failed: ${String(e.message).slice(0, 100)}`);
     res.calls = client.calls - start;

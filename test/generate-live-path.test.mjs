@@ -14,6 +14,7 @@ import { createMockClient } from '../src/lib/mock.mjs';
 import { createEmbedder } from '../src/lib/embed.mjs';
 import { FEEDS, fixtureFetch } from '../src/lib/news.mjs';
 import { realPersonas } from './fixtures/pipeline-fixtures.mjs';
+import { LlmAuthError } from '../src/lib/llm.mjs';
 
 const SCRATCH = path.join(ROOT, 'test', '.live-path-scratch');
 after(() => fs.rmSync(SCRATCH, { recursive: true, force: true }));
@@ -47,4 +48,25 @@ test('live (non-offline) runDaily path completes with a mock client and stubbed 
   assert.ok([0, 2].includes(r.exitCode), `live path finished (status ${r.status}, error ${r.error ?? '-'})`);
   assert.equal(r.path, 'cloudflare', 'ran the non-mock path');
   assert.ok(linkCalls.some((u) => /bsky/.test(u)), 'real-post candidate fetch ran');
+});
+
+test('live authentication rejection fails the run instead of returning a green partial day', async () => {
+  const root = path.join(SCRATCH, 'auth');
+  const client = createMockClient({ nonce: 'auth' });
+  client.chat = async () => { throw new LlmAuthError({ name: 'openrouter', keySource: 'OPENROUTER_API_KEY' }, 401); };
+  await assert.rejects(runDaily({
+    date: '2026-11-16',
+    maxCalls: 90,
+    quiet: true,
+    seed: 'auth',
+    nonce: 'auth',
+    personas: realPersonas(),
+    env: { NEWS_FEEDS: '', GEN_EMBEDDINGS: 'off' },
+    root,
+    client,
+    fetchImpl: fixtureFetch(FEEDS),
+    linkFetch: async () => new Response('not found', { status: 404 }),
+    embedder: await createEmbedder({ mode: 'hash' }),
+  }), LlmAuthError);
+  assert.ok(!fs.existsSync(path.join(root, 'content', 'posts', 'daily-2026-11-16.json')));
 });

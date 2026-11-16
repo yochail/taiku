@@ -26,6 +26,13 @@ export class LlmError extends Error {
   }
 }
 
+export class LlmAuthError extends LlmError {
+  constructor(cfg, status) {
+    super(`HTTP ${status}: authentication/authorization rejected for ${cfg.name}. Check ${cfg.keySource ?? 'provider credentials'}, including production environment secret overrides.`, { status });
+    this.name = 'LlmAuthError';
+  }
+}
+
 const num = (v, d) => (v === undefined || v === null || String(v).trim() === '' || Number.isNaN(Number(v)) ? d : Number(v));
 
 /** Expand ${VAR} from env. Missing vars stay empty (→ invalid URL → no key is ever sent). */
@@ -179,6 +186,7 @@ export function createClient({ cfg = llmConfig(), fetchImpl = globalThis.fetch, 
           if (st === 429) stats.rateLimited++;
           const quota = (st === 429 || st === 403 || st === 400) && QUOTA_RE.test(text);
           if (st === 410 || st === 404 || quota) throw new LlmError(`HTTP ${st}: ${text.slice(0, 160)}`, { status: st, capped: true });
+          if (st === 401 || st === 403) throw new LlmAuthError(cfg, st);
           if (st === 429) {
             // Back off once (bounded), then let the rotation switch models.
             if (cfg.retry429 !== false && attempt === 0 && (wait ?? 0) <= Math.min(cfg.maxRetryAfterMs, 30000)) {
@@ -244,7 +252,7 @@ export async function probeTools(client, known = null) {
       });
       ok = Array.isArray(r.message.tool_calls) && r.message.tool_calls.length > 0;
     } catch (e) {
-      if (e instanceof BudgetError) throw e;
+      if (e instanceof BudgetError || e instanceof LlmAuthError) throw e;
       ok = e.status === 400 ? false : null;
     }
   }
