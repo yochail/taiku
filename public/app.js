@@ -661,7 +661,9 @@
     onboard.addEventListener('click', (e) => { if (e.target === onboard) onboard.close(); });
     onboard.querySelector('.ob-skip').addEventListener('click', () => onboard.close());
     obDone.addEventListener('click', () => { onboard.close(); const tb = document.getElementById('tab-following'); if (tb) tb.click(); else location.href = '/'; });
-    if (!store.get('taiku_onboarded', 0) && !follows.size && !topics.size && !navigator.webdriver && !matchMedia('(display-mode: standalone)').matches) setTimeout(() => { if (!document.querySelector('dialog[open]')) open(); }, 2500);
+    if (!store.get('taiku_onboarded', 0) && !follows.size && !topics.size && !navigator.webdriver && !matchMedia('(display-mode: standalone)').matches) setTimeout(() => {
+      if (!document.querySelector('dialog[open]') && !document.querySelector('[data-ga4-consent]:not([hidden])')) open();
+    }, 2500);
   }
   // Posts opened on this device, for the "Viewed" tab of /me/.
   const focalPost = document.querySelector('.post.focal[data-pid]');

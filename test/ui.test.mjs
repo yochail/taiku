@@ -264,6 +264,8 @@ test('discovery: topics/trends data, /connect and /me pages, onboarding outside 
   assert.match(home, /class="tabbar"[\s\S]*?href="\/me\/"/);
   const onboard = home.indexOf('id="onboard"');
   assert.ok(onboard > 0);
+  const app = fs.readFileSync(new URL('../public/app.js', import.meta.url), 'utf8');
+  assert.match(app, /!document\.querySelector\('\[data-ga4-consent\]:not\(\[hidden\]\)'\)/);
   const panel = home.slice(home.indexOf('id="panel-following"'), onboard);
   assert.equal((panel.match(/<div\b/g) ?? []).length + 1, (panel.match(/<\/div>/g) ?? []).length, 'panel closes before the dialog');
   const { items } = JSON.parse(read('data/foryou.json'));
