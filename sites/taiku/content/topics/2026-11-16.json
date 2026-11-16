@@ -1,0 +1,399 @@
+{
+  "date": "2026-11-16",
+  "generatedAt": "2026-11-16T18:40:01.304Z",
+  "sourceSnapshotHash": "f80cdd7afb23af27",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 23,
+      "kept": 23
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 20
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 20
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 22,
+      "kept": 19
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 19,
+      "kept": 19
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "t90d083f9",
+      "title": "Russell Brand prison message 'appalling' and being investigated, No 10 says",
+      "url": "https://www.bbc.co.uk/news/articles/cm9d7pe8y559o",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-culture",
+      "tier": "curated",
+      "kind": "news",
+      "section": "culture",
+      "publishedAt": "2026-11-16T18:22:22.000Z",
+      "score": 1.17,
+      "keys": {
+        "politics": 1,
+        "memes": 1,
+        "culture": 1.5
+      }
+    },
+    {
+      "id": "t6b3f9293",
+      "title": "Trump backs return of ex-Nvidia boss after 'Bring Jensen Back' campaign launched",
+      "url": "https://www.bbc.co.uk/news/articles/cry49plv8v3go",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-16T18:06:26.000Z",
+      "score": 1.102,
+      "keys": {
+        "tech": 1,
+        "politics": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "tfb710be5",
+      "title": "Five EU countries announce migrant deportation centre in Rwanda",
+      "url": "https://www.bbc.co.uk/news/articles/cw987343352go",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-16T16:27:24.000Z",
+      "score": 1.004,
+      "keys": {
+        "politics": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t72a6c1de",
+      "title": "The Scouse actor reaching new heights in Liverpool drama This City Is Ours",
+      "url": "https://www.bbc.co.uk/news/articles/cm15e3xg9njeo",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-culture",
+      "tier": "curated",
+      "kind": "news",
+      "section": "culture",
+      "publishedAt": "2026-11-16T12:12:39.000Z",
+      "score": 0.973,
+      "keys": {
+        "economy": 1,
+        "memes": 0.7,
+        "culture": 1.5
+      }
+    },
+    {
+      "id": "t5bcd4127",
+      "title": "Emma Barnett to leave Radio 4's Today for new BBC Show",
+      "url": "https://www.bbc.co.uk/news/articles/c6rrgw2p52l5o",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-culture",
+      "tier": "curated",
+      "kind": "news",
+      "section": "culture",
+      "publishedAt": "2026-11-16T17:46:12.000Z",
+      "score": 0.962,
+      "keys": {
+        "culture": 2.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "td4d59d04",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tbed17eb4",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "tf7febecb",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tb64d8e38",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tec3fbbdd",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf4395e82",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t265560c4",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t2496d2c5",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t822e5f8b",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "td7b436d7",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "taf3aefb2",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t5f7711f8",
+      "feedId": "bbc-science",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t76f1ba81",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t80ed49a1",
+      "feedId": "verge",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7ed8340b",
+      "feedId": "hn",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "tfb710be5",
+      "title": "Five EU countries announce migrant deportation centre in Rwanda",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te3c6bc67",
+      "title": "Yemeni forces retreat to defend port city from Houthis",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6b3f9293",
+      "title": "Trump backs return of ex-Nvidia boss after 'Bring Jensen Back' campaign launched",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tff72e800",
+      "title": "Raye, Rosalía and Dolly Parton recognised in Grammy nominations",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb9b16089",
+      "title": "Landmark Crimea bridge hit as Russia reports biggest Ukrainian drone attack of war",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tae523b7e",
+      "title": "UK and allies call on Israel to allow rapid humanitarian access to Gaza",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t896c03dc",
+      "title": "Estonia to close Russia border crossings after attempted drone factory arson attack",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t98f8478c",
+      "title": "Australian MP 'full of gratitude' upon leaving hospital after alleged car attack",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t919d62f7",
+      "title": "Ashes of exiled Nobel Laureate Miguel Ángel Asturias returned to Guatemala",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t8cac580e",
+      "title": "Clothing factories shut in Bangladesh as workers strike over pay",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tffe115de",
+      "title": "'Can you believe it?': SpaceX catches part of its Starship rocket on return to Earth",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tdb67b4f4",
+      "title": "Watch: Cruise ship overturns after collision with tanker in New Orleans",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t891f06b1",
+      "title": "Watch: Divers explore US ship sunk off Florida coast to create new reef",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t838aa7a8",
+      "title": "Russia's mega-rich are already imagining a future after Putin",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t73cb95bb",
+      "title": "Judo champion shakes up French presidential race with surprise candidacy",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6ec39c9d",
+      "title": "My mother told me I would die if I sought treatment for Ebola - I am proof you can survive",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf4aa784a",
+      "title": "How telecoms upgrade work sparked US flight chaos",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tef373941",
+      "title": "GTA 6 hacker pleads guilty after release from secure hospital",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t675ddd29",
+      "title": "Intel sued by investors after PC sales slump hits share price",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t5ec261fe",
+      "title": "Suspected China spy linked to Nvidia's ex-boss left in 2025, Megaspeed says",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t78899130",
+      "title": "South Korea's top scorer in tax accountancy exam admits cheating",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta2e4f894",
+      "title": "Italy fines Meta €805m over accessing users' photos",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta61501fb",
+      "title": "Microsoft says services fully restored after day-long global outage",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4470d2fe",
+      "title": "Even Grand Theft Auto's original creators haven't been able to play GTA 6",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tebf9d86a",
+      "title": "How the Jensen Huang scandal created a headache for business-friendly Singapore",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf953851b",
+      "title": "Microsoft outage 'stark reminder' of how much we rely on tech",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t49b7f4e0",
+      "title": "Pressure grows on Trump's Commerce Secretary Lutnick in fallout from Nvidia scandal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta7179ac4",
+      "title": "Why is Microsoft's outage lasting so long and will emails be lost?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "td5428893",
+      "title": "Courts, spies and MPs: How the Microsoft outage has been felt around the world",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t01e43e6d",
+      "title": "Tech Life",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
