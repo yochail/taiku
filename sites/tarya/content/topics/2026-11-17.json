@@ -1,0 +1,566 @@
+{
+  "date": "2026-11-17",
+  "generatedAt": "2026-11-17T12:10:54.708Z",
+  "sourceSnapshotHash": "650159e2d2a865b6",
+  "feeds": [
+    {
+      "feed": "ynet",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ynetnews",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz-en",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "toi",
+      "ok": false,
+      "error": "HTTP 403"
+    },
+    {
+      "feed": "jpost",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "kan",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom-en",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "maariv",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "walla",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "jta",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "forward",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "jns",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "reuters",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 21,
+      "kept": 21
+    },
+    {
+      "feed": "bbc-me",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    }
+  ],
+  "picks": [
+    {
+      "id": "tef2f159d",
+      "title": "Twenty-nine percent of French Jews have removed mezuzahs, poll finds",
+      "url": "https://www.jns.org/news/antisemitism/twenty-nine-percent-of-french-jews-have-removed-mezuzahs-poll-finds",
+      "source": "JNS",
+      "domain": "jns.org",
+      "feedId": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "publishedAt": "2026-11-17T11:44:28.000Z",
+      "score": 1.193,
+      "keys": {
+        "politics": 1,
+        "religion": 1.5
+      }
+    },
+    {
+      "id": "t501e7cb3",
+      "title": "Jerusalem teen charged with plot to shoot Jews, police on Temple Mount",
+      "url": "https://www.jns.org/news/israel-news/jerusalem-teen-charged-with-plot-to-shoot-jews-police-on-temple-mount",
+      "source": "JNS",
+      "domain": "jns.org",
+      "feedId": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "publishedAt": "2026-11-17T11:51:59.000Z",
+      "score": 1.192,
+      "keys": {
+        "religion": 2.5,
+        "politics": 1
+      }
+    },
+    {
+      "id": "t37d306f3",
+      "title": "Hunter College student government cancels cultural event, and Jewish students say Hillel was the reason",
+      "url": "https://forward.com/news/863236/hunter-college-hillel-event-canceled/",
+      "source": "The Forward",
+      "domain": "forward.com",
+      "feedId": "forward",
+      "tier": "curated",
+      "kind": "news",
+      "section": "culture",
+      "publishedAt": "2026-11-17T11:17:17.000Z",
+      "score": 1.176,
+      "keys": {
+        "politics": 1,
+        "religion": 1,
+        "culture": 2.5
+      }
+    },
+    {
+      "id": "ta88dd38b",
+      "title": "US education secretary denounces antisemitism following Philadelphia school probe",
+      "url": "https://www.jns.org/news/u-s-news/us-education-secretary-denounces-antisemitism-following-philadelphia-school-probe",
+      "source": "JNS",
+      "domain": "jns.org",
+      "feedId": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "publishedAt": "2026-11-17T10:38:30.000Z",
+      "score": 1.168,
+      "keys": {
+        "culture": 1,
+        "religion": 1.5
+      }
+    },
+    {
+      "id": "tcfa1755c",
+      "title": "UK sanctions eight Israeli firms, activist group over Judea and Samaria, Gaza aid",
+      "url": "https://www.jns.org/news/world/uk-sanctions-eight-israeli-firms-activist-group-over-judea-and-samaria-gaza-aid",
+      "source": "JNS",
+      "domain": "jns.org",
+      "feedId": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "publishedAt": "2026-11-17T11:38:07.000Z",
+      "score": 1.148,
+      "keys": {
+        "politics": 2,
+        "religion": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "tb76ea6ae",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t3065dc54",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t38601dd2",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t5596c294",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t198e492d",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "td6337e48",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6287e95d",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t56bddd4c",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta4ae2c60",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t45ff1666",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta8a70b7d",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t63b9d1f2",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t3c0d14ca",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc729933b",
+      "feedId": "forward",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t3b15dc4a",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tbf7238ee",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t7b2673dd",
+      "feedId": "forward",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t10b47fcc",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "ta02a1e33",
+      "feedId": "forward",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc28bcccc",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te835938e",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tb18b5672",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t0192544e",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tf4c6c292",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tef924be3",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tda3e6d8a",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t37ce03c7",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t1ec1d21f",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t725d743a",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te90ccf35",
+      "feedId": "reuters",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t1f5e8323",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t91118539",
+      "feedId": "ap",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t050a46d9",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf4cd3366",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tec3fbbdd",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t11f7e70f",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6d8f0dff",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf3c5272c",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9455bfed",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t31208e9b",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t638ef79e",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te20e75c8",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t05f5ba2b",
+      "title": "\"יורים לעצמנו ברגל\": הגזענות נגד הרופאים הערבים - שתפגע גם בביטחון",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "td2cd4d48",
+      "title": "נערים בני 15 מהצפון נאשמים בייצור נשק מאולתר: \"אחד גרם לפיצוץ ונפצע\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t3e96f879",
+      "title": "\"מי שיצלם, אני שובר את אימא שלו\": נער הוכה ע\"י פקחים אבל התיק נסגר | תיעוד",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t92b896ba",
+      "title": "הליכוד מציב מתמודד מול מועמד איזנקוט ליו\"ר הכנסת, כך יצביעו החרדים",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t686dda18",
+      "title": "הרמיזה המוזרה מצד מקורבו של נתניהו על איראן, וההבהרה: \"אין לי שום מודיעין\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t3b4c7eb7",
+      "title": "עוד לפני הקמת ממשלה: הכנסת עוברת לידי גוש איזנקוט | זה היעד הבא של יו\"ר ישר!",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tf02035a0",
+      "title": "בריטניה הטילה סנקציות חדשות על חברות ישראליות - לראשונה מאז הבחירות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "taf683257",
+      "title": "מתווה איזנקוט לא עובר את החרדים: \"קל יותר להגיע להבנות עם ליברמן על הגיוס\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t02c5c5f5",
+      "title": "הקמת ממשלה חדשה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t4efa90ff",
+      "title": "בונקרים על הכוונת: \"פצצת הגרעין המסתורית\" שארה\"ב מפתחת - לראשונה זה 35 שנה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tc951304c",
+      "title": "ראש השב\"כ דיבר עם נציג הליכוד וביקש חומרים על זיופים בבחירות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tce003e77",
+      "title": "התרסקות חריגה: מטוס קל נתקע בכבלי חשמל, הטייס ניצל והחליק על הכנף לקרקע",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t9e9d9202",
+      "title": "נתניהו בבית המשפט: \"משקרים שקיבלתי כסף מקטאר, לא היה ולא נברא\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tc9fb0e38",
+      "title": "פיילוט הנשים בשריון מתחדש מחר אחרי עשור של דחיות: \"תנו להן להיות לוחמות\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t13185ab0",
+      "title": "אש אדירה בלב ים; איראן במשוואה חדשה: תקפה מתקן אמריקני בגלל \"הפרת המרחב האווירי\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tc2a22074",
+      "title": "עוד שיא של 1,441 כטב\"מים על רוסיה, תיעוד: \"פיצוץ וקריסה\" בגשר קרים האסטרטגי",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5f2becbb",
+      "title": "במסגרת פרשת שחיתות: יזם נדל\"ן מוכר עוכב לחקירה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t2acfdc05",
+      "title": "הסדרה מחדש למשתמטים מול צה\"ל: המתווה שאיזנקוט הציג לשותפים בגוש",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t9c9dc0dc",
+      "title": "התחזית: ירידה קלה בטמפרטורות, ייתכן גשם מקומי בצפון ובחוף",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "te2bb3cb7",
+      "title": "למרות המלחמות והמשברים: ילדי ישראל מהמאושרים בעולם | הנתונים המפתיעים",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t0f28726b",
+      "title": "הקרב על טוהר הבחירות והסערה סביב ראש השב\"כ | עם נטעאל בנדל",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t1f360723",
+      "title": "3 ימים אחרי השבתת התעופה: תקלה נוספת שיבשה טיסות בארה\"ב",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t9973e629",
+      "title": "\"פצצה מלוכלכת\" בלב וושינגטון? תוכנית הפיגוע האיראנית שמדאיגה את ארה\"ב",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tbfcf4595",
+      "title": "מ' \"יצא למלחמה\" - ורק אחרי 5 שנים נחשף שם המורה שאנס אותו | קשה לקריאה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5cd5d377",
+      "title": "המידע מלשכת נתניהו, המעצרים - וחשיפת \"המקור המודיעיני\": כך הסתעפה פרשת הבחירות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t2227f05a",
+      "title": "Netanyahu, Eisenkot to meet for first time since Israel election",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t70e1676c",
+      "title": "US push to tighten Iran blockade meets resistance from Turkey, Iraq and Pakistan",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t710e201a",
+      "title": "Hundreds of days at war, now a warning: Israeli reservists tell politicians, 'Don't betray us'",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t0cb9d650",
+      "title": "Another GOP defeat: Mississippi elects first Black senator since 1874",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "ta2c3b5e5",
+      "title": "JD Vance could lead Iran talks as hard-line IRGC chief threatens deal",
+      "domain": "ynetnews.com"
+    }
+  ]
+}
