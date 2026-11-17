@@ -241,6 +241,11 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
         reactor.force(parent, persona.id, 'reply', 'minimum-thread', reply.createdAt);
       }
     }
+    // The deep-thread plan fixes reply counts, but still needs the ordinary non-text reactions.
+    for (const n of nodes) reactor.spend(n.authorId);
+    for (const n of [...nodes].sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id))) {
+      reactor.consider({ ...n, noReply: true }, { horizon: day.end + 2 * 3.6e6 });
+    }
     return { day, nodes: nodes.sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id)),
       reactor, calibration: cal, llmCap: content.llmReplies, sampler, rand };
   }
@@ -745,8 +750,9 @@ export async function runDaily(opts = {}) {
   for (const t of tasks) {
     const r = repair.get(t.taskId);
     if (!r || t.exec === 'pool' || t.exec === 'wire') continue;
-    if (r.length) t.spec.length = { ...r.length };
+    if (r.length) t.spec.length = { ...r.length, strict: true };
     t.repair = r.reason ?? 'gate';
+    if (t.repair.startsWith('self_bio:')) t.spec.selfBioRepair = t.repair.slice('self_bio:'.length);
     if (/^(repetitive|catchphrase):/.test(t.repair) && !r.thread) t.spec.repair = t.repair;
   }
 

@@ -189,6 +189,19 @@ test('turn: policy violations fail after one repair', async () => {
   assert.equal(r.error, 'policy');
 });
 
+test('sampled length slack cannot cross distribution bands; gate repairs honor their exact ceiling', async () => {
+  for (const [max, strict, accepted, rejected] of [[40, false, 40, 41], [80, false, 120, 121], [140, false, 140, 141], [120, true, 120, 121]]) {
+    const opts = { task: task({ length: { min: 5, max, strict } }), persona, passages: new Map(), policyCtx, ctx };
+    assert.equal((await validateItem({ text: 'x'.repeat(accepted) }, opts)).problem, null);
+    assert.equal((await validateItem({ text: 'x'.repeat(rejected) }, opts)).kind, 'length');
+  }
+  const { fetchImpl, requests } = scripted([final({ text: 'x'.repeat(160) }), final({ text: 'shorter, not truncated' })]);
+  const client = createClient({ cfg: cfg(), fetchImpl, maxCalls: 10, sleep });
+  const r = await runTurn({ client, persona, byId, task: task({ length: { min: 20, max: 120, strict: true } }), ctx, nativeTools: true, policyCtx });
+  assert.equal(r.fields.text, 'shorter, not truncated');
+  assert.match(requests[1].body.messages.at(-1).content, /target is 20-120/);
+});
+
 test('turn: JSON tool-call emulation for models without function calling', async () => {
   const { fetchImpl, requests } = scripted([
     reply({ content: JSON.stringify({ tool_calls: [{ name: 'search_sources', arguments: { query: passage.text.split(' ').slice(0, 4).join(' ') } }] }) }),
@@ -307,4 +320,38 @@ test('runBatch: items still invalid after the repair fail individually; a garbag
   const bad = { cfg: { model: 'f' }, get calls() { return call; }, async chat() { call++; return { message: { content: 'I cannot help with that' } }; } };
   const r2 = await runBatch({ client: bad, items, byId, policyCtx, rand: () => 0.4 });
   assert.ok([...r2.results.values()].every((x) => x.ok === false));
+});
+
+test('batch length checks remain binding on the final repair attempt', async () => {
+  for (const length of [{ min: 81, max: 140 }, { min: 20, max: 120, strict: true }]) {
+    let calls = 0;
+    const client = { get calls() { return calls; }, async chat() {
+      calls++;
+      return { message: { content: JSON.stringify([{ id: 'short', text: 'x'.repeat(calls === 1 ? 170 : 141) }]) } };
+    } };
+    const items = [{ id: 'short', persona, task: task({ length }), ctx, passages: new Map() }];
+    const r = await runBatch({ client, items, byId, policyCtx });
+    assert.equal(calls, 2);
+    assert.equal(r.results.get('short').ok, false);
+    assert.match(r.results.get('short').detail, /Too long: 141/);
+  }
+});
+
+test('a gate-flagged self-biography repair is prompted explicitly and cannot bypass the final batch check', async () => {
+  const inventor = { ...persona, background: 'Invented the alternating current induction motor.', key_works: [] };
+  const text = 'I invented the induction motor and the credit went elsewhere.';
+  const opts = { persona: inventor, passages: new Map(), policyCtx, ctx, attempt: 2 };
+  assert.equal((await validateItem({ text }, { ...opts, task: task() })).problem, null, 'ordinary runs retain the soft check');
+  const repairTask = task({ selfBioRepair: 'induction motor' });
+  assert.deepEqual((await validateItem({ text }, { ...opts, task: repairTask })).style, ['self_bio']);
+  let calls = 0;
+  const client = { get calls() { return calls; }, async chat(body) {
+    calls++;
+    assert.match(body.messages[1].content, /self_biography_repair.*induction motor/);
+    return { message: { content: JSON.stringify([{ id: 'bio', text }]) } };
+  } };
+  const r = await runBatch({ client, items: [{ id: 'bio', persona: inventor, task: repairTask, ctx }], byId, policyCtx });
+  assert.equal(calls, 2);
+  assert.equal(r.results.get('bio').ok, false);
+  assert.match(r.results.get('bio').detail, /biography/);
 });

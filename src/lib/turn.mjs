@@ -110,8 +110,8 @@ export async function validateItem(out, { task, persona, passages, policyCtx, ct
   // Novelty is a soft check: NOVELTY_ATTEMPTS tries to say something new, then the day gate decides.
   const nv = attempt < NOVELTY_ATTEMPTS ? checkNovelty(text, ctx.novelty) : null;
   if (nv) return { problem: nv.problem, kind: 'style', style: [nv.reason] };
-  // Self-biography is soft too: retelling the persona's own famous deeds gets the same tries, then the gate decides.
-  const sb = attempt < NOVELTY_ATTEMPTS && persona && (persona.kind ?? 'thinker') !== 'news' ? selfBioHit(text, selfBioProfileOf(persona)) : null;
+  // Ordinary self-biography gets the same soft tries; a gate-flagged retelling must actually be fixed.
+  const sb = (task.selfBioRepair || attempt < NOVELTY_ATTEMPTS) && persona && (persona.kind ?? 'thinker') !== 'news' ? selfBioHit(text, selfBioProfileOf(persona)) : null;
   if (sb) return { problem: selfBioRepair(sb.episode), kind: 'style', style: ['self_bio'] };
   const { refs, bad } = resolveQuotes(text, out.quoteRefs, passages);
   if (bad.length) return { problem: quoteRepair(bad), kind: 'quote' };

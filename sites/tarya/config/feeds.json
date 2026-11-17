@@ -1,5 +1,5 @@
 {
-  "$comment": "News feeds for tarya. tier: curated (auto-publish). Reuters, AP and Kan come through Google News site: searches (Kan blocks direct RSS with 403; Reuters/AP have no public RSS). Link cards must use the publisher URL, never the news.google.com redirect.",
+  "$comment": "News feeds for tarya. tier: curated (auto-publish). Reuters, AP, Kan and Times of Israel come through Google News site: searches (Kan and Times of Israel block CI's direct RSS with 403; Reuters/AP have no public RSS). Link cards must use the publisher URL, never the news.google.com redirect.",
   "feeds": [
     {
       "id": "ynet",
@@ -39,7 +39,7 @@
       "kind": "news",
       "section": "politics",
       "source": "The Times of Israel",
-      "url": "https://www.timesofisrael.com/feed/"
+      "url": "https://news.google.com/rss/search?q=site:timesofisrael.com+when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     {
       "id": "jpost",

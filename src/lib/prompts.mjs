@@ -6,6 +6,7 @@ import { MOVE_HINT, NO_FILLER } from './conversation.mjs';
 import { houseStyle } from './house-style.mjs';
 import { MAX_TAIK_CHARS } from './data.mjs';
 import { wrapUntrusted, sanitizeUntrusted } from './news.mjs';
+import { selfBioRepair } from './selfbio.mjs';
 
 export const PROMPT_VERSION = 'taiku-gen-2026.11.4';
 
@@ -112,6 +113,7 @@ export function userMessage(task, ctx) {
     ...(task.idea ? { idea: { ...task.idea, how: 'build the taik on this, in your own words; go beyond your most famous lines' } } : {}),
     ...(task.avoid?.length ? { avoid: `you used these recently; skip them this time: ${task.avoid.join('; ')}` } : {}),
     ...(task.repair ? { novelty: 'your last version repeated something you posted this week; make a different point' } : {}),
+    ...(task.selfBioRepair ? { self_biography_repair: selfBioRepair(task.selfBioRepair) } : {}),
     handles: 'when you speak to or dunk on another account, use its @handle (from the profiles/thread); third-person talk may use the name. Never invent handles.',
   };
   const parts = [`<task_spec>${JSON.stringify(spec)}</task_spec>`];
@@ -133,8 +135,12 @@ export function userMessage(task, ctx) {
 export const shortenRepair = (len, min, max) => `Too long: ${len} characters, the limit is ${MAX_TAIK_CHARS}. Rewrite it shorter (aim ${min}-${max}); keep any verified quote verbatim or drop it. Return the JSON object only.`;
 /** Over the item's sampled target (with slack): real X posts are short; rewrite to the target, never truncate. */
 export const targetRepair = (len, min, max) => `Too long: ${len} characters for this item; the target is ${min}-${max}. Rewrite it to fit (cut, don't summarize; one point, said fast). Return the JSON object only.`;
-/** Hard ceiling for an item with a sampled target: 1.5x the bucket top or +40 chars, whichever is larger. */
-export const targetCeiling = (length) => Math.min(MAX_TAIK_CHARS, Math.max(Math.round((length?.max ?? MAX_TAIK_CHARS) * 1.5), (length?.max ?? MAX_TAIK_CHARS) + 40));
+/** Slack stays within the short/medium/long distribution band; gate repair targets are strict. */
+export const targetCeiling = (length) => {
+  const max = length?.max ?? MAX_TAIK_CHARS;
+  const band = max <= 40 ? 40 : max <= 140 ? 140 : MAX_TAIK_CHARS;
+  return Math.min(band, length?.strict ? max : Math.max(Math.round(max * 1.5), max + 40));
+};
 export const quoteRepair = (spans) => `These double-quoted spans are not verbatim passages from your tool results in this conversation: ${spans.map((s) => `‘${String(s).slice(0, 60)}’`).join('; ')}. Remove the double quotes (paraphrase, or use single curly quotes), or quote a returned passage exactly with its passageId in quoteRefs. Return the JSON object only.`;
 export const formatRepair = () => 'That was not a valid JSON object with a non-empty "text". Return ONLY the JSON object.';
 
@@ -198,6 +204,7 @@ export function batchMessages(items, byId, { kind = 'replies' } = {}) {
     ...(t.idea ? { idea: { ...t.idea, how: 'build the taik on this, in your own words; go beyond your most famous lines' } } : {}),
     ...(t.avoid?.length ? { avoid: `you used these recently; skip them this time: ${t.avoid.join('; ')}` } : {}),
     ...(t.repair ? { novelty: 'your last version repeated something you posted this week; make a different point' } : {}),
+    ...(t.selfBioRepair ? { self_biography_repair: selfBioRepair(t.selfBioRepair) } : {}),
       ...(it.ctx?.relation ? { relationship: `${it.ctx.relation.kind}: ${it.ctx.relation.why ?? ''}`.slice(0, 140) } : {}),
       ...(it.ctx?.target ? { replying_to: `@${it.ctx.target.handle}` } : {}),
       ...(it.ctx?.theme && !it.ctx?.topic ? { riff_on: String(it.ctx.theme).slice(0, 140) } : {}),

@@ -154,11 +154,11 @@ test('repair: flagged tasks are regenerated to their new target; everything else
   const beforePosts = days.get(date);
   const long = beforePosts.filter((p) => p.taskId && !p.retaikOf && [...(p.text ?? '')].length > 100).slice(0, 3);
   assert.ok(long.length >= 2);
-  const r = await runDaily({ date, mock: true, quiet: true, seed: 'gate3', nonce: 'n3', spec, personas, env: {}, root: SCRATCH, repair: long.map((p) => ({ taskId: p.taskId, reason: 'over_140', length: { min: 5, max: 40 } })) });
+  const r = await runDaily({ date, mock: true, quiet: true, seed: 'gate3', nonce: 'n3', spec, personas, env: {}, root: SCRATCH, llmConfig, maxCalls: 90, repair: long.map((p) => ({ taskId: p.taskId, reason: 'over_140', length: { min: 5, max: 40 } })) });
   assert.equal(r.status, 'complete');
   const afterPosts = JSON.parse(fs.readFileSync(fileOf(date), 'utf8')).posts;
   const byId = new Map(afterPosts.map((p) => [p.id, p]));
-  for (const p of long) assert.ok([...byId.get(p.id).text].length <= 60, `${p.id} shortened: ${byId.get(p.id).text}`);
+  for (const p of long) assert.ok([...byId.get(p.id).text].length <= 40, `${p.id} shortened: ${byId.get(p.id).text}`);
   // Plain retaik rows are re-derived from the day's engagement (which the shortened items change); authored items must not move.
   const others = beforePosts.filter((p) => !long.includes(p) && !p.retaikOf);
   const changed = others.filter((p) => byId.get(p.id)?.text !== p.text).map((p) => `${p.id} [${p.text}] -> [${byId.get(p.id)?.text}]`);
@@ -172,14 +172,16 @@ test('repair: a flagged self-thread part regenerates its whole thread (no dangli
   const part = beforePosts.find((p) => /\.t2$/.test(p.taskId ?? ''));
   assert.ok(part, 'fixture day has a self-thread');
   const root = part.taskId.replace(/\.t2$/, '');
-  const r = await runDaily({ date, mock: true, quiet: true, seed: 'gate4', nonce: 'n4', spec, personas, env: {}, root: SCRATCH, repair: [{ taskId: part.taskId, reason: 'catchphrase:x' }] });
+  // This regression tests cache/resume, not entity detection in the public-domain meme artist credit.
+  const r = await runDaily({ date, mock: true, quiet: true, seed: 'gate4', nonce: 'n4', spec, personas, env: { POLICY_ALLOW_NAMES: 'Joseph Ducreux' }, root: SCRATCH, llmConfig, maxCalls: 90, repair: [{ taskId: part.taskId, reason: 'catchphrase:x' }] });
   assert.equal(r.status, 'complete', r.errors?.slice(0, 3).join('; '));
   const afterPosts = JSON.parse(fs.readFileSync(fileOf(date), 'utf8')).posts;
   const ids = new Set(afterPosts.map((p) => p.id));
   const sameDay = new Set(beforePosts.map((p) => p.id));
   for (const p of afterPosts) for (const k of ['inReplyTo', 'quoteOf', 'retaikOf']) if (sameDay.has(p[k])) assert.ok(ids.has(p[k]), `${p.id}.${k} -> ${p[k]} dangling`);
   const thread = afterPosts.filter((p) => p.taskId === root || (p.taskId ?? '').startsWith(`${root}.t`));
-  assert.ok(thread.length >= 3 && thread.some((p) => p.taskId === part.taskId), 'whole thread present after repair');
+  assert.ok(thread.length >= 3 && thread.some((p) => p.taskId === part.taskId),
+    `whole thread present after repair: ${JSON.stringify(r.manifest.tasks.filter((t) => t.taskId === root || (t.taskId ?? '').startsWith(`${root}.t`)))}`);
   days.set(date, afterPosts);
 });
 

@@ -152,11 +152,15 @@ test('workflow uploads drafts when the daily feed was skipped and persists state
   assert.match(workflow, /Create English X post and comment drafts[\s\S]*?if: always\(\) && matrix\.site == 'taiku' && inputs\.mock != true/);
   assert.match(workflow, /steps\.contentvalidate\.outcome == 'success' && steps\.contentchecks\.outcome == 'success'/);
   assert.match(workflow, /Upload readable X drafts[\s\S]*?retention-days: 14/);
+  assert.match(workflow.split('- name: Upload readable X drafts')[1].split('      - name:')[0], /steps\.drafts\.outcome == 'success'/);
   assert.match(workflow, /Show X drafts and download link in run summary[\s\S]*?steps\.draftartifact\.outcome == 'success'/);
   assert.match(workflow, /DRAFT_ARTIFACT_URL: \$\{\{ steps\.draftartifact\.outputs\.artifact-url \}\}/);
   assert.match(workflow, /cat _scratch\/x-drafts\/taiku\/drafts\.md >> "\$GITHUB_STEP_SUMMARY"/);
   assert.doesNotMatch(workflow, /CF_EMAIL_API_TOKEN|X_DRAFT_EMAIL_|smtp|send-x-drafts-email/);
   assert.match(workflow, /Download X draft dedupe state[\s\S]*?name: x-draft-state-taiku-/);
+  const download = workflow.split('- name: Download X draft dedupe state')[1].split('      - name:')[0];
+  assert.match(download, /steps\.artifacts\.outputs\.draftstate == 'true'/);
+  assert.doesNotMatch(download, /continue-on-error/, 'a missing optional artifact is skipped; an actual download failure still fails');
   assert.match(workflow, /git add sites\/taiku\/content\/state\/x-draft-state\.json/);
   assert.doesNotMatch(workflow, /api\.x\.com|twitter\.com\/i\/|statuses\/update/);
 });

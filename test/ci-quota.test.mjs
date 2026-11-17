@@ -134,3 +134,21 @@ test('generate.yml: the gate after repair turns a rate-limited repair into a gre
   // The publish job skips a site whose generate leg wrote gen-meta/skipped.txt.
   assert.match(yml, /if \[ -f gen-meta\/skipped\.txt \]; then/);
 });
+
+test('publish distinguishes unapproved diagnostic output from a missing approved file', { skip: bash.status !== 0 && 'no bash' }, () => {
+  const yml = fs.readFileSync(path.join(ROOT, '.github/workflows/generate.yml'), 'utf8');
+  const step = yml.split('- name: Generated day file present?')[1].split('      - name:')[0];
+  const script = step.split('        run: |\n')[1].split('\n').map((line) => line.replace(/^          /, '')).join('\n');
+  for (const state of ['unapproved', 'missing', 'quota']) {
+    const dir = path.join(SCRATCH, `publish-${state}`);
+    fs.mkdirSync(path.join(dir, 'gen-meta'), { recursive: true });
+    if (state === 'missing') fs.writeFileSync(path.join(dir, 'gen-meta/dayfile.txt'), 'sites/x/content/posts/daily-2026-11-17.json');
+    if (state === 'quota') fs.writeFileSync(path.join(dir, 'gen-meta/skipped.txt'), 'quota exhausted');
+    const r = spawnSync('bash', ['-e', '-c', script], { cwd: dir, encoding: 'utf8',
+      env: { ...process.env, SITE: 'x', GITHUB_OUTPUT: 'out.txt' } });
+    assert.equal(r.status, state === 'missing' ? 1 : 0, r.stderr);
+    assert.match(r.stdout, state === 'missing' ? /::error::.*approved a missing day file/ : /::notice::/);
+    if (state !== 'missing') assert.match(fs.readFileSync(path.join(dir, 'out.txt'), 'utf8'), /ok=false/);
+    if (state === 'unapproved') assert.match(r.stdout, /did not approve a day for publication/);
+  }
+});

@@ -30,6 +30,10 @@ test('varied 3-8 replies and an author answer-back per root, budgeted for the up
     assert.ok(replies.every((n) => n.exec !== 'pool' && n.role === 'reply'));
   }
   assert.ok(new Set(roots.map((root) => root.plannedReactions)).size >= 3, 'thread counts vary within one plan');
+  assert.ok(plan.nodes.some((n) => n.likes.length), 'deep threads receive non-text reactions too');
+  assert.ok(plan.nodes.some((n) => n.reposts.length), 'deep threads can produce plain retaiks');
+  assert.equal(plan.reactor.reactions.filter((r) => r.action === 'reply').length, plan.nodes.filter((n) => n.parent).length,
+    'engagement sampling never adds unplanned replies or LLM calls');
   assert.ok(content.llmReplies >= plan.nodes.filter((n) => n.parent).length, 'reserved reply capacity covers all draws');
   const smaller = contentPlan({ voice: 12, batch: 12, threadPolicy: policy });
   assert.ok(smaller.originals < content.originals);
@@ -123,4 +127,5 @@ test('an offline deep-thread day passes blocking checks without weakening voice 
   assert.equal(g.ok, true, JSON.stringify(g.failures));
   assert.ok(g.checks.some((c) => c.id === 'hard.thread_reactions' && c.status === 'pass'));
   assert.ok(g.checks.some((c) => c.id === 'persona.novelty' && c.blocking));
+  assert.ok([...r.published, ...r.staged].some((p) => p.retaikOf), 'non-text engagement emits real retaik rows');
 });

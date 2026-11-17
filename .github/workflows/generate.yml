@@ -57,14 +57,14 @@ concurrency:
 
 jobs:
   sites:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: read
     outputs:
       list: ${{ steps.list.outputs.list }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - id: list
@@ -72,7 +72,7 @@ jobs:
 
   generate:
     needs: sites
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     # Secrets live in the `production` environment (restricted to main).
     environment: production
@@ -91,7 +91,7 @@ jobs:
       GROQ_FREE_ONLY: ${{ vars.GROQ_FREE_ONLY }}
       GEMINI_FREE_ONLY: ${{ vars.GEMINI_FREE_ONLY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -145,7 +145,7 @@ jobs:
             echo "skipped=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 
@@ -168,7 +168,7 @@ jobs:
         run: echo "rev=$(node -e "import('./src/lib/embed.mjs').then(m=>console.log(m.MODEL_REVISION))")" >> "$GITHUB_OUTPUT"
       - name: Cache embedding model
         if: steps.local.outputs.skipped != 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/taiku-hf
           key: hf-minilm-l6-v2-${{ runner.os }}-${{ steps.hf.outputs.rev }}
@@ -275,7 +275,7 @@ jobs:
         run: mkdir -p gen-meta && printf '%s\n' "$DAYFILE" > gen-meta/dayfile.txt
       - name: Upload generated content
         if: always() && steps.local.outputs.skipped != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: daily-content-${{ matrix.site }}
           path: |
@@ -305,14 +305,14 @@ jobs:
             --out "_scratch/x-drafts/taiku"
       - name: Upload readable X drafts
         id: draftartifact
-        if: always() && matrix.site == 'taiku' && inputs.mock != true
-        uses: actions/upload-artifact@v4
+        if: always() && matrix.site == 'taiku' && inputs.mock != true && steps.drafts.outcome == 'success'
+        uses: actions/upload-artifact@v7
         with:
           name: x-drafts-taiku-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             _scratch/x-drafts/taiku/drafts.md
             _scratch/x-drafts/taiku/drafts.json
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 14
       - name: Show X drafts and download link in run summary
         if: always() && matrix.site == 'taiku' && steps.drafts.outcome == 'success' && steps.draftartifact.outcome == 'success'
@@ -329,7 +329,7 @@ jobs:
           cp sites/taiku/content/state/x-draft-state.json _scratch/x-draft-state/sites/taiku/content/state/x-draft-state.json
       - name: Upload X draft dedupe state
         if: always() && matrix.site == 'taiku' && steps.drafts.outcome == 'success' && inputs.mock != true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: x-draft-state-taiku-${{ github.run_id }}-${{ github.run_attempt }}
           path: _scratch/x-draft-state/
@@ -338,7 +338,7 @@ jobs:
 
       - name: Persist shared usage even when generation or gate fails
         if: always() && steps.budget.outcome == 'success'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: free-budget-${{ steps.budget.outputs.day }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.site }}
           path: _scratch/free-budget.json
@@ -350,10 +350,11 @@ jobs:
   publish:
     needs: [sites, generate]
     if: always() && needs.sites.result == 'success' && !inputs.mock
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: write
+      actions: read
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -362,31 +363,42 @@ jobs:
     env:
       SITE: ${{ matrix.site }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
-      # No artifact = this site skipped (local run present) or its generate leg failed: nothing to publish.
-      - uses: actions/download-artifact@v4
+      - name: Find published artifacts
+        id: artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          artifacts="$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?per_page=100" --jq '.artifacts[] | select(.expired == false) | .name')"
+          if grep -Fxq "daily-content-$SITE" <<< "$artifacts"; then
+            echo "content=true" >> "$GITHUB_OUTPUT"
+          fi
+          if [ "$SITE" = "taiku" ] && grep -Fxq "x-draft-state-taiku-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" <<< "$artifacts"; then
+            echo "draftstate=true" >> "$GITHUB_OUTPUT"
+          fi
+      # No artifact = this site skipped (local run present) or its generate leg failed.
+      - uses: actions/download-artifact@v8
         id: dl
-        continue-on-error: true
+        if: steps.artifacts.outputs.content == 'true'
         with:
           name: daily-content-${{ matrix.site }}
           path: .
 
       - name: Download X draft dedupe state
         id: draftstate
-        if: matrix.site == 'taiku'
-        uses: actions/download-artifact@v4
-        continue-on-error: true
+        if: matrix.site == 'taiku' && steps.artifacts.outputs.draftstate == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: x-draft-state-taiku-${{ github.run_id }}-${{ github.run_attempt }}
           path: .
 
       # The artifact uploads even when generation failed (always()), but then without gen-meta/dayfile.txt
-      # or the day file itself: skip this site with a clear error instead of tripping the allowlist below.
+      # on gate failure: never mistake the diagnostic day file for approved content.
       - name: Generated day file present?
         id: have
         if: steps.dl.outcome == 'success'
@@ -395,9 +407,12 @@ jobs:
           if [ -f gen-meta/skipped.txt ]; then
             echo "::notice::generate (${SITE}) skipped publishing: $(head -n1 gen-meta/skipped.txt)"
             echo "ok=false" >> "$GITHUB_OUTPUT"
-          elif [ -z "$DAYFILE" ] || [ ! -f "$DAYFILE" ]; then
-            echo "::error::generate (${SITE}) produced no day file${DAYFILE:+ ($DAYFILE missing)}; nothing to publish for $SITE. See the generate job log."
+          elif [ -z "$DAYFILE" ]; then
+            echo "::notice::generate (${SITE}) did not approve a day for publication; see the generate job's validation/gate failure."
             echo "ok=false" >> "$GITHUB_OUTPUT"
+          elif [ ! -f "$DAYFILE" ]; then
+            echo "::error::generate (${SITE}) approved a missing day file ($DAYFILE); nothing to publish."
+            exit 1
           elif [[ "$DAYFILE" != *-cf.json ]] && git fetch --quiet --depth=1 origin "$GITHUB_REF_NAME" 2>/dev/null && git cat-file -e "FETCH_HEAD:$DAYFILE" 2>/dev/null; then
             # The local run landed on main while this fallback was generating: it wins, never clobber it.
             echo "::notice::$DAYFILE is already on main (local run pushed meanwhile); not publishing the fallback for $SITE."
