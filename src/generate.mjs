@@ -77,6 +77,7 @@ function summarize(r) {
     embeddings: m.embeddings.kind,
     models: m.models.filter((x) => x.calls > 0 || x.plan > 0).map((x) => `${x.name}: ${x.calls}/${x.plan}+${x.reserve} calls, ~${x.neurons_est} N, ${x.items} items${x['429s'] ? `, ${x['429s']}x429` : ''}`),
     plannedNeurons: m.budgetPlan.totals.neurons,
+    freePools: m.budgetPlan.pools,
     items: m.items,
     pools: m.pools,
     micro: { calls: m.micro.calls, replies: m.micro.replies, added: m.micro.added.length },

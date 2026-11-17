@@ -5,6 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { createFreeBudget, freeProvider, ledgerUsage, mergeLedgers, readLedger, requestBound } from '../src/lib/free-budget.mjs';
 import { createClient } from '../src/lib/llm.mjs';
+import { spawnSync } from 'node:child_process';
+import { ROOT } from '../src/lib/site.mjs';
 
 const day = '2026-11-14';
 const now = () => day;
@@ -66,8 +68,45 @@ test('empty responses and retries are charged and cannot overflow the run ceilin
 
 test('free-only attestation excludes paid-capable providers, :free models need none', () => {
   assert.equal(freeProvider({ ...p, model: '@cf/model' }, {}), false);
-  assert.equal(freeProvider({ ...p, model: '@cf/model' }, { CF_FREE_ONLY: 'true' }), true);
-  assert.equal(freeProvider({ ...p, model: 'model:free' }, {}), true);
+  assert.equal(freeProvider({ ...p, model: '@cf/model', freeTier: true }, { CF_FREE_ONLY: 'true' }), true);
+  assert.equal(freeProvider({ ...p, model: '@cf/paid-model' }, { CF_FREE_ONLY: 'true' }), false);
+  assert.equal(freeProvider({ ...p, model: '@cf/model', freeTier: true, neuronRate: {} }, { CF_FREE_ONLY: 'true' }), false);
+  assert.equal(freeProvider({ ...p, model: 'model:free' }, {}), false, 'suffix alone does not make a Cloudflare model free');
+  assert.equal(freeProvider({ ...p, keyEnv: 'OPENROUTER_API_KEY', model: 'model:free' }, {}), true);
+  assert.equal(freeProvider({ ...p, keyEnv: 'OPENROUTER_API_KEY', model: 'paid-model' }, { OPENROUTER_FREE_ONLY: 'true' }), false);
   const b = createFreeBudget({ config, day, now: () => '2026-11-15' });
   assert.equal(b.take(p, body), null, 'stop a run crossing UTC midnight');
+});
+
+test('both independent free pools remain usable when the other is exhausted', () => {
+  const or = { ...p, name: 'or', keyEnv: 'OPENROUTER_API_KEY', capUnit: 'requests', cap: 2, calls: 2, neuronRate: null };
+  const cfg = { ...config, providers: [p, or], freePools: { OPENROUTER_API_KEY: { calls: 2 } } };
+  const b = createFreeBudget({ config: cfg, day, now });
+  assert.ok(b.take(or, body));
+  assert.ok(b.take(or, body));
+  assert.equal(b.take(or, body), null);
+  assert.ok(b.take(p, body), 'OpenRouter exhaustion does not disable Cloudflare');
+  assert.ok(b.take(p, body));
+  assert.equal(b.take(p, body), null);
+  assert.equal(b.usage().a.neurons, config.totalCap.cap);
+  assert.equal(b.usage().or.calls, 2);
+});
+
+test('workflow matrix and quota sharing both count the default-on site', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'taiku-sites-'));
+  try {
+    for (const [id, cfg] of Object.entries({ taiku: {}, second: { generate: true }, disabled: { generate: false }, unspecified: {} })) {
+      fs.mkdirSync(path.join(dir, id));
+      fs.writeFileSync(path.join(dir, id, 'site.json'), JSON.stringify(cfg));
+    }
+    const output = path.join(dir, 'output.txt');
+    const env = { ...process.env, SITES_DIR: dir, SITE: 'taiku', GITHUB_ACTIONS: 'false',
+      GEN_USAGE_FILE: path.join(dir, 'usage.json'), GITHUB_OUTPUT: output };
+    const matrix = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'sites.mjs'), '--generate', '--json'], { env, encoding: 'utf8' });
+    assert.equal(matrix.status, 0, matrix.stderr);
+    assert.deepEqual(JSON.parse(matrix.stdout), ['second', 'taiku']);
+    const sync = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'free-budget-sync.mjs')], { env, encoding: 'utf8' });
+    assert.equal(sync.status, 0, sync.stderr);
+    assert.match(fs.readFileSync(output, 'utf8'), /^remaining=2$/m);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });

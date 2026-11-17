@@ -1,10 +1,14 @@
 import fs from 'node:fs';
 import { randomUUID } from 'node:crypto';
-import { neuronsFor } from './budget.mjs';
+import { neuronsFor, poolBudgets } from './budget.mjs';
 import { writeJsonAtomic } from './pipeline-util.mjs';
 
-export const freeProvider = (p, env) => p.model.endsWith(':free') ||
-  env[`${p.keyEnv.replace(/_(API_KEY|AI_TOKEN)$/, '')}_FREE_ONLY`] === 'true';
+export const freeProvider = (p, env) => {
+  if (p.keyEnv === 'OPENROUTER_API_KEY') return p.model.endsWith(':free');
+  if (p.keyEnv === 'CF_AI_TOKEN' && (!p.freeTier || p.capUnit !== 'neurons' ||
+      !(p.neuronRate?.input > 0) || !(p.neuronRate?.output > 0))) return false;
+  return env[`${p.keyEnv.replace(/_(API_KEY|AI_TOKEN)$/, '')}_FREE_ONLY`] === 'true';
+};
 
 // A UTF-8 byte is a conservative token bound, including Hebrew and tool schemas.
 export function requestBound(p, body) {
@@ -59,17 +63,8 @@ export function createFreeBudget({ config, used = {}, file = null, day, shares =
   const usage = () => ledgerUsage(doc);
   const persist = () => { if (file) writeJsonAtomic(file, doc); };
   const initial = usage();
-  const limits = {};
-  for (const key of new Set(config.providers.map((p) => p.keyEnv))) {
-    const group = config.providers.filter((p) => p.keyEnv === key);
-    const sum = (k) => Object.entries(initial).filter(([name, u]) => u.keyEnv === key || group.some((p) => p.name === name))
-      .reduce((s, [, u]) => s + (u[k] ?? 0), 0);
-    const quota = config.freePools?.[key] ?? {};
-    limits[key] = Object.fromEntries(['calls', 'tokens', 'neurons'].map((k) => {
-      const cap = k === 'neurons' && key === 'CF_AI_TOKEN' ? config.totalCap.cap : quota[k] ?? Infinity;
-      return [k, sum(k) + Math.max(0, cap - sum(k)) / shares];
-    }));
-  }
+  const limits = Object.fromEntries(Object.entries(poolBudgets(config, initial, shares)).map(([key, pool]) =>
+    [key, Object.fromEntries(['calls', 'tokens', 'neurons'].map((k) => [k, pool.used[k] + (pool.share[k] ?? Infinity)]))]));
   return {
     take(p, body) {
       if (sessionCalls >= maxCalls || now() !== day) return null;

@@ -535,6 +535,9 @@ export async function runDaily(opts = {}) {
   const threadPolicy = spec.sampling.conversation?.daily_reactions ?? null;
   const shares = Math.max(1, Number(env.GEN_REMAINING_SITES) || 1);
   const budget = planBudget({ config, used: usedToday, available: discovery.available, maxCalls, threadPolicy, shares });
+  for (const [key, pool] of Object.entries(budget.pools)) {
+    log(`free pool ${key}: used ${JSON.stringify(pool.used)}, remaining ${JSON.stringify(pool.remaining)}, site share ${JSON.stringify(pool.share)}`);
+  }
   const reusePlan = prev?.nonce === nonce && prev?.budgetPlan?.content &&
     JSON.stringify(prev.budgetPlan.content.threadPolicy ?? null) === JSON.stringify(threadPolicy);
   const content = reusePlan ? prev.budgetPlan.content : budget.content;

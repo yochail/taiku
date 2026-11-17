@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { ROOT, listSites, siteDir } from '../src/lib/site.mjs';
+import { ROOT, listGeneratingSites, listSites, siteDir } from '../src/lib/site.mjs';
 import { mergeLedgers, readLedger } from '../src/lib/free-budget.mjs';
 import { writeJsonAtomic } from '../src/lib/pipeline-util.mjs';
 
@@ -45,4 +45,4 @@ if (!Object.keys(doc.events).length) for (const site of listSites()) {
 }
 writeJsonAtomic(file, doc);
 if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT,
-  `day=${day}\nremaining=${Math.max(1, listSites().filter((s) => JSON.parse(fs.readFileSync(path.join(siteDir(s), 'site.json'), 'utf8')).generate && !completedSites.has(s)).length)}\n`);
+  `day=${day}\nremaining=${Math.max(1, listGeneratingSites().filter((s) => !completedSites.has(s)).length)}\n`);

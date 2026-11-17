@@ -54,3 +54,10 @@ export function listSites() {
   const ids = fs.existsSync(SITES_DIR) ? fs.readdirSync(SITES_DIR, { withFileTypes: true }).filter((d) => d.isDirectory() && fs.existsSync(path.join(SITES_DIR, d.name, 'site.json'))).map((d) => d.name) : [];
   return [...new Set([DEFAULT_SITE, ...ids])].sort();
 }
+
+export function listGeneratingSites() {
+  return listSites().filter((id) => {
+    const cfg = JSON.parse(fs.readFileSync(path.join(siteDir(id), 'site.json'), 'utf8'));
+    return cfg.generate ?? id === DEFAULT_SITE;
+  });
+}

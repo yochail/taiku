@@ -59,6 +59,7 @@
   "providers": [
     {
       "name": "cf-llama-3.3-70b",
+      "freeTier": true,
       "baseURL": "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/v1",
       "keyEnv": "CF_AI_TOKEN",
       "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
@@ -83,6 +84,7 @@
     },
     {
       "name": "cf-gemma-4-26b",
+      "freeTier": true,
       "baseURL": "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/v1",
       "keyEnv": "CF_AI_TOKEN",
       "model": "@cf/google/gemma-4-26b-a4b-it",
@@ -108,6 +110,7 @@
     },
     {
       "name": "cf-gemma-4-26b-micro",
+      "freeTier": true,
       "baseURL": "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/v1",
       "keyEnv": "CF_AI_TOKEN",
       "model": "@cf/google/gemma-4-26b-a4b-it",
@@ -133,6 +136,7 @@
     },
     {
       "name": "cf-gpt-oss-120b",
+      "freeTier": true,
       "baseURL": "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/v1",
       "keyEnv": "CF_AI_TOKEN",
       "model": "@cf/openai/gpt-oss-120b",

@@ -1,4 +1,4 @@
-// Budget planner (Neurons). Before generating, turn the remaining Workers AI quota into a day plan
+// Budget planner. Combine independent free-provider pools into a day plan
 // (topics, single voice turns, batch calls, micro calls, LLM reply capacity) so a short quota
 // degrades the day gracefully instead of failing half-way. Non-LLM filler (likes, plain retaiks,
 // pool micro-reactions) makes up the rest of the volume.
@@ -26,6 +26,18 @@ export function saveUsage(file, day, models) {
   writeJsonAtomic(file, { day, updatedAt: new Date().toISOString(), models });
 }
 
+export function poolBudgets(config, used = {}, shares = 1) {
+  return Object.fromEntries([...new Set(config.providers.map((p) => p.keyEnv))].map((key) => {
+    const names = new Set(config.providers.filter((p) => p.keyEnv === key).map((p) => p.name));
+    const cap = { ...(config.freePools?.[key] ?? {}), ...(key === 'CF_AI_TOKEN' ? { neurons: config.totalCap.cap } : {}) };
+    const spent = Object.fromEntries(['calls', 'tokens', 'neurons'].map((k) =>
+      [k, Object.entries(used).filter(([name, u]) => u.keyEnv === key || names.has(name)).reduce((s, [, u]) => s + (u[k] ?? 0), 0)]));
+    const remaining = Object.fromEntries(Object.entries(cap).map(([k, n]) => [k, Math.max(0, n - spent[k])]));
+    const share = Object.fromEntries(Object.entries(remaining).map(([k, n]) => [k, n / Math.max(1, shares)]));
+    return [key, { cap, used: spent, remaining, share }];
+  }));
+}
+
 /**
  * Plan one day's calls per provider.
  * @param o.config   config/llm.json
@@ -48,28 +60,31 @@ export function planBudget({ config, used = {}, available = null, maxCalls = Inf
     if (Number.isFinite(p.calls)) allowance = Math.min(allowance, p.calls - (u.calls ?? 0));
     return { name: p.name, model: p.model, role: p.role, capUnit: p.capUnit, cap: p.cap, perCall: Math.round(perCall * 10) / 10, usedToday: u, allowance: Math.max(0, allowance) };
   });
-  if (threadPolicy) for (const m of models) m.capacity = m.allowance;
-  // Global Neuron cap (shared pool) and the total-call target / GEN_MAX_CALLS.
-  const neuronCap = Math.max(0, ((config.totalCap?.cap ?? Infinity) - models.reduce((s, m) => s + (m.usedToday.neurons ?? 0), 0)) / shares);
-  for (const [key, quota] of Object.entries(config.freePools ?? {})) {
+  const pools = poolBudgets(config, used, shares);
+  const neuronCap = pools.CF_AI_TOKEN?.share.neurons ?? Infinity;
+  for (const [key, pool] of Object.entries(pools)) {
     const group = models.filter((m) => config.providers.find((p) => p.name === m.name).keyEnv === key);
-    const remaining = Math.max(0, (quota.calls - group.reduce((s, m) => s + (m.usedToday.calls ?? 0), 0)) / shares);
-    const total = group.reduce((s, m) => s + m.allowance, 0);
-    if (total > remaining) for (const m of group) m.allowance = Math.floor(m.allowance * remaining / total);
+    const cost = (m, k) => {
+      const p = config.providers.find((p) => p.name === m.name);
+      return k === 'calls' ? 1 : k === 'neurons' ? m.perCall : (p.est?.input ?? 2000) + (p.est?.output ?? 150);
+    };
+    if (threadPolicy) for (const m of group) m.capacity = Math.min(m.allowance,
+      ...Object.entries(pool.share).map(([k, n]) => cost(m, k) > 0 ? Math.floor(n / cost(m, k)) : Infinity));
+    const scale = Math.min(1, ...Object.entries(pool.share).map(([k, n]) => {
+      const demand = group.reduce((s, m) => s + m.allowance * cost(m, k), 0);
+      return demand > 0 ? n / demand : 1;
+    }));
+    const fractions = new Map(group.map((m) => [m, m.allowance * scale % 1]));
+    for (const m of group) m.allowance = Math.floor(m.allowance * scale);
+    // Keep an odd request instead of rounding it away from both models in a pool.
+    for (const m of [...group].sort((a, b) => fractions.get(b) - fractions.get(a))) {
+      if (fractions.get(m) > 0 && Object.entries(pool.share).every(([k, n]) =>
+        group.reduce((s, x) => s + x.allowance * cost(x, k), 0) + cost(m, k) <= n)) m.allowance++;
+    }
   }
   const maxTotal = Math.min(target.max ?? Infinity, maxCalls);
   const spend = () => models.reduce((s, m) => s + m.allowance * m.perCall, 0);
-  if (spend() > neuronCap) {
-    const scale = neuronCap / spend();
-    for (const m of models) if (m.perCall > 0) m.allowance = Math.floor(m.allowance * scale);
-  }
-  // 1) Neuron cap (Workers AI only): trim micro first, voice last.
   const order = ['micro', 'fallback', 'batch', 'voice'];
-  for (let guard = 0; guard < 5000 && spend() > neuronCap; guard++) {
-    const m = models.filter((x) => x.allowance > 0 && x.perCall > 0).sort((x, y) => order.indexOf(x.role) - order.indexOf(y.role) || y.allowance - x.allowance)[0];
-    if (!m) break;
-    m.allowance--;
-  }
   // Each model keeps its whole allowance as a ceiling, so a role can fall through its chain
   // (config.chains) when a model 429s. Per-model plan/reserve split.
   for (const m of models) {
@@ -98,7 +113,7 @@ export function planBudget({ config, used = {}, available = null, maxCalls = Inf
   const sum = (k) => order.reduce((t, r) => t + roles[r][k], 0);
   const totals = { calls: sum('calls'), plan: sum('plan'), reserve: sum('reserve'), neurons: Math.round(spend()), neuronCap: Math.round(neuronCap), targetMin: target.min, targetMax: target.max };
   totals.degraded = totals.calls < (target.min ?? 0);
-  return { models, roles, totals, content: contentPlan({ voice: roles.voice.plan + Math.floor(roles.fallback.plan / 2), batch: roles.batch.plan, micro: roles.micro.plan, maxTopics, threadPolicy }) };
+  return { models, roles, totals, pools, content: contentPlan({ voice: roles.voice.plan + Math.floor(roles.fallback.plan / 2), batch: roles.batch.plan, micro: roles.micro.plan, maxTopics, threadPolicy }) };
 }
 
 /** Convert per-role call budgets into a content plan. */

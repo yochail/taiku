@@ -49,3 +49,23 @@ test('content plan scales with the role budgets', () => {
   assert.equal(a.microPool, 1);
   assert.deepEqual(contentPlan({}).llmItems, 0);
 });
+
+test('combined budgets add independent pools, divide both sites fairly and retain odd requests', () => {
+  const available = new Set(config.providers.filter((p) => ['CF_AI_TOKEN', 'OPENROUTER_API_KEY'].includes(p.keyEnv)).map((p) => p.name));
+  const orNames = config.providers.filter((p) => p.keyEnv === 'OPENROUTER_API_KEY').map((p) => p.name);
+  const used = { [orNames[0]]: { calls: 49, neurons: 0 }, retired: { keyEnv: 'CF_AI_TOKEN', calls: 1, neurons: 1000 } };
+  const plan = planBudget({ config, used, available, threadPolicy: { max: 8 }, shares: 1 });
+  assert.equal(plan.models.filter((m) => orNames.includes(m.name)).reduce((n, m) => n + m.allowance, 0), 1, 'last OpenRouter request is not rounded away');
+  assert.equal(plan.pools.CF_AI_TOKEN.remaining.neurons, 9000, 'retired-model usage still counts');
+  assert.ok(plan.totals.calls > 1, 'remaining Cloudflare capacity is added');
+  assert.ok(plan.content.originals > 0);
+  const half = planBudget({ config, available, shares: 2, threadPolicy: { max: 8 } });
+  assert.equal(half.pools.CF_AI_TOKEN.share.neurons, 5000);
+  assert.equal(half.pools.OPENROUTER_API_KEY.share.calls, 25);
+  assert.equal(half.models.filter((m) => orNames.includes(m.name)).reduce((n, m) => n + m.allowance, 0), 25);
+  assert.ok(half.totals.neurons <= 5000);
+  for (const m of half.models.filter((m) => orNames.includes(m.name))) assert.ok(m.capacity <= 25, 'rotation ceilings respect site share');
+  const exhausted = planBudget({ config, available, used: { [orNames[0]]: { calls: 50 } } });
+  assert.equal(exhausted.pools.OPENROUTER_API_KEY.remaining.calls, 0);
+  assert.ok(exhausted.totals.calls > 0, 'an exhausted request pool does not exhaust Neurons');
+});
