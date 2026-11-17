@@ -138,7 +138,7 @@ async function main() {
   try {
     const r = await runDaily({ ...opts, spec, quiet: opts.quiet || opts.summaryOnly });
     console.log(JSON.stringify(summarize(r), null, 2));
-    if (r.status === 'partial') console.error('run is PARTIAL: completeness thresholds not met — nothing published; rerun the same date to resume.');
+    if (r.status === 'partial') console.error('run is PARTIAL: completeness thresholds not met — curated candidates require offline salvage and blocking gates before publication; rerun the same date to resume.');
     if (r.status === 'invalid') console.error(`run is INVALID:\n  ${r.errors.slice(0, 20).join('\n  ')}`);
     process.exitCode = r.exitCode;
   } finally {

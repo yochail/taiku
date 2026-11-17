@@ -4,7 +4,9 @@
 #
 #   exit 0 from generate (complete)               -> ok
 #   exit 2 (partial: below GEN_MIN_COMPLETE, or the
-#     free-tier LLM quota / wall clock ran out)  -> soft skip: ::warning::, job summary, step output
+#     free-tier LLM quota / wall clock ran out)  -> salvage curated candidates without inference;
+#     if all item checks and blocking gates pass, continue with explicit partial metadata.
+#     Without a usable subset: soft skip, job summary, step output
 #                                                   soft=true and gen-meta/skipped.txt; exits 0 and
 #                                                   nothing is published (the local run covers the day)
 #   anything else, when the fatal error is a
@@ -69,16 +71,40 @@ soft_skip() { # $1 = why (one line), $2 = summary paragraph
   exit 0
 }
 
+salvage() {
+  node "$here/salvage-day.mjs" --file "$1" --out gen-meta/recovered.json --dayfile "$DAYFILE" --report gen-meta/partial-publication.json || return $?
+  mkdir -p "$(dirname "$DAYFILE")" && mv gen-meta/recovered.json "$DAYFILE" || return $?
+  echo "partial=true" >> "${GITHUB_OUTPUT:-/dev/null}"
+  echo "generate ($SITE): recovered a gated partial day; workflow validation still required ($facts)."
+}
+
 case "$rc" in
   0)
     echo "generate ($SITE $GEN_DATE${*:+ $*}): complete. $facts${quota:+; rate-limited: $quota}"
     ;;
   2)
+    candidates="$(dirname "$(dirname "$(dirname "$DAYFILE")")")/staging/$(basename "$DAYFILE" .json | sed 's/^daily-//')/candidates.json"
+    if [ -f "$candidates" ] && [ -z "${MOCK:-}" ]; then
+      if salvage "$candidates"; then
+        exit 0
+      else
+        salvage_rc=$?
+        [ "$salvage_rc" -eq 2 ] || exit "$salvage_rc"
+      fi
+    fi
     soft_skip "ended PARTIAL" "The Workers AI fallback ${*:+(\`$*\`) }ended **partial**, below the completeness floor (\`GEN_MIN_COMPLETE\`), usually because the free-tier LLM quotas (Groq / Gemini / OpenRouter / Workers AI) were exhausted." "$@"
     ;;
   *)
     if err="$(node "$here/ci-quota.mjs" log "$log" 2>/dev/null)"; then
       quota="$err"
+      if [ -f "$DAYFILE" ] && [ -z "${MOCK:-}" ]; then
+        if salvage "$DAYFILE"; then
+          exit 0
+        else
+          salvage_rc=$?
+          [ "$salvage_rc" -eq 2 ] || exit "$salvage_rc"
+        fi
+      fi
       soft_skip "failed on LLM quota / rate limits ($err)" "The Workers AI fallback ${*:+(\`$*\`) }stopped on a free-tier LLM quota / rate-limit error (Groq / Gemini / OpenRouter / Workers AI), not a code error." "$@"
     fi
     echo "::error title=Daily feed fallback failed ($SITE)::generate ${*:+$* }exited $rc for $GEN_DATE ($facts). This is a real error (invalid output, an exception or missing credentials), not quota."

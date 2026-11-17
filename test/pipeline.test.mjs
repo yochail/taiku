@@ -130,6 +130,8 @@ test('budget exhaustion → partial: exit 2, nothing published, rerun resumes', 
   assert.equal(r.exitCode, 2);
   assert.ok(!fs.existsSync(paths.posts), 'no published content for a partial day');
   assert.equal(read(paths.run).status, 'partial');
+  if (r.published.length) assert.deepEqual(read(paths.candidates).posts, r.published,
+    'curated partial output is persisted for offline salvage, not directly published');
   assert.ok(read(paths.run).budget.budgetHit);
   const done1 = r.manifest.tasks.filter((t) => t.status === 'done').length;
   const r2 = await run({ root });

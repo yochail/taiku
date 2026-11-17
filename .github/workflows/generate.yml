@@ -199,7 +199,7 @@ jobs:
           FORCE: ${{ inputs.force && '1' || '' }}
           MOCK: ${{ inputs.mock && '1' || '' }}
           DAYFILE: ${{ steps.local.outputs.dayfile }}
-        # Partial (quota exhausted / below GEN_MIN_COMPLETE) → warning + summary, soft=true, nothing published.
+        # A partial day with curated candidates goes through offline salvage, never straight to publish.
         run: bash scripts/ci-generate.sh
 
       - name: Day gate (distribution)
@@ -239,8 +239,18 @@ jobs:
         env:
           DAYFILE: ${{ steps.local.outputs.dayfile }}
           REPAIR_QUOTA: ${{ steps.repair.outputs.quota }}
+          POLICY_ALLOW_NAMES: ${{ vars.POLICY_ALLOW_NAMES }}
         run: |
           npm run realism -- --file "$DAYFILE" --json day-gate.json && exit 0
+          # Keep a coherent subset only if the unchanged gate and item checks approve it.
+          if node scripts/salvage-day.mjs --file "$DAYFILE" --out gen-meta/recovered.json --report gen-meta/partial-publication.json; then
+            mv gen-meta/recovered.json "$DAYFILE"
+            npm run realism -- --file "$DAYFILE" --json day-gate.json
+            exit 0
+          else
+            rc=$?
+            [ "$rc" -eq 2 ] || exit "$rc"
+          fi
           # Still off-band. If the repair was quota- or rate-limited (budget hit, 429s, capped models: the
           # flagged items could not all be regenerated) that is a quota day, not a defect: skip publishing
           # with a warning. Otherwise the gate blocks.

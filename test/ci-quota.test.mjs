@@ -5,6 +5,7 @@ import path from 'node:path';
 import { after, test } from 'node:test';
 import { ROOT } from '../src/lib/data.mjs';
 import { quotaFailure, quotaReasons } from '../scripts/ci-quota.mjs';
+import { loadPersonas } from '../src/lib/data.mjs';
 
 // The Nov 7 2026 repair: exit 0, no budget hit, but Groq / Gemini 429s left the day gate failing.
 const rateLimitedRepair = {
@@ -50,7 +51,7 @@ const bash = spawnSync('bash', ['-c', 'echo ok'], { encoding: 'utf8' });
 const SCRATCH = path.join(ROOT, 'test', '.ci-quota-scratch');
 after(() => fs.rmSync(SCRATCH, { recursive: true, force: true }));
 
-function ciGenerate(name, { rc, manifest, stderr = '' }, args = []) {
+function ciGenerate(name, { rc, manifest, stderr = '', candidates = null, existingDay = null }, args = []) {
   const dir = path.join(SCRATCH, name);
   const bin = path.join(dir, 'bin');
   fs.rmSync(dir, { recursive: true, force: true });
@@ -58,6 +59,14 @@ function ciGenerate(name, { rc, manifest, stderr = '' }, args = []) {
   const runs = path.join(dir, 'sites/x/content/runs');
   fs.writeFileSync(path.join(dir, 'stub-manifest.json'), manifest ? JSON.stringify(manifest) : '');
   fs.writeFileSync(path.join(dir, 'stub-stderr.txt'), stderr);
+  if (candidates) {
+    fs.mkdirSync(path.join(dir, 'sites/x/staging/2026-11-07'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'sites/x/staging/2026-11-07/candidates.json'), JSON.stringify(candidates));
+  }
+  if (existingDay) {
+    fs.mkdirSync(path.join(dir, 'sites/x/content/posts'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'sites/x/content/posts/daily-2026-11-07.json'), JSON.stringify(existingDay));
+  }
   fs.writeFileSync(
     path.join(bin, 'npm'),
     `#!/usr/bin/env bash\nmkdir -p "${runs.replace(/\\/g, '/')}"\n[ -s stub-manifest.json ] && cp stub-manifest.json "${runs.replace(/\\/g, '/')}/2026-11-07.json"\ncat stub-stderr.txt >&2\nexit ${rc}\n`,
@@ -68,10 +77,11 @@ function ciGenerate(name, { rc, manifest, stderr = '' }, args = []) {
   const r = spawnSync('bash', [path.join(ROOT, 'scripts/ci-generate.sh').replace(/\\/g, '/'), ...args], {
     cwd: dir,
     encoding: 'utf8',
-    env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}`, SITE: 'x', GEN_DATE: '2026-11-07', DAYFILE: 'sites/x/content/posts/daily-2026-11-07.json', GITHUB_OUTPUT: out, GITHUB_STEP_SUMMARY: sum, MOCK: '', FORCE: '', GEN_NONCE: '' },
+    env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}`, SITE: candidates || existingDay ? 'taiku' : 'x', POSTS_DIR: path.join(dir, 'sites/x/content/posts'), GEN_DATE: '2026-11-07', DAYFILE: 'sites/x/content/posts/daily-2026-11-07.json', GITHUB_OUTPUT: out, GITHUB_STEP_SUMMARY: sum, MOCK: '', FORCE: '', GEN_NONCE: '' },
   });
   const read = (f) => (fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : '');
-  return { status: r.status, stdout: r.stdout, output: read(out), summary: read(sum), skipped: read(path.join(dir, 'gen-meta/skipped.txt')), quota: read(path.join(dir, 'gen-meta/quota-repair.txt')) };
+  return { status: r.status, stdout: r.stdout, output: read(out), summary: read(sum), skipped: read(path.join(dir, 'gen-meta/skipped.txt')), quota: read(path.join(dir, 'gen-meta/quota-repair.txt')),
+    day: read(path.join(dir, 'sites/x/content/posts/daily-2026-11-07.json')) };
 }
 
 test('ci-generate.sh: a rate-limited repair is flagged quota=true for the gate after repair', { skip: bash.status !== 0 && 'no bash' }, () => {
@@ -117,6 +127,40 @@ test('ci-generate.sh: a partial run stays a soft skip', { skip: bash.status !== 
   assert.match(r.output, /^soft=true$/m);
   assert.match(r.output, /^quota=true$/m);
   assert.match(r.summary, /ended \*\*partial\*\*/);
+});
+
+test('ci-generate.sh: a usable partial day is salvaged without inference; unsafe or mock candidates never publish', { skip: bash.status !== 0 && 'no bash' }, () => {
+  const authors = loadPersonas().filter((p) => p.kind !== 'news');
+  const posts = Array.from({ length: 4 }, (_, i) => ({ id: `salvage-${i}`, authorId: authors[i].id, origin: 'cloudflare',
+    type: i ? 'joke' : 'hot_take', text: ['A new question for this morning.', 'Try a different starting point.', 'The premise needs work.', 'What would change your mind?'][i],
+    createdAt: `2026-11-07T10:${13 + i * 3}:17Z`, ...(i ? { inReplyTo: 'salvage-0' } :
+      { media: [{ kind: 'gif', src: '/test.gif', alt: 'A reaction.', rating: 'g' }] }) }));
+  const candidates = { origin: 'cloudflare', provider: 'fixture', threadPolicy: { min: 3, max: 8 }, posts };
+  const manifest = { ...rateLimitedRepair, status: 'partial' };
+  const r = ciGenerate('usable-partial', { rc: 2, manifest, candidates });
+  assert.equal(r.status, 0, r.stdout);
+  assert.match(r.output, /^partial=true$/m, r.stdout);
+  assert.doesNotMatch(r.output, /soft=true/);
+  assert.equal(JSON.parse(r.day).posts.length, 4);
+  assert.equal(JSON.parse(r.day).publication.status, 'partial');
+  assert.match(r.summary, /4\/4 existing posts retained/);
+  const unsafe = ciGenerate('unsafe-partial', { rc: 2, manifest, candidates: { ...candidates, posts: posts.map((p) => ({ ...p, text: 'https://example.com' })) } });
+  assert.equal(unsafe.day, '');
+  assert.match(unsafe.output, /soft=true/);
+  assert.match(unsafe.summary, /unpublishable/);
+  const mock = ciGenerate('mock-partial', { rc: 2, manifest, candidates: { ...candidates, origin: 'mock' } });
+  assert.notEqual(mock.status, 0);
+  assert.equal(mock.day, '');
+  const quota = ciGenerate('quota-existing', { rc: 1, manifest: null, existingDay: candidates,
+    stderr: 'LlmError: model test capped mid-turn\n    at test (rotation.mjs:1:1)\n' }, ['--repair']);
+  assert.equal(quota.status, 0, quota.stdout);
+  assert.match(quota.output, /partial=true/);
+  assert.doesNotMatch(quota.output, /soft=true/);
+  assert.equal(JSON.parse(quota.day).publication.retained, 4);
+  const auth = ciGenerate('auth-existing', { rc: 1, manifest: null, existingDay: candidates,
+    stderr: 'LlmAuthError: HTTP 401: rejected\n    at test (llm.mjs:1:1)\n' });
+  assert.equal(auth.status, 1, 'authentication failures must not be hidden by salvage');
+  assert.doesNotMatch(auth.output, /partial=true/);
 });
 
 test('generate.yml: the gate after repair turns a rate-limited repair into a green skip, nothing published', () => {

@@ -82,6 +82,7 @@ export function outputPaths(root, date, { mock = false, publish = true, suffix =
     postsDir: path.join(root, 'content', 'posts'),
     run: publish ? path.join(root, 'content', 'runs', `${date}${sfx}.json`) : path.join(staging, 'run.json'),
     work: publish ? path.join(root, 'content', 'runs', `${date}${sfx}.work.json`) : path.join(staging, 'work.json'),
+    candidates: path.join(staging, 'candidates.json'),
     topics: publish ? path.join(root, 'content', 'topics', `${date}${sfx}.json`) : path.join(staging, 'topics.json'),
     staging,
     staged: path.join(staging, 'posts.json'),
@@ -1266,6 +1267,11 @@ export async function runDaily(opts = {}) {
 
   if (!dryRun) {
     writeJsonAtomic(paths.run, manifest);
+    if (status === 'partial' && publish && published.length) {
+      writeJsonAtomic(paths.candidates, { runId, generatedAt: new Date().toISOString(), origin, provider: manifest.provider,
+        models: models.filter((m) => m.calls > 0).map((m) => m.model), promptVersion: PROMPT_VERSION,
+        ...(threadPolicy ? { threadPolicy } : {}), completeness: manifest.completeness, posts: published });
+    } else if (fs.existsSync(paths.candidates)) fs.rmSync(paths.candidates);
     if (!offline) {
       const merged = { ...usedToday };
       for (const [name, u] of Object.entries(rotation.usageByName())) merged[name] = { calls: (usedToday[name]?.calls ?? 0) + u.calls, neurons: (usedToday[name]?.neurons ?? 0) + u.neurons };
