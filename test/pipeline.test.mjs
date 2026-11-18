@@ -72,6 +72,13 @@ test('news wire flow: wire posts carry headline + link_card, thinkers quote/repl
   assert.deepEqual(errors, []);
 });
 
+test('blank GEN_TOPICS uses the budget plan and selects up to three article events', async () => {
+  const root = freshRoot();
+  const r = await run({ root, env: { GEN_TOPICS: '' } });
+  assert.equal(r.topics.picks.length, 3);
+  assert.ok(r.topics.picks.every((topic) => topic.url && ['news', 'trend', 'viral'].includes(topic.kind)));
+});
+
 test('fallback without news personas: 1–2 thinker roots per topic with topic{}', async () => {
   const root = freshRoot();
   const r = await run({ root, personas: base.filter((p) => p.kind !== 'news') });

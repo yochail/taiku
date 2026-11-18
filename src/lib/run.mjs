@@ -561,7 +561,8 @@ export async function runDaily(opts = {}) {
   if (!topicsDoc) {
     const fetchImpl = opts.fetchImpl ?? (offline ? fixtureFetch(FEEDS) : globalThis.fetch);
     const pool = await fetchPool({ env: offline ? { ...env, NEWS_FEEDS: '' } : env, fetchImpl, feeds: offline ? FEEDS : undefined, log, resolveRedirects: opts.resolveRedirects ?? !offline });
-    const requestedTopics = Number(opts.topics ?? env.GEN_TOPICS ?? content.topics);
+    const topicInput = opts.topics ?? env.GEN_TOPICS;
+    const requestedTopics = topicInput == null || String(topicInput).trim() === '' ? content.topics : Number(topicInput);
     const topicCapacity = threadPolicy ? content.originals : content.topics;
     const n = Math.max(0, Math.min(MAX_TOPICS, topicCapacity,
       Number.isFinite(requestedTopics) ? Math.floor(requestedTopics) : 0));
