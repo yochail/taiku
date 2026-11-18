@@ -37,7 +37,7 @@ on:
         description: "Run nonce: replay a logged one or re-roll the day (blank = derived from date + seed)"
         default: ""
       topics:
-        description: "Topics this run (3-5, blank = budget plan)"
+        description: "Topics this run (up to 3, blank = budget plan)"
         default: ""
       max_calls:
         description: "LLM request ceiling incl. tool rounds and retries (blank = GEN_MAX_CALLS or 1000)"
