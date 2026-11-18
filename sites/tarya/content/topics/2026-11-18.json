@@ -1,0 +1,542 @@
+{
+  "date": "2026-11-18",
+  "generatedAt": "2026-11-18T20:38:04.548Z",
+  "sourceSnapshotHash": "5bf97d5dff498227",
+  "feeds": [
+    {
+      "feed": "ynet",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ynetnews",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz-en",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "toi",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "jpost",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "kan",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom-en",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "maariv",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "walla",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "jta",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "forward",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "jns",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "reuters",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-me",
+      "ok": true,
+      "items": 25,
+      "kept": 22
+    }
+  ],
+  "picks": [
+    {
+      "id": "t76a20b60",
+      "title": "Iranian agent sentenced to 27-plus years in prison over plot to assassinate Trump, other US officials",
+      "url": "https://www.jns.org/news/u-s-news/iranian-agent-sentenced-to-27-plus-years-in-prison-over-plot-to-assassinate-trump-other-us-officials",
+      "source": "JNS",
+      "domain": "jns.org",
+      "feedId": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "publishedAt": "2026-11-18T20:21:13.000Z",
+      "score": 1.196,
+      "keys": {
+        "politics": 1,
+        "religion": 1.5
+      }
+    },
+    {
+      "id": "t801f8099",
+      "title": "Israel Police chief vows to 'turn over every stone' to find Haymanut Kasau",
+      "url": "https://www.jns.org/news/israel-news/israel-police-chief-vows-to-turn-over-every-stone-to-find-haymanut-kasau",
+      "source": "JNS",
+      "domain": "jns.org",
+      "feedId": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "publishedAt": "2026-11-18T19:45:54.000Z",
+      "score": 1.176,
+      "keys": {
+        "politics": 1,
+        "religion": 1.5
+      }
+    },
+    {
+      "id": "t116fe32a",
+      "title": "The Jewish hotel on the Lower East Side that was too good to last",
+      "url": "https://forward.com/yiddish-world/863506/the-jewish-hotel-on-the-lower-east-side-that-was-too-good-to-last/",
+      "source": "The Forward",
+      "domain": "forward.com",
+      "feedId": "forward",
+      "tier": "curated",
+      "kind": "news",
+      "section": "culture",
+      "publishedAt": "2026-11-18T20:28:29.000Z",
+      "score": 1.173,
+      "keys": {
+        "religion": 1,
+        "culture": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "tf7bfe1c2",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc6717a0c",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf1a8cbf8",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t64fbdfb4",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t03cf9889",
+      "feedId": "haaretz-en",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t0f19ab20",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "taee4cbc2",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t850d555f",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6842e057",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tca7805ba",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t03b86e30",
+      "feedId": "toi",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tfad6d24c",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t13f985b4",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta8a70b7d",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta8ce5067",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc05a329f",
+      "feedId": "israelhayom",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t989bbf36",
+      "feedId": "israelhayom-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6ed59e12",
+      "feedId": "walla",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t53274eb4",
+      "feedId": "jta",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t166b570c",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t16108bb0",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "td7ba42d4",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tc729933b",
+      "feedId": "forward",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t3b15dc4a",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tbf7238ee",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t7b2673dd",
+      "feedId": "forward",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t10b47fcc",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tdcbec083",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t896d9840",
+      "feedId": "reuters",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t8e4adb07",
+      "feedId": "reuters",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t91118539",
+      "feedId": "ap",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t848811dc",
+      "feedId": "ap",
+      "reason": "nsfw"
+    },
+    {
+      "id": "teff63436",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tb56bc510",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t44bb7886",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t9bd1fa35",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0156fee1",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7036da4c",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t11f7e70f",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6d8f0dff",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf3c5272c",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9455bfed",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t638ef79e",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te20e75c8",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t143f836a",
+      "title": "טראמפ מתוסכל מוואנס על רקע הביקורת שלו על המלחמה באיראן | דיווח",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tafaf00f9",
+      "title": "הולכת רגל נהרגה בלב תל אביב, רוכב אופנוע נפצע קשה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t9dcd9282",
+      "title": "אישה ממושב בשפלה נדבקה בכלבת, מצבה אנוש: \"מיטב המומחים נלחמים על חייה\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t273737b2",
+      "title": "של מי הבייגלה הירושלמי? הפלסטינים מבקשים מאונסק”ו להכיר בו כמורשתם התרבותית",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t66c29c3a",
+      "title": "1,000 ימים בלי קצה חוט: \"היימנוט חייבת לחזור\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t99742e3a",
+      "title": "היועמ\"שית צפויה להגיש מחדש את כתב האישום נגד ח\"כ גוטליב",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "ta8abb800",
+      "title": "8 פצועים מדריסות בכפר קאסם: נהג נעצר, תיעוד דרמטי מרגעי הפגיעות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t124f61ff",
+      "title": "\"חולם לחזור לימין\" או \"משחק עם נתניהו\": מה רוצה בנט?",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tca1c4419",
+      "title": "כוננות שיא ומסר לאיראן ב\"זרוע הארוכה\": הביקור הקריטי - והניסיון לקדם תקיפות משותפות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t52da93ac",
+      "title": "פגישות עם הנסיכה - והגנרל: הצעדים של ישראל אחרי התקריות המביכות בתאילנד",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t060a5264",
+      "title": "טיבי התעמת עם ח\"כים מהימין שקראו לו \"תומך טרור\" - והוציא אותם מהמליאה | תיעוד",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tbef9601f",
+      "title": "עם גרזן וכימיקלים: פרו-פלסטיני השמיד מטוס צבאי אמריקני בשווי 60 מיליון דולר",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t777b3075",
+      "title": "בגלל השם, בגלל הצבע",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t12d4cb8e",
+      "title": "\"צעד היסטורי\": פרויקט הענק של ירדן יוצא לדרך | זו המשמעות לישראל",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t43ec7ed7",
+      "title": "היסטוריה בקפיטול: ג'פריס נבחר, ועשוי להיות המפתח למועצת השלום בעזה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "teadbc4ee",
+      "title": "בשל עבודות: שינויים בתנועת הרכבות בשבוע הבא | התחנות והקווים שיושפעו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tcca11c26",
+      "title": "הרצוג קרא \"לשבור לפושעים את העצמות\", תיעוד: עשרות רעולי פנים בהפגנת החמולה נגד העבריינות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tb9c1e241",
+      "title": "גם בשם החשד הסביר, אסור לוותר על הספק הסביר",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t06590114",
+      "title": "כשביבי שיתף פעולה עם טיבי: כמה פעמים נתניהו הצביע עם המפלגות הערביות?",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tf22bef50",
+      "title": "הזמן בבית יתקצר: צה\"ל הבטיח הקלה בימי המילואים - והעלה את המכסה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t91c5d5b8",
+      "title": "עם קשתות וחיצים: בני שבט מבודד יצאו מהאמזונס וביקשו אוכל | תמונות נדירות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t93953f95",
+      "title": "דוח הדתות הגדול: המוסלמים יעקפו את הנוצרים ב-2035, יהיו שליש מהעולם עד 2070",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t41ba8fbd",
+      "title": "\"העדיפות העליונה - החלפת נתניהו\": פגישת ראשי גוש השינוי - והמסר מבנט",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t23fc81ad",
+      "title": "אישום נגד תושב הדרום: \"התעלל בבת זוגו ובילדיו, ואיים שירצח אותם\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tc360bd24",
+      "title": "מנהיג בקהילה היהודית שקשור לתעשיות ביטחוניות: \"זה היעד של החוליה האיראנית ביוון\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5d657757",
+      "title": "‘I may have created draft dodgers’: Ben-Gurion's forgotten warning on Haredi draft exemptions",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t5df24178",
+      "title": "Iran, Hezbollah recruited Thai clerics to attack Israeli embassy, report says",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "tbf87687a",
+      "title": "Haredi kingmakers keep Netanyahu and Eisenkot guessing in coalition negotiations",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t184210bb",
+      "title": "Iran sees Trump weakened by midterm rout, hardens war demands",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t0cb9ec6c",
+      "title": "Australia joins Britain in sanctioning Israelis over West Bank violence",
+      "domain": "ynetnews.com"
+    }
+  ]
+}
