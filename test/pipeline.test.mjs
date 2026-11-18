@@ -32,6 +32,13 @@ after(() => {
 const DATE = '2026-11-02';
 const run = (o) => runDaily({ date: DATE, mock: true, quiet: true, seed: 'test', nonce: 'nonce1', spec, personas: base, env: {}, maxCalls: 90, ...o });
 const read = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
+const seedTopics = (root, picks) => {
+  const file = outputPaths(root, DATE, { mock: true }).topics;
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify({ date: DATE, picks }));
+};
+const makeTopic = (id, title, tier) => ({ id, title, url: null, source: 'Fixture', feedId: 'fixture',
+  tier, kind: 'news', section: 'tech', publishedAt: null, score: 1, keys: { tech: 1 } });
 const persErr = (e) => !/^(persona |duplicate persona|duplicate handle)/.test(e);
 
 test('news wire flow: wire posts carry headline + link_card, thinkers quote/reply/retaik them, parody joins', async () => {
@@ -141,6 +148,10 @@ test('budget exhaustion → partial: exit 2, nothing published, rerun resumes', 
 
 test('community topics are staged; promote moves them into content without duplicates', async () => {
   const root = freshRoot();
+  seedTopics(root, [
+    makeTopic('community-fixture', 'A community technology story', 'community'),
+    makeTopic('community-fixture-two', 'A community astronomy story', 'community'),
+  ]);
   const r = await run({ root });
   const paths = outputPaths(root, DATE, { mock: true });
   const community = new Set(r.topics.picks.filter((t) => t.tier === 'community').map((t) => t.id));
@@ -187,6 +198,7 @@ test('dry-run writes nothing', async () => {
 
 test('a policy failure fails the whole topic', async () => {
   const root = freshRoot();
+  seedTopics(root, [makeTopic('football-fixture', 'Football club announces a controversial rule', 'curated')]);
   const inner = createMockClient({ nonce: 'p' });
   // Every turn that mentions the football headline in its prompt answers with a URL (policy violation).
   const client = {

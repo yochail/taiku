@@ -42,7 +42,8 @@ before(async () => {
   fs.rmSync(SCRATCH, { recursive: true, force: true });
   fs.mkdirSync(SCRATCH, { recursive: true });
   for (const [i, date] of DATES.entries()) {
-    const r = await runDaily({ date, mock: true, quiet: true, seed: `gate${i}`, nonce: `n${i}`, spec, personas, env: {}, root: SCRATCH, llmConfig, maxCalls: 90 });
+    const seed = i === 1 ? 'gate1-top-three' : `gate${i}`;
+    const r = await runDaily({ date, mock: true, quiet: true, seed, nonce: `n${i}`, spec, personas, env: {}, root: SCRATCH, llmConfig, maxCalls: 90 });
     assert.equal(r.status, 'complete', `${date}: ${r.errors?.slice(0, 3).join('; ')}`);
     days.set(date, JSON.parse(fs.readFileSync(fileOf(date), 'utf8')).posts);
   }

@@ -6,7 +6,7 @@ import { completeThreads, threadCoverage } from '../src/lib/complete-threads.mjs
 import { contentPlan } from '../src/lib/budget.mjs';
 import { reactionCount } from '../src/lib/conversation.mjs';
 import { seededRng } from '../src/lib/pipeline-util.mjs';
-import { selectTopics } from '../src/lib/topics.mjs';
+import { scorePool, selectTopics } from '../src/lib/topics.mjs';
 import { planDay, runDaily } from '../src/lib/run.mjs';
 import { createMockClient } from '../src/lib/mock.mjs';
 import { loadDistribution } from '../src/lib/crowd.mjs';
@@ -88,6 +88,48 @@ test('main curated news precedes high-scoring viral posts, with one topic per du
   assert.deepEqual(r.picks.map((p) => p.id), ['news']);
   assert.ok(r.dropped.some((p) => p.id === 'same' && p.reason === 'duplicate'));
   assert.deepEqual(selectTopics(items, personas, { n: 0, prioritizeNews: true }).picks, []);
+});
+
+test('news selection caps at the top three article events and deep threads attach to each article', () => {
+  const headlines = [
+    'Astronomers find a new moon around a distant planet',
+    'Parliament passes a national housing reform after debate',
+    'River restoration brings back a rare migratory fish',
+    'Museum opens a newly restored collection of ancient sculpture',
+    'Sprinter breaks the national record at the winter championships',
+  ];
+  const items = headlines.map((title, i) => ({
+    id: `news${i + 1}`, title, url: `https://example.org/story-${i + 1}`,
+    tier: 'curated', kind: 'news', feedId: `feed${i + 1}`,
+  }));
+  items.push({ id: 'viral', title: 'Viral technology culture story', url: 'https://example.org/viral',
+    tier: 'community', kind: 'viral', feedId: 'v' });
+  const selected = selectTopics(items, personas, { n: 99, prioritizeNews: true, date: '2026-11-02' }).picks;
+  const topThreeNews = scorePool(items, personas).filter((topic) => topic.tier === 'curated' && topic.kind === 'news')
+    .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id)).slice(0, 3).map((topic) => topic.id);
+  assert.deepEqual(selected.map((topic) => topic.id), topThreeNews);
+
+  const content = contentPlan({ voice: 120, batch: 120, threadPolicy: policy });
+  const plan = planDay({ personas, spec, topics: selected, date: '2026-11-02', seed: 'news-events',
+    nonce: 'n', tz: 'UTC', content });
+  const articles = plan.nodes.filter((node) => node.kind === 'wire');
+  assert.equal(articles.length, 3, 'one article root per selected event, never more than three');
+  assert.deepEqual(new Set(articles.map((node) => node.topicId)), new Set(selected.map((topic) => topic.id)));
+  for (const article of articles) {
+    const replies = plan.nodes.filter((node) => {
+      let parent = node;
+      while (parent?.parent) parent = plan.nodes.find((candidate) => candidate.id === parent.parent);
+      return parent?.id === article.id && node.role === 'reply';
+    });
+    assert.ok(replies.length >= 3 && replies.length <= 8);
+    assert.equal(replies.length, article.plannedReactions);
+    const [first, second, answer] = [1, 2, 3].map((n) => plan.nodes.find((node) => node.id === `${article.id}.r${n}`));
+    assert.equal(first.parent, article.id, 'first thinker response is attached to the article');
+    assert.equal(second.parent, first.id);
+    assert.equal(answer.parent, second.id);
+    assert.equal(first.authorId, answer.authorId, 'the first thinker answers back');
+    assert.notEqual(first.authorId, second.authorId);
+  }
 });
 
 test('quota exhaustion publishes useful complete threads instead of a shallow partial day', async () => {

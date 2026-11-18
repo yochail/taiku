@@ -1,12 +1,13 @@
 // Topic picking: filter the feed pool (tragedy, NSFW, injection, duplicates), score items
 // (source weight × recency × how many personas care), then pick 3–5 with diversity (MMR over
-// topic vectors and feeds). Evergreen fallbacks fill a thin day. Writes content/topics/<date>.json.
+// topic vectors and feeds). Prioritized news selection requires URL-backed articles and never
+// fills missing events with evergreen topics. Writes content/topics/<date>.json.
 import { TOPIC_KEYS } from './data.mjs';
 import { isGrave, topicVector } from './themes.mjs';
 import { hash8, sha256, tokens } from './pipeline-util.mjs';
 
 export const MIN_TOPICS = 3;
-export const MAX_TOPICS = 5;
+export const MAX_TOPICS = 3;
 
 /** NSFW keywords (feed titles). Reddit over_18 is honoured separately. */
 const NSFW = /\b(nsfw|porn\w*|nude\w*|naked|onlyfans|sex\w*|xxx|fetish\w*|erotic\w*|hentai|strip(?:per|club)|escort\w*|boob\w*|horny|nip+les?|genital\w*|gore|gory|beheading|dismember\w*|corpse\w*|not safe for work|you should not open at work)\b/i;
@@ -105,11 +106,13 @@ export function selectTopics(items, personas, { n = 4, date, rand = Math.random,
   const { kept, dropped } = filterPool(items);
   const scored = scorePool(kept, personas);
   const count = prioritizeNews ? Math.max(0, Math.min(MAX_TOPICS, n)) : topicCount(n);
-  const main = prioritizeNews ? scored.filter((t) => t.tier === 'curated' && t.kind === 'news')
+  const articleTopics = prioritizeNews ? scored.filter((t) => t.url && ['news', 'trend', 'viral'].includes(t.kind)) : scored;
+  const main = prioritizeNews ? articleTopics.filter((t) => t.tier === 'curated' && t.kind === 'news')
     .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id)).slice(0, count) : [];
-  const picks = [...main, ...pickTopics(scored.filter((t) => !main.some((p) => p.id === t.id)), count - main.length)];
+  const remainder = prioritizeNews ? articleTopics : scored;
+  const picks = [...main, ...pickTopics(remainder.filter((t) => !main.some((p) => p.id === t.id)), count - main.length)];
   const ever = [...EVERGREEN].sort(() => rand() - 0.5);
-  while (picks.length < (prioritizeNews ? count : MIN_TOPICS) && ever.length) {
+  while (!prioritizeNews && picks.length < MIN_TOPICS && ever.length) {
     const e = ever.shift();
     picks.push({ id: `e${hash8(`${date}:${e.title}`)}`, title: e.title, url: null, domain: '', source: 'Taiku', feedId: 'evergreen', tier: 'evergreen', kind: 'evergreen', section: e.keys[0], publishedAt: null, keys: topicVector(e.title, e.keys), score: 0.2 });
   }

@@ -1,7 +1,7 @@
 {
-  "_note": "Daily free-only fallback. Workers AI models share ONE 10,000-Neuron UTC-day pool; model caps are ceilings, not additional allowances. OpenRouter :free models share 50 requests; Groq is conservatively pooled at 1000 requests/200000 tokens. Gemini's 200 requests is an application ceiling, not a promise of free availability. Missing keys or free-only attestations skip paid-capable providers. The planner uses 100% of allowance, with 5% of calls reserved for rejected-item repairs. Request admission reserves UTF-8 input bytes plus tool overhead and the full output cap before EVERY HTTP attempt; reported usage releases only unused reservation, absent usage/failure keeps the full charge. Shared per-request ledger persists across sites, reruns, failures and repairs. neuronRate = Neurons per 1M input/output tokens. See README daily free-budget policy.",
+  "_note": "Daily free-only fallback. Workers AI models share ONE 10,000-Neuron UTC-day pool; model caps are ceilings, not additional allowances. OpenRouter :free models share ONE account-level 1,000-request/day ceiling (the documented higher tier for accounts with qualifying all-time credit purchases; otherwise OpenRouter enforces 50/day); :free inference costs $0 and paid fallback models are excluded. The pool is shared across models and sites. Groq is conservatively pooled at 1000 requests/200000 tokens. Gemini's 200 requests is an application ceiling, not a promise of free availability. Missing keys or free-only attestations skip paid-capable providers. The planner uses 100% of allowance, with 5% of calls reserved for rejected-item repairs. Request admission reserves UTF-8 input bytes plus tool overhead and the full output cap before EVERY HTTP attempt; reported usage releases only unused reservation, absent usage/failure keeps the full charge. Shared per-request ledger persists across sites, reruns, failures and repairs. neuronRate = Neurons per 1M input/output tokens. See README daily free-budget policy.",
   "freePools": {
-    "OPENROUTER_API_KEY": { "calls": 50 },
+    "OPENROUTER_API_KEY": { "calls": 1000 },
     "GROQ_API_KEY": { "calls": 1000, "tokens": 200000 }
   },
   "totalCap": {
@@ -187,8 +187,8 @@
       "voiceWeight": 0,
       "tools": "off",
       "capUnit": "requests",
-      "cap": 50,
-      "calls": 50,
+      "cap": 1000,
+      "calls": 1000,
       "rpm": 6,
       "max_tokens": 1200,
       "temperature": 0.95,
@@ -208,8 +208,8 @@
       "voiceWeight": 0,
       "tools": "off",
       "capUnit": "requests",
-      "cap": 50,
-      "calls": 50,
+      "cap": 1000,
+      "calls": 1000,
       "rpm": 6,
       "max_tokens": 1600,
       "temperature": 0.95,

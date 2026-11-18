@@ -29,7 +29,7 @@ import { MOVE_ARCHETYPES, conversationOf, pickMove, reactionCount, turnOf } from
 import { mentionDebts, mentionDecision, resurface } from './followon.mjs';
 import { mentionTargets } from './tags.mjs';
 import { FEEDS, domainOf, fetchPool, fixtureFetch, sanitizeUntrusted } from './news.mjs';
-import { selectTopics, topicCount } from './topics.mjs';
+import { MAX_TOPICS, selectTopics } from './topics.mjs';
 import { BudgetError, llmConfig, loadLlmConfig } from './llm.mjs';
 import { createMockClient } from './mock.mjs';
 import { createRotation, discoverModels, singleClientRotation } from './rotation.mjs';
@@ -203,16 +203,21 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
     const authored = new Map();
     const replied = new Map();
     for (let i = 0; i < count; i++) {
-      const topic = topics[i] ?? null;
+      const topic = i < MAX_TOPICS ? topics[i] ?? null : null;
       const pid = weightedPick(rand, active.map((p) => [p.id,
         ((behaviorOf(p).activity ?? 0.5) * (0.2 + topicAffinity(p, topic?.keys ?? {}))) / (1 + (authored.get(p.id) ?? 0))]));
       if (!pid || active.length < 3) break;
       authored.set(pid, (authored.get(pid) ?? 0) + 1);
       const author = active.find((p) => p.id === pid);
+      const article = i < MAX_TOPICS && topic?.url && news.length > 0;
+      const rootAuthor = article ? weightedPick(rand, news.map((p) => [p.id, 0.2 + topicAffinity(p, topic.keys)])) : pid;
       const theme = weightedPick(rand, Object.entries(author.topic_affinity ?? { philosophy: 1 }));
-      const root = node({ id: topic ? `${topic.id}-root1` : `s${i + 1}`, authorId: pid, createdAt: sessionAt(pid),
-        vector: topic?.keys ?? { [theme]: 1 }, role: 'original', kind: topic ? 'topic-root' : 'standalone',
-        exec: i < content.singleTurns ? 'single' : 'originals', topicId: topic?.id ?? null, theme });
+      const root = node({ id: article ? `${topic.id}-wire` : topic ? `${topic.id}-root${i + 1}` : `s${i + 1}`,
+        authorId: rootAuthor, createdAt: article ? at(6) : sessionAt(pid),
+        vector: topic?.keys ?? { [theme]: 1 }, role: 'original',
+        kind: article ? 'wire' : topic ? 'topic-root' : 'standalone',
+        exec: article ? 'wire' : i < content.singleTurns ? 'single' : 'originals',
+        topicId: topic?.id ?? null, theme });
       nodes.push(root);
       const candidates = active.filter((p) => p.id !== pid);
       const first = [];
@@ -220,10 +225,12 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
       const reactions = reactionCount(seededRng('reaction-count', seed, nonce, root.id), content.threadPolicy, author);
       root.plannedReactions = reactions;
       for (let j = 0; j < reactions; j++) {
-        const parent = j < 2 ? root : first[(j - 2) % first.length];
+        const parent = article
+          ? j === 0 ? root : j === 1 ? first[0] : first[(j - 1) % first.length]
+          : j < 2 ? root : first[(j - 2) % first.length];
         const fresh = candidates.filter((p) => p.id !== parent.authorId && !used.has(p.id));
         const pool = fresh.length ? fresh : candidates.filter((p) => p.id !== parent.authorId);
-        const replyId = j === 2 ? pid : weightedPick(rand, pool.map((p) => [p.id,
+        const replyId = article && j === 0 ? pid : j === 2 ? pid : weightedPick(rand, pool.map((p) => [p.id,
           (p.reactivity ?? 3) * (0.2 + topicAffinity(p, root.vector)) *
           (conversationOf(spec).relation_boost[relationOf(p, author)] ?? 1) / (1 + (replied.get(p.id) ?? 0))]));
         const persona = active.find((p) => p.id === replyId);
@@ -250,7 +257,7 @@ export function planDay({ personas, spec, topics, date, seed, nonce, tz, content
     return { day, nodes: nodes.sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id)),
       reactor, calibration: cal, llmCap: content.llmReplies, sampler, rand };
   }
-  for (const t of topics) {
+  for (const t of topics.slice(0, MAX_TOPICS)) {
     const T = at(6);
     const fans = active
       .map((p) => [p, (clamp(p.reactivity ?? 3, 1, 5) / 3) * (0.2 + topicAffinity(p, t.keys)) * Math.sqrt(p.popularity ?? 5)])
@@ -554,8 +561,11 @@ export async function runDaily(opts = {}) {
   if (!topicsDoc) {
     const fetchImpl = opts.fetchImpl ?? (offline ? fixtureFetch(FEEDS) : globalThis.fetch);
     const pool = await fetchPool({ env: offline ? { ...env, NEWS_FEEDS: '' } : env, fetchImpl, feeds: offline ? FEEDS : undefined, log, resolveRedirects: opts.resolveRedirects ?? !offline });
-    const n = threadPolicy ? Math.min(content.originals, Number(opts.topics ?? env.GEN_TOPICS) || content.topics) : topicCount(opts.topics ?? env.GEN_TOPICS ?? content.topics);
-    const sel = selectTopics(pool.items, personas.filter((p) => !isNews(p)), { n, date, prioritizeNews: Boolean(threadPolicy), rand: seededRng('topics', seed, date) });
+    const requestedTopics = Number(opts.topics ?? env.GEN_TOPICS ?? content.topics);
+    const topicCapacity = threadPolicy ? content.originals : content.topics;
+    const n = Math.max(0, Math.min(MAX_TOPICS, topicCapacity,
+      Number.isFinite(requestedTopics) ? Math.floor(requestedTopics) : 0));
+    const sel = selectTopics(pool.items, personas.filter((p) => !isNews(p)), { n, date, prioritizeNews: true, rand: seededRng('topics', seed, date) });
     topicsDoc = {
       date,
       generatedAt: new Date().toISOString(),

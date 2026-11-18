@@ -53,7 +53,7 @@ test('content plan scales with the role budgets', () => {
 test('combined budgets add independent pools, divide both sites fairly and retain odd requests', () => {
   const available = new Set(config.providers.filter((p) => ['CF_AI_TOKEN', 'OPENROUTER_API_KEY'].includes(p.keyEnv)).map((p) => p.name));
   const orNames = config.providers.filter((p) => p.keyEnv === 'OPENROUTER_API_KEY').map((p) => p.name);
-  const used = { [orNames[0]]: { calls: 49, neurons: 0 }, retired: { keyEnv: 'CF_AI_TOKEN', calls: 1, neurons: 1000 } };
+  const used = { [orNames[0]]: { calls: 999, neurons: 0 }, retired: { keyEnv: 'CF_AI_TOKEN', calls: 1, neurons: 1000 } };
   const plan = planBudget({ config, used, available, threadPolicy: { max: 8 }, shares: 1 });
   assert.equal(plan.models.filter((m) => orNames.includes(m.name)).reduce((n, m) => n + m.allowance, 0), 1, 'last OpenRouter request is not rounded away');
   assert.equal(plan.pools.CF_AI_TOKEN.remaining.neurons, 9000, 'retired-model usage still counts');
@@ -61,11 +61,34 @@ test('combined budgets add independent pools, divide both sites fairly and retai
   assert.ok(plan.content.originals > 0);
   const half = planBudget({ config, available, shares: 2, threadPolicy: { max: 8 } });
   assert.equal(half.pools.CF_AI_TOKEN.share.neurons, 5000);
-  assert.equal(half.pools.OPENROUTER_API_KEY.share.calls, 25);
-  assert.equal(half.models.filter((m) => orNames.includes(m.name)).reduce((n, m) => n + m.allowance, 0), 25);
+  assert.equal(half.pools.OPENROUTER_API_KEY.share.calls, 500);
+  assert.equal(half.models.filter((m) => orNames.includes(m.name)).reduce((n, m) => n + m.allowance, 0), 500);
   assert.ok(half.totals.neurons <= 5000);
-  for (const m of half.models.filter((m) => orNames.includes(m.name))) assert.ok(m.capacity <= 25, 'rotation ceilings respect site share');
-  const exhausted = planBudget({ config, available, used: { [orNames[0]]: { calls: 50 } } });
+  for (const m of half.models.filter((m) => orNames.includes(m.name))) assert.ok(m.capacity <= 500, 'rotation ceilings respect site share');
+  const exhausted = planBudget({ config, available, used: { [orNames[0]]: { calls: 1000 } } });
   assert.equal(exhausted.pools.OPENROUTER_API_KEY.remaining.calls, 0);
   assert.ok(exhausted.totals.calls > 0, 'an exhausted request pool does not exhaust Neurons');
+});
+
+test('OpenRouter free-model pool is 1,000 account-level requests shared across free models and sites', () => {
+  const providers = config.providers.filter((p) => p.keyEnv === 'OPENROUTER_API_KEY');
+  const names = new Set(providers.map((p) => p.name));
+  assert.equal(config.freePools.OPENROUTER_API_KEY.calls, 1000);
+  assert.equal(providers.length, 2);
+  assert.ok(providers.every((p) => p.model.endsWith(':free') && p.cap === 1000 && p.calls === 1000));
+
+  const available = names;
+  const all = planBudget({ config, available, maxCalls: 1000 });
+  assert.equal(all.pools.OPENROUTER_API_KEY.remaining.calls, 1000);
+  assert.equal(all.models.filter((m) => names.has(m.name)).reduce((n, m) => n + m.allowance, 0), 1000);
+  assert.equal(all.totals.calls, 1000);
+
+  const shared = planBudget({ config, available, maxCalls: 1000, shares: 2 });
+  assert.equal(shared.pools.OPENROUTER_API_KEY.share.calls, 500);
+  assert.equal(shared.models.filter((m) => names.has(m.name)).reduce((n, m) => n + m.allowance, 0), 500);
+
+  const partiallyUsed = planBudget({ config, available, maxCalls: 1000, used: { [providers[0].name]: { calls: 173 } } });
+  assert.equal(partiallyUsed.pools.OPENROUTER_API_KEY.remaining.calls, 827);
+  assert.equal(partiallyUsed.models.filter((m) => names.has(m.name)).reduce((n, m) => n + m.allowance, 0), 827);
+  assert.ok(providers.every((p) => p.model.endsWith(':free')), 'the increased cap contains no paid route');
 });
