@@ -5,6 +5,7 @@ import { fetchPool } from '../src/lib/news.mjs';
 import { cardProblems, loadPosts } from '../src/lib/data.mjs';
 
 const GN = 'https://news.google.com/rss/articles/CBMiAU_yqLtestid123?oc=5';
+const GN_HE = 'https://news.google.com/rss/articles/CBMiAU_yqLheTest?oc=5&hl=he&gl=IL&ceid=IL%3Ahe';
 const REAL = 'https://www.reuters.com/world/some-story-2026-11-05/';
 
 const resp = (body, ok = true) => ({ ok, status: ok ? 200 : 500, text: async () => body });
@@ -39,6 +40,42 @@ test('gnews: resolves to the publisher URL (memoised), null when Google fails or
   assert.equal(await resolveGoogleNews(GN, { fetchImpl: fakeGoogle(), offline: true }), null);
   // a redirect that points back at Google is not a resolution
   assert.equal(await resolveGoogleNews(GN, { fetchImpl: fakeGoogle('https://news.google.com/x') }), null);
+});
+
+test('gnews: uses the feed URL and locale for new-style localized ids', async () => {
+  let batch;
+  const localized = async (url, options = {}) => {
+    if (String(url) === GN_HE) return resp('<c-wiz><div data-n-a-ts="1730000000" data-n-a-sg="SIG"></div></c-wiz>');
+    if (String(url).includes('batchexecute')) {
+      batch = options;
+      return resp(`)]}'\n${JSON.stringify([['wrb.fr', 'Fbv4je', JSON.stringify(['garturlres', REAL, 1])]])}`);
+    }
+    return resp('', false);
+  };
+  assert.equal(await resolveGoogleNews(GN_HE, { fetchImpl: localized }), REAL);
+  assert.equal(batch.headers.referer, GN_HE);
+  const request = JSON.parse(decodeURIComponent(batch.body.slice('f.req='.length)));
+  const inner = JSON.parse(request[0][0][1]);
+  assert.equal(inner[1][0][7], 'IL:he');
+});
+
+test('gnews: accepts a followed publisher redirect before using batchexecute', async () => {
+  const direct = async () => ({ ok: true, url: REAL, body: { cancel: async () => {} }, text: async () => { throw new Error('body should not be read'); } });
+  assert.equal(await resolveGoogleNews(GN_HE, { fetchImpl: direct }), REAL);
+});
+
+test('gnews: tries the localized article page when the RSS URL fetch fails', async () => {
+  const calls = [];
+  const fallback = async (url) => {
+    calls.push(String(url));
+    if (String(url) === GN_HE) throw new Error('RSS redirect endpoint unavailable');
+    if (String(url).startsWith('https://news.google.com/articles/')) return resp('<c-wiz><div data-n-a-ts="1730000000" data-n-a-sg="SIG"></div></c-wiz>');
+    if (String(url).includes('batchexecute')) return resp(`)]}'\n${JSON.stringify([['wrb.fr', 'Fbv4je', JSON.stringify(['garturlres', REAL, 1])]])}`);
+    return resp('', false);
+  };
+  assert.equal(await resolveGoogleNews(GN_HE, { fetchImpl: fallback }), REAL);
+  assert.equal(calls[0], GN_HE);
+  assert.match(calls[1], /hl=he.*gl=IL.*ceid=IL%3Ahe/);
 });
 
 test('gnews: fetchPool swaps Google News items for the publisher URL, or drops them', async () => {

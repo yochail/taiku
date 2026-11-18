@@ -73,7 +73,8 @@ jobs:
   generate:
     needs: sites
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    # 25-minute generation + a full 25-minute repair, with time left for validation and artifacts.
+    timeout-minutes: 65
     # Secrets live in the `production` environment (restricted to main).
     environment: production
     permissions:
