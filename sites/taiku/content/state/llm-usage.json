@@ -1,33 +1,33 @@
 {
-  "day": "2026-11-16",
-  "updatedAt": "2026-11-16T18:44:12.377Z",
+  "day": "2026-11-18",
+  "updatedAt": "2026-11-18T20:35:57.350Z",
   "models": {
-    "or-nemotron-3-ultra": {
-      "calls": 18,
-      "neurons": 0
-    },
     "cf-llama-3.3-70b": {
-      "calls": 0,
-      "neurons": 0
+      "calls": 44,
+      "neurons": 5534.240264999999
     },
     "cf-gemma-4-26b": {
-      "calls": 0,
+      "calls": 7,
+      "neurons": 789.6806140000001
+    },
+    "cf-gpt-oss-120b": {
+      "calls": 4,
+      "neurons": 643.8064719999999
+    },
+    "or-nemotron-3.5-super": {
+      "calls": 311,
       "neurons": 0
     },
     "cf-gemma-4-26b-micro": {
-      "calls": 0,
-      "neurons": 0
+      "calls": 35,
+      "neurons": 1516.255387
     },
-    "cf-gpt-oss-120b": {
-      "calls": 0,
+    "or-nemotron-3-ultra": {
+      "calls": 330,
       "neurons": 0
     },
     "gemini-3.5-flash": {
       "calls": 0,
-      "neurons": 0
-    },
-    "or-nemotron-3.5-super": {
-      "calls": 23,
       "neurons": 0
     },
     "groq-gpt-oss-120b": {

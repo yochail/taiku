@@ -1,0 +1,376 @@
+{
+  "date": "2026-11-18",
+  "generatedAt": "2026-11-18T20:15:06.956Z",
+  "sourceSnapshotHash": "0fea27f2be1a35a0",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 17
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 19
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 23,
+      "kept": 21
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 24
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "t342a28bb",
+      "title": "Mullin, appearing before Congress, defends his flight to LSU-Texas game after nationwide ground stop",
+      "url": "https://apnews.com/article/mullin-congress-ground-stop-cyber-threats-immigration-ce63a22797c61ee53d88678000236c37",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-18T17:05:00.000Z",
+      "score": 1.122,
+      "keys": {
+        "politics": 1,
+        "culture": 1,
+        "economy": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t91118539",
+      "title": "2026 U.S. Senate Election Results",
+      "url": "https://apnews.com/projects/elections-2026/us-senate-results/",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-18T19:06:45.000Z",
+      "score": 1.029,
+      "keys": {
+        "politics": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "td4af335e",
+      "title": "NFL Scores, News & Stats | Latest Super Bowl News",
+      "url": "https://apnews.com/hub/nfl",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-18T17:59:05.000Z",
+      "score": 0.998,
+      "keys": {
+        "sports": 1,
+        "culture": 1,
+        "world": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "teff63436",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tb56bc510",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t44bb7886",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t9bd1fa35",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0156fee1",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7036da4c",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te12a3e47",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t01e43e6d",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t265560c4",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t822e5f8b",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t7108dd3d",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te3e9895c",
+      "feedId": "bbc-science",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tffe115de",
+      "feedId": "bbc-science",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t458dca79",
+      "feedId": "bbc-culture",
+      "reason": "nsfw"
+    },
+    {
+      "id": "td00f24f1",
+      "feedId": "bbc-culture",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t1aa51dd4",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t848811dc",
+      "feedId": "ap",
+      "reason": "nsfw"
+    }
+  ],
+  "pool": [
+    {
+      "id": "ta8922761",
+      "title": "Inside the old gas pipeline where Ukraine is fighting an underground war with Russia",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4b139367",
+      "title": "'The drones don't fly here' - BBC reports from Ukraine's new front line",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ted6ab888",
+      "title": "Trump shakes hands with Putin and Xi ahead of historic talks in China",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t239d1311",
+      "title": "William and Kate meet PM Modi as they wrap up India tour",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcdc6a802",
+      "title": "Grand Theft Auto 6 is a masterpiece, say critics",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t37933f5f",
+      "title": "Ghana's new $60m presidential jet sparks public outrage",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te6f36187",
+      "title": "Democrats nominate Hakeem Jeffries to be US Speaker of the House",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0ecfa8cd",
+      "title": "Democrats win Alaska Senate race two weeks after midterms counting began",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb5409889",
+      "title": "Bancroft sandpaper claims heap pressure on Cummins",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tceaa8eb6",
+      "title": "British hacker who stole $11m through text message scheme jailed for six years in US",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tdf1977ca",
+      "title": "Nvidia says it won't reinstate Huang as it reports soaring sales",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2dfd1d8d",
+      "title": "Waymo pulls driverless taxis from all US freeways",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0ca29b64",
+      "title": "Rubio says US not 'under systemic attack' after series of tech outages",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t896b2d5f",
+      "title": "Irishman charged with destroying US military aircraft with axe",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t79e1c95f",
+      "title": "Putin's Crimean Bridge partly collapses as Zelensky hails 'unprecedented' attack by Ukraine",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t7e169f37",
+      "title": "US loses measles elimination status after 26 years amid record case numbers",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t519aa89e",
+      "title": "American soldier arrested by UK police on suspicion of spying taken into US military custody",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "teadd1306",
+      "title": "William and Kate celebrate Earthshot Prize winners in Mumbai",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta48badf7",
+      "title": "The seven Anthropic founders who are about to become multi-billionaires",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf95d61ce",
+      "title": "Hacks, AI or just overdue updates - why have there been so many outages?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9fdc6d69",
+      "title": "Security flaw found in Java, world's third-largest programming language",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf48018da",
+      "title": "How important are Nvidia and Jensen Huang to the US economy?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t67dd5bd4",
+      "title": "Watch: Marco Rubio says recent tech outages are 'completely unrelated' to one another",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t27cb41e2",
+      "title": "Europe plans to catch the next computer chip wave",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t48bbf664",
+      "title": "How new US chip restrictions on South East Asia will hit China",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcf0e8e6d",
+      "title": "NHS data contract to stay with Palantir until 2029",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta3b4fa55",
+      "title": "Pretending to be in New Zealand, booking leave and buying consoles - the lengths fans are going to for GTA 6",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6f9e983e",
+      "title": "Tech Life",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t019c7b7f",
+      "title": "Tech Now",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te4862155",
+      "title": "Stormont department failing to protect wild birds, investigation finds",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}

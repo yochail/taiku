@@ -188,6 +188,13 @@
    "fetchedAt": "2026-11-08T17:35:58.147Z",
    "meta": null
   },
+  "https://apnews.com/article/mullin-congress-ground-stop-cyber-threats-immigration-ce63a22797c61ee53d88678000236c37": {
+   "url": "https://apnews.com/article/mullin-congress-ground-stop-cyber-threats-immigration-ce63a22797c61ee53d88678000236c37",
+   "ok": false,
+   "status": 403,
+   "fetchedAt": "2026-11-18T20:15:06.959Z",
+   "meta": null
+  },
   "https://apnews.com/article/netherlands-eurovision-song-festival-dutch-27ee0f300f9cd0ca4a4844b51865bd95": {
    "url": "https://apnews.com/article/netherlands-eurovision-song-festival-dutch-27ee0f300f9cd0ca4a4844b51865bd95",
    "ok": false,
@@ -263,6 +270,13 @@
    "ok": false,
    "status": 403,
    "fetchedAt": "2026-11-12T04:01:20.263Z",
+   "meta": null
+  },
+  "https://apnews.com/hub/nfl": {
+   "url": "https://apnews.com/hub/nfl",
+   "ok": false,
+   "status": 403,
+   "fetchedAt": "2026-11-18T20:15:07.028Z",
    "meta": null
   },
   "https://apnews.com/projects/elections-2026/us-senate-results/": {
@@ -3567,6 +3581,23 @@
     "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/news/touch-icon-36.413a37b227.png"
    }
   },
+  "https://www.bbc.co.uk/news/articles/cm5y1wr1535ko": {
+   "url": "https://www.bbc.co.uk/news/articles/cm5y1wr1535ko",
+   "ok": true,
+   "status": 200,
+   "fetchedAt": "2026-11-17T12:05:42.221Z",
+   "meta": {
+    "url": "https://www.bbc.co.uk/news/articles/cm5y1wr1535ko",
+    "title": "Nigerians among 12 suspects arrested in Canada luxury car theft syndicate",
+    "description": "Canadian authorities say they have recovered 96 luxury vehicles destined for West Africa.",
+    "site_name": "BBC News",
+    "published": null,
+    "image": {
+     "url": "https://ichef.bbci.co.uk/ace/branded_news/1200/cpsprodpb/e5db/live/3bffede0-e252-11f1-876d-1dfc6cf3b709.jpg"
+    },
+    "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/news/touch-icon-36.413a37b227.png"
+   }
+  },
   "https://www.bbc.co.uk/news/articles/cm9d7pe8y559o": {
    "url": "https://www.bbc.co.uk/news/articles/cm9d7pe8y559o",
    "ok": true,
@@ -3614,6 +3645,23 @@
     "published": null,
     "image": {
      "url": "https://ichef.bbci.co.uk/ace/branded_news/1200/cpsprodpb/b0d1/live/49c24750-d9d0-11f1-9e5a-c30c5e3d8c85.jpg"
+    },
+    "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/news/touch-icon-36.413a37b227.png"
+   }
+  },
+  "https://www.bbc.co.uk/news/articles/cmn504nq5033o": {
+   "url": "https://www.bbc.co.uk/news/articles/cmn504nq5033o",
+   "ok": true,
+   "status": 200,
+   "fetchedAt": "2026-11-17T12:05:41.810Z",
+   "meta": {
+    "url": "https://www.bbc.co.uk/news/articles/cmn504nq5033o",
+    "title": "US government confirms investigation into tech firm Megaspeed",
+    "description": "The Singapore-based company is suspected of helping to ship high-end AI chips from tech giant Nvidia to China, violating US export rules.",
+    "site_name": "BBC News",
+    "published": null,
+    "image": {
+     "url": "https://ichef.bbci.co.uk/ace/branded_news/1200/cpsprodpb/a77e/live/31ebc580-e267-11f1-900c-895604014268.jpg"
     },
     "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/news/touch-icon-36.413a37b227.png"
    }
@@ -3954,6 +4002,23 @@
     "published": null,
     "image": {
      "url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/0705/live/c4462280-dc6e-11f1-a36b-c52bf1cef2c5.jpg"
+    },
+    "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/sport/touch-icon-36.4462ac53e0.png"
+   }
+  },
+  "https://www.bbc.co.uk/sport/basketball/articles/cw808v4vj7exo": {
+   "url": "https://www.bbc.co.uk/sport/basketball/articles/cw808v4vj7exo",
+   "ok": true,
+   "status": 200,
+   "fetchedAt": "2026-11-17T12:05:42.283Z",
+   "meta": {
+    "url": "https://www.bbc.co.uk/sport/basketball/articles/cw808v4vj7exo",
+    "title": "Bill Fennelly: Iowa State head coach suspended for one game for pushing Sienna Harvey on head",
+    "description": "University basketball coach Bill Fennelly is given a one-game suspension for pushing a female player on the head during a timeout.",
+    "site_name": "BBC Sport",
+    "published": null,
+    "image": {
+     "url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/9df4/live/a84e6c90-e27c-11f1-a094-5fdc692f3e33.png"
     },
     "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/sport/touch-icon-36.4462ac53e0.png"
    }
@@ -9708,57 +9773,6 @@
     "handle": "log4j",
     "text": "i own a relatively new (2025) samsung tv. i kept getting weirdly targeted ads. i tried reversing the firmware but it was aes encrypted and no keys unless tear it apart and do uart/jtag magic. zero days it is. root shell on new samsung TVs! discovered PRIVACY HORROR. write up? pic.twitter.com/EsxxCy1b6a",
     "created_at": "2026-10-21"
-   }
-  },
-  "https://www.bbc.co.uk/news/articles/cm5y1wr1535ko": {
-   "url": "https://www.bbc.co.uk/news/articles/cm5y1wr1535ko",
-   "ok": true,
-   "status": 200,
-   "fetchedAt": "2026-11-17T12:05:42.221Z",
-   "meta": {
-    "url": "https://www.bbc.co.uk/news/articles/cm5y1wr1535ko",
-    "title": "Nigerians among 12 suspects arrested in Canada luxury car theft syndicate",
-    "description": "Canadian authorities say they have recovered 96 luxury vehicles destined for West Africa.",
-    "site_name": "BBC News",
-    "published": null,
-    "image": {
-     "url": "https://ichef.bbci.co.uk/ace/branded_news/1200/cpsprodpb/e5db/live/3bffede0-e252-11f1-876d-1dfc6cf3b709.jpg"
-    },
-    "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/news/touch-icon-36.413a37b227.png"
-   }
-  },
-  "https://www.bbc.co.uk/news/articles/cmn504nq5033o": {
-   "url": "https://www.bbc.co.uk/news/articles/cmn504nq5033o",
-   "ok": true,
-   "status": 200,
-   "fetchedAt": "2026-11-17T12:05:41.810Z",
-   "meta": {
-    "url": "https://www.bbc.co.uk/news/articles/cmn504nq5033o",
-    "title": "US government confirms investigation into tech firm Megaspeed",
-    "description": "The Singapore-based company is suspected of helping to ship high-end AI chips from tech giant Nvidia to China, violating US export rules.",
-    "site_name": "BBC News",
-    "published": null,
-    "image": {
-     "url": "https://ichef.bbci.co.uk/ace/branded_news/1200/cpsprodpb/a77e/live/31ebc580-e267-11f1-900c-895604014268.jpg"
-    },
-    "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/news/touch-icon-36.413a37b227.png"
-   }
-  },
-  "https://www.bbc.co.uk/sport/basketball/articles/cw808v4vj7exo": {
-   "url": "https://www.bbc.co.uk/sport/basketball/articles/cw808v4vj7exo",
-   "ok": true,
-   "status": 200,
-   "fetchedAt": "2026-11-17T12:05:42.283Z",
-   "meta": {
-    "url": "https://www.bbc.co.uk/sport/basketball/articles/cw808v4vj7exo",
-    "title": "Bill Fennelly: Iowa State head coach suspended for one game for pushing Sienna Harvey on head",
-    "description": "University basketball coach Bill Fennelly is given a one-game suspension for pushing a female player on the head during a timeout.",
-    "site_name": "BBC Sport",
-    "published": null,
-    "image": {
-     "url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/9df4/live/a84e6c90-e27c-11f1-a094-5fdc692f3e33.png"
-    },
-    "icon": "https://static.files.bbci.co.uk/core/website/assets/static/icons/touch/sport/touch-icon-36.4462ac53e0.png"
    }
   }
  },
