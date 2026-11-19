@@ -356,6 +356,17 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Email X draft composer links
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' && matrix.site == 'taiku' && inputs.mock != true && steps.drafts.outcome == 'success' && steps.draftartifact.outcome == 'success' }}
+        continue-on-error: true
+        timeout-minutes: 1
+        env:
+          X_DRAFT_EMAIL_FREE_ONLY: ${{ vars.X_DRAFT_EMAIL_FREE_ONLY }}
+          RESEND_X_DRAFT_API_KEY: ${{ secrets.RESEND_X_DRAFT_API_KEY }}
+          X_DRAFT_EMAIL_FROM: ${{ secrets.X_DRAFT_EMAIL_FROM }}
+          X_DRAFT_EMAIL_TO: ${{ secrets.X_DRAFT_EMAIL_TO }}
+        run: node scripts/send-x-drafts-email.mjs _scratch/x-drafts/taiku/drafts.json
+
   # With content publishing disabled, this job may still persist Taiku's draft hashes only; no draft
   # text or X target URL is committed, and the kill switch keeps feed content in staging.
   publish:

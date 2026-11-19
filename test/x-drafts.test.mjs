@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createDrafts, draftStateFrom, loadRecentDailyPosts, renderDraftMarkdown, xComposerUrl } from '../src/lib/x-drafts.mjs';
+import { sendDraftEmail } from '../scripts/send-x-drafts-email.mjs';
 
 const DATE = '2026-11-14';
 const BASE = 'https://taiku.app';
@@ -156,13 +157,64 @@ test('workflow uploads drafts when the daily feed was skipped and persists state
   assert.match(workflow, /Show X drafts and download link in run summary[\s\S]*?steps\.draftartifact\.outcome == 'success'/);
   assert.match(workflow, /DRAFT_ARTIFACT_URL: \$\{\{ steps\.draftartifact\.outputs\.artifact-url \}\}/);
   assert.match(workflow, /cat _scratch\/x-drafts\/taiku\/drafts\.md >> "\$GITHUB_STEP_SUMMARY"/);
-  assert.doesNotMatch(workflow, /CF_EMAIL_API_TOKEN|X_DRAFT_EMAIL_|smtp|send-x-drafts-email/);
+  const email = workflow.split('- name: Email X draft composer links')[1].split('  # With content publishing disabled')[0];
+  assert.match(email, /github\.ref == 'refs\/heads\/main'.*matrix\.site == 'taiku'.*inputs\.mock != true.*steps\.drafts\.outcome == 'success'.*steps\.draftartifact\.outcome == 'success'/);
+  assert.match(email, /continue-on-error: true/);
+  assert.doesNotMatch(workflow.split('- name: Email X draft composer links')[0], /RESEND_X_DRAFT_API_KEY|X_DRAFT_EMAIL_TO/);
   assert.match(workflow, /Download X draft dedupe state[\s\S]*?name: x-draft-state-taiku-/);
   const download = workflow.split('- name: Download X draft dedupe state')[1].split('      - name:')[0];
   assert.match(download, /steps\.artifacts\.outputs\.draftstate == 'true'/);
   assert.doesNotMatch(download, /continue-on-error/, 'a missing optional artifact is skipped; an actual download failure still fails');
   assert.match(workflow, /git add sites\/taiku\/content\/state\/x-draft-state\.json/);
   assert.doesNotMatch(workflow, /api\.x\.com|twitter\.com\/i\/|statuses\/update/);
+});
+
+const emailEnv = {
+  X_DRAFT_EMAIL_FREE_ONLY: 'true', RESEND_X_DRAFT_API_KEY: 'test-key',
+  X_DRAFT_EMAIL_FROM: 'drafts@example.com', X_DRAFT_EMAIL_TO: 'reviewer@example.org',
+};
+const emailDrafts = () => {
+  const post = { kind: 'post', text: 'A < B & C\nwith a literal "quote".' };
+  const comment = { kind: 'comment', text: 'A reply & review.', originalPostId: '123456789' };
+  return {
+    site: 'taiku', date: DATE,
+    posts: [{ ...post, openInXUrl: xComposerUrl(post.text) }],
+    comments: [{ ...comment, openInXUrl: xComposerUrl(comment.text, comment.originalPostId) }],
+  };
+};
+
+test('email sends the exact composer links once per request with a stable daily key', async () => {
+  const drafts = emailDrafts();
+  const fetchImpl = async (endpoint, request) => {
+    assert.equal(endpoint, 'https://api.resend.com/emails');
+    assert.equal(request.method, 'POST');
+    assert.equal(request.redirect, 'error');
+    assert.equal(request.headers['Idempotency-Key'], `taiku-x-drafts/${DATE}`);
+    const body = JSON.parse(request.body);
+    assert.deepEqual(body.to, [emailEnv.X_DRAFT_EMAIL_TO]);
+    assert.match(body.html, /A &lt; B &amp; C<br>with a literal &quot;quote&quot;/);
+    for (const draft of [...drafts.posts, ...drafts.comments]) assert.ok(body.text.includes(draft.openInXUrl));
+    assert.match(body.html, /&amp;in_reply_to=123456789/);
+    return Response.json({ id: 'accepted-id' });
+  };
+  assert.equal(await sendDraftEmail(drafts, { env: emailEnv, fetchImpl }), 'accepted');
+});
+
+test('email skips disabled and empty drafts, rejects mismatches and invalid recipients without fetching', async () => {
+  const env = emailEnv;
+  const fetchImpl = async () => assert.fail('must not fetch');
+  assert.equal(await sendDraftEmail(null, { env: {}, fetchImpl }), 'disabled');
+  assert.equal(await sendDraftEmail({ ...emailDrafts(), posts: [], comments: [] }, { env, fetchImpl }), 'empty');
+  const drafts = emailDrafts();
+  await assert.rejects(sendDraftEmail(drafts, { env: { ...env, X_DRAFT_EMAIL_TO: 'bad@example.org,foo@example.org' }, fetchImpl }), /Configure/);
+  drafts.comments[0].openInXUrl = xComposerUrl(drafts.comments[0].text, '987654321');
+  await assert.rejects(sendDraftEmail(drafts, { env, fetchImpl }), /Invalid X composer link/);
+});
+
+test('email reports provider errors without leaking response bodies', async () => {
+  const fetchImpl = async () => new Response('private-recipient@example.com', { status: 403 });
+  await assert.rejects(sendDraftEmail(emailDrafts(), { env: emailEnv, fetchImpl }),
+    { message: 'Resend did not accept the email (HTTP 403); check the Resend dashboard' });
 });
 
 test('run summary contains the actual upload URL and readable composer drafts; missing URL fails', () => {
