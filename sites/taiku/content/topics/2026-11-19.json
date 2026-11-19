@@ -1,0 +1,361 @@
+{
+  "date": "2026-11-19",
+  "generatedAt": "2026-11-19T20:19:05.515Z",
+  "sourceSnapshotHash": "a9f04f620320017a",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 19
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 19
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 21,
+      "kept": 18
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "t15a39393",
+      "title": "PM urges social media companies to 'show some decency' and take down Brand video",
+      "url": "https://www.bbc.co.uk/news/articles/cmgrenln8p29o",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-culture",
+      "tier": "curated",
+      "kind": "news",
+      "section": "culture",
+      "publishedAt": "2026-11-19T15:47:56.000Z",
+      "score": 1.064,
+      "keys": {
+        "tech": 1,
+        "economy": 1,
+        "culture": 2.5,
+        "memes": 1
+      }
+    },
+    {
+      "id": "t65b8119e",
+      "title": "Oil firm fined for breaking environmental rules hundreds of times",
+      "url": "https://www.bbc.co.uk/news/articles/cmwy5de1177yo",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-science",
+      "tier": "curated",
+      "kind": "news",
+      "section": "science",
+      "publishedAt": "2026-11-19T19:58:27.000Z",
+      "score": 1.031,
+      "keys": {
+        "science": 2.5,
+        "politics": 1
+      }
+    },
+    {
+      "id": "ta0db95a2",
+      "title": "Anthropic begins trading in the biggest IPO on record despite the many fears surrounding AI",
+      "url": "https://apnews.com/article/anthropic-ipo-nasdaq-ai-b6a74b8949021207dc162fcc876c4649",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-19T18:51:00.000Z",
+      "score": 1.023,
+      "keys": {
+        "tech": 1,
+        "economy": 1,
+        "world": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t5d000ade",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tcc4395e2",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tca1d8168",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tb56bc510",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "teff63436",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t44bb7886",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t01e43e6d",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t265560c4",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t822e5f8b",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t7e9f649e",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7108dd3d",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te3e9895c",
+      "feedId": "bbc-science",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t458dca79",
+      "feedId": "bbc-culture",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t898e831b",
+      "feedId": "ap",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t5282d21d",
+      "title": "Trump, Putin and Xi release 'peace declaration' after historic meeting",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4517641d",
+      "title": "Europe ready for talks with Russia on ending war in Ukraine, leaders say",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t266dd20b",
+      "title": "Van Gogh painting sells for record $190.4m after row over its Nazi history",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "td65a0674",
+      "title": "Venezuela signs military deal with US less than a year after Maduro's removal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t067ed6b7",
+      "title": "Susan Smith denied parole again 32 years after drowning her two sons",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t93a963da",
+      "title": "US consortium wins huge Kenya mining deal, beating Chinese rivals",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t935e6daa",
+      "title": "Survivors of Uganda's deadly landslide seek justice at the UN",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tdb0496e7",
+      "title": "Florida pastor found guilty over role in assassination of Haitian president",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t116efff4",
+      "title": "Israeli military completes ground operation in Gaza beyond Yellow Line",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4ff4c870",
+      "title": "Elon Musk says record $446m spending on US midterms was 'pretty foolish'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta8922761",
+      "title": "Inside the old gas pipeline where Ukraine is fighting an underground war with Russia",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t720e16ec",
+      "title": "Russian arrested for spying on US defence company Palantir over Ukraine support",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t239d1311",
+      "title": "William and Kate meet PM Modi as they wrap up India tour",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t37933f5f",
+      "title": "Ghana's new $60m presidential jet sparks public outrage",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te6f36187",
+      "title": "Democrats nominate Hakeem Jeffries to be US Speaker of the House",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0ecfa8cd",
+      "title": "Democrats win Alaska Senate race two weeks after midterms counting began",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb5409889",
+      "title": "Bancroft sandpaper claims heap pressure on Cummins",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tceaa8eb6",
+      "title": "British hacker who stole $11m through text message scheme jailed for six years in US",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tdf1977ca",
+      "title": "Nvidia says it won't reinstate Huang as it reports soaring sales",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf4f25b9c",
+      "title": "Dutch watchdog tells people not to buy AI smart glasses",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcae7150e",
+      "title": "Anthropic raises $81bn in record-breaking stock market debut",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tee69d519",
+      "title": "UK joins in GTA 6 frenzy as game becomes available worldwide",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta48badf7",
+      "title": "The seven Anthropic founders who are about to become multi-billionaires",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6936d425",
+      "title": "Simon Jack: Can Anthropic's record-breaking IPO stop the AI bubble bursting?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcdc6a802",
+      "title": "Grand Theft Auto 6 is a masterpiece, say critics",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf95d61ce",
+      "title": "Hacks, AI or just overdue updates - why have there been so many outages?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9fdc6d69",
+      "title": "Security flaw found in Java, world's third-largest programming language",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf48018da",
+      "title": "How important are Nvidia and Jensen Huang to the US economy?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t67dd5bd4",
+      "title": "Watch: Marco Rubio says recent tech outages are 'completely unrelated' to one another",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2dfd1d8d",
+      "title": "Waymo pulls driverless taxis from all US freeways",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
