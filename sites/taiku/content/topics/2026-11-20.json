@@ -1,0 +1,387 @@
+{
+  "date": "2026-11-20",
+  "generatedAt": "2026-11-20T19:50:52.353Z",
+  "sourceSnapshotHash": "f37c8cb0014661f3",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 23,
+      "kept": 23
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 19
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 17
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 20,
+      "kept": 18
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "tff725159",
+      "title": "White House removes cyber-security chief after series of tech outages",
+      "url": "https://www.bbc.co.uk/news/articles/cwz0k3nn5p5mo",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-20T19:03:56.000Z",
+      "score": 1.092,
+      "keys": {
+        "tech": 1,
+        "politics": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "tbb98b992",
+      "title": "Anthropic shares fall after blockbuster opening as wider tech sell-off continues",
+      "url": "https://www.bbc.co.uk/news/articles/c6808ym10vzgo",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-20T19:38:46.000Z",
+      "score": 1.063,
+      "keys": {
+        "tech": 1,
+        "economy": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t54a86c49",
+      "title": "Filming training by drones should be illegal - Iraola",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cqdr1xmekmg5o",
+      "source": "BBC Sport",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-sport",
+      "tier": "curated",
+      "kind": "news",
+      "section": "sports",
+      "publishedAt": "2026-11-20T15:08:51.000Z",
+      "score": 0.986,
+      "keys": {
+        "culture": 1,
+        "politics": 1,
+        "economy": 1,
+        "sports": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t3fb8e5ed",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tac848c93",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t667ba2ba",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta8ca822f",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t013099f9",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t01e43e6d",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t265560c4",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t822e5f8b",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t7e9f649e",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7108dd3d",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tdb246dfa",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    },
+    {
+      "id": "td06b854f",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9a4707d7",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tcf35ea3d",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t662e6862",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2fc401cb",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t898e831b",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6d45d5e6",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta58bde0e",
+      "feedId": "google-trends",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t312bd5c0",
+      "title": "UK to explore even closer ties with EU after agreeing deal, says Burnham",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tdd678c41",
+      "title": "Russian missile hits Poland as Ukraine's allies hold military exercise, says Tusk",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t288e765f",
+      "title": "Russia targets Kyiv crossings days after Ukraine hits Crimean Bridge",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tbb98b992",
+      "title": "Anthropic shares fall after blockbuster opening as wider tech sell-off continues",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t8a87ce94",
+      "title": "Indian man sentenced to 19-plus years in plot to assassinate US-based Sikh separatist leader",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3df35227",
+      "title": "Catherine Zeta-Jones' daughter says parents warned her about 'nepo baby' label",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t458e3a90",
+      "title": "South Korea catches 111 students with new measures against exam cheating",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tff725159",
+      "title": "White House removes cyber-security chief after series of tech outages",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta52a2719",
+      "title": "Massive hope for pancreatic cancer pill after trial saw tumours vanish",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4517641d",
+      "title": "Europe ready for talks with Russia on ending war in Ukraine, leaders say",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4be5e249",
+      "title": "Cost of living protests sweep across Europe",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6a05d9ec",
+      "title": "BBC correspondents discuss what Trump, Xi and Putin got out of historic talks",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t5db3dcd9",
+      "title": "How did Anthropic's stock market debut unfold?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t715dabc2",
+      "title": "'I tell my son it's just fireworks': Life inside Yemeni city besieged by Houthis",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t50e29ab8",
+      "title": "Mysterious Mercury is about to get a visitor - after spacecraft's eight-year epic voyage",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3ccb78af",
+      "title": "Why Canada is embracing AI data centres while the US pushes back",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6098fe5b",
+      "title": "More climate money for Africa? Europe says use what's already pledged",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t706d3a99",
+      "title": "Cumin-laced fizzy sodas are giving cola giants a tough fight in India",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc098c8de",
+      "title": "GTA 6 drives spike in download demand, as estimated sales top $2.3bn",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t26f93c1b",
+      "title": "Should AI be judging our credit worthiness?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t7f4bf209",
+      "title": "Tens of thousands of UK fridges secured from hackers in secret nationwide operation",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc9042b87",
+      "title": "Anthropic becomes one of world's most valuable public companies in stock market debut",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf4f25b9c",
+      "title": "Dutch watchdog tells people not to buy AI smart glasses",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcae7150e",
+      "title": "Anthropic raises $81bn in record-breaking stock market debut",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tee69d519",
+      "title": "UK joins in GTA 6 frenzy as game becomes available worldwide",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4ff4c870",
+      "title": "Elon Musk says record $446m spending on US midterms was 'pretty foolish'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta48badf7",
+      "title": "The seven Anthropic founders who are about to become multi-billionaires",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6936d425",
+      "title": "Simon Jack: Can Anthropic's record-breaking IPO stop the AI bubble bursting?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcdc6a802",
+      "title": "Grand Theft Auto 6 is a masterpiece, say critics",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6f9e983e",
+      "title": "Tech Life",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
