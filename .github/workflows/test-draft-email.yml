@@ -1,0 +1,61 @@
+name: Test draft email
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_sha256:
+        description: SHA-256 of the approved sender address
+        required: true
+        type: string
+      to_sha256:
+        description: SHA-256 of the approved recipient address
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  test-email:
+    if: github.ref == 'refs/heads/main' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check approved addresses and free-only opt-in
+        env:
+          X_DRAFT_EMAIL_FREE_ONLY: ${{ vars.X_DRAFT_EMAIL_FREE_ONLY }}
+          X_DRAFT_EMAIL_FROM: ${{ secrets.X_DRAFT_EMAIL_FROM }}
+          X_DRAFT_EMAIL_TO: ${{ secrets.X_DRAFT_EMAIL_TO }}
+          EXPECTED_FROM: ${{ inputs.from_sha256 }}
+          EXPECTED_TO: ${{ inputs.to_sha256 }}
+        run: |
+          node -e '
+            const { createHash, timingSafeEqual } = require("node:crypto");
+            const matches = (value, expected) => {
+              if (!value || !/^[a-f0-9]{64}$/.test(expected || "")) return false;
+              return timingSafeEqual(createHash("sha256").update(value).digest(), Buffer.from(expected, "hex"));
+            };
+            if (process.env.X_DRAFT_EMAIL_FREE_ONLY !== "true" ||
+                !matches(process.env.X_DRAFT_EMAIL_FROM, process.env.EXPECTED_FROM) ||
+                !matches(process.env.X_DRAFT_EMAIL_TO, process.env.EXPECTED_TO)) {
+              console.error("Free-only opt-in or approved addresses do not match.");
+              process.exit(1);
+            }
+          '
+      - name: Download previously published draft artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: x-drafts-taiku-44607308493-1
+          path: _scratch/email-test
+          run-id: 44607308493
+          github-token: ${{ github.token }}
+      - name: Send one draft email
+        env:
+          X_DRAFT_EMAIL_FREE_ONLY: ${{ vars.X_DRAFT_EMAIL_FREE_ONLY }}
+          RESEND_X_DRAFT_API_KEY: ${{ secrets.RESEND_TAIKU_KEY }}
+          X_DRAFT_EMAIL_FROM: ${{ secrets.X_DRAFT_EMAIL_FROM }}
+          X_DRAFT_EMAIL_TO: ${{ secrets.X_DRAFT_EMAIL_TO }}
+        run: node scripts/send-x-drafts-email.mjs _scratch/email-test/drafts.json

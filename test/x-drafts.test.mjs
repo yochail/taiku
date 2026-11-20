@@ -170,6 +170,19 @@ test('workflow uploads drafts when the daily feed was skipped and persists state
   assert.doesNotMatch(workflow, /api\.x\.com|twitter\.com\/i\/|statuses\/update/);
 });
 
+test('email-only test is manual, main-only and uses the existing draft and production secret', () => {
+  const workflow = fs.readFileSync(path.join(process.cwd(), '.github', 'workflows', 'test-draft-email.yml'), 'utf8');
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.doesNotMatch(workflow, /^\s+(push|schedule|pull_request):/m);
+  assert.match(workflow, /github\.ref == 'refs\/heads\/main' && github\.run_attempt == 1/);
+  assert.match(workflow, /X_DRAFT_EMAIL_FREE_ONLY !== "true"/);
+  assert.match(workflow, /matches\(process\.env\.X_DRAFT_EMAIL_FROM, process\.env\.EXPECTED_FROM\)/);
+  assert.match(workflow, /matches\(process\.env\.X_DRAFT_EMAIL_TO, process\.env\.EXPECTED_TO\)/);
+  assert.match(workflow, /name: x-drafts-taiku-44607308493-1/);
+  assert.match(workflow, /RESEND_X_DRAFT_API_KEY: \$\{\{ secrets\.RESEND_TAIKU_KEY \}\}/);
+  assert.equal((workflow.match(/node scripts\/send-x-drafts-email\.mjs/g) || []).length, 1);
+});
+
 const emailEnv = {
   X_DRAFT_EMAIL_FREE_ONLY: 'true', RESEND_X_DRAFT_API_KEY: 'test-key',
   X_DRAFT_EMAIL_FROM: 'drafts@example.com', X_DRAFT_EMAIL_TO: 'reviewer@example.org',
