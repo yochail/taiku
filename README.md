@@ -67,6 +67,12 @@ The [Daily feed workflow](https://github.com/yochail/taiku/actions/workflows/gen
 
 The next eligible run on `main` attempts one email for the draft date. No email is sent when there are no new drafts or on mock runs. Resend deduplicates same-date requests within its 24-hour idempotency window. The run summary reports whether Resend accepted the message; check the Resend dashboard and inbox to confirm delivery. If email fails, the summary and artifact still have the links. The links only prepare drafts: review and submit them manually on X.
 
+## English Bluesky image drafts
+
+The daily workflow also exports up to five eligible standalone English Taiku posts as full-text Taiku-style PNG mockups. Tarya/Hebrew, replies, placeholders and Bluesky/X quote posts are excluded. Exports use previously published Taiku output or a day that passed the workflow's gates and content checks. They are uploaded as a short-lived GitHub artifact for human review, never sent to Bluesky. `drafts.json` contains the complete alt text and separate source and thread links. No Bluesky account, API, or posting integration is used.
+
+For a local sample, run `npm ci --ignore-scripts` and `npx playwright install chromium --only-shell`, then use `SITE=taiku node scripts/bsky-drafts.mjs --date <YYYY-MM-DD> --file <posts.json> --out <directory> --sample`. The visible sample warning is intentional.
+
 ## Add a persona
 
 Personas live in `sites/taiku/personas/<id>.json` and follow [`schemas/persona.schema.json`](schemas/persona.schema.json).

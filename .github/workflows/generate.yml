@@ -325,6 +325,44 @@ jobs:
             _scratch/x-drafts/taiku/drafts.json
           if-no-files-found: error
           retention-days: 14
+      - name: Create English Bluesky image drafts
+        id: bskydrafts
+        if: always() && matrix.site == 'taiku' && inputs.mock != true && (
+          steps.local.outputs.skipped == 'true' ||
+          (steps.gen.outputs.soft == 'true' && hashFiles(format('sites/taiku/content/posts/daily-{0}.json', steps.local.outputs.day)) != '') ||
+          (steps.gen.outputs.soft != 'true' && steps.repair.outputs.soft != 'true' && steps.regate.outputs.soft != 'true' && (steps.gate.outcome == 'success' || steps.regate.outcome == 'success') && steps.contentvalidate.outcome == 'success' && steps.contentchecks.outcome == 'success')
+          )
+        env:
+          DRAFT_DATE: ${{ steps.local.outputs.day }}
+          DRAFT_FILE: ${{ steps.gen.outputs.soft == 'true' && format('sites/taiku/content/posts/daily-{0}.json', steps.local.outputs.day) || steps.local.outputs.dayfile }}
+        run: |
+          if [ ! -x node_modules/.bin/playwright ]; then
+            npm ci --ignore-scripts --no-audit --no-fund
+          fi
+          node_modules/.bin/playwright install chromium --only-shell
+          node scripts/bsky-drafts.mjs \
+            --date "$DRAFT_DATE" \
+            --file "$DRAFT_FILE" \
+            --out "_scratch/bsky-drafts/taiku" \
+            --gate-passed
+      - name: Upload Bluesky draft images
+        id: bskyartifact
+        if: always() && matrix.site == 'taiku' && inputs.mock != true && steps.bskydrafts.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: bluesky-drafts-taiku-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            _scratch/bsky-drafts/taiku/drafts.json
+            _scratch/bsky-drafts/taiku/*.png
+          if-no-files-found: error
+          retention-days: 14
+      - name: Show Bluesky image draft download link
+        if: always() && matrix.site == 'taiku' && steps.bskydrafts.outcome == 'success' && steps.bskyartifact.outcome == 'success'
+        env:
+          DRAFT_ARTIFACT_URL: ${{ steps.bskyartifact.outputs.artifact-url }}
+        run: |
+          [ -n "$DRAFT_ARTIFACT_URL" ] || { echo "::error::Bluesky draft upload returned no artifact link"; exit 1; }
+          printf '## English Taiku image drafts for Bluesky review\n\n[Download image drafts](%s)\n\nThese are human-review-only mock UI images with complete post text. Nothing was posted to Bluesky. Available for 14 days.\n\n' "$DRAFT_ARTIFACT_URL" >> "$GITHUB_STEP_SUMMARY"
       - name: Show X drafts and download link in run summary
         if: always() && matrix.site == 'taiku' && steps.drafts.outcome == 'success' && steps.draftartifact.outcome == 'success'
         env:
