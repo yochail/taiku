@@ -152,7 +152,7 @@ Refer to secrets **by name only**. Never print, log or commit values, and never 
 
 - Secrets: `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `GROQ_API_KEY`, `CF_ACCOUNT_ID`, `CF_AI_TOKEN`, `GIPHY_API_KEY`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 - Variables: `GEN_TOPICS`, `GEN_MAX_CALLS`, `GEN_MAX_CALLS_<SITE>`, `GEN_MIN_COMPLETE`, `GIPHY_MAX_CALLS`, `NEWS_FEEDS`, `POLICY_ALLOW_NAMES`, `PUBLISH_ENABLED`.
-- Optional draft email: `RESEND_X_DRAFT_API_KEY`, `X_DRAFT_EMAIL_FROM`, and `X_DRAFT_EMAIL_TO` are production secrets; `X_DRAFT_EMAIL_FREE_ONLY` is the opt-in variable.
+- Optional draft email: `RESEND_TAIKU_KEY`, `X_DRAFT_EMAIL_FROM`, and `X_DRAFT_EMAIL_TO` are production secrets; `X_DRAFT_EMAIL_FREE_ONLY` is the opt-in variable.
 - Local env: `SITE`, `OUT_DIR`, `SITE_URL`, `BUILD_NOW`, `LLM_*`, `GEN_*`.
 - A missing secret skips that provider. The code must keep working without it.
 
