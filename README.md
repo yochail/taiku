@@ -57,6 +57,16 @@ npm run generate:dry
 
 `npm install` adds a few optional extras (embeddings, meme rasterising). Everything works without them.
 
+## Daily X draft email (optional)
+
+The [Daily feed workflow](https://github.com/yochail/taiku/actions/workflows/generate.yml) always puts eligible Taiku drafts in its run summary and artifact. GitHub's run notifications do not include the composer links. To get the links directly in your inbox:
+
+1. Use a [Resend Free](https://resend.com/pricing) account with no paid plan or overage. [Verify a sender domain](https://resend.com/docs/dashboard/domains/introduction), then create a sending-only API key restricted to that domain.
+2. In [GitHub's `production` environment](https://github.com/yochail/taiku/settings/environments), add `RESEND_X_DRAFT_API_KEY`, `X_DRAFT_EMAIL_FROM` (a mailbox on the verified domain), and `X_DRAFT_EMAIL_TO` (one verified recipient who opted in) as secrets. Do not share the values in chat or commit them.
+3. Set the environment variable `X_DRAFT_EMAIL_FREE_ONLY` under **Variables** to `true` only after verifying the free plan and recipient. Remove that variable to disable delivery.
+
+The next eligible run on `main` attempts one email for the draft date. No email is sent when there are no new drafts or on mock runs. Resend deduplicates same-date requests within its 24-hour idempotency window. The run summary reports whether Resend accepted the message; check the Resend dashboard and inbox to confirm delivery. If email fails, the summary and artifact still have the links. The links only prepare drafts: review and submit them manually on X.
+
 ## Add a persona
 
 Personas live in `sites/taiku/personas/<id>.json` and follow [`schemas/persona.schema.json`](schemas/persona.schema.json).

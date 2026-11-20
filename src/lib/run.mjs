@@ -52,6 +52,13 @@ import { checkPost, policyContext } from './policy.mjs';
 import { runTurn } from './turn.mjs';
 import { clamp, editorialDay, hash8, readJson, round3, seededRng, sha256, shuffle, weightedPick, writeJsonAtomic } from './pipeline-util.mjs';
 
+export function compareTaskRoots(a, b, topics) {
+  const pollPriority = Number(b.media === 'poll') - Number(a.media === 'poll');
+  if (pollPriority) return pollPriority;
+  const priority = (task) => task.topicId ? topics.findIndex((topic) => topic.id === task.topicId) : topics.length;
+  return priority(a) - priority(b);
+}
+
 export const DEFAULT_MAX_CALLS = 1000;
 export const DEFAULT_MIN_COMPLETE = 0.7;
 export const MIN_TOPIC_SHARE = 0.6;
@@ -1095,8 +1102,7 @@ export async function runDaily(opts = {}) {
     while (t.parentTaskId && taskById.has(t.parentTaskId)) t = taskById.get(t.parentTaskId);
     return t.taskId;
   };
-  const priority = (t) => t.topicId ? topics.findIndex((tp) => tp.id === t.topicId) : topics.length;
-  const groups = threadPolicy ? tasks.filter((t) => !t.parentTaskId).sort((a, b) => priority(a) - priority(b))
+  const groups = threadPolicy ? tasks.filter((t) => !t.parentTaskId).sort((a, b) => compareTaskRoots(a, b, topics))
     .map((root) => tasks.filter((t) => taskRoot(t) === root.taskId)) : [tasks];
   const stages = groups.flatMap((group) => [...new Set(group.map((t) => t.level))].sort((a, b) => a - b)
     .map((level) => group.filter((t) => t.level === level)));
