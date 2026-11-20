@@ -362,7 +362,7 @@ jobs:
         timeout-minutes: 1
         env:
           X_DRAFT_EMAIL_FREE_ONLY: ${{ vars.X_DRAFT_EMAIL_FREE_ONLY }}
-          RESEND_X_DRAFT_API_KEY: ${{ secrets.RESEND_X_DRAFT_API_KEY }}
+          RESEND_X_DRAFT_API_KEY: ${{ secrets.RESEND_TAIKU_KEY }}
           X_DRAFT_EMAIL_FROM: ${{ secrets.X_DRAFT_EMAIL_FROM }}
           X_DRAFT_EMAIL_TO: ${{ secrets.X_DRAFT_EMAIL_TO }}
         run: node scripts/send-x-drafts-email.mjs _scratch/x-drafts/taiku/drafts.json

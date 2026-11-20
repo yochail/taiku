@@ -160,7 +160,8 @@ test('workflow uploads drafts when the daily feed was skipped and persists state
   const email = workflow.split('- name: Email X draft composer links')[1].split('  # With content publishing disabled')[0];
   assert.match(email, /github\.ref == 'refs\/heads\/main'.*matrix\.site == 'taiku'.*inputs\.mock != true.*steps\.drafts\.outcome == 'success'.*steps\.draftartifact\.outcome == 'success'/);
   assert.match(email, /continue-on-error: true/);
-  assert.doesNotMatch(workflow.split('- name: Email X draft composer links')[0], /RESEND_X_DRAFT_API_KEY|X_DRAFT_EMAIL_TO/);
+  assert.match(email, /RESEND_X_DRAFT_API_KEY: \$\{\{ secrets\.RESEND_TAIKU_KEY \}\}/);
+  assert.doesNotMatch(workflow.split('- name: Email X draft composer links')[0], /RESEND_X_DRAFT_API_KEY|RESEND_TAIKU_KEY|X_DRAFT_EMAIL_TO/);
   assert.match(workflow, /Download X draft dedupe state[\s\S]*?name: x-draft-state-taiku-/);
   const download = workflow.split('- name: Download X draft dedupe state')[1].split('      - name:')[0];
   assert.match(download, /steps\.artifacts\.outputs\.draftstate == 'true'/);
