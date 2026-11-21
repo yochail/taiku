@@ -1,0 +1,577 @@
+{
+  "date": "2026-11-21",
+  "generatedAt": "2026-11-21T19:22:06.075Z",
+  "sourceSnapshotHash": "429207bbcdb1b22d",
+  "feeds": [
+    {
+      "feed": "ynet",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ynetnews",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz-en",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "toi",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "jpost",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "kan",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom-en",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "maariv",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "walla",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "jta",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "forward",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "jns",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "reuters",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-me",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    }
+  ],
+  "picks": [
+    {
+      "id": "tc9970b25",
+      "title": "Spry 93-year-old Jerusalemite has one message: God's greatest gift is exercise - interview",
+      "url": "https://www.jpost.com/aliyah/article-915408",
+      "source": "The Jerusalem Post",
+      "domain": "jpost.com",
+      "feedId": "jpost",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "publishedAt": "2026-11-21T18:29:13.000Z",
+      "score": 1.132,
+      "keys": {
+        "religion": 1,
+        "politics": 1.5
+      }
+    },
+    {
+      "id": "tc70a5200",
+      "title": "Former Italian police chief De Gennaro takes own life amid mafia probe",
+      "url": "https://www.reuters.com/world/former-italian-police-chief-de-gennaro-takes-own-life-amid-mafia-probe-2026-11-21/",
+      "source": "Reuters",
+      "domain": "reuters.com",
+      "feedId": "reuters",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-21T18:00:26.000Z",
+      "score": 1.075,
+      "keys": {
+        "politics": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t77e625c0",
+      "title": "Iran's army claims it damaged US F-16 over Gulf, forcing emergency landing; US military denies",
+      "url": "https://www.timesofisrael.com/liveblog_entry/irans-army-claims-it-damaged-us-f-16-over-gulf-forcing-emergency-landing-no-immediate-comment-from-us-military/",
+      "source": "The Times of Israel",
+      "domain": "timesofisrael.com",
+      "feedId": "toi",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "publishedAt": "2026-11-21T16:40:06.000Z",
+      "score": 1.061,
+      "keys": {
+        "world": 1,
+        "politics": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "tf7bfe1c2",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc6717a0c",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf1a8cbf8",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t59afdd8c",
+      "feedId": "haaretz",
+      "reason": "duplicate"
+    },
+    {
+      "id": "td2e1e1d0",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t04137ab6",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc8b49df0",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t96da0452",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9961bcf9",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t73a9ef78",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0f88fe64",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tb310fc12",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t4583e89a",
+      "feedId": "toi",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t44b5cd0a",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t607fda2a",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "teb749967",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t094a08e4",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tbf15713c",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t652d3ada",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta8a70b7d",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tbe4e387f",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t44861304",
+      "feedId": "kan",
+      "reason": "duplicate"
+    },
+    {
+      "id": "ta6f53aa0",
+      "feedId": "israelhayom-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tb8e61a47",
+      "feedId": "jta",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t4baeb37e",
+      "feedId": "forward",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te9ba00fe",
+      "feedId": "forward",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t25ebee6d",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t804db08c",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tdb318407",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t0e6e63ee",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tc3fc8186",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t407c3e3b",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t1d2411d2",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tb452b3fa",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t4474f1a3",
+      "feedId": "reuters",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2d8a12b8",
+      "feedId": "reuters",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc1322c40",
+      "feedId": "reuters",
+      "reason": "tragedy"
+    },
+    {
+      "id": "td0ae8102",
+      "feedId": "reuters",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t693bfb3f",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t662e6862",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t15214c5c",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tab5e41a5",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0afef7db",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta8ca822f",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t39508776",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "teff63436",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7036da4c",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t11f7e70f",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6d8f0dff",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t638ef79e",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te20e75c8",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "tadb4507c",
+      "title": "הלם בעקבות רצח הנער בן ה-13: \"לעצור את הטירוף\" | תיעוד מהימלטות האופנוען",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t41084f15",
+      "title": "אסון הכלבת בשפלה: \"זו שאלה של זמן עד שווטרינר ימות מנשיכה של כלב\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "teda252b7",
+      "title": "התשובה לליברמן? איזנקוט הזמין את צוות הליכוד ל\"מרתון שיחות\", בנט דוחף לאחדות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tf63434b1",
+      "title": "רצח רודף רצח: צעיר נורה למוות בגליל התחתון",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t06caec97",
+      "title": "יו\"ר הוועדה לאבטחת אישים על ראשי גוש השינוי: \"גוש הבגידה. כן, הם בוגדים\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "td78cd706",
+      "title": "\"באתי מהעתיד להציל את הממשלה\": תושב ת\"א נעצר בחשד לאיומים על בנט",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t397df2b3",
+      "title": "\"שימוש ציני\": הפלסטינים טענו שצה\"ל הרג עובדי סיוע בעזה, הארגון הבינ\"ל הכחיש",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "td19c1e03",
+      "title": "\"אני לא משוטה\" | גרסת סולברג לחקירת הבחירות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "te02777d8",
+      "title": "נאשם ב'פיראטיות חמורה': הוסגר הישראלי ש\"ניצח\" על חטיפת אוניית המשא הרוסית",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5acb7d9f",
+      "title": "בן 13 נרצח עם תיק בית הספר על גבו בי-ם, נקבע מותה של האישה שנדבקה בכלבת | כותרות השבת",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t240c1e2f",
+      "title": "הפגישה החריגה שיזם סולברג, ועמדת חוקרי הצוות המיוחד משב\"כ - בניגוד לדעת זיני",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5bd779be",
+      "title": "נמצא סמוך לאופנוע שרוף: בן 16 נעצר בחשד למעורבות ברצח בן ה-13, וישוחרר",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t17bc6eec",
+      "title": "אחרי הצהרת טראמפ, איראן פרסמה תיעוד מ\"עיר טילים תת קרקעית\" - ושבה לאיים",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t3032d89b",
+      "title": "אחרי יותר מ-40 נרצחים: הסולחה הגדולה בין החמולות ברמלה | תיעוד",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "td706c5ef",
+      "title": "ירי במגרש בייסבול וקרבות רחוב: תיעודים דרמטיים ממעצר ראש קרטל",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t70128fd3",
+      "title": "הן חנקו תינוקות: \"יושבת מולי מפלצת\" | החקירה שטלטלה את המדינה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t1860c425",
+      "title": "ליברמן מגיב לאיזנקוט: הדרך היחידה להקים ממשלה - לפרק את גוש נתניהו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t99a8275e",
+      "title": "ניצחון הנשים על המנהל שהטריד מינית: \"חגגו איתו בבריכה. עכשיו שיראו את ההרשעה\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "ta1e7db5a",
+      "title": "נקבע מותה של האישה שנדבקה בכלבת",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t4d3ac4f0",
+      "title": "רצח במזרח ירושלים: בן 13 נורה למוות עם תיק בית הספר על גבו, לעיני תלמידים",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t83a5cb1d",
+      "title": "\"איך אפשר לעשות לה את זה?\": הרצח של הייא בפיצוץ הרכב לעיני ילדיה - וההלם",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t9e431a35",
+      "title": "מזג האוויר: מעונן חלקית וחם מהרגיל לעונה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "te3928017",
+      "title": "המאהבת של מנכ\"ל אנבידיה הפורש - וקשריה עם צבא סין | תחקיר חדש",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t8b6d214c",
+      "title": "רבש\"צ בית אל ירה למוות בפלסטיני שהתקרב ליישוב",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t945cb85f",
+      "title": "בישראל נערכים בהגנה גם למתקפת פתע; דיווח: \"בצבא ארה\"ב דוחקים להחליט\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5d657757",
+      "title": "‘I may have created draft dodgers’: Ben-Gurion's forgotten warning on Haredi draft exemptions",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t5df24178",
+      "title": "Iran, Hezbollah recruited Thai clerics to attack Israeli embassy, report says",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "tbf87687a",
+      "title": "Haredi kingmakers keep Netanyahu and Eisenkot guessing in coalition negotiations",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t184210bb",
+      "title": "Iran sees Trump weakened by midterm rout, hardens war demands",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t0cb9ec6c",
+      "title": "Australia joins Britain in sanctioning Israelis over West Bank violence",
+      "domain": "ynetnews.com"
+    }
+  ]
+}
