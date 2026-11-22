@@ -153,6 +153,22 @@ test('budget exhaustion → partial: exit 2, nothing published, rerun resumes', 
   assert.equal(r2.manifest.tasks.filter((t) => t.resumed).length, done1, 'finished turns are reused');
 });
 
+test('resume regenerates a cached poll task whose older output had no poll', async () => {
+  const root = freshRoot();
+  const first = await run({ root });
+  const poll = first.manifest.tasks.find((t) => t.media === 'poll' && t.status === 'done');
+  assert.ok(poll, 'fixture needs a completed poll');
+  const paths = outputPaths(root, DATE, { mock: true });
+  const work = read(paths.work);
+  delete work.results[poll.taskId].fields.poll;
+  fs.writeFileSync(paths.work, JSON.stringify(work));
+  const second = await run({ root });
+  const rerun = second.manifest.tasks.find((t) => t.taskId === poll.taskId);
+  assert.equal(rerun.status, 'done');
+  assert.notEqual(rerun.resumed, true);
+  assert.ok(read(paths.work).results[poll.taskId].fields.poll);
+});
+
 test('community topics are staged; promote moves them into content without duplicates', async () => {
   const root = freshRoot();
   seedTopics(root, [

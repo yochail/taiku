@@ -41,6 +41,22 @@ const sleep = async (ms) => noSleep.push(ms);
 const task = (over = {}) => ({ taskId: 't1', postId: 'd20261102-test0001', role: 'original', archetype: 'hot_take', length: { min: 40, max: 200 }, emoji: false, hashtag: false, native: false, wantQuote: true, media: null, mention: null, wantNote: false, ...over });
 const ctx = { topic: { id: 't1', title: 'Robot referee debuts at football final', domain: 'bbc.co.uk' }, thread: [], pool: [], threadFn: () => [] };
 
+test('poll generation repairs missing or duplicate options instead of silently publishing a question', async () => {
+  const pollTask = task({ tools: false, wantQuote: false, media: 'poll', mediaPlan: { kind: 'poll' } });
+  const { fetchImpl, requests } = scripted([
+    final({ text: 'Which question deserves another look?' }),
+    final({ text: 'Which question deserves another look?', poll: { options: ['First', 'Second'] } }),
+  ]);
+  const client = createClient({ cfg: cfg(), fetchImpl, sleep });
+  const result = await runTurn({ client, persona, byId, task: pollTask, ctx, policyCtx });
+  assert.equal(result.ok, true, JSON.stringify(result));
+  assert.equal(result.fields.poll.options.length, 2);
+  assert.match(requests[1].body.messages.at(-1).content, /poll\.options/);
+  const invalid = await validateItem({ text: 'Which question deserves another look?', poll: { options: ['Same', 'Same'] } },
+    { task: pollTask, persona, passages: new Map(), policyCtx, ctx });
+  assert.match(invalid.problem, /distinct/);
+});
+
 test('CF_AI_TOKEN is only sent to https://api.cloudflare.com; no GitHub Models fallback', () => {
   const env = { CF_ACCOUNT_ID: 'acc', CF_AI_TOKEN: 'cf', GITHUB_TOKEN: 'gh' };
   const c = llmConfig(env);

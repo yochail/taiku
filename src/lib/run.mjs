@@ -906,7 +906,8 @@ export async function runDaily(opts = {}) {
       t.error = 'topic blocked';
       return false;
     }
-    const cached = t.repair ? null : work[t.taskId];
+    const saved = work[t.taskId];
+    const cached = t.repair || (t.media === 'poll' && saved?.fields && !saved.fields.poll) ? null : saved;
     if (cached && cached.sig === t.sig) {
       t.resumed = true;
       t.calls = 0;

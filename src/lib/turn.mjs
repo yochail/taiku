@@ -116,6 +116,9 @@ export async function validateItem(out, { task, persona, passages, policyCtx, ct
   const { refs, bad } = resolveQuotes(text, out.quoteRefs, passages);
   if (bad.length) return { problem: quoteRepair(bad), kind: 'quote' };
   const fields = await assembleFields({ out, text, refs, task, persona, passages, rand, giphy });
+  if (task.mediaPlan?.kind === 'poll' && !fields.poll) {
+    return { problem: 'This is a poll. Return the JSON object with poll.options containing 2–4 distinct, non-empty answers.', kind: 'format' };
+  }
   const check = checkPost({ text: fields.text, ...fields }, policyCtx, { topic: ctx.topic, parentText: (ctx.thread ?? []).map((p) => p.text).join(' ') });
   if (!check.ok) return { problem: repairHint(check.violations), kind: 'policy', violations: check.violations };
   return { problem: null, fields };
