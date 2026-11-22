@@ -24,12 +24,12 @@ function fakeClients(scripts, seen) {
 
 const config = loadLlmConfig();
 
-test('config/llm.json: quality-ranked chains (Gemini → OpenRouter → Groq → Workers AI), each key pinned to its host', () => {
+test('config/llm.json: provider chains and keys pinned to their hosts', () => {
   assert.ok(!JSON.stringify(config).includes('github'), 'GitHub Models is retired');
   const model = (n) => config.providers.find((p) => p.name === n)?.model;
   const chain = (r) => config.chains[r].map(model);
   assert.deepEqual(chain('voice'), ['gemini-3.5-flash', 'nvidia/nemotron-3-ultra-550b-a55b:free', 'nvidia/nemotron-3.5-super-vl:free', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', 'qwen/qwen3.5-122b-a10b']);
-  assert.deepEqual(chain('batch'), ['gemini-3.5-flash', 'nvidia/nemotron-3.5-super-vl:free', 'openai/gpt-oss-120b', '@cf/google/gemma-4-26b-a4b-it', 'qwen/qwen3.5-122b-a10b']);
+  assert.deepEqual(chain('batch'), ['gemini-3.5-flash', 'qwen/qwen3.5-122b-a10b', 'nvidia/nemotron-3.5-super-vl:free', 'openai/gpt-oss-120b', '@cf/google/gemma-4-26b-a4b-it']);
   assert.deepEqual(chain('micro'), ['qwen/qwen3.8-27b', '@cf/google/gemma-4-26b-a4b-it']);
   assert.deepEqual(chain('fallback'), ['@cf/openai/gpt-oss-120b']);
   assert.ok(!config.providers.some((p) => /gemma/.test(p.model) && /googleapis/.test(p.baseURL)), 'no gemma via Gemini (leaks <thought>)');
@@ -213,6 +213,25 @@ test('attested serialized NVIDIA requests use the shared budget and switch on 42
   assert.equal(calls.length, 2);
   assert.equal(rot.freeUsage()[nvidia.name].calls, 1);
   assert.equal(rot.report().find((m) => m.name === nvidia.name)['429s'], 1);
+});
+
+test('both site shares select attested NVIDIA for batches before OpenRouter, then fall back on 429', async () => {
+  for (const shares of [2, 1]) {
+    const calls = [];
+    const liveEnv = { NVIDIA_KAY: 'nvidia', OPENROUTER_API_KEY: 'or', NVIDIA_FREE_ONLY: 'true', GITHUB_ACTIONS: 'true', NVIDIA_CI_SERIALIZED: 'true' };
+    const available = new Set(config.providers.filter((p) => ['NVIDIA_KAY', 'OPENROUTER_API_KEY'].includes(p.keyEnv)).map((p) => p.name));
+    const rot = createRotation({ config, plan: planBudget({ config, shares, available }), env: liveEnv, sleep,
+      fetchImpl: async (url) => {
+        calls.push(url);
+        return url.startsWith('https://integrate.api.nvidia.com/')
+          ? new Response('rate limited', { status: 429 }) : ok('openrouter');
+      } });
+    const result = await rot.clientFor('batch').chat({ messages: [{ role: 'user', content: 'hello' }] });
+    assert.equal(JSON.parse(result.message.content).text, 'openrouter');
+    assert.match(calls[0], /^https:\/\/integrate\.api\.nvidia\.com\//);
+    assert.match(calls[1], /^https:\/\/openrouter\.ai\//);
+    assert.equal(rot.freeUsage()['nvidia-qwen3.5-122b'].calls, 1);
+  }
 });
 
 test('rotation: micro role gets /no_think, batch role keeps high max_tokens, fallback low reasoning', async () => {

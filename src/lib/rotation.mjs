@@ -1,5 +1,5 @@
 // Provider rotation over config/llm.json. Each role (voice / batch / micro / fallback) walks its
-// priority chain (config.chains: Gemini → OpenRouter Nemotron → Groq → Cloudflare Workers AI) and
+// priority chain in config.chains and
 // spills over to the next model with quota left. Providers without their key are skipped. 429 /
 // quota errors / 410 mark a model capped and switch. Per-model stats ({model, calls, cap,
 // neurons_est, 429s, items}) go into the run manifest.
