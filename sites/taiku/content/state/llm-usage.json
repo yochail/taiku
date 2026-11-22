@@ -1,33 +1,37 @@
 {
-  "day": "2026-11-20",
-  "updatedAt": "2026-11-20T20:40:59.321Z",
+  "day": "2026-11-22",
+  "updatedAt": "2026-11-22T19:42:25.711Z",
   "models": {
+    "nvidia-qwen3.5-122b": {
+      "calls": 0,
+      "neurons": 0
+    },
     "cf-llama-3.3-70b": {
-      "calls": 20,
-      "neurons": 2415.4709340000004
+      "calls": 39,
+      "neurons": 4054
     },
     "cf-gemma-4-26b": {
-      "calls": 3,
-      "neurons": 152.58334399999998
+      "calls": 1,
+      "neurons": 1
     },
     "cf-gemma-4-26b-micro": {
-      "calls": 15,
-      "neurons": 623.115322
+      "calls": 27,
+      "neurons": 803
     },
     "cf-gpt-oss-120b": {
-      "calls": 3,
-      "neurons": 396.184634
+      "calls": 1,
+      "neurons": 2
     },
     "gemini-3.5-flash": {
       "calls": 0,
       "neurons": 0
     },
     "or-nemotron-3-ultra": {
-      "calls": 159,
+      "calls": 61,
       "neurons": 0
     },
     "or-nemotron-3.5-super": {
-      "calls": 175,
+      "calls": 91,
       "neurons": 0
     },
     "groq-gpt-oss-120b": {

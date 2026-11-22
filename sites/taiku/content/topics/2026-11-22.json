@@ -1,0 +1,363 @@
+{
+  "date": "2026-11-22",
+  "generatedAt": "2026-11-22T19:17:25.253Z",
+  "sourceSnapshotHash": "4c64874c6a819368",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 24
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 18
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 19
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 25,
+      "kept": 22
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": false,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "t3bca3cc3",
+      "title": "Some of our favorite Switch 2 games are cheaper through Black Friday",
+      "url": "https://www.theverge.com/gadgets/1037313/nintendo-switch-2-game-black-friday-cyber-monday-deal-sale",
+      "source": "The Verge",
+      "domain": "theverge.com",
+      "feedId": "verge",
+      "tier": "curated",
+      "kind": "news",
+      "section": "tech",
+      "publishedAt": "2026-11-22T19:03:33.000Z",
+      "score": 1.043,
+      "keys": {
+        "culture": 1,
+        "tech": 1.5
+      }
+    },
+    {
+      "id": "tcd68c8fe",
+      "title": "US Army to detonate tonnes of unstable explosives in Iowa despite court order",
+      "url": "https://www.bbc.co.uk/news/articles/cvglrx764gdxo",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-22T18:29:46.000Z",
+      "score": 0.999,
+      "keys": {
+        "world": 2.5,
+        "politics": 1
+      }
+    },
+    {
+      "id": "t9afcf394",
+      "title": "Protesters storm Meta offices in India",
+      "url": "https://www.theverge.com/tech/1039732/protesters-storm-meta-offices-in-india",
+      "source": "The Verge",
+      "domain": "theverge.com",
+      "feedId": "verge",
+      "tier": "curated",
+      "kind": "news",
+      "section": "tech",
+      "publishedAt": "2026-11-22T15:15:07.000Z",
+      "score": 0.998,
+      "keys": {
+        "tech": 2.5,
+        "science": 1,
+        "politics": 1
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t58887607",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6660a0cd",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0afef7db",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t79db65a6",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tca140870",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t01e43e6d",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t265560c4",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t019c7b7f",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tb291b457",
+      "feedId": "bbc-science",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t73e838d8",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7e9f649e",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t8fe59e45",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7c788926",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t8a7da858",
+      "feedId": "bbc-culture",
+      "reason": "nsfw"
+    },
+    {
+      "id": "tb0fb47fb",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t5a536dc8",
+      "title": "COP31 fails to reach major climate deal as talks expose deep divisions",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfcb85812",
+      "title": "What's next after no deal at COP31 climate talks?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t26411d09",
+      "title": "South Korea education minister resigns over exam cheating scandal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcd68c8fe",
+      "title": "US Army to detonate tonnes of unstable explosives in Iowa despite court order",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2bc870e4",
+      "title": "Miley Cyrus marries Maxx Morando in California ceremony",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6e5196c5",
+      "title": "Mexican drug lord on FBI's 10 most wanted list arrested in shoot-out",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t82d79003",
+      "title": "FBI reportedly investigating apparent hack of its criminal database",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb1953102",
+      "title": "Lock of former US President George Washington's hair sells for $4,000",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf6fc1dbe",
+      "title": "Zelensky says Crimean Bridge strikes 'fair response' as he meets UK's Streeting",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t272d3b21",
+      "title": "Man convicted of starting Palisades fire in Los Angeles",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te7ac62ee",
+      "title": "Deal with EU not dependent on tuition fees agreement, Miliband says",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3a2a0872",
+      "title": "Denmark accuses Russia of plotting to assassinate US-Ukrainian rapper",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t722df501",
+      "title": "French police officers sentenced for beating of music producer Michel Zecler",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tbb98b992",
+      "title": "Tech stock sell-off drags markets down as Anthropic shares slide",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t930b7109",
+      "title": "In a year of AI solving maths problems, an Anthropic worker says he may have cracked the biggest",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3df0760b",
+      "title": "Mamdani announces plan to close New York's Rikers Island jail by 2032",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t1f0b8484",
+      "title": "Trafalgar Square Christmas tree felled in Norway",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6bd0be23",
+      "title": "Zelensky says Putin is a 'killer' after Trump calls Russian leader a friend",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t1d859d9b",
+      "title": "Trump threatens ban on US firms building AI data centres overseas",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2fa41ae8",
+      "title": "Can AI really help spot Black Friday deals? We put it to the test",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc098c8de",
+      "title": "GTA 6 sales hit $3.8bn in a single day - the biggest entertainment launch in history",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tff725159",
+      "title": "White House removes cyber-security chief after series of tech outages",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t26f93c1b",
+      "title": "Should AI be judging our credit worthiness?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t7f4bf209",
+      "title": "Tens of thousands of UK fridges secured from hackers in secret nationwide operation",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc9042b87",
+      "title": "Anthropic becomes one of world's most valuable public companies in stock market debut",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf4f25b9c",
+      "title": "Dutch watchdog tells people not to buy AI smart glasses",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcae7150e",
+      "title": "Anthropic raises $81bn in record-breaking stock market debut",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tee69d519",
+      "title": "UK joins in GTA 6 frenzy as game becomes available worldwide",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4ff4c870",
+      "title": "Elon Musk says record $446m spending on US midterms was 'pretty foolish'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6f9e983e",
+      "title": "Tech Life",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
