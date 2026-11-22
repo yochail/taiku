@@ -22,17 +22,19 @@ test('fresh day: available allowance within shared caps, 5% kept as repair reser
 
 test('Neuron arithmetic per M tokens', () => {
   assert.equal(neuronsFor({ neuronRate: { input: 1e6, output: 2e6 } }, 10, 5), 20);
-  assert.equal(Math.round(neuronsFor(config.providers[0], 1e6, 0)), config.providers[0].neuronRate.input);
+  const cf = config.providers.find((p) => p.keyEnv === 'CF_AI_TOKEN');
+  assert.equal(Math.round(neuronsFor(cf, 1e6, 0)), cf.neuronRate.input);
 });
 
 test('degrades gracefully as the quota runs out', () => {
-  const full = planBudget({ config });
+  const available = new Set(config.providers.filter((p) => p.keyEnv !== 'NVIDIA_KAY').map((p) => p.name));
+  const full = planBudget({ config, available });
   const used = Object.fromEntries(config.providers.map((p) => [p.name, p.capUnit === 'requests' ? { calls: Math.ceil(p.calls * 0.85), neurons: 0 } : { calls: 0, neurons: p.cap * 0.85 }]));
-  const half = planBudget({ config, used });
+  const half = planBudget({ config, used, available });
   assert.ok(half.totals.calls < full.totals.calls && half.totals.calls > 0);
   assert.ok(half.content.llmItems < full.content.llmItems);
   const gone = Object.fromEntries(config.providers.map((p) => [p.name, { calls: p.calls, neurons: p.cap }]));
-  const none = planBudget({ config, used: gone });
+  const none = planBudget({ config, used: gone, available });
   assert.equal(none.totals.calls, 0);
   assert.equal(none.totals.degraded, true);
   assert.equal(none.content.llmItems, 0);
@@ -91,4 +93,14 @@ test('OpenRouter free-model pool is 1,000 account-level requests shared across f
   assert.equal(partiallyUsed.pools.OPENROUTER_API_KEY.remaining.calls, 827);
   assert.equal(partiallyUsed.models.filter((m) => names.has(m.name)).reduce((n, m) => n + m.allowance, 0), 827);
   assert.ok(providers.every((p) => p.model.endsWith(':free')), 'the increased cap contains no paid route');
+});
+
+test('NVIDIA application capacity is shared between site runs without treating old calls as a daily quota', () => {
+  const nv = config.providers.find((p) => p.keyEnv === 'NVIDIA_KAY');
+  const available = new Set([nv.name]);
+  const first = planBudget({ config, available, maxCalls: 200, shares: 2 });
+  const second = planBudget({ config, available, maxCalls: 200, shares: 1, used: { [nv.name]: { calls: 10000 } } });
+  assert.equal(first.models.find((m) => m.name === nv.name).allowance, 100);
+  assert.equal(second.models.find((m) => m.name === nv.name).allowance, 200);
+  assert.deepEqual(first.pools.NVIDIA_KAY.cap, {});
 });

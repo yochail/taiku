@@ -6,7 +6,7 @@
 import { BudgetError, LlmError, createClient, expandEnv, llmConfig, probeTools, toolCapsKey } from './llm.mjs';
 import { neuronsFor } from './budget.mjs';
 import { sha256 } from './pipeline-util.mjs';
-import { createFreeBudget } from './free-budget.mjs';
+import { createFreeBudget, freeProvider } from './free-budget.mjs';
 
 /**
  * Models search: returns { available: Set<name>|null, skipped: [{name, model, reason}] }. A failed
@@ -88,11 +88,12 @@ export function createRotation({ config, plan, env = process.env, makeClient = n
       role: p.role,
       plan: pm.capacity == null ? pm.plan : allowance - reserve,
       reserve,
-      neuronCap: p.capUnit === 'requests' ? Infinity : p.cap * planShare - (pm.usedToday?.neurons ?? 0),
+      neuronCap: p.capUnit !== 'neurons' ? Infinity : p.cap * planShare - (pm.usedToday?.neurons ?? 0),
       neurons: 0,
       r429: 0,
       items: 0,
-      capped: allowance <= 0 ? 'no allowance' : !makeClient && !cfg.apiKey ? `no ${p.keyEnv}` : null,
+      capped: allowance <= 0 ? 'no allowance' : !makeClient && !cfg.apiKey ? `no ${p.keyEnv}` :
+        !makeClient && p.keyEnv === 'NVIDIA_KAY' && !freeProvider(p, env) ? 'NVIDIA free-only or serialized workflow attestation missing' : null,
       tools: null,
     });
   }

@@ -27,7 +27,7 @@ const legacyCaps = {
 };
 const config = loadLlmConfig();
 const llmConfig = { ...config, freePools: {}, totalCap: { cap: 8000 }, planShare: 0.8, reserveShare: 0.1,
-  targetCalls: { min: 50, max: 90 }, providers: config.providers.map((p) => ({
+  targetCalls: { min: 50, max: 90 }, providers: config.providers.filter((p) => legacyCaps[p.name]).map((p) => ({
     ...p, cap: legacyCaps[p.name][0], calls: legacyCaps[p.name][1],
   })) };
 const personas = loadPersonas();

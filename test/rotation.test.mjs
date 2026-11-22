@@ -4,7 +4,7 @@ import { createClient, llmConfig, loadLlmConfig, LlmError } from '../src/lib/llm
 import { createRotation, discoverModels, hashPick } from '../src/lib/rotation.mjs';
 import { planBudget } from '../src/lib/budget.mjs';
 
-const env = { CF_ACCOUNT_ID: 'acc', CF_AI_TOKEN: 'tok', GEMINI_API_KEY: 'gem', GROQ_API_KEY: 'groq', OPENROUTER_API_KEY: 'or' };
+const env = { CF_ACCOUNT_ID: 'acc', CF_AI_TOKEN: 'tok', GEMINI_API_KEY: 'gem', GROQ_API_KEY: 'groq', OPENROUTER_API_KEY: 'or', NVIDIA_KAY: 'nvidia' };
 const ok = (text = 'hi') => new Response(JSON.stringify({ result: { choices: [{ message: { role: 'assistant', content: JSON.stringify({ text }) } }], usage: { prompt_tokens: 1000, completion_tokens: 100 } }, success: true }), { status: 200, headers: { 'content-type': 'application/json' } });
 const sleep = async () => {};
 
@@ -28,8 +28,8 @@ test('config/llm.json: quality-ranked chains (Gemini → OpenRouter → Groq →
   assert.ok(!JSON.stringify(config).includes('github'), 'GitHub Models is retired');
   const model = (n) => config.providers.find((p) => p.name === n)?.model;
   const chain = (r) => config.chains[r].map(model);
-  assert.deepEqual(chain('voice'), ['gemini-3.5-flash', 'nvidia/nemotron-3-ultra-550b-a55b:free', 'nvidia/nemotron-3.5-super-vl:free', '@cf/meta/llama-3.3-70b-instruct-fp8-fast']);
-  assert.deepEqual(chain('batch'), ['gemini-3.5-flash', 'nvidia/nemotron-3.5-super-vl:free', 'openai/gpt-oss-120b', '@cf/google/gemma-4-26b-a4b-it']);
+  assert.deepEqual(chain('voice'), ['gemini-3.5-flash', 'nvidia/nemotron-3-ultra-550b-a55b:free', 'nvidia/nemotron-3.5-super-vl:free', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', 'qwen/qwen3.5-122b-a10b']);
+  assert.deepEqual(chain('batch'), ['gemini-3.5-flash', 'nvidia/nemotron-3.5-super-vl:free', 'openai/gpt-oss-120b', '@cf/google/gemma-4-26b-a4b-it', 'qwen/qwen3.5-122b-a10b']);
   assert.deepEqual(chain('micro'), ['qwen/qwen3.8-27b', '@cf/google/gemma-4-26b-a4b-it']);
   assert.deepEqual(chain('fallback'), ['@cf/openai/gpt-oss-120b']);
   assert.ok(!config.providers.some((p) => /gemma/.test(p.model) && /googleapis/.test(p.baseURL)), 'no gemma via Gemini (leaks <thought>)');
@@ -37,10 +37,11 @@ test('config/llm.json: quality-ranked chains (Gemini → OpenRouter → Groq →
   const byName = Object.fromEntries(config.providers.map((p) => [p.name, p]));
   assert.ok(byName['cf-gemma-4-26b'].max_tokens >= 1500);
   assert.equal(byName['cf-gemma-4-26b-micro'].extra?.chat_template_kwargs?.enable_thinking, false);
-  const hosts = { CF_AI_TOKEN: 'api.cloudflare.com', GEMINI_API_KEY: 'generativelanguage.googleapis.com', GROQ_API_KEY: 'api.groq.com', OPENROUTER_API_KEY: 'openrouter.ai' };
+  const hosts = { CF_AI_TOKEN: 'api.cloudflare.com', GEMINI_API_KEY: 'generativelanguage.googleapis.com', GROQ_API_KEY: 'api.groq.com', OPENROUTER_API_KEY: 'openrouter.ai', NVIDIA_KAY: 'integrate.api.nvidia.com' };
   for (const p of config.providers) {
     assert.ok(hosts[p.keyEnv], `${p.name} key env`);
-    assert.ok(['requests', 'neurons'].includes(p.capUnit) && p.cap > 0 && p.rpm > 0 && p.calls > 0);
+    assert.ok(['requests', 'neurons', 'run'].includes(p.capUnit) && p.rpm > 0);
+    assert.ok(p.cap > 0 && p.calls > 0);
     if (p.capUnit === 'neurons') assert.ok(p.neuronRate?.input > 0 && p.neuronRate?.output > 0);
     const cfg = llmConfig(env, p);
     assert.equal(new URL(cfg.baseUrl).hostname, hosts[p.keyEnv]);
@@ -92,7 +93,7 @@ test('rotation: a 429 / quota / 410 moves straight on to the next model in the c
   // Every chain ends in Workers AI: with all external models capped, voice lands on CF llama.
   const seen3 = [];
   const r429 = () => new Response('rate limited', { status: 429 });
-  const scripts = Object.fromEntries(config.chains.voice.slice(0, -1).map((n) => [n, [r429]]));
+  const scripts = Object.fromEntries(config.chains.voice.slice(0, 3).map((n) => [n, [r429]]));
   const rot3 = createRotation({ config, plan, env, makeClient: fakeClients(scripts, seen3) });
   const r3 = await rot3.clientFor('voice', 'hume').chat({ messages: [{ role: 'user', content: 'w' }] });
   assert.equal(JSON.parse(r3.message.content).text, 'from cf-llama-3.3-70b');
@@ -158,6 +159,60 @@ test('rotation: providers without their secret are skipped (live runs)', async (
   assert.equal(seen.length, 1);
   assert.match(seen[0].url, /api\.cloudflare\.com/);
   assert.match(rot.report().find((m) => m.name === 'gemini-3.5-flash').capped ?? '', /GEMINI_API_KEY/);
+});
+
+test('NVIDIA transport parses responses and falls back on exhausted credits without leaking its key', async () => {
+  const nvidia = { ...config.providers.find((p) => p.keyEnv === 'NVIDIA_KAY'), cap: 10, calls: 10 };
+  const fallback = config.providers.find((p) => p.name === 'cf-gpt-oss-120b');
+  const cfg = { ...config, providers: [nvidia, fallback], chains: { fallback: [nvidia.name, fallback.name] }, targetCalls: { min: 0, max: 100 } };
+  const seen = [];
+  const rot = createRotation({ config: cfg, plan: planBudget({ config: cfg }), env,
+    makeClient: fakeClients({ [nvidia.name]: [new Response('Insufficient API credits', { status: 402 })] }, seen) });
+  const response = await rot.clientFor('fallback').chat({ messages: [{ role: 'user', content: 'hello' }] });
+  assert.equal(JSON.parse(response.message.content).text, `from ${fallback.name}`);
+  assert.equal(seen[0].url, 'https://integrate.api.nvidia.com/v1/chat/completions');
+  assert.equal(seen[0].auth, 'Bearer nvidia');
+  assert.equal(seen[1].auth, 'Bearer tok');
+  assert.match(rot.report().find((m) => m.name === nvidia.name).capped, /402/);
+
+  const direct = createClient({ cfg: { ...llmConfig(env, nvidia), rpm: 0 }, sleep,
+    fetchImpl: async () => new Response(JSON.stringify({ choices: [{ message: { role: 'assistant', content: 'hello' } }], usage: { prompt_tokens: 4, completion_tokens: 2 } })) });
+  const result = await direct.chat({ messages: [{ role: 'user', content: 'hello' }] });
+  assert.equal(result.message.content, 'hello');
+  assert.equal(result.usage.completion_tokens, 2);
+  const unauthorized = createClient({ cfg: { ...llmConfig(env, nvidia), rpm: 0 }, sleep,
+    fetchImpl: async () => new Response('bad key', { status: 401 }) });
+  await assert.rejects(unauthorized.chat({ messages: [] }), /authentication\/authorization rejected/);
+});
+
+test('NVIDIA cannot be used live even if a caller fabricates a positive plan', async () => {
+  const nvidia = { ...config.providers.find((p) => p.keyEnv === 'NVIDIA_KAY'), cap: 10, calls: 10 };
+  const cfg = { ...config, providers: [nvidia], chains: { fallback: [nvidia.name] } };
+  let calls = 0;
+  const rot = createRotation({ config: cfg, plan: planBudget({ config: cfg }), env,
+    fetchImpl: async () => { calls++; throw new Error('unexpected network request'); }, sleep });
+  await assert.rejects(rot.clientFor('fallback').chat({ messages: [] }), /no fallback model with quota left/);
+  assert.equal(calls, 0);
+  assert.match(rot.report()[0].capped, /attestation missing/);
+});
+
+test('attested serialized NVIDIA requests use the shared budget and switch on 429', async () => {
+  const nvidia = config.providers.find((p) => p.keyEnv === 'NVIDIA_KAY');
+  const fallback = config.providers.find((p) => p.name === 'cf-gpt-oss-120b');
+  const cfg = { ...config, providers: [nvidia, fallback], chains: { fallback: [nvidia.name, fallback.name] } };
+  const calls = [];
+  const rot = createRotation({ config: cfg, plan: planBudget({ config: cfg, maxCalls: 20, shares: 2 }),
+    env: { ...env, NVIDIA_FREE_ONLY: 'true', GITHUB_ACTIONS: 'true', NVIDIA_CI_SERIALIZED: 'true' }, sleep,
+    fetchImpl: async (url) => {
+      calls.push(url);
+      return url.startsWith('https://integrate.api.nvidia.com/')
+        ? new Response('rate limited', { status: 429 }) : ok('fallback');
+    } });
+  const result = await rot.clientFor('fallback').chat({ messages: [{ role: 'user', content: 'hello' }] });
+  assert.equal(JSON.parse(result.message.content).text, 'fallback');
+  assert.equal(calls.length, 2);
+  assert.equal(rot.freeUsage()[nvidia.name].calls, 1);
+  assert.equal(rot.report().find((m) => m.name === nvidia.name)['429s'], 1);
 });
 
 test('rotation: micro role gets /no_think, batch role keeps high max_tokens, fallback low reasoning', async () => {

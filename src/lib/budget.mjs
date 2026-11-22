@@ -55,9 +55,10 @@ export function planBudget({ config, used = {}, available = null, maxCalls = Inf
     const perCall = neuronsPerCall(p);
     let allowance;
     if (available && !available.has(p.name)) allowance = 0;
+    else if (p.capUnit === 'run') allowance = Math.floor(Math.min(p.calls ?? Infinity, maxCalls, target.max ?? Infinity) / Math.max(1, shares));
     else if (p.capUnit === 'requests') allowance = Math.floor(p.cap * planShare) - (u.calls ?? 0);
     else allowance = Math.min(p.calls ?? Infinity, Math.floor((p.cap * planShare - (u.neurons ?? 0)) / Math.max(perCall, 1e-9)) - 0);
-    if (Number.isFinite(p.calls)) allowance = Math.min(allowance, p.calls - (u.calls ?? 0));
+    if (Number.isFinite(p.calls) && p.capUnit !== 'run') allowance = Math.min(allowance, p.calls - (u.calls ?? 0));
     return { name: p.name, model: p.model, role: p.role, capUnit: p.capUnit, cap: p.cap, perCall: Math.round(perCall * 10) / 10, usedToday: u, allowance: Math.max(0, allowance) };
   });
   const pools = poolBudgets(config, used, shares);

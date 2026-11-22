@@ -92,6 +92,20 @@ test('both independent free pools remain usable when the other is exhausted', ()
   assert.equal(b.usage().or.calls, 2);
 });
 
+test('NVIDIA requires free-only and serialized-workflow attestations; usage is a per-run bound', () => {
+  const nv = { ...p, name: 'nvidia', keyEnv: 'NVIDIA_KAY', model: 'qwen/qwen3.5-122b-a10b', capUnit: 'run', cap: 2, calls: 2 };
+  const cfg = { ...config, providers: [p, nv] };
+  assert.equal(freeProvider(nv, { NVIDIA_FREE_ONLY: 'true', NVIDIA_KAY_FREE_ONLY: 'true' }), false);
+  assert.equal(freeProvider(nv, { NVIDIA_FREE_ONLY: 'true', GITHUB_ACTIONS: 'true', NVIDIA_CI_SERIALIZED: 'true' }), true);
+  for (const [siteDay, shares] of [[day, 2], [day, 1], ['2026-11-15', 1]]) {
+    const b = createFreeBudget({ config: cfg, day: siteDay, now: () => siteDay, shares, used: { nvidia: { calls: 9999 } } });
+    assert.ok(b.take(nv, body));
+    assert.ok(b.take(nv, body));
+    assert.equal(b.take(nv, body), null);
+    assert.ok(b.take(p, body), 'other pools remain available');
+  }
+});
+
 test('workflow matrix and quota sharing both count the default-on site', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'taiku-sites-'));
   try {
@@ -109,4 +123,14 @@ test('workflow matrix and quota sharing both count the default-on site', () => {
     assert.equal(sync.status, 0, sync.stderr);
     assert.match(fs.readFileSync(output, 'utf8'), /^remaining=2$/m);
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('workflow confines NVIDIA to serialized legs with a cross-process cooldown on generate and repair', () => {
+  const workflow = fs.readFileSync(path.join(ROOT, '.github', 'workflows', 'generate.yml'), 'utf8');
+  assert.match(workflow, /group: generate/);
+  assert.match(workflow, /max-parallel: 1/);
+  assert.match(workflow, /NVIDIA_FREE_ONLY: \$\{\{ vars\.NVIDIA_FREE_ONLY \}\}/);
+  assert.match(workflow, /NVIDIA_CI_SERIALIZED: 'true'/);
+  assert.equal((workflow.match(/NVIDIA_KAY: \$\{\{ secrets\.NVIDIA_KAY \}\}/g) ?? []).length, 2);
+  assert.equal((workflow.match(/if \[ "\$NVIDIA_FREE_ONLY" = "true" \]; then sleep 60; fi/g) ?? []).length, 2);
 });

@@ -57,6 +57,14 @@ npm run generate:dry
 
 `npm install` adds a few optional extras (embeddings, meme rasterising). Everything works without them.
 
+## Optional NVIDIA generation
+
+The shared daily workflow can use NVIDIA's [Qwen endpoint](https://docs.api.nvidia.com/nim/reference/qwen-qwen3-5-122b-a10b-infer) as a fallback for both sites. It is **off by default**. After checking the account's free entitlement, no paid overflow, no total credit cap, and model access, add the `NVIDIA_KAY` secret and set `NVIDIA_FREE_ONLY=true` in the GitHub `production` environment. Remove the variable to disable it. The account owner reports a 40 requests/minute limit and no total limit or paid overflow; these are account-specific assertions, not independently verified NVIDIA-wide guarantees.
+
+The workflow serializes its site legs and runs, waits 60 seconds between generation processes, and limits NVIDIA to 30 requests/minute per process. Do not use the same NVIDIA account concurrently outside this workflow: external traffic is not tracked. The existing per-run application call ceiling and site-share planning apply; they are not NVIDIA credit limits. The usage ledger resets daily and does **not** track a lifetime trial-credit balance. If the account has any finite credit allowance, remove the opt-in until durable credit accounting is implemented.
+
+[NVIDIA describes its free hosted endpoints as prototype access](https://docs.api.nvidia.com/nim/docs/product) and says production serving real users requires a license. The project being a prototype does not establish entitlement or override the applicable agreement. NVIDIA's [older trial-credit guidance](https://forums.developer.nvidia.com/t/api-credits-for-build-nvidia-com/306633) is not evidence of a daily reset or this account's balance.
+
 ## Daily X draft email (optional)
 
 The [Daily feed workflow](https://github.com/yochail/taiku/actions/workflows/generate.yml) always puts eligible Taiku drafts in its run summary and artifact. GitHub's run notifications do not include the composer links. To get the links directly in your inbox:

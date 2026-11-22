@@ -57,6 +57,7 @@ export const KEY_HOSTS = {
   GEMINI_API_KEY: 'generativelanguage.googleapis.com',
   GROQ_API_KEY: 'api.groq.com',
   OPENROUTER_API_KEY: 'openrouter.ai',
+  NVIDIA_KAY: 'integrate.api.nvidia.com',
 };
 
 /**
@@ -185,7 +186,7 @@ export function createClient({ cfg = llmConfig(), fetchImpl = globalThis.fetch, 
           wait = parseRetryAfter(res.headers?.get?.('retry-after'));
           if (st === 429) stats.rateLimited++;
           const quota = (st === 429 || st === 403 || st === 400) && QUOTA_RE.test(text);
-          if (st === 410 || st === 404 || quota) throw new LlmError(`HTTP ${st}: ${text.slice(0, 160)}`, { status: st, capped: true });
+          if (st === 410 || st === 404 || quota || (st === 402 && cfg.keySource === 'NVIDIA_KAY')) throw new LlmError(`HTTP ${st}: ${text.slice(0, 160)}`, { status: st, capped: true });
           if (st === 401 || st === 403) throw new LlmAuthError(cfg, st);
           if (st === 429) {
             // Back off once (bounded), then let the rotation switch models.

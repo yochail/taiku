@@ -545,11 +545,14 @@ export async function runDaily(opts = {}) {
   const sharedUsage = offline || opts.client ? {} : ledgerUsage(readLedger(sharedFile, usageDay));
   const usedToday = offline ? {} : { ...loadUsage(usageFileLlm, usageDay), ...sharedUsage };
   const discovery = offline || opts.client ? { available: null, skipped: [] } : await discoverModels({ config, env, fetchImpl: opts.fetchImpl, log });
+  if (offline && !opts.client) discovery.available = new Set(config.providers.filter((p) => p.keyEnv !== 'NVIDIA_KAY').map((p) => p.name));
   for (const s of discovery.skipped ?? []) log(`model ${s.name} (${s.model}) skipped: ${s.reason}`);
   if (!offline && !opts.client) {
     // Providers whose secret isn't set get no allowance, so the plan only counts usable models.
     const keyed = config.providers.filter((p) => llmConfig(env, p).apiKey && freeProvider(p, env)).map((p) => p.name);
-    for (const p of config.providers) if (!keyed.includes(p.name)) log(`model ${p.name} skipped: missing key or free-only attestation for ${p.keyEnv}`);
+    for (const p of config.providers) if (!keyed.includes(p.name)) log(p.keyEnv === 'NVIDIA_KAY'
+      ? `model ${p.name} skipped: NVIDIA free-only attestation or serialized workflow unavailable`
+      : `model ${p.name} skipped: missing key or free-only attestation for ${p.keyEnv}`);
     discovery.available = new Set(keyed.filter((n) => !discovery.available || discovery.available.has(n)));
   }
   const threadPolicy = spec.sampling.conversation?.daily_reactions ?? null;

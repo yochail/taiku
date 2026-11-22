@@ -4,6 +4,9 @@ import { neuronsFor, poolBudgets } from './budget.mjs';
 import { writeJsonAtomic } from './pipeline-util.mjs';
 
 export const freeProvider = (p, env) => {
+  // NVIDIA is restricted to the serialized workflow, which enforces the shared rate limit.
+  if (p.keyEnv === 'NVIDIA_KAY') return env.NVIDIA_FREE_ONLY === 'true' &&
+    env.GITHUB_ACTIONS === 'true' && env.NVIDIA_CI_SERIALIZED === 'true';
   if (p.keyEnv === 'OPENROUTER_API_KEY') return p.model.endsWith(':free');
   if (p.keyEnv === 'CF_AI_TOKEN' && (!p.freeTier || p.capUnit !== 'neurons' ||
       !(p.neuronRate?.input > 0) || !(p.neuronRate?.output > 0))) return false;
@@ -52,6 +55,7 @@ export function mergeLedgers(docs, day) {
 
 export function createFreeBudget({ config, used = {}, file = null, day, shares = 1, maxCalls = Infinity, now = () => new Date().toISOString().slice(0, 10) }) {
   let sessionCalls = 0;
+  const sessionByModel = {};
   const doc = file ? readLedger(file, day) : { day, events: {} };
   const recorded = ledgerUsage(doc);
   for (const [name, base] of Object.entries(used)) {
@@ -74,7 +78,7 @@ export function createFreeBudget({ config, used = {}, file = null, day, shares =
       const group = config.providers.filter((x) => x.keyEnv === p.keyEnv);
       const sum = (k) => Object.entries(current).filter(([name, u]) => u.keyEnv === p.keyEnv || group.some((x) => x.name === name))
         .reduce((s, [, u]) => s + (u[k] ?? 0), 0);
-      if ((own.calls ?? 0) + 1 > Math.min(p.calls ?? Infinity, p.capUnit === 'requests' ? p.cap : Infinity) ||
+      if ((p.capUnit === 'run' ? sessionByModel[p.name] ?? 0 : own.calls ?? 0) + 1 > Math.min(p.calls ?? Infinity, p.capUnit === 'requests' ? p.cap : Infinity) ||
           sum('calls') + 1 > limits[p.keyEnv].calls ||
           sum('tokens') + charge.tokens > limits[p.keyEnv].tokens ||
           (p.capUnit === 'neurons' && sum('neurons') + charge.neurons > limits[p.keyEnv].neurons)) return null;
@@ -82,6 +86,7 @@ export function createFreeBudget({ config, used = {}, file = null, day, shares =
       doc.events[id] = { name: p.name, keyEnv: p.keyEnv, ...charge };
       persist(); // Charge before sending: crashes, retries and empty responses cannot reset usage.
       sessionCalls++;
+      sessionByModel[p.name] = (sessionByModel[p.name] ?? 0) + 1;
       return {
         settle(usage) {
           if (!Number.isFinite(usage?.prompt_tokens) || !Number.isFinite(usage?.completion_tokens)) return;

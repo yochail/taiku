@@ -91,6 +91,8 @@ jobs:
       CF_FREE_ONLY: ${{ vars.CF_FREE_ONLY }}
       GROQ_FREE_ONLY: ${{ vars.GROQ_FREE_ONLY }}
       GEMINI_FREE_ONLY: ${{ vars.GEMINI_FREE_ONLY }}
+      NVIDIA_FREE_ONLY: ${{ vars.NVIDIA_FREE_ONLY }}
+      NVIDIA_CI_SERIALIZED: 'true'
     steps:
       - uses: actions/checkout@v7
         with:
@@ -186,6 +188,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          NVIDIA_KAY: ${{ secrets.NVIDIA_KAY }}
           GEN_DATE: ${{ steps.local.outputs.day }}
           GEN_NONCE: ${{ inputs.nonce }}
           GEN_TOPICS: ${{ inputs.topics || vars.GEN_TOPICS }}
@@ -201,7 +204,9 @@ jobs:
           MOCK: ${{ inputs.mock && '1' || '' }}
           DAYFILE: ${{ steps.local.outputs.dayfile }}
         # A partial day with curated candidates goes through offline salvage, never straight to publish.
-        run: bash scripts/ci-generate.sh
+        run: |
+          if [ "$NVIDIA_FREE_ONLY" = "true" ]; then sleep 60; fi
+          bash scripts/ci-generate.sh
 
       - name: Day gate (distribution)
         id: gate
@@ -219,6 +224,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          NVIDIA_KAY: ${{ secrets.NVIDIA_KAY }}
           GEN_DATE: ${{ steps.local.outputs.day }}
           GEN_NONCE: ${{ inputs.nonce }}
           GEN_TOPICS: ${{ inputs.topics || vars.GEN_TOPICS }}
@@ -233,7 +239,9 @@ jobs:
           FORCE: ${{ inputs.force && '1' || '' }}
           MOCK: ${{ inputs.mock && '1' || '' }}
           DAYFILE: ${{ steps.local.outputs.dayfile }}
-        run: bash scripts/ci-generate.sh --repair
+        run: |
+          if [ "$NVIDIA_FREE_ONLY" = "true" ]; then sleep 60; fi
+          bash scripts/ci-generate.sh --repair
       - name: Day gate after repair (blocking; a failure means nothing is committed)
         id: regate
         if: steps.local.outputs.skipped != 'true' && steps.gen.outputs.soft != 'true' && steps.gate.outcome == 'failure' && steps.repair.outputs.soft != 'true'
