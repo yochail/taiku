@@ -1,0 +1,396 @@
+{
+  "date": "2026-11-24",
+  "generatedAt": "2026-11-24T22:11:36.620Z",
+  "sourceSnapshotHash": "872e8639ad2506c7",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 19
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 21
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 20,
+      "kept": 18
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 19,
+      "kept": 19
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "t0ff725cb",
+      "title": "US attorney general dodges questions about Nvidia investigation",
+      "url": "https://www.bbc.co.uk/news/articles/crpdw1qx7jgxo",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-24T21:19:42.000Z",
+      "score": 1.086,
+      "keys": {
+        "tech": 1,
+        "science": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "tbf6cda95",
+      "title": "Substance released at concert could be linked to robberies, police say",
+      "url": "https://www.bbc.co.uk/news/articles/cqrmgvnzwrm3o",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-culture",
+      "tier": "curated",
+      "kind": "news",
+      "section": "culture",
+      "publishedAt": "2026-11-24T22:01:30.000Z",
+      "score": 1.057,
+      "keys": {
+        "culture": 2.5,
+        "politics": 1
+      }
+    },
+    {
+      "id": "t09e62d6e",
+      "title": "Tidal will start banning AI-generated music next month",
+      "url": "https://www.theverge.com/entertainment/1041362/tidal-ai-music-ban",
+      "source": "The Verge",
+      "domain": "theverge.com",
+      "feedId": "verge",
+      "tier": "curated",
+      "kind": "news",
+      "section": "tech",
+      "publishedAt": "2026-11-24T17:17:09.000Z",
+      "score": 1.026,
+      "keys": {
+        "tech": 2.5,
+        "science": 1,
+        "culture": 1,
+        "politics": 1
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t41365066",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc8c6dcd4",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t5b1c5c7e",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t291e07ea",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "te4b01f5e",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tabd87581",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6660a0cd",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2a56997e",
+      "feedId": "bbc-tech",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6f9e983e",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t01e43e6d",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t019c7b7f",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t981ee1da",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t73e838d8",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta21e722b",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf6bdb2a0",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t67a8508a",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t4a2bc088",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7334054e",
+      "feedId": "ap",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t76fbe64c",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2130d6fc",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t178a209e",
+      "feedId": "google-trends",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t0ff725cb",
+      "title": "US attorney general dodges questions about Nvidia investigation",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tce9a1668",
+      "title": "French ex-President Sarkozy and wife Carla Bruni to face trial",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2a2c7240",
+      "title": "Indian government has 'lost the plot', says 'cockroach' leader barred from UK flight",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t93741d05",
+      "title": "Huawei found guilty of stealing trade secrets but acquitted of racketeering",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4deb70d6",
+      "title": "Nato chief vows defence against space threat after Russian nuclear satellite reports",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4aa184a2",
+      "title": "What Jensen Huang's return teaches China's Xi about Trump",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t65d52090",
+      "title": "Pope Francis' diary reveals claims he saw the devil three times",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tadab002c",
+      "title": "Zimbabwean convicted in South Africa of trying to fight in Ukraine",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t39dd47a9",
+      "title": "Car bomb tears through Colombian city wounding more than 20",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tba120362",
+      "title": "Russian governor detained in rare criminal case against regional leader",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0b696fb1",
+      "title": "Iranian authorities flog singer who performed without hijab, lawyers say",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta441ea78",
+      "title": "Bangladesh's ex-PM Sheikh Hasina says she plans to return on 16 December",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t8c84f5c4",
+      "title": "Comedian impersonates Trump's dance moves, mocks trade talks at Canada press dinner",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2fac5e56",
+      "title": "King Charles and Elton John pay tribute to Australian music legend Molly Meldrum",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t92cb9bb2",
+      "title": "Watch: Moment troops raid home and capture Mexican drug lord",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb0b4c3a9",
+      "title": "Cheers and applause as Jensen Huang returns to Nvidia office",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb21408f0",
+      "title": "Outrage after ICE arrest father and daughter at Seattle airport",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3e7ba6f9",
+      "title": "First Lady Melania Trump welcomes this year's White House Christmas tree",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc4b16dee",
+      "title": "Faisal Islam: Fears over the AI boom haven't gone away",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfbbd947e",
+      "title": "Helpful but awkward: My week with Meta's Muse ahead of its UK launch",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3f7a79e9",
+      "title": "US to blacklist Asian AI firm Megaspeed after Nvidia scandal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb9ddec0a",
+      "title": "Nvidia value climbs by almost $1tn and tech stocks rally after Jensen Huang returns",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf48018da",
+      "title": "How important are Nvidia and Jensen Huang to the US economy?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfaaac939",
+      "title": "The rise and fall and rise again of Jensen Huang",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t96b6c659",
+      "title": "GTA 6 hacker released on licence with warning 'don't let this happen again'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2fa41ae8",
+      "title": "Can AI really help spot Black Friday deals? We put it to the test",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t930b7109",
+      "title": "In a year of AI solving maths problems, an Anthropic worker says he may have cracked the biggest",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc098c8de",
+      "title": "GTA 6 sales hit $3.8bn in a single day - the biggest entertainment launch in history",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9390548d",
+      "title": "Tech Life",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t10136600",
+      "title": "Tech Now",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
