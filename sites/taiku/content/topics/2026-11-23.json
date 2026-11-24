@@ -1,0 +1,391 @@
+{
+  "date": "2026-11-23",
+  "generatedAt": "2026-11-23T23:40:39.692Z",
+  "sourceSnapshotHash": "b5c95b647ae6229a",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 20
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 19
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 25,
+      "kept": 22
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "t324adbaf",
+      "title": "NCAA College Basketball Rankings: AP Top 25 Basketball Poll",
+      "url": "https://apnews.com/hub/ap-top-25-college-basketball-poll",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-23T23:32:33.000Z",
+      "score": 1.152,
+      "keys": {
+        "politics": 1,
+        "culture": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t1476a014",
+      "title": "Nvidia board reinstates Jensen Huang as CEO just days after rejecting his offer to return",
+      "url": "https://apnews.com/article/nvidia-jensen-huang-39d4b34ffaa867b4e669893b5fd5028f",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-23T23:36:00.000Z",
+      "score": 1.063,
+      "keys": {
+        "tech": 1,
+        "economy": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t382d6b57",
+      "title": "Jensen Huang's return to Nvidia caps a comeback bid that stumbled before White House helped",
+      "url": "https://apnews.com/article/nvidia-jensen-huang-chips-china-ai-fce355eac6dd81677f3005578c5c8ca4",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-23T21:15:00.000Z",
+      "score": 1.04,
+      "keys": {
+        "tech": 1,
+        "politics": 1,
+        "world": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t054b8a7a",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t15a6872d",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t4867b7d9",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t52e5a87f",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0afef7db",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t79db65a6",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tca140870",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2a56997e",
+      "feedId": "bbc-tech",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t01e43e6d",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t265560c4",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t019c7b7f",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t73e838d8",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2fac5e56",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t8fe59e45",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7c788926",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t8a7da858",
+      "feedId": "bbc-culture",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t7334054e",
+      "feedId": "ap",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t730f9453",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t3fb17966",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t41b02061",
+      "feedId": "ap",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t3f7a79e9",
+      "title": "US to blacklist Asian AI firm Megaspeed after Nvidia scandal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t58887607",
+      "title": "Russian warship hit by Ukrainian drones in Libya, Zelensky says",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0b696fb1",
+      "title": "Iranian authorities flog singer who performed without hijab, lawyers say",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t8f563a59",
+      "title": "What failure of COP31 reveals about a divided world",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te0337e18",
+      "title": "Israeli attacks have turned Gaza into 'toxic wasteland', Oxfam says",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb470b186",
+      "title": "India pledges $1.6bn to Nepal in reset of ties",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "teeadb700",
+      "title": "Search and rescue teams race against time to find survivors after Nigeria boat tragedy",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t8c84f5c4",
+      "title": "Comedian impersonates Trump's dance moves, mocks trade talks at Canada press dinner",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t8562e82e",
+      "title": "Flights cancelled in Belgium due to cost-of-living strike",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2bc870e4",
+      "title": "Miley Cyrus marries Maxx Morando in California ceremony",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t21b95b03",
+      "title": "Kenya and DR Congo agree to restore ties after tensions over conflict",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t61fe69c3",
+      "title": "Nigeria's president says he is also hit by water and power cuts plaguing country",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t26411d09",
+      "title": "South Korea education minister resigns over exam cheating scandal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t42e3f1bf",
+      "title": "Democrats win largest House majority since 1992 after flipping North Carolina seat",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcd68c8fe",
+      "title": "US Army to detonate tonnes of unstable explosives in Iowa despite court order",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6e5196c5",
+      "title": "Mexican drug lord on FBI's 10 most wanted list arrested in shoot-out",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t82d79003",
+      "title": "FBI reportedly investigating apparent hack of its criminal database",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb1953102",
+      "title": "Lock of former US President George Washington's hair sells for $4,000",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb9ddec0a",
+      "title": "Nvidia value climbs by almost $1tn and tech stocks rally after Jensen Huang returns",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf48018da",
+      "title": "How important are Nvidia and Jensen Huang to the US economy?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfaaac939",
+      "title": "The rise and fall and rise again of Jensen Huang",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t96b6c659",
+      "title": "GTA 6 hacker released on licence with warning 'don't let this happen again'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2fa41ae8",
+      "title": "Can AI really help spot Black Friday deals? We put it to the test",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t930b7109",
+      "title": "In a year of AI solving maths problems, an Anthropic worker says he may have cracked the biggest",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc098c8de",
+      "title": "GTA 6 sales hit $3.8bn in a single day - the biggest entertainment launch in history",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tbb98b992",
+      "title": "Tech stock sell-off drags markets down as Anthropic shares slide",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t1d859d9b",
+      "title": "Trump threatens ban on US firms building AI data centres overseas",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tff725159",
+      "title": "White House removes cyber-security chief after series of tech outages",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t26f93c1b",
+      "title": "Should AI be judging our credit worthiness?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t6f9e983e",
+      "title": "Tech Life",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
