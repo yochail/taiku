@@ -1,29 +1,33 @@
 {
-  "day": "2026-11-21",
-  "updatedAt": "2026-11-21T20:12:16.265Z",
+  "day": "2026-11-24",
+  "updatedAt": "2026-11-24T23:31:28.647Z",
   "models": {
     "cf-llama-3.3-70b": {
-      "calls": 36,
-      "neurons": 3966.7517900000007
+      "calls": 27,
+      "neurons": 5688.2673460000005
     },
     "cf-gemma-4-26b": {
-      "calls": 5,
-      "neurons": 488.41397499999994
+      "calls": 6,
+      "neurons": 545.469091
     },
     "cf-gpt-oss-120b": {
-      "calls": 2,
-      "neurons": 84.781868
+      "calls": 3,
+      "neurons": 163.041026
+    },
+    "nvidia-qwen3.5-122b": {
+      "calls": 5,
+      "neurons": 0
     },
     "or-nemotron-3.5-super": {
-      "calls": 288,
+      "calls": 376,
       "neurons": 0
     },
     "cf-gemma-4-26b-micro": {
-      "calls": 25,
-      "neurons": 1035.91945
+      "calls": 32,
+      "neurons": 2069.102509
     },
     "or-nemotron-3-ultra": {
-      "calls": 213,
+      "calls": 353,
       "neurons": 0
     },
     "gemini-3.5-flash": {
