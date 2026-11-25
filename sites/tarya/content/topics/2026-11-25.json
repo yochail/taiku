@@ -1,0 +1,490 @@
+{
+  "date": "2026-11-25",
+  "generatedAt": "2026-11-25T21:57:04.849Z",
+  "sourceSnapshotHash": "9118371828d5036a",
+  "feeds": [
+    {
+      "feed": "ynet",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ynetnews",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz-en",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "toi",
+      "ok": false,
+      "error": "HTTP 503"
+    },
+    {
+      "feed": "jpost",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "kan",
+      "ok": false,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "feed": "israelhayom",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom-en",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "maariv",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "walla",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "jta",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "forward",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "jns",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "reuters",
+      "ok": false,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "feed": "ap",
+      "ok": false,
+      "error": "HTTP 503"
+    },
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-me",
+      "ok": true,
+      "items": 25,
+      "kept": 22
+    }
+  ],
+  "picks": [
+    {
+      "id": "tb75b951b",
+      "title": "Pritzker opts Illinois out of education tax credit program, frustrating Jewish leaders",
+      "url": "https://www.haaretz.com/us-news/2026-11-25/ty-article-magazine/.premium/gov-pritzker-opts-out-of-education-program-frustrating-jewish-leaders/000001a2-1410-d22a-a1bb-153380510000",
+      "source": "Haaretz",
+      "domain": "haaretz.com",
+      "feedId": "haaretz-en",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "publishedAt": "2026-11-25T21:26:20.000Z",
+      "score": 1.044,
+      "keys": {
+        "economy": 1,
+        "religion": 1,
+        "culture": 1,
+        "politics": 1.5
+      }
+    },
+    {
+      "id": "t5788f82a",
+      "title": "לא שופטי נתניהו. שפוטי נתניהו",
+      "url": "https://www.haaretz.co.il/opinions/2026-11-26/ty-article-opinion/.highlight/000001a2-135b-d22a-a1bb-177bbc3b0000",
+      "source": "Haaretz",
+      "domain": "haaretz.co.il",
+      "feedId": "haaretz",
+      "tier": "curated",
+      "kind": "news",
+      "section": "politics",
+      "publishedAt": "2026-11-26T04:00:00.000Z",
+      "score": 1.04,
+      "keys": {
+        "politics": 1.5
+      }
+    },
+    {
+      "id": "t21b4810e",
+      "title": "Jewish student files federal civil rights complaint against Hunter over Hillel exclusion",
+      "url": "https://www.jns.org/news/u-s-news/jewish-student-files-federal-civil-rights-complaint-against-hunter-over-hillel-exclusion",
+      "source": "JNS",
+      "domain": "jns.org",
+      "feedId": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "publishedAt": "2026-11-25T19:24:17.000Z",
+      "score": 1.035,
+      "keys": {
+        "religion": 2.5,
+        "politics": 1,
+        "culture": 1
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t253ff2fb",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t358f0806",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta3765d33",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t03cf28ca",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tfb40b5be",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t61dcdafa",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta8a70b7d",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tcb1ec08a",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t54e59b4d",
+      "feedId": "israelhayom-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tbb9acba2",
+      "feedId": "israelhayom-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t430989f2",
+      "feedId": "jta",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tb8e61a47",
+      "feedId": "jta",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tbbc30261",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t4ea6bfbf",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t027a97dd",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t119fda45",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t90e68124",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t8f798b84",
+      "feedId": "forward",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t8047a822",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc5541579",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "teb7e935d",
+      "feedId": "jns",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t8ac00ea2",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0aa80888",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc49453b0",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf3370d38",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t13422489",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t0552a842",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9e2b35da",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tabd87581",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t5b1c5c7e",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t41365066",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "teff63436",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7036da4c",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t638ef79e",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "tfffdd515",
+      "title": "10 דקות שטרפו קלפים של עשור שלם: כל התחנות במשפט נתניהו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t3e5e6039",
+      "title": "המשטרה חוקרת: פעוט כבן שנתיים נמצא חבול במעלה אדומים, מותו נקבע בבי\"ח",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5834fcbf",
+      "title": "איזנקוט מתכנן ממשלה: דמי הרצינות לחרדים, התיקים שיישמרו לש\"ס ומה יקבלו גולן, בנט וליברמן",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t4eb5b1ad",
+      "title": "נשבר שיא ההגירה לאיים הספרדיים, תינוק נולד באמצע המסע: \"צריכים סיוע צבאי\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "te084462e",
+      "title": "המציאות, הדמיון, והכי חשוב - הקרדיט",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t1189a260",
+      "title": "המפכ\"ל: לא ייתכן ששוטרים ישתתפו באירועי סולחה בין חמולות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5f42119e",
+      "title": "קושנר דחק בנתניהו: \"תיישמו את חלקכם בתוכנית 20 הנקודות, סייעו לעזה בחורף\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tb83cd54b",
+      "title": "\"מערכת גשם חורפית של ממש\" | מה שצפוי בשבוע הבא",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5f86dac6",
+      "title": "\"נבנה במהירות מחשידה\": המתקן המבוצר החדש באיראן - בין נתנז לאיספהאן",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t42ff63bf",
+      "title": "הוקפצו בדרגות תוך כדי מלחמה – ועכשיו בצה\"ל מנסים לתקן",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tdcd7dbcf",
+      "title": "נתניהו בהצהרה אחרי הדרמה במשפט: \"אמרתי שלא יהיה כלום - אבל זה לקח 10 שנים של סבל נורא\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t8dd10d50",
+      "title": "\"מראות שלא רואים אפילו באפריקה\": התיעוד של נשיא איראן עורר סערה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t0cf86c3c",
+      "title": "לא רק הספינות של פוטין: \"קייב הפציצה גם אונייה איראנית בלוב\" | הקשר לגנרל שביקר אצל ארדואן",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t01db344c",
+      "title": "חברות הפרלמנט חסמו את הכניסה לברנע: \"פושע מלחמה!\" | תיעוד - וכך הוא השיב",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t9e5d36d7",
+      "title": "הליכוד הגישה ערעור רשמי על תוצאות הבחירות ב-120 קלפיות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tf8ca19f3",
+      "title": "בנט נגד האיש המקורב ביותר לאיזנקוט: \"מוביל קו תקיף נגד נתניהו וממשלת אחדות\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t70fa4980",
+      "title": "חשש מענן עופרת רעיל: צבא ארה\"ב פוצץ 5 טונות של חומר נפץ לא-יציב | תיעוד",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t7ca3e63f",
+      "title": "הפרשיות שבדרך להימחק - וזו שעדיין מסבכת את נתניהו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t6d837b10",
+      "title": "מקימים ממשלה? כל ההבטחות שבגוש השינוי יצטרכו להפר",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t1d2e501d",
+      "title": "הפגיעות המיניות בחברה החרדית: הפקרתם וגם מחקתם",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tc8a24c6f",
+      "title": "זה הזמן: מנהיגים גבריות בריאה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t535f67c1",
+      "title": "ההזדמנות של איזנקוט",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t514c97b7",
+      "title": "70% מכתב האישום ירד מסדר היום - השאלה הגדולה היא הקלון",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t2e1395f8",
+      "title": "גוש השינוי הפיל את הקפאת המעצרים; רגב ליעקב אשר שנפגש עם נתניהו: \"אין אמון באשכנזים\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t9ab8d7f3",
+      "title": "הצדעה במועל יד, קללות וריקודים במעון ר\"מ בריטניה: זעם על \"קרקס המשפיענים\" בדאונינג 10",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t263af2bf",
+      "title": "Report: North Korea helping Iran develop launch systems inside underground missile cities",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "tfae2a17a",
+      "title": "From immigrant transit camp to state comptroller: the rise of Supreme Court outsider Yosef Elron",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t50baf2b9",
+      "title": "Five sentenced to up to seven years in prison over 2021 Bat Yam mob attack of Arab man",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t6887eacc",
+      "title": "Eisenkot bloc prepares to swear in government next week, with pressure mounting on Shas",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t41bb8edd",
+      "title": "Knesset set for showdown over Oct. 7 inquiry, Netanyahu eligibility and draft dodgers",
+      "domain": "ynetnews.com"
+    }
+  ]
+}

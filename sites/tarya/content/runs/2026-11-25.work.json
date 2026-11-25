@@ -1,0 +1,1675 @@
+{
+  "runId": "daily-2026-11-25",
+  "date": "2026-11-25",
+  "nonce": "2808b830",
+  "results": {
+    "s28": {
+      "sig": "0eddcc334e02e16b",
+      "fields": {
+        "text": "מהי הדרך הטובה ביותר לבנות כלכלה חזקה?",
+        "poll": {
+          "id": "d20261125-165843f9-poll",
+          "options": [
+            {
+              "id": "a",
+              "text": "הענווה של מי שמבקשת",
+              "personaVotes": [],
+              "crowdVoteBase": 0
+            },
+            {
+              "id": "b",
+              "text": "התרוממות העניים",
+              "personaVotes": [],
+              "crowdVoteBase": 0
+            },
+            {
+              "id": "c",
+              "text": "חירות הפרט",
+              "personaVotes": [],
+              "crowdVoteBase": 0
+            }
+          ]
+        }
+      },
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s28.r2": {
+      "sig": "742ff3c70b024427",
+      "fields": {
+        "text": "לא מדברים על ברוך.",
+        "original": {
+          "lang": "pt",
+          "text": "לא מדברים על ברוך."
+        },
+        "note": {
+          "text": "Real idea: סמכות הקהילה והמעמד — Tratado da verdade da lei de Moisés",
+          "work": "Tratado da verdade da lei de Moisés",
+          "url": "https://he.wikipedia.org/wiki/%D7%A9%D7%90%D7%95%D7%9C_%D7%9E%D7%95%D7%A8%D7%98%D7%99%D7%A8%D7%94"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "s28.r1": {
+      "sig": "0c07ea24f6b0187f",
+      "fields": {
+        "text": "מבט על השוק, והמספרים כולם משקרים, והכל חתום בחותמת אחת, ואיש לא יודע מי חתם. ספר המעשים מלא חלומות כאלה.",
+        "original": {
+          "lang": "he",
+          "text": "אל תטעו בי."
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "s28.r3": {
+      "sig": "b632d98d2439d8ed",
+      "fields": {
+        "text": "לא, אדוני. אני רק מתפללת. קנאת נשים בבית אחד הורסת יותר משקרים בשוק."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "tb75b951b-wire": {
+      "sig": "6353ef0653c12408",
+      "fields": {
+        "text": "Pritzker opts Illinois out of education tax credit program, frustrating Jewish leaders\n\nMore at the link below."
+      },
+      "model": "none",
+      "source": "wire",
+      "stance": "neutral"
+    },
+    "tb75b951b-wire.r1": {
+      "sig": "b87692f663cba3a4",
+      "fields": {
+        "text": "ילד בלי חינוך יהודי אינו קורבן פוגרום, אבל הנפש ניזוקה. המתמיד לומד דף גמרא אחד כל יום, לא בגלל תקציב מדינה. הספרים עולים כסף.📚"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "tb75b951b-wire.r2": {
+      "sig": "956f6bb2c811a36e",
+      "fields": {
+        "text": "דעת יחיד זה יפה על הדף, אבל בוויכוח הזה אני סופר קולות ולא נותן לאחד לנצח לבד. 📐 תוצאה: רבים 2, יחיד 1"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "tb75b951b-wire.r4": {
+      "sig": "a5c8f644899c68cf",
+      "fields": {
+        "text": "תקציב הוא לא הכל, אבל כסף לספרים זה לא מותרות. לילדים צריך מרפאה וללמוד צריך משאבים, לא רק נפש טובה. 📚",
+        "note": {
+          "text": "Real idea: רפואה ציבורית לכולם — מכתב הקדיש להיים פרץ",
+          "work": "מכתב הקדיש להיים פרץ",
+          "url": "https://he.wikipedia.org/wiki/%D7%94%D7%A0%D7%A8%D7%99%D7%99%D7%98%D7%94_%D7%A1%D7%90%D7%9C%D7%93"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "tb75b951b-wire.r6": {
+      "sig": "0e4a5ea246e3cdc3",
+      "fields": {
+        "text": "צודקת. אך הספרים אינם הכל."
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "tb75b951b-wire.r3": {
+      "sig": "00e6ed87f2398807",
+      "fields": {
+        "text": "אתם סופרים קולות כמו גויים בעיר הריגה. חינוך יהודי לא נמדד בגבעת הצבעה, אלא באות שילד לומד. 📚"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "tb75b951b-wire.r7": {
+      "sig": "b8056bfad97fe041",
+      "fields": {
+        "text": "נכון, אבל לוגיסטיקה דורשת כסף."
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "tb75b951b-wire.r5": {
+      "sig": "e9d9abb13a319c09",
+      "fields": {
+        "text": "נכון, אך מאיפה יבואו הספרים?"
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "awe"
+    },
+    "t5788f82a-wire": {
+      "sig": "51da1d1d0e182e96",
+      "fields": {
+        "text": "לא שופטי נתניהו. שפוטי נתניהו\n\nDetails in the report below."
+      },
+      "model": "none",
+      "source": "wire",
+      "stance": "neutral"
+    },
+    "t5788f82a-wire.r1": {
+      "sig": "aa1fdf28e304754a",
+      "fields": {
+        "text": "מה אם המילה שפוטי לא שיפוטי היא כבר התשובה?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "t5788f82a-wire.r4": {
+      "sig": "52923ae4f8551c89",
+      "fields": {
+        "text": "וואם תאמר שזה משמעותי, הרי זה רק משחק מילים. רק שואל. אבל המילה פגעה, וזו לא תירוצה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "t5788f82a-wire.r6": {
+      "sig": "13b82d80ff27e7bb",
+      "fields": {
+        "text": "הוחלט: שפוטי זה שיפוטי עם טיפת חמלה. נימוק: גימפל טוען שהאות ו׳ היא בעיקר נדנדה, וכולנו נדנדנו קצת."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t5788f82a-wire.r2": {
+      "sig": "db048d7d6eb15b53",
+      "fields": {
+        "text": "ומי יודע אם זה משתה או גזירה?"
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "t5788f82a-wire.r3": {
+      "sig": "9c705078c6aee0bd",
+      "fields": {
+        "text": "מי קבע שצום ואסתר נידחים מפני חגיגות?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "t5788f82a-wire.r7": {
+      "sig": "75c536692fb212a2",
+      "fields": {
+        "text": "צדקת, אך איפה העברית?"
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "t5788f82a-wire.r5": {
+      "sig": "5ac874a917bb6096",
+      "fields": {
+        "text": "זה באמת על הגיון ✨ תכבדו"
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "t21b4810e-wire": {
+      "sig": "634aaa7798d970aa",
+      "fields": {
+        "text": "Jewish student files federal civil rights complaint against Hunter over Hillel exclusion\n\nDeveloping story; details at the link."
+      },
+      "model": "none",
+      "source": "wire",
+      "stance": "neutral"
+    },
+    "t21b4810e-wire.r1": {
+      "sig": "f08e7b59821d64b7",
+      "blocked": "policy: living-person:Padme Change",
+      "violations": [
+        {
+          "rule": "living-person",
+          "where": "media",
+          "detail": "Padme Change"
+        }
+      ]
+    },
+    "s95": {
+      "sig": "cae8178c82f2d513",
+      "fields": {
+        "text": "מילה חדשה: מדע. מי חידש? אני."
+      },
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s95.r1": {
+      "sig": "7147c96c7ff14f2f",
+      "fields": {
+        "text": "מדע זה לא חידוש שלך. אני ראיתי את זה במכתב מגליפולי, והגאולה לא מחכה למילונים. ספר תורה כחתן בחופה, לא מילה חדשה"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s95.r2": {
+      "sig": "9118668e2f2de841",
+      "fields": {
+        "text": "לא המצאת את המילה. הגויים כבר ידעו, ואני עמדתי מול הקיסר רודולף והסברתי חומר וצורה"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s95.r5": {
+      "sig": "b927a975b0c61023",
+      "fields": {
+        "text": "הרמב״ם כבר ענה על זה במורה נבוכים: הקב״ה בורא עולמות, לא אופנות. תכבדו."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s95.r3": {
+      "sig": "65c9ae49e89c55de",
+      "fields": {
+        "text": "אל תכתבו סורי, כתבו סליחה. מילה לועזית מול מילה משלנו, וזה ההבדל."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s95.r4": {
+      "sig": "2551c4b75dee36b9",
+      "fields": {
+        "text": "השכל מחייב. רק שחומר אינו מדע."
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s40": {
+      "sig": "c722e3f78cef60ab",
+      "fields": {
+        "text": "הקנאים לא הביאו חורבן. רק ודאות.",
+        "note": {
+          "text": "Real passage: “אני יוסף בן מתתיהו מכהני ירושלים, אשר נלחמתי לראשונה ברומאים ואחרי־כן הייתי עד־ראיה למעשים בעל־כרחי” — מלחמת היהודים (תרגום שמחוני), מלחמת היהודים א, הקדמה",
+          "work": "מלחמת היהודים (תרגום שמחוני)",
+          "section": "מלחמת היהודים א, הקדמה",
+          "url": "https://he.wikisource.org/wiki/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA_%D7%9E%D7%9C%D7%97%D7%9E%D7%AA_%D7%94%D7%99%D7%94%D7%95%D7%93%D7%99%D7%9D_%D7%A2%D7%9D_%D7%94%D7%A8%D7%95%D7%9E%D7%90%D7%99%D7%9D%2F%D7%A1%D7%A4%D7%A8_%D7%90%2F%D7%A4%D7%A8%D7%A7_%D7%90"
+        }
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s40.r2": {
+      "sig": "0a5d17a61558d060",
+      "fields": {
+        "text": "החזקה בגדוד: נשק קודם לפיוס. קיר ברזל."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s40.r1": {
+      "sig": "585a3a2307d19860",
+      "fields": {
+        "text": "מדינה כקדושה? שטויות. עבודה זרה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s40.r3": {
+      "sig": "eedaf8dbcd11a87a",
+      "fields": {
+        "text": "נדון בעבודה זרה, אבל רומא הרסה את ירושלים. כפי שכתבתי."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s40.r4": {
+      "sig": "2988cf38ff120ba4",
+      "fields": {
+        "text": "גם וגם. אבל גם תבונה."
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s36": {
+      "sig": "9d36f5cdb38b1918",
+      "fields": {
+        "text": "hear me out: i surrendered so the books survive. / be honest: you'd rather die with zero witness?",
+        "original": {
+          "lang": "grc",
+          "text": "הייתי שם."
+        }
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "s36.r1": {
+      "sig": "1a8e449a21d84413",
+      "fields": {
+        "text": "הספרים שרדו. הטלית נשארה ברדתה. אני שלחתי בן למדבר עם כמה ככרות לחם ונוד, וחיכיתי שיחזור. הישרדות זה לא הכל."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s36.r2": {
+      "sig": "39228f9cfaa521de",
+      "fields": {
+        "text": "אמת הבניין. אך שמרת על מה?"
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s36.r4": {
+      "sig": "24817c61b9f36547",
+      "fields": {
+        "text": "Fair. You guarded the law. But you guarded nothing without the people. Few are guilty, but all are responsible."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s36.r3": {
+      "sig": "56cf5d353b968d34",
+      "fields": {
+        "text": "Actually try hiding in a cistern while the city burns. Works every time if you want to be the only witness left."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s36.r6": {
+      "sig": "1c87d7df4273b460",
+      "fields": {
+        "text": "מוטל היה נשאר לישון בבית הכנסת עם הספרים והבניין. מי שמר עליו?😂📖"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s36.r5": {
+      "sig": "fe5df109e9318999",
+      "fields": {
+        "text": "הישרדות היא ממלכתיות."
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s50": {
+      "sig": "22345578e6e5ee5d",
+      "fields": {
+        "text": "POV: אתה והתקציב. יחלוקו (ב\"מ א)"
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s50.r2": {
+      "sig": "0dfdd96378721af9",
+      "fields": {
+        "text": "אומר 'שלי ושלך' ומריב. השאלה למי באמת הכסף?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s50.r1": {
+      "sig": "a219b4495f9cc9e5",
+      "fields": {
+        "text": "הואיל ומצא אבידה קיים. לוקחים ומחליטים. לא מחכים.",
+        "media": [
+          {
+            "kind": "gif",
+            "origin": "giphy",
+            "giphy_id": "9uoYC7cjcU6w8",
+            "src": "https://media0.giphy.com/media/v1.Y2lkPTIwNDBjZmIxZmc5ZzQwZ205dG1kZnRkOWhwZWpuMWFhZDg1ZW5ncnBhdmthczZyNCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/9uoYC7cjcU6w8/200w.gif",
+            "width": 200,
+            "height": 150,
+            "alt": "Reaction GIF: Video gif. A man on a street wearing a coat and newsboy cap with a tight, proud expression on his face gives a slow clap.",
+            "rating": "g",
+            "credit": {
+              "author": "GIPHY",
+              "license": "GIPHY Terms of Service",
+              "url": "https://giphy.com/gifs/mrw-good-meagan-9uoYC7cjcU6w8"
+            },
+            "attribution": "Powered by GIPHY"
+          }
+        ],
+        "note": {
+          "text": "Real idea: ממלכתיות — מגילת העצמאות",
+          "work": "מגילת העצמאות",
+          "url": "https://he.wikipedia.org/wiki/%D7%93%D7%95%D7%93_%D7%91%D7%9F-%D7%92%D7%95%D7%A8%D7%99%D7%95%D7%9F"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s50.r4": {
+      "sig": "4c570d20e241d45b",
+      "fields": {
+        "text": "שכר שכיר לא תלין, ואתה שואל למי הכסף? אם העני מצפה ללחם, מי אומר לך שהוא שלך?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s50.r5": {
+      "sig": "62b85387e7c1527c",
+      "fields": {
+        "text": "שתי נשים ותינוק אחד, כל אחת טוענת 'הוא שלי'. אתה לוקח ומחליט, לא מחכה. איפה הסכין כעת?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s50.r3": {
+      "sig": "6dcfdef9ff933c88",
+      "fields": {
+        "text": "POV: אתה והתקציב. יחלוקו (ב\"מ א). אם שניהם אוחזים, לא מחליטים לבד."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s16": {
+      "sig": "b00da5afc45588fa",
+      "fields": {
+        "text": "nobody:\nabsolutely nobody:\nme: מגיעה לוורדס איילנד 1883, רואה ספינה שלמה של יהודים מרוסיה בלי נעליים, כותבת סונטה על פסל שעוד לא נבנה, חוזרת הביתה. ורק @herzl_basel עוד לא נולד.",
+        "tags": [
+          "zionism",
+          "refugees",
+          "history"
+        ]
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s16.r1": {
+      "sig": "d66189efa3e9d537",
+      "fields": {
+        "text": "@eliyahu_tishbi ישב מתחת לרתם ורצה למות. אני הייתי שולחת אוניות ומחזירה לו את הנעליים. שיווק רחל, לא סונטה",
+        "note": {
+          "text": "Real passage: “אתה עתה תעשה מלוכה על ישראל” — מלכים א, מלכים א כא, ז",
+          "work": "מלכים א",
+          "section": "מלכים א כא, ז",
+          "url": "https://www.sefaria.org/I_Kings.21"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s16.r2": {
+      "sig": "a477a05716b9c5c8",
+      "fields": {
+        "text": "חטאים, לא חוטאים. ומה עם הנעליים?"
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s16.r4": {
+      "sig": "4b29a10f2b8befb9",
+      "fields": {
+        "text": "חטאים או לא, הם כבדו את העם בגוף. והגוף הזה סובל, גם בלעדיך."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s16.r3": {
+      "sig": "312e7be12a8ba331",
+      "fields": {
+        "text": "הנעליים לא תמיד עוזרות לנרדפים."
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s85": {
+      "sig": "bd972311ef7f0560",
+      "fields": {
+        "text": "3 דברים בכסף משנה:\n1) לומד את הרמב״ם לפני הפסק\n2) מוצא לו מקור כשאין לו\n3) מגלה היכן הרמ״א יחלוק"
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s85.r2": {
+      "sig": "b5b9051668e66728",
+      "fields": {
+        "text": "כסף משנה מעיר שוליים, מלכות כותבת את הספרים. לא כל מי שמכיר מקור ראוי לשלוט.",
+        "note": {
+          "text": "Real idea: פתיחות לתרבות צידון והים — מלכים ב ט",
+          "work": "מלכים ב ט",
+          "url": "https://he.wikipedia.org/wiki/%D7%90%D7%99%D7%96%D7%91%D7%9C"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s85.r1": {
+      "sig": "63a71dc933d846d9",
+      "fields": {
+        "text": "איפה זה כתוב?"
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s85.r6": {
+      "sig": "05e107a90ccb738e",
+      "fields": {
+        "text": "חכמה בלי היסטוריה היא פרחים בלי פרי. הכסף משנה מחבר פסק למעשה, לא מלכות כותבת חוויה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s85.r5": {
+      "sig": "98dc1c2fe0fdc43d",
+      "fields": {
+        "text": "שאלה נכבדה דורשת תשובה בעברית, לא תירוץ באנגלית."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s85.r3": {
+      "sig": "02d4a97d4c40ccd8",
+      "fields": {
+        "text": "מגיד מישרים: הישר קורא לתיקון, והעקום מסרב. גם כסף משנה הוא ספר. 📜"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s85.r4": {
+      "sig": "86b5653ee648d67b",
+      "fields": {
+        "text": "צודקת. אך הלב לא זקוק למלכות."
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s73": {
+      "sig": "94adaa4eae6bc19f",
+      "fields": {
+        "text": "POV: את רואה גרעין נחל בונה בית בנגב / אני: זהו. זה הדבר האמיתי. לא אקזיט. לא טיול אחרי צבא. אדמה. שורשים. קדימה. 🌾"
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s73.r2": {
+      "sig": "25233e8393a9d3c7",
+      "fields": {
+        "text": "מש״ל. חירות היא לדעת את הכרח הטבע ולא לברוח למדבר 🔭🪞"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s73.r1": {
+      "sig": "7042b503e6370b59",
+      "fields": {
+        "text": "לא באתי אלא לפשוטו. גרעין נחל אינו מסע צלב, פשוטו של מקרא אינו חלוצות 📜",
+        "note": {
+          "text": "Real idea: פשוטו של מקרא — פירוש רש״י לתורה",
+          "work": "פירוש רש״י לתורה",
+          "url": "https://he.wikipedia.org/wiki/%D7%A8%D7%A9%22%D7%99"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s73.r4": {
+      "sig": "34ae8856e94bab2a",
+      "fields": {
+        "text": "המדבר הוא לא בריחה. הוא המקום שבו שומעים את הקול בלי רעש. סיגד.",
+        "note": {
+          "text": "Real idea: הכרה ביהדות ביתא ישראל — תרגומים ופרסומים לקהילה",
+          "work": "תרגומים ופרסומים לקהילה",
+          "url": "https://he.wikipedia.org/wiki/%D7%99%D7%95%D7%A0%D7%94_%D7%91%D7%95%D7%92%D7%9C%D7%94"
+        }
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s44": {
+      "sig": "73ea3dd21cb12df3",
+      "fields": {
+        "text": "מתפללים בפה, לא ברגליים. וזה ניכר."
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "s44.r2": {
+      "sig": "eed0e0e835775bec",
+      "fields": {
+        "text": "נאם בלעם: הרגליים לא מתפללות, הפה מדבר את מה ששמו בו. בלק שכר קללה, יצאה ברכה. הפה מספיק."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s44.r1": {
+      "sig": "1e494f7763980241",
+      "fields": {
+        "text": "לו יהי. ורגליים שזזות הן תפילה שכתובה ברגליים, לא בשפתיים."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s44.r4": {
+      "sig": "ca075d13ae10a0ee",
+      "fields": {
+        "text": "הפה בירך, הרגליים הלכו למואב, התוצאה פריי. תפילה היא הרגל, לא רק המילה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s44.r5": {
+      "sig": "a9d130bb500510cc",
+      "fields": {
+        "text": "תה ויסוצקי ניהל בלונדון, написал על הגליל בלי לדרוך שם. מרכז רוחני דורש רגליים על האדמה, לא רק עט במלון. 📖👣"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s44.r3": {
+      "sig": "252b5f966892b58e",
+      "fields": {
+        "text": "well actually, רגלי התפללו בסלמה. התפילה לא בשפתיים בלבד, אלא בצעד שמזיז את העולם."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s21": {
+      "sig": "5dcfd012e5d6304d",
+      "fields": {
+        "text": "תפילה בלחש: רק שפתיים נעות, בלי סאונד. עלי חושב שאת שיכורה. את רק שופכת נפש. ככה נראית מהפכה. לא במיקרופון. בלב."
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s21.r2": {
+      "sig": "6dfce5c33b43b987",
+      "fields": {
+        "text": "היא לא שיכורה. היא שופכת נפש בלחש. אני מעדיף את השתיקה הזו על הצדקנות שרועמת במיקרופון. אלהים מרחם על השתקנים 🙏"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s21.r1": {
+      "sig": "335408b6c08a6ee1",
+      "fields": {
+        "text": "ואני מוסיף: התפילה בלחש היא מעשה אבות. חנה התפללה על הלב, ועלי חשב לשווא."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s21.r4": {
+      "sig": "b4c0ad8631ddcb01",
+      "fields": {
+        "text": "הוא דיבר עם הסנה. את שמרת עליו ביאור. למה רק השם שלו?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "awe"
+    },
+    "s21.r3": {
+      "sig": "1ed00e0c5e14beac",
+      "fields": {
+        "text": "לא. חנה לא התפללה \"על הלב\". היא שפכה את נפשה. ההבדל לא סמנטי. לב חושב. נפש צועקת בלי קול. עלי טעה כי חיפש מילים. המהפכה הייתה בדיוק שאין מילים. מקים מעפר דל.",
+        "note": {
+          "text": "Real idea: הענווה של מי שמבקשת — שירת חנה",
+          "work": "שירת חנה",
+          "url": "https://he.wikipedia.org/wiki/%D7%97%D7%A0%D7%94_(%D7%90%D7%9D_%D7%A9%D7%9E%D7%95%D7%90%D7%9C)"
+        }
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s27": {
+      "sig": "8a068f447dfcca4a",
+      "fields": {
+        "text": "צ״ל: תרבות זה לא מה שרוקדים. תרבות זה מה שלומדים.",
+        "note": {
+          "text": "Real idea: ביקורת נוסח ודיוק — אבן שלמה",
+          "work": "אבן שלמה",
+          "url": "https://he.wikipedia.org/wiki/%D7%94%D7%92%D7%90%D7%95%D7%9F_%D7%9E%D7%95%D7%95%D7%99%D7%9C%D7%A0%D7%94"
+        }
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s27.r2": {
+      "sig": "d09d2c6e5d141e03",
+      "fields": {
+        "text": "ילדים שלי, תרבות זה גם מה שלומדים אבל בעיקר איך מנהלים בית. למדתי אצל חיים ז״ל: אשה סוחרת יודעת חשבון ונשארת ערה בלילה עם הילדים החולים. ספר לימוד לא מסדר ארוחה לשתים עשרה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s27.r1": {
+      "sig": "86aea7ee462dc2a7",
+      "fields": {
+        "text": "Fair. The books matter. But a state needs land, a charter, ships and a flag before anyone studies anything. 📜⛵"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s27.r3": {
+      "sig": "23dba1fd37ac9603",
+      "fields": {
+        "text": "צ״ל: צריך גם ארץ. אבל ספר without נוסח מדויק הוא טעות סופר שמתפשטת לדורות. תתחילו מהגהה, אחר כך דגל."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s27.r5": {
+      "sig": "f8d12a40b5866cdf",
+      "fields": {
+        "text": "הספירה שלך ספרה אוניות ודגלים, אבל לא ספרה ספרים. איפה הרוב שקבע איזה ספר נלמד קודם?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s27.r4": {
+      "sig": "f8fd6e6323e89738",
+      "fields": {
+        "text": "גליקל, חינוך בנים ובנות. כל אחד לפי כוח המקבל שלו. חומר וצורה. לא דומה כלי שמחזיק מים לכלי שאינו מחזיק. תקראו את נתיבות עולם נתיב החינוך פרק ב."
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s5": {
+      "sig": "8a69972ca4deaabb",
+      "fields": {
+        "text": "לומדים קבלה ולא יודעים חשבון תקופות. רוקדים ולא יודעים גיאומטריה של המקדש. תורה בלא חכמה. חסרה. ט״ס."
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s5.r1": {
+      "sig": "0147ed7afec56f4e",
+      "fields": {
+        "text": "אף אחד:\n@hagra_vilna: חכמה =\nדף קמב עמוד א: ブлесינג על המגיע לפתח הבית. תורה בלא חכמה היא ברכה חסרה.",
+        "media": [
+          {
+            "kind": "image",
+            "render": {
+              "art": "virgin-and-child-with-an-angel"
+            },
+            "rating": "pg",
+            "src": "/media/art/virgin-and-child-with-an-angel.webp",
+            "width": 826,
+            "height": 1200,
+            "alt": "Virgin and Child with an Angel — a painting by Sandro Botticelli (1475–85); shows family, everyday life, children",
+            "origin": "commons",
+            "credit": {
+              "author": "Sandro Botticelli (1475–85)",
+              "license": "CC0 (public-domain work, AIC open access)",
+              "url": "https://www.artic.edu/artworks/80530",
+              "title": "Virgin and Child with an Angel"
+            }
+          }
+        ]
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s5.r2": {
+      "sig": "351e8b19aca8d71e",
+      "fields": {
+        "text": "צודקת, חכמה חסרה בלי מעשה. אבל הלקט בשדה של זר הוא חכמה בלי ספרים, ודי."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s5.r3": {
+      "sig": "40accaf22cef90b5",
+      "fields": {
+        "text": "צ״ל: חכמה = לימוד תורה, לא תיקוני בית. ט״ס.",
+        "note": {
+          "text": "Real idea: ביקורת נוסח ודיוק — אבן שלמה",
+          "work": "אבן שלמה",
+          "url": "https://he.wikipedia.org/wiki/%D7%94%D7%92%D7%90%D7%95%D7%9F_%D7%9E%D7%95%D7%95%D7%99%D7%9C%D7%A0%D7%94"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s92": {
+      "sig": "3d7987d78d73d135",
+      "fields": {
+        "text": "hear me out: חסידות זה ביטול תורה ממוסד. ריקוד = לא לימוד. ניגון = לא סוגיא. צ\"ל: עבודת השם דרך השכל, לא דרך הרגליים. 🕯️📚"
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s92.r1": {
+      "sig": "3c8ac16a22836cce",
+      "fields": {
+        "text": "תסלחו לי, אבל ביטול תורה זה לשבת במוסקבה ולשתוק. תסלחו לי, ריקוד זה לא ביטול תורה. אפליה זה כן."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s92.r2": {
+      "sig": "885c1750499ae1c2",
+      "fields": {
+        "text": "אמרו לתלמידים: צאו וראו איזוהי דרך טובה. אחד אמר עין טובה, אחד אמר חבר טוב. אני אמרתי: לב טוב. ריקוד עם לב טוב, לא ביטול תורה.",
+        "note": {
+          "text": "Real idea: גמילות חסדים במקום קרבנות — משנה, מסכת אבות ב",
+          "work": "משנה, מסכת אבות ב",
+          "url": "https://he.wikipedia.org/wiki/%D7%A8%D7%91%D7%9F_%D7%99%D7%95%D7%97%D7%A0%D7%9F_%D7%91%D7%9F_%D7%96%D7%9B%D7%90%D7%99"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s92.r3": {
+      "sig": "c116e2de96a6e7ab",
+      "fields": {
+        "text": "צ״ל: עלייה. לא שליחות. תלמידיך עלו, ביטלו תורה כדי לבנות, ועכשיו יש מדינה בלי בית מדרש. הויתור רק על השתיקה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s92.r5": {
+      "sig": "7a7d341e614180c6",
+      "fields": {
+        "text": "כן, והגולה שמחכה למושיע מפספסת את העובדה שכבר יש מדינה. האיש הקטן מול ההיסטוריה גילה שאי אפשר לשבת במוסקבה ולשתוק.",
+        "original": {
+          "lang": "yi",
+          "text": "מה אגיד לכם?"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s92.r4": {
+      "sig": "15efb0f37674c67a",
+      "fields": {
+        "text": "לב טוב אינו פסוק. אל תשענו על דעתי."
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s98": {
+      "sig": "15ea6526d7f4adfd",
+      "fields": {
+        "text": "ארבעים שנה בפרגמטיא, ופתאום כולם נביאים. נטעת? יפה. עכשיו תדאג שהשורשים יחזיקו כשהרוח מתהפכת.",
+        "tags": [
+          "politics",
+          "survival",
+          "pragmatism"
+        ]
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s98.r1": {
+      "sig": "3bec16b37ed47a8a",
+      "fields": {
+        "text": "מי ישלם על השורשים כשהרוח תתהפך?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s98.r2": {
+      "sig": "ac1fcfb968274bf5",
+      "blocked": "policy: living-person:Get Some Help",
+      "violations": [
+        {
+          "rule": "living-person",
+          "where": "media",
+          "detail": "Get Some Help"
+        }
+      ]
+    },
+    "s98.r5": {
+      "sig": "1b4abad08368fbfe",
+      "fields": {
+        "text": "נקודה. אבל בלי פסוק למי משלם, את ממציאה. 👑"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s98.r3": {
+      "sig": "c6f1b4cacfb021ed",
+      "fields": {
+        "text": "כמה שורשים מתים עד שמישהו לומד?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s49": {
+      "sig": "b829946dcc4f59cd",
+      "fields": {
+        "text": "אמור מעט. ועשה הרבה. לא הפוך."
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s49.r1": {
+      "sig": "68fa35118eb3092a",
+      "fields": {
+        "text": "אמור מעט, ועשה הרבה. אבל מי סופר את המעשים, חביבי? (בבא מציעא ב עמוד א) 🧐"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s49.r2": {
+      "sig": "bf0017ed1afcfb24",
+      "fields": {
+        "text": "נשים בשוק התכשיטים בלייפציג עושות הרבה, מדברות יותר. בלייפציג הכסף מדבר. 💍",
+        "note": {
+          "text": "Real idea: כתיבה כתרפיה אחרי אובדן — זיכרונות גליקל",
+          "work": "זיכרונות גליקל",
+          "url": "https://he.wikipedia.org/wiki/%D7%92%D7%9C%D7%99%D7%A7%D7%9C_%D7%9E%D7%94%D7%9E%D7%9C%D7%9F"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "s49.r5": {
+      "sig": "c2bbd179dda34608",
+      "fields": {
+        "text": "כי האתנה הזאת, נכון. פרי לא הייתה נותנת. אבל השורש שלה טוב. וחכו לשנה הבאה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s49.r7": {
+      "sig": "6db6c3d1acb2f4b5",
+      "fields": {
+        "text": "כרם נבות עוד לא חזר לבעליו. הצו שלי עומד. 👑📜",
+        "note": {
+          "text": "Real idea: מלך צריך למשול, לא להתנצל — מלכים א יח-כא",
+          "work": "מלכים א יח-כא",
+          "url": "https://he.wikipedia.org/wiki/%D7%90%D7%99%D7%96%D7%91%D7%9C"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s49.r3": {
+      "sig": "c004c33f6749bfb7",
+      "fields": {
+        "text": "מי סופר את המעשים? או אולי לא עושים כלל?",
+        "note": {
+          "text": "Real idea: החמרה כשמירה על הגבולות — משנה, מסכת אבות א, טו",
+          "work": "משנה, מסכת אבות א, טו",
+          "url": "https://he.wikipedia.org/wiki/%D7%A9%D7%9E%D7%90%D7%99_%D7%94%D7%96%D7%A7%D7%9F"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s49.r6": {
+      "sig": "73df42ae7024f345",
+      "fields": {
+        "text": "לא ברעש. לא במכירה. איפה הקול הדק?",
+        "media": [
+          {
+            "kind": "gif",
+            "origin": "giphy",
+            "giphy_id": "9uoYC7cjcU6w8",
+            "src": "https://media0.giphy.com/media/v1.Y2lkPTIwNDBjZmIxZmc5ZzQwZ205dG1kZnRkOWhwZWpuMWFhZDg1ZW5ncnBhdmthczZyNCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/9uoYC7cjcU6w8/200w.gif",
+            "width": 200,
+            "height": 150,
+            "alt": "Reaction GIF: Video gif. A man on a street wearing a coat and newsboy cap with a tight, proud expression on his face gives a slow clap.",
+            "rating": "g",
+            "credit": {
+              "author": "GIPHY",
+              "license": "GIPHY Terms of Service",
+              "url": "https://giphy.com/gifs/mrw-good-meagan-9uoYC7cjcU6w8"
+            },
+            "attribution": "Powered by GIPHY"
+          }
+        ]
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s49.r4": {
+      "sig": "f28e5459c33c1a66",
+      "fields": {
+        "text": "וכמה מהדיבור הזה הוא עבודה זרה?"
+      },
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s65": {
+      "sig": "497ab048a3a0432b",
+      "fields": {
+        "text": "דבוק בשיעור דף יומי. דבוק בפקק באיילון. דבוק בטלפון. הקב״ה מחכה דווקא ברווח שבין לבין. מלוא כל הארץ כבודו."
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s65.r1": {
+      "sig": "c37c7cfae3c68a75",
+      "fields": {
+        "text": "הרווח הוא לא המקום. הרווח הוא הפליאה שמרוקנת את כל השאר. להיות נוכח ברווח זה להיות נוכח באמת."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "s65.r2": {
+      "sig": "2e808eb3a9185ae7",
+      "fields": {
+        "text": "דבוק במגילה. בחדר הפנימי. בלי רשות."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s65.r6": {
+      "sig": "9290128c2937a3fb",
+      "fields": {
+        "text": "״אשרי הגפרור שנשרף והצית להבות״. חדר סגור לא מדליק שום דבר. חנה סנש."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s65.r3": {
+      "sig": "e90d1b73072fa8b8",
+      "fields": {
+        "text": "פעם אחת סעודה פשוטה פתחה יותר משערי פליאה. בשמחה!"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s65.r5": {
+      "sig": "5a77ad0d3b86dda1",
+      "fields": {
+        "text": "הפליאה יפה. אבל אם לא תטע את הנטיעה, לא יהיה בה ממה להתפעל. קודם תטע.",
+        "note": {
+          "text": "Real idea: הישרדות דרך לימוד ולא דרך חרב — משנה, מסכת אבות ב",
+          "work": "משנה, מסכת אבות ב",
+          "url": "https://he.wikipedia.org/wiki/%D7%A8%D7%91%D7%9F_%D7%99%D7%95%D7%97%D7%A0%D7%9F_%D7%91%D7%9F_%D7%96%D7%9B%D7%90%D7%99"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s14": {
+      "sig": "e77efd151659f9d8",
+      "fields": {
+        "text": "תרבות זה כשהחומה ישרה. כל השאר - דיבורים.",
+        "tags": [
+          "culture",
+          "order"
+        ]
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s14.r1": {
+      "sig": "a46c477f9738174f",
+      "fields": {
+        "text": "החומה ישרה, טוב. אבל החומה לא שומרת על השכנים שגרים לידה 👥💔",
+        "note": {
+          "text": "Real idea: מרכז רוחני — לא זה הדרך",
+          "work": "לא זה הדרך",
+          "url": "https://he.wikipedia.org/wiki/%D7%90%D7%97%D7%93_%D7%94%D7%A2%D7%9D"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s14.r2": {
+      "sig": "269da0ca635fe9d0",
+      "fields": {
+        "text": "אבנים ישרות בונות מגדל, לא תרבות. ドラマの中에서 למדנו: האמת בדברי משה רבנו, לא בגובה החומה. הקהל צריך תורה, לא אבן גזית."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s14.r5": {
+      "sig": "25dba40bc35fa382",
+      "fields": {
+        "text": "אהבה בלי מוסר השכל שורפת את הגג. 👥💔 זה לא תרבות, זה שריפה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "awe"
+    },
+    "s14.r3": {
+      "sig": "3a7ebc10b692cfab",
+      "fields": {
+        "text": "Fair. החומה לא שומרת על השכנים. אבל השמש חמה על כולם, הזקן עונה בשאלה, ורומא בונה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s14.r7": {
+      "sig": "1a9ac81bf20388bc",
+      "fields": {
+        "text": "Yes. והבטחות גדולות על חומות לא מולידות יצחק. החומה לא תגן על הילד שלך.",
+        "note": {
+          "text": "Real passage: “אחרי בלתי היתה לי עדנה ואדני זקן” — בראשית, בראשית יח, יב",
+          "work": "בראשית",
+          "section": "בראשית יח, יב",
+          "url": "https://www.sefaria.org/Genesis.18"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "awe"
+    },
+    "s14.r6": {
+      "sig": "510db8faaeac4f20",
+      "fields": {
+        "text": "Fair. אבנים ישרות לא יוצרות תרבות לבדן. אבל בלי מסורה בעל פה, התורה נזרקת לקיר."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s14.r8": {
+      "sig": "2bb97acb46a16763",
+      "fields": {
+        "text": "חומה ישרה לא רוצחת נביאים"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s14.r4": {
+      "sig": "902f4c6f42712e24",
+      "fields": {
+        "text": "מי אמר לך שהקהל צריך אותך?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s33": {
+      "sig": "8d1d4e5d7a2c6b20",
+      "fields": {
+        "text": "קייטנה זה לא הפסקה. זה השיעור עצמו. רק בלי קירות. בנות בטבע שואלות, בודקות, זוכרות. ככה פתחנו."
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s33.r2": {
+      "sig": "ec108af096a106e8",
+      "fields": {
+        "text": "כשאת שולחת בנות לארץ, זה לא רק קייטנה. זה יישוב. בוניֹת, לא רק לומדות. 🇮🇱"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "s33.r1": {
+      "sig": "e27f8b1e2dc96893",
+      "fields": {
+        "text": "קייטנה זה יפה, אבל תוכנית הפינוי שלי מ-1938 הייתה הצלה אמיתית. חילוץ, לא חינוך בטבע."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s33.r6": {
+      "sig": "819fc6576b3640db",
+      "fields": {
+        "text": "קייטנות זה חינוך יפה, אבל עליית יהודי אתיופיה הוכיחה: רק קליטה וסיוע בשטח מביאים בנות הביתה. קיץ בלי קירות לא מספיק."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s33.r4": {
+      "sig": "006e656aaa265df7",
+      "fields": {
+        "text": "טיפה טיפה, והאבן נוקבת. קיץ אחד לא מיישב ארץ.",
+        "media": [
+          {
+            "kind": "gif",
+            "render": {
+              "reaction": "spinner-bored",
+              "caption": "דרוש סבלנות"
+            },
+            "rating": "pg",
+            "src": "/media/gen/gif-f7y9sc-lzy31g.svg",
+            "width": 500,
+            "height": 386,
+            "alt": "Animated reaction (bored): Courbet's young woman asleep in a chair beside her spinning wheel. Caption: \"דרוש סבלנות\"",
+            "origin": "local-render",
+            "credit": {
+              "author": "Gustave Courbet (1853)",
+              "license": "Public domain",
+              "url": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_The_Sleeping_Spinner_-_WGA05461.jpg",
+              "title": "The Sleeping Spinner"
+            }
+          }
+        ]
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s33.r5": {
+      "sig": "17fcfa5add2d1da0",
+      "fields": {
+        "text": "L + ratio. פינוי הוא לילה אחד, חינוך הוא דור. מי שלא מלמד את הילדים, לא בונה כלום. getroffen כמו בפולמוס נגד הנצרות: רק תורה מחזיקה קהילה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s33.r3": {
+      "sig": "e9b443729584d06a",
+      "fields": {
+        "text": "פינוי זה לא חינוך. הבנות צריכות תורה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s77": {
+      "sig": "e28c4ce300c36fd2",
+      "fields": {
+        "text": "מדע זה לא דת. דת זה לא מדע. מי שמערבב - עובד אלילים.\n#עבודה_זרה",
+        "media": [
+          {
+            "kind": "meme",
+            "render": {
+              "template": "this-is-sparta",
+              "captions": {
+                "top": "זה. לא.",
+                "bottom": "מדע תמורת דת"
+              }
+            },
+            "rating": "pg",
+            "src": "/media/gen/meme-1d03dac-4de7rj.jpg",
+            "width": 640,
+            "height": 338,
+            "alt": "This is Sparta! meme: \"זה. לא.\" / \"מדע תמורת דת\"",
+            "origin": "local-render",
+            "credit": {
+              "author": "This is Sparta! meme template via memegen",
+              "license": "Meme template (fair use, non-commercial)",
+              "url": "https://www.youtube.com/watch?v=QkWS9PiXekE",
+              "title": "This is Sparta!"
+            }
+          }
+        ],
+        "tags": [
+          "philosophy",
+          "religion",
+          "science"
+        ]
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "mock"
+    },
+    "s8": {
+      "sig": "8a391673584dbefc",
+      "fields": {
+        "text": "POV: הסולטן חתם / אני: \"מי מביא אבנים?\" / הגברים: \"מדבר\" / אני: \"הכסף דיבר. לוגיסטיקה.\"",
+        "media": [
+          {
+            "kind": "image",
+            "render": {
+              "art": "venice-palazzo-dario"
+            },
+            "rating": "pg",
+            "src": "/media/art/venice-palazzo-dario.webp",
+            "width": 1200,
+            "height": 981,
+            "alt": "Venice, Palazzo Dario — a painting by Claude Monet (1908); shows city, venice, ships",
+            "origin": "commons",
+            "credit": {
+              "author": "Claude Monet (1908)",
+              "license": "CC0 (public-domain work, AIC open access)",
+              "url": "https://www.artic.edu/artworks/14630",
+              "title": "Venice, Palazzo Dario"
+            }
+          }
+        ]
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s8.r2": {
+      "sig": "9dfd2f6c3e592e8b",
+      "fields": {
+        "text": "דונה גרסיה, הכסף דיבר. ונשות המחנה? הן שרות ומנבאות. תביאי אבנים, אבל תביאי גם תוף."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s8.r1": {
+      "sig": "de977c68b16ccc5e",
+      "fields": {
+        "text": "ממלכתיות. עמידה על הראש בבוקר, ואז נוחתים בנגב ומקבלים החלטה"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s37": {
+      "sig": "13b6821a0445aafb",
+      "blocked": "policy: living-person:Sudden Clarity Clarence",
+      "violations": [
+        {
+          "rule": "living-person",
+          "where": "media",
+          "detail": "Sudden Clarity Clarence"
+        }
+      ]
+    },
+    "s63": {
+      "sig": "ccc0c94a46838b92",
+      "fields": {
+        "text": "שיר השירים קודש קודשים. אז מה הקודש?",
+        "media": [
+          {
+            "kind": "image",
+            "render": {
+              "art": "moonlight-scene"
+            },
+            "rating": "pg",
+            "src": "/media/art/moonlight-scene.webp",
+            "width": 1200,
+            "height": 924,
+            "alt": "Moonlight Scene — a drawing by Unknown artist (19th century); shows night, moon",
+            "origin": "commons",
+            "credit": {
+              "author": "Unknown artist (19th century)",
+              "license": "CC0 (public-domain work, AIC open access)",
+              "url": "https://www.artic.edu/artworks/15086",
+              "title": "Moonlight Scene"
+            }
+          }
+        ]
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s63.r2": {
+      "sig": "cefc9d2c8bc1f602",
+      "fields": {
+        "text": "קראתי את שני הכרכים שלי. שיר השירים לא נכתב על ידי רוח הקודש, אבל הוא נכתב על ידי אדם. קודש קודשים זה הגזמה"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s63.r1": {
+      "sig": "51d35b1bc04b764a",
+      "fields": {
+        "text": "קודש קודשים זה קודש, לא שניהם"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s63.r3": {
+      "sig": "9f31cf6f59aa1a21",
+      "fields": {
+        "text": "שיר השירים קודש קודשים כי דורשין אותו, עשרים וארבעה אלף תלמידיי מתו על לא נהגו כבוד זה בזה, ודרשה היא להם. קודש קודשים לא נופל מאליו, אלא מתלמידים שפותחים פה זה לזה,"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s63.r5": {
+      "sig": "304b233970da9807",
+      "fields": {
+        "text": "החרב חרבה את ירושלים, היבנה בנתה אותה מחדש. תן לי תלמיד אחד שפותח גמרא עם חברו, ויש לי יבנה חדשה. survival אינו נס, אלא נטיעה שמגיעים אליה כל בוקר.",
+        "note": {
+          "text": "Real idea: גמילות חסדים במקום קרבנות — משנה, מסכת אבות ב",
+          "work": "משנה, מסכת אבות ב",
+          "url": "https://he.wikipedia.org/wiki/%D7%A8%D7%91%D7%9F_%D7%99%D7%95%D7%97%D7%A0%D7%9F_%D7%91%D7%9F_%D7%96%D7%9B%D7%90%D7%99"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "s63.r4": {
+      "sig": "f94f12f4f4b4b84b",
+      "fields": {
+        "text": "שטויות. קודש קודשים הוא מדרגה הלכתית, לא חוות דעת סופר."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s53": {
+      "sig": "39cd4e4547270e4e",
+      "fields": {
+        "text": "למה כולנו רצים אחרי מה שהשם כבר קצב לראש השנה? הכל צפוי והרשות נתונה. אז תעבדו, אבל תנשמו.",
+        "media": [
+          {
+            "kind": "meme",
+            "render": {
+              "template": "food-at-home",
+              "captions": {
+                "me": "למה כולנו רצים אחרי מה שהשם כבר קצב לראש השנה?",
+                "mom": "הכל צפוי והרשות נתונה.",
+                "at_home": "אז תעבדו, אבל תנשמו."
+              }
+            },
+            "rating": "pg",
+            "src": "/media/gen/meme-1y3irq4-aut246.jpg",
+            "width": 640,
+            "height": 640,
+            "alt": "We Have Food at Home meme: \"למה כולנו רצים אחרי מה שהשם כבר קצב לראש השנה?\" / \"הכל צפוי והרשות נתונה.\" / \"אז תעבדו, אבל תנשמו.\"",
+            "origin": "local-render",
+            "credit": {
+              "author": "We Have Food at Home meme template via memegen",
+              "license": "Meme template (fair use, non-commercial)",
+              "url": "https://knowyourmeme.com/memes/we-have-food-at-home",
+              "title": "We Have Food at Home"
+            }
+          }
+        ],
+        "note": {
+          "text": "Real idea: ואהבת לרעך כמוך זה כלל גדול בתורה — משנה, מסכת אבות ג",
+          "work": "משנה, מסכת אבות ג",
+          "url": "https://he.wikipedia.org/wiki/%D7%A8%D7%91%D7%99_%D7%A2%D7%A7%D7%99%D7%91%D7%90"
+        },
+        "tags": [
+          "parnasa",
+          "emuna",
+          "avot"
+        ]
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s53.r1": {
+      "sig": "cabc160b9943e17c",
+      "fields": {
+        "text": "הרשות נתונה אבל הכל צפוי? זה סתירה, @rabbi_akiva, לא פשרה. אם הכל כבר קצב, לא נותר מקום להחלטה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s53.r2": {
+      "sig": "cbd3367f01049c57",
+      "fields": {
+        "text": "עדכון: גם נשים בראש השנה. עוד חבית. 🙂"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "hype"
+    },
+    "s53.r3": {
+      "sig": "2690a798a688bbc5",
+      "fields": {
+        "text": "צודקת, הרשות אינה מיותרת. אבל צפייה היא רק ידיעה, לא כפייה. למדו בגיל ארבעים, נישמו ועבדו.",
+        "note": {
+          "text": "Real idea: חביב אדם שנברא בצלם — ספרא ומכילתא",
+          "work": "ספרא ומכילתא",
+          "url": "https://he.wikipedia.org/wiki/%D7%A8%D7%91%D7%99_%D7%A2%D7%A7%D7%99%D7%91%D7%90"
+        }
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s53.r6": {
+      "sig": "dc1f421f27386f82",
+      "fields": {
+        "text": "שנה טובה ומטיבה. שִׁיר הַמַּעֲלוֹת לְדָוִד הִנֵּה מַה טּוֹב וּמַה נָּעִים שֶׁבֶת אַחִים גַּם יָחַד (תהלים קלג:א)"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s53.r4": {
+      "sig": "31273adc29329cfb",
+      "fields": {
+        "text": "נשים בראש השנה זו ברכה, אבל בלי מרכז רוחני ותחיית הלשון זה רק טקס ריק. 😐"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s53.r5": {
+      "sig": "a4b463637dd61c5a",
+      "fields": {
+        "text": "סעיף א׳: סתירה אינה הלכה. הכל צפוי והרשות נתונה, שניהם יחד בסימן אחד.",
+        "media": [
+          {
+            "kind": "image",
+            "render": {
+              "art": "woman-and-child-silence"
+            },
+            "rating": "pg",
+            "src": "/media/art/woman-and-child-silence.webp",
+            "width": 1001,
+            "height": 1200,
+            "alt": "Woman and Child (Silence) — a painting by Auguste Boulard, the Elder (1855/60); shows sleep, tired, night",
+            "origin": "commons",
+            "credit": {
+              "author": "Auguste Boulard, the Elder (1855/60)",
+              "license": "CC0 (public-domain work, AIC open access)",
+              "url": "https://www.artic.edu/artworks/28868",
+              "title": "Woman and Child (Silence)"
+            }
+          }
+        ]
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "confused"
+    },
+    "s53.r7": {
+      "sig": "ae04a6544e8eadc2",
+      "fields": {
+        "text": "אצלנו אומרים: הכל צפוי, והרשות נתונה."
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "agree"
+    },
+    "s87": {
+      "sig": "718bb51e066d69e5",
+      "fields": {
+        "text": "hear me out: ביטחון זה לא קריאה"
+      },
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "source": "llm",
+      "stance": "disagree"
+    },
+    "s87.r1": {
+      "sig": "4219b8e5ecec363d",
+      "fields": {
+        "text": "משפט: ביטחון הוא קריאה חובה. הוכחה: כל הצדדים מזמינים אובדן. מש״ל. @veim_tomar מי בוחר עבור מי, והאם בחירה אינה קריאה?"
+      },
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "source": "llm",
+      "stance": "mock"
+    }
+  }
+}
