@@ -1,0 +1,379 @@
+{
+  "date": "2026-11-25",
+  "generatedAt": "2026-11-25T21:27:18.147Z",
+  "sourceSnapshotHash": "7d5e4abf1b81a7c8",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 20
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 16
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 25,
+      "kept": 23
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "td39de8e3",
+      "title": "Wall street recovers most early losses as pullback in AI stocks eases",
+      "url": "https://apnews.com/article/stock-markets-ai-earnings-oil-10044b4fb55d3ff20fde9ba9e9acaab1",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-25T21:08:00.000Z",
+      "score": 1.062,
+      "keys": {
+        "tech": 1,
+        "economy": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t03d52681",
+      "title": "Israeli judges recommend dropping most serious charges against Netanyahu",
+      "url": "https://www.bbc.co.uk/news/articles/cxj05mv723r2o",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-25T19:47:39.000Z",
+      "score": 1.019,
+      "keys": {
+        "politics": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t72ed6c8b",
+      "title": "North Korea expels Swiss diplomat in sanctions row",
+      "url": "https://www.bbc.co.uk/news/articles/cq0l34e4kkr5o",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-25T19:19:06.000Z",
+      "score": 1.005,
+      "keys": {
+        "politics": 1,
+        "world": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t0aa80888",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc49453b0",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf3370d38",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t13422489",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t0552a842",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9e2b35da",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tabd87581",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2a56997e",
+      "feedId": "bbc-tech",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6f9e983e",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t01e43e6d",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t019c7b7f",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t981ee1da",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tfd77f71a",
+      "feedId": "bbc-science",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tf79dd064",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9fa4e207",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9363c822",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t32ef2b6c",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta6d41fc2",
+      "feedId": "hn",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t0a34feb6",
+      "title": "US announces new tariffs on host of countries including China",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tad9d81f8",
+      "title": "Images of asteroid targeted to test Earth's defences reveal stadium-sized crater",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t03d52681",
+      "title": "Israeli judges recommend dropping most serious charges against Netanyahu",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0f4a0d81",
+      "title": "US stocks fall further as fears over AI intensify",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9ad12a5e",
+      "title": "US Army says controlled blast of explosives in Iowa was 'huge success'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t72ed6c8b",
+      "title": "North Korea expels Swiss diplomat in sanctions row",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta6e35e03",
+      "title": "Russia's own figures show it has lost nearly 500,000 people in Ukraine war",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t752d869d",
+      "title": "Five Russian military jets hit in airfield strike, says Ukraine",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te6280c36",
+      "title": "Protesters call on Israel to free Palestinian student held without charge",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t93741d05",
+      "title": "Huawei found guilty of stealing US trade secrets but acquitted of racketeering",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t8b076620",
+      "title": "Canadian astronaut welcomes baby girl from space station",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2f294c57",
+      "title": "South Africa's Ramaphosa wins court battle over impeachment threat",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcac104bb",
+      "title": "Moment Chinese space mission lifts off with first Pakistan astronaut aboard",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9a5946c4",
+      "title": "Watch: Flock of turkeys chases woman on Massachusetts pavement",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t92cb9bb2",
+      "title": "Watch: Moment troops raid home and capture Mexican drug lord",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb0b4c3a9",
+      "title": "Cheers and applause as Jensen Huang returns to Nvidia office",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3e7ba6f9",
+      "title": "First Lady Melania Trump welcomes this year's White House Christmas tree",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t47454625",
+      "title": "Trump's rescue of Nvidia's Huang brings political risks",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t52a9ba1c",
+      "title": "EA adds AI-generated John Motson to FC 27 video game",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tdb38b8b4",
+      "title": "Zoe Kleinman: Nobody is irreplaceable - unless you're Jensen Huang",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0ff725cb",
+      "title": "US attorney general dodges questions about Nvidia investigation",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t5de68533",
+      "title": "Why tiny cars are taking off across Europe",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc4b16dee",
+      "title": "Faisal Islam: Fears over the AI boom haven't gone away",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfbbd947e",
+      "title": "Helpful but awkward: My week with Meta's Muse ahead of its UK launch",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3f7a79e9",
+      "title": "US to blacklist Asian AI firm Megaspeed after Nvidia scandal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb9ddec0a",
+      "title": "Nvidia value climbs by almost $1tn and tech stocks rally after Jensen Huang returns",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf48018da",
+      "title": "How important are Nvidia and Jensen Huang to the US economy?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfaaac939",
+      "title": "The rise and fall and rise again of Jensen Huang",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t96b6c659",
+      "title": "GTA 6 hacker released on licence with warning 'don't let this happen again'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9390548d",
+      "title": "Tech Life",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
