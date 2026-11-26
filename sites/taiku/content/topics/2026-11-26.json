@@ -1,0 +1,425 @@
+{
+  "date": "2026-11-26",
+  "generatedAt": "2026-11-26T21:14:46.633Z",
+  "sourceSnapshotHash": "622334cb3d7d1c63",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 20
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 18
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 23,
+      "kept": 20
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "te8c16845",
+      "title": "Leaders choose Spain’s former central bank head as next European Central Bank president",
+      "url": "https://apnews.com/article/ecb-eurozone-pablo-hernandez-de-cos-lagarde-d308b6cfbe6399b131255f2a678b10e4",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-26T18:25:00.000Z",
+      "score": 1.068,
+      "keys": {
+        "politics": 2,
+        "economy": 1,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "tdb806ae0",
+      "title": "Netflix’s coziest show has made a very quiet return",
+      "url": "https://www.theverge.com/entertainment/1043489/midnight-diner-season3",
+      "source": "The Verge",
+      "domain": "theverge.com",
+      "feedId": "verge",
+      "tier": "curated",
+      "kind": "news",
+      "section": "tech",
+      "publishedAt": "2026-11-26T20:50:57.000Z",
+      "score": 1.039,
+      "keys": {
+        "culture": 1,
+        "tech": 1.5
+      }
+    },
+    {
+      "id": "teeea85eb",
+      "title": "Iranian activist and Oscar-nominated screenwriter Mehdi Mahmoudian arrested in Tehran",
+      "url": "https://apnews.com/article/iran-arrest-death-penalty-mahmoudian-7ea2fb068ddaf13e4ab34501efcac74e",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-26T16:39:00.000Z",
+      "score": 1.029,
+      "keys": {
+        "culture": 1,
+        "politics": 2,
+        "world": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t9dafd680",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t72a1a2ad",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9cf58e9b",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t846ac1e1",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t01a5a993",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tff3888f9",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t736700ee",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tdea278de",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t192d27f7",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t275589e9",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "teb2c47c4",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t7d59dc26",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6f9e983e",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t01e43e6d",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t019c7b7f",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t737f291d",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t060f1f99",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tfd5dcd6d",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf79dd064",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te4d03e41",
+      "feedId": "bbc-sport",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tde7aeb28",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t9fa4e207",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t32ef2b6c",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t5922793d",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6b0a8a3d",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te8ebff76",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tcdf4329b",
+      "feedId": "ap",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t22b662a3",
+      "title": "Watch: Roofs torn off and streets under water as severe weather hits US",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tbb1a7c8c",
+      "title": "German boat dealer suspected of supplying Channel smuggling gangs, BBC finds",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tbda37d1b",
+      "title": "Watch: BBC confronts German man suspected of supplying migrant gangs with small boats",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t66d31071",
+      "title": "Pregnant US inmate escapes in prison vehicle after medical appointment",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t4ee6e3d1",
+      "title": "Hope for millions as cheaper HIV prevention jab reaches Africa",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t1b6d70b4",
+      "title": "Politics and peek-a-boo in Australian parliament as senator brings baby to work",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf654e352",
+      "title": "DR Congo demands answers over Ugandan general's threats",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te1fe9045",
+      "title": "New UK-EU treaty has 10-year termination clause",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tbe88955a",
+      "title": "Guinea orders residents to clean up the capital months after deadly rubbish dump collapse",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3e9db239",
+      "title": "Musk's plan to send a million SpaceX data satellites into space approved",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t57729986",
+      "title": "Watch: Alaskan flying team airdrops Thanksgiving turkeys to remote communities",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t5fa41bf6",
+      "title": "Moment Nasa spacecraft hit asteroid - and what happened next",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tef3157f6",
+      "title": "Greatest catch ever? Man on motorbike takes incredible grab",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t93741d05",
+      "title": "Huawei found guilty of stealing US trade secrets but acquitted of racketeering",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t52a9ba1c",
+      "title": "EA adds AI-generated John Motson to FC 27 video game",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tdb38b8b4",
+      "title": "Zoe Kleinman: Nobody is irreplaceable - unless you're Jensen Huang",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0ff725cb",
+      "title": "US attorney general dodges questions about Nvidia investigation",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t5de68533",
+      "title": "Why tiny cars are taking off across Europe",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc4b16dee",
+      "title": "Faisal Islam: Fears over the AI boom haven't gone away",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfbbd947e",
+      "title": "Helpful but awkward: My week with Meta's Muse ahead of its UK launch",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3f7a79e9",
+      "title": "US to blacklist Asian AI firm Megaspeed after Nvidia scandal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb9ddec0a",
+      "title": "Nvidia value climbs by almost $1tn and tech stocks rally after Jensen Huang returns",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf48018da",
+      "title": "How important are Nvidia and Jensen Huang to the US economy?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfaaac939",
+      "title": "The rise and fall and rise again of Jensen Huang",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t96b6c659",
+      "title": "GTA 6 hacker released on licence with warning 'don't let this happen again'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9390548d",
+      "title": "Tech Life",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t10136600",
+      "title": "Tech Now",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3a1bdfcf",
+      "title": "Second court defeat for Trump's deep-sea mining ambitions",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tab380d34",
+      "title": "More than 1,000 flights cancelled or delayed in US as weather disrupts Thanksgiving travel",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9ad12a5e",
+      "title": "US Army says controlled blast of explosives in Iowa was 'huge success'",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
