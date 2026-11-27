@@ -1,0 +1,400 @@
+{
+  "date": "2026-11-27",
+  "generatedAt": "2026-11-27T20:57:43.234Z",
+  "sourceSnapshotHash": "8039b65f68822a03",
+  "feeds": [
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-tech",
+      "ok": true,
+      "items": 21,
+      "kept": 21
+    },
+    {
+      "feed": "bbc-science",
+      "ok": true,
+      "items": 25,
+      "kept": 17
+    },
+    {
+      "feed": "bbc-culture",
+      "ok": true,
+      "items": 18,
+      "kept": 17
+    },
+    {
+      "feed": "bbc-sport",
+      "ok": true,
+      "items": 25,
+      "kept": 24
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "verge",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "hn",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "google-trends",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "reddit-popular",
+      "ok": false,
+      "error": "HTTP 403"
+    }
+  ],
+  "picks": [
+    {
+      "id": "t542fb101",
+      "title": "New satellite data shows how fast some African cities are sinking",
+      "url": "https://www.bbc.co.uk/news/articles/cq074p95z4llo",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-science",
+      "tier": "curated",
+      "kind": "news",
+      "section": "science",
+      "publishedAt": "2026-11-27T19:03:18.000Z",
+      "score": 1.074,
+      "keys": {
+        "tech": 1,
+        "science": 2.5,
+        "economy": 1
+      }
+    },
+    {
+      "id": "td6379a86",
+      "title": "Protesters take to the streets in Puerto Rico’s capital as standard of living deteriorates",
+      "url": "https://apnews.com/article/puerto-rico-protest-water-power-luma-san-juan-282de19fa396ef0c8bcf276499486578",
+      "source": "AP News",
+      "domain": "apnews.com",
+      "feedId": "ap",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-27T20:00:00.000Z",
+      "score": 1.06,
+      "keys": {
+        "politics": 1,
+        "memes": 0.7,
+        "world": 1.5
+      }
+    },
+    {
+      "id": "t21d8bca4",
+      "title": "Spanish PM and rivals rally supporters in final pitch for votes",
+      "url": "https://www.bbc.co.uk/news/articles/c8wy5p4gdnwvo",
+      "source": "BBC News",
+      "domain": "bbc.co.uk",
+      "feedId": "bbc-world",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-27T20:57:04.000Z",
+      "score": 1.058,
+      "keys": {
+        "politics": 1,
+        "world": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t21d4ccee",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t1d114d95",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t295e8e2d",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te5f79411",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2ed150af",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t09848a3d",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tff3888f9",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t736700ee",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t883ff1fa",
+      "feedId": "bbc-world",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t6f9e983e",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t01e43e6d",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "te52398fe",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t019c7b7f",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t43e9abbb",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t577d6463",
+      "feedId": "bbc-tech",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t6d1b1078",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tab380d34",
+      "feedId": "bbc-science",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tbce9c3d1",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tfd5dcd6d",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t72a1a2ad",
+      "feedId": "bbc-culture",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0ceba176",
+      "feedId": "ap",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t89415d1c",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t213af482",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t48d9eacd",
+      "feedId": "hn",
+      "reason": "nsfw"
+    },
+    {
+      "id": "ta719afea",
+      "feedId": "hn",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "t21d8bca4",
+      "title": "Spanish PM and rivals rally supporters in final pitch for votes",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0ee55cb0",
+      "title": "Zelensky criticises 'strange' Trump-Putin friendship in BBC interview",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t1c974769",
+      "title": "Weary of war but with no sign of backing down, Kyiv faces another punishing winter",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "td72130f0",
+      "title": "'We couldn't give up that easily': Marching bands scramble to cover costs after Thanksgiving parade rearranged",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t218dc7c3",
+      "title": "Brazil pushes back on Macron calling its meat 'doped'",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t802c1368",
+      "title": "Capsized tanker carrying 7,000 tonnes of diesel to be towed away from Ibiza",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tbd6ce613",
+      "title": "Canada's top court largely upholds Quebec ban on religious symbols for public servants",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta6302653",
+      "title": "Clashes mar European games as Macron condemns violence",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t01ce204f",
+      "title": "Rare turtles found inside baggage at Amsterdam airport",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t557b7d02",
+      "title": "Venezuela to scrap law that bars opposition from public office",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t2e76a212",
+      "title": "EU leaders fail to bridge budget splits as talks stall",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tcadc89db",
+      "title": "Uganda to withdraw troops from DR Congo town amid diplomatic row",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "ta42abdef",
+      "title": "Guinea-Bissau's military leaders delay return to civilian rule until 2028",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t1b6d70b4",
+      "title": "Politics and peek-a-boo in Australian parliament as senator brings baby to work",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t05d3e5b4",
+      "title": "'It's impossible': Spain's young people on housing ahead of Sunday's election",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tbda37d1b",
+      "title": "Watch: BBC confronts German man suspected of supplying migrant gangs with small boats",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t83034ad2",
+      "title": "Why is there a shortage of 'wizard' elevator mechanics?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "te6162371",
+      "title": "Asia made a big AI bet on Nvidia. What happens now?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3e9db239",
+      "title": "Musk's plan to send a million SpaceX data satellites into space approved",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t93741d05",
+      "title": "Huawei found guilty of stealing US trade secrets but acquitted of racketeering",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t52a9ba1c",
+      "title": "EA adds AI-generated John Motson to FC 27 video game",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tdb38b8b4",
+      "title": "Zoe Kleinman: Nobody is irreplaceable - unless you're Jensen Huang",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t0ff725cb",
+      "title": "US attorney general dodges questions about Nvidia investigation",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t5de68533",
+      "title": "Why tiny cars are taking off across Europe",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tc4b16dee",
+      "title": "Faisal Islam: Fears over the AI boom haven't gone away",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tfbbd947e",
+      "title": "Helpful but awkward: My week with Meta's Muse ahead of its UK launch",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t3f7a79e9",
+      "title": "US to blacklist Asian AI firm Megaspeed after Nvidia scandal",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tb9ddec0a",
+      "title": "Nvidia value climbs by almost $1tn and tech stocks rally after Jensen Huang returns",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "tf48018da",
+      "title": "How important are Nvidia and Jensen Huang to the US economy?",
+      "domain": "bbc.co.uk"
+    },
+    {
+      "id": "t9390548d",
+      "title": "Tech Life",
+      "domain": "bbc.co.uk"
+    }
+  ]
+}
