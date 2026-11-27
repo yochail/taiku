@@ -1,0 +1,610 @@
+{
+  "date": "2026-11-27",
+  "generatedAt": "2026-11-27T21:26:30.548Z",
+  "sourceSnapshotHash": "bd11f23db15f6bd0",
+  "feeds": [
+    {
+      "feed": "ynet",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ynetnews",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "haaretz-en",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "toi",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "jpost",
+      "ok": true,
+      "items": 24,
+      "kept": 24
+    },
+    {
+      "feed": "kan",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "israelhayom-en",
+      "ok": true,
+      "items": 10,
+      "kept": 10
+    },
+    {
+      "feed": "maariv",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "walla",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "jta",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "forward",
+      "ok": true,
+      "items": 20,
+      "kept": 20
+    },
+    {
+      "feed": "jns",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "reuters",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "ap",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-world",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    },
+    {
+      "feed": "bbc-me",
+      "ok": true,
+      "items": 25,
+      "kept": 25
+    }
+  ],
+  "picks": [
+    {
+      "id": "tce5dcde9",
+      "title": "Israel’s clash of branches draws in the army and puts civil peace at risk",
+      "url": "https://www.jns.org/opinion/igor-kaminnyk/israels-clash-of-branches-draws-in-the-army-and-puts-civil-peace-at-risk",
+      "source": "JNS",
+      "domain": "jns.org",
+      "feedId": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "publishedAt": "2026-11-27T20:30:58.000Z",
+      "score": 1.242,
+      "keys": {
+        "world": 1,
+        "politics": 1,
+        "religion": 1.5
+      }
+    },
+    {
+      "id": "t610af164",
+      "title": "Protesting Israel outside synagogues not Jew-hatred, most Canadian students say",
+      "url": "https://www.jns.org/news/world/protesting-israel-outside-synagogues-not-jew-hatred-most-canadian-students-say",
+      "source": "JNS",
+      "domain": "jns.org",
+      "feedId": "jns",
+      "tier": "curated",
+      "kind": "news",
+      "section": "religion",
+      "publishedAt": "2026-11-27T19:57:33.000Z",
+      "score": 1.237,
+      "keys": {
+        "religion": 2.5,
+        "politics": 1,
+        "culture": 1
+      }
+    },
+    {
+      "id": "t0638be4d",
+      "title": "Canada's top court upholds Quebec law banning religious symbols in test of unity",
+      "url": "https://www.reuters.com/legal/government/canadas-supreme-court-rule-quebecs-law-religious-symbols-test-canadian-unity-2026-11-27/",
+      "source": "Reuters",
+      "domain": "reuters.com",
+      "feedId": "reuters",
+      "tier": "curated",
+      "kind": "news",
+      "section": "world",
+      "publishedAt": "2026-11-27T19:36:59.000Z",
+      "score": 1.17,
+      "keys": {
+        "religion": 1,
+        "politics": 1,
+        "world": 1.5
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "t253ff2fb",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t358f0806",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta3765d33",
+      "feedId": "ynetnews",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta2716526",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc60e51ae",
+      "feedId": "haaretz-en",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t422665cc",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t05320169",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te84ed6c6",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t14097dc5",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t4958011e",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tf68da3ee",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t315024cb",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tbc957c22",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t49738a43",
+      "feedId": "toi",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t127f2f3e",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t5c3af784",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t3f21460b",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "ta8a70b7d",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6f6a4ed5",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc18970dd",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t6f7aab03",
+      "feedId": "jpost",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t57e9204e",
+      "feedId": "walla",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t430989f2",
+      "feedId": "jta",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tbdb850db",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "ta7174d9f",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "tbbc30261",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t4ea6bfbf",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t027a97dd",
+      "feedId": "forward",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t10f3561c",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tfa938ecd",
+      "feedId": "jns",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t3c74f4d5",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tfb2bf1b1",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t783f22df",
+      "feedId": "jns",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t997eb2ca",
+      "feedId": "reuters",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t386d89c3",
+      "feedId": "reuters",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t44fef181",
+      "feedId": "reuters",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t0ceba176",
+      "feedId": "ap",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t89415d1c",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t213af482",
+      "feedId": "ap",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t21d4ccee",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t1d114d95",
+      "feedId": "bbc-world",
+      "reason": "nsfw"
+    },
+    {
+      "id": "t295e8e2d",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "te5f79411",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t2ed150af",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t09848a3d",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tff3888f9",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t736700ee",
+      "feedId": "bbc-world",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t883ff1fa",
+      "feedId": "bbc-world",
+      "reason": "duplicate"
+    },
+    {
+      "id": "t9cf58e9b",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t846ac1e1",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tdea278de",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "teb2c47c4",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t8ac00ea2",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "tc49453b0",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t5b1c5c7e",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t41365066",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    },
+    {
+      "id": "t638ef79e",
+      "feedId": "bbc-me",
+      "reason": "tragedy"
+    }
+  ],
+  "pool": [
+    {
+      "id": "te00b53b2",
+      "title": "לא היה כלום?",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "te002dfa8",
+      "title": "ברחה מחברון, התגוררה ברמלה, נרצחה בבאר שבע",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t181a086a",
+      "title": "הפרקליטות: מערערים או נסוגים? העיקר שתהליכי קבלת ההחלטות ישופרו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tb292a429",
+      "title": "גולן במקום בן גביר, פורר יחליף את לוין, רייטן את קרעי: חילופי השרים הצפויים - ועימותי העבר",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "ta76978dd",
+      "title": "המטרה - לשדוד מבלים בחסות \"גז מדמיע\": החשד אחרי הכאוס בהופעת הענק במנצ'סטר",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t42ba0b0e",
+      "title": "הפורצים לבתים בתל אביב הופכים נועזים ומסוכנים יותר: \"היה פה סרט אימים\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t55aeb75a",
+      "title": "עוקץ הרכבים הגדול: \"הגיעו אליי אנשים בעשר בלילה\" | כך תיזהרו",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tce1c595d",
+      "title": "תקיפה אמריקנית חריגה: \"השבתנו ספינה שיצאה מאיראן - וניסתה להפר את המצור\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t8eb98a43",
+      "title": "\"זה מרסק אותי\": הפוסט הכואב של ירדן ביבס - והדרישה לעצור את החלטת ניר עוז",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "te661cc33",
+      "title": "\"הגבר הפופולרי ביותר\" בטינדר נאשם באונס",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tfb2553a9",
+      "title": "עימות סוער לפני הבחירות שיכריעו את גורל רה\"מ האנטי-ישראלי: \"מה את חייבת לחמאס?\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "td5a41f07",
+      "title": "בנט לא פוסל ממשלת מיעוט - וזה המסר של מנהיג הציבור הליטאי",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t76de9680",
+      "title": "לחץ על נתניהו להציע להיות שני ברוטציה, איזנקוט במתקפה על הליכוד: \"מורחים זמן\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "teb7b2ed2",
+      "title": "האקרים פרצו למערכת הענן של חיל האוויר האמריקני: \"זה ביג דיל\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t401b124f",
+      "title": "אחרי אמירת השופטים: להביט נכוחה במציאות",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t527f78db",
+      "title": "בהרב מיארה, תתפטרי",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t008ee1e2",
+      "title": "החשד - דרס ערבים בכוונה: \"לא הפעם הראשונה שהגיע לכפר קאסם\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5e5c0984",
+      "title": "צעיר שנפצע בתאונה נלקח מביה\"ח לתחנת המשטרה, מצבו הידרדר: \"מח\"ש חוקרת\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t5d36cc4e",
+      "title": "מתן כהנא: נתניהו מנסה להוביל לבחירות כשהוא רה\"מ, לא נוכל לאפשר את זה",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "tb45c7497",
+      "title": "האפשרות ששוקלים בגוש השינוי: \"האצבע היהודית\" מרע\"מ - שתעמוד ב\"תנאים\" של ליברמן",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t1d3e7171",
+      "title": "לא רק אוהלים: תיעוד בלעדי - מה באמת בנה חיזבאללה בשטח ישראל לפני 7/10",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t85e925fc",
+      "title": "חוסל מחבל חמאס שחדר לישראל ב-7/10 - והשתתף ב\"טקס\" שחרור חטופים",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t204c0a01",
+      "title": "איראן נחנקת מהמצור הכלכלי, מחיר הלחם נוסק. טראמפ: אם נתקוף, זה יהיה היעד",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t12738092",
+      "title": "מנסור עבאס צפוי להכריז: חמאס הוא ארגון טרור | זה המהלך ששוקלים בגוש השינוי",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t8d62151b",
+      "title": "6 מטפלים בפנימייה בנגב נעצרו בחשד להתעללות בחוסים: \"הצוות ידע והתעלם\"",
+      "domain": "ynet.co.il"
+    },
+    {
+      "id": "t263af2bf",
+      "title": "Report: North Korea helping Iran develop launch systems inside underground missile cities",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "tfae2a17a",
+      "title": "From immigrant transit camp to state comptroller: the rise of Supreme Court outsider Yosef Elron",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t50baf2b9",
+      "title": "Five sentenced to up to seven years in prison over 2021 Bat Yam mob attack of Arab man",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t6887eacc",
+      "title": "Eisenkot bloc prepares to swear in government next week, with pressure mounting on Shas",
+      "domain": "ynetnews.com"
+    },
+    {
+      "id": "t41bb8edd",
+      "title": "Knesset set for showdown over Oct. 7 inquiry, Netanyahu eligibility and draft dodgers",
+      "domain": "ynetnews.com"
+    }
+  ]
+}
